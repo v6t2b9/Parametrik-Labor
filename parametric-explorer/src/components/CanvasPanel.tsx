@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 
 const CANVAS_SIZE = 800;
@@ -9,33 +9,14 @@ export function CanvasPanel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
 
-  const { trails, agents, parameters, running, tick } = useSimulationStore();
-  const { visualization } = parameters;
+  const tick = useSimulationStore((state) => state.tick);
+  const trails = useSimulationStore((state) => state.trails);
+  const agents = useSimulationStore((state) => state.agents);
+  const running = useSimulationStore((state) => state.running);
+  const visualization = useSimulationStore((state) => state.parameters.visualization);
 
-  // Animation loop
-  useEffect(() => {
-    const animate = () => {
-      tick();
-      animationFrameRef.current = requestAnimationFrame(animate);
-    };
-
-    if (running) {
-      animationFrameRef.current = requestAnimationFrame(animate);
-    } else {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    }
-
-    return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [running, tick]);
-
-  // Render loop
-  useEffect(() => {
+  // Render function
+  const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -98,6 +79,36 @@ export function CanvasPanel() {
       ctx.fill();
     });
   }, [trails, agents, visualization]);
+
+  // Animation loop
+  useEffect(() => {
+    const animate = () => {
+      tick();
+      render();
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    if (running) {
+      animationFrameRef.current = requestAnimationFrame(animate);
+    } else {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      // Render one frame when paused
+      render();
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [running, tick, render]);
+
+  // Initial render
+  useEffect(() => {
+    render();
+  }, [render]);
 
   return (
     <div style={styles.container}>
