@@ -8,8 +8,8 @@ function getQualitySettings(preset: QualityPreset) {
   switch (preset) {
     case 'low':
       return {
-        agentCount: 1000,
-        diffusionFreq: 8,
+        agentCount: 800,
+        diffusionFreq: 10,
         waveDistortion: 0,
         chromaticAberration: 0,
         bloom: 0,
@@ -18,8 +18,8 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'medium':
       return {
-        agentCount: 2000,
-        diffusionFreq: 5,
+        agentCount: 1500,
+        diffusionFreq: 6,
         waveDistortion: 0,
         chromaticAberration: 0,
         bloom: 0.1,
@@ -28,7 +28,7 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'high':
       return {
-        agentCount: 3500,
+        agentCount: 3000,
         diffusionFreq: 3,
         waveDistortion: 0,
         chromaticAberration: 0,
@@ -38,7 +38,7 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'ultra':
       return {
-        agentCount: 6000,
+        agentCount: 5000,
         diffusionFreq: 2,
         waveDistortion: 0.1,
         chromaticAberration: 2,
@@ -281,12 +281,22 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       let newOptLevel = _currentOptLevel;
 
       // FPS too low - increase optimization (reduce quality)
-      if (fpsRatio < 0.85 && newOptLevel < 10) {
+      // More aggressive at very low FPS
+      if (fpsRatio < 0.5 && newOptLevel < 10) {
+        // Very bad FPS - jump 3 levels
+        newOptLevel = Math.min(10, _currentOptLevel + 3);
+        console.log(`[Auto-Optimizer] FPS critical (${avgFPS.toFixed(1)}/${targetFPS}), jumping opt level: ${_currentOptLevel} → ${newOptLevel}`);
+      } else if (fpsRatio < 0.7 && newOptLevel < 10) {
+        // Bad FPS - jump 2 levels
+        newOptLevel = Math.min(10, _currentOptLevel + 2);
+        console.log(`[Auto-Optimizer] FPS very low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
+      } else if (fpsRatio < 0.9 && newOptLevel < 10) {
+        // Low FPS - increase 1 level
         newOptLevel = Math.min(10, _currentOptLevel + 1);
-        console.log(`[Auto-Optimizer] FPS too low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
+        console.log(`[Auto-Optimizer] FPS low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
       }
-      // FPS good - decrease optimization (increase quality)
-      else if (fpsRatio > 1.1 && newOptLevel > 0) {
+      // FPS good - decrease optimization (increase quality) - but slowly
+      else if (fpsRatio > 1.2 && newOptLevel > 0) {
         newOptLevel = Math.max(0, _currentOptLevel - 1);
         console.log(`[Auto-Optimizer] FPS good (${avgFPS.toFixed(1)}/${targetFPS}), decreasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
       }
@@ -315,13 +325,13 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
           diffusionFreq: optimizedDiffusion,
         });
 
-        // 3. Agent count (last resort, only at high opt levels)
-        if (newOptLevel >= 7) {
-          const agentReduction = (newOptLevel - 6) / 4; // 0 at level 6, 1 at level 10
-          const targetAgents = Math.floor(qualitySettings.agentCount * (1 - agentReduction * 0.5)); // Max 50% reduction
+        // 3. Agent count (aggressive reduction at high opt levels)
+        if (newOptLevel >= 5) {
+          const agentReduction = (newOptLevel - 4) / 6; // 0 at level 4, 1 at level 10
+          const targetAgents = Math.max(150, Math.floor(qualitySettings.agentCount * (1 - agentReduction * 0.85))); // Max 85% reduction, min 150 agents
           const currentAgents = parameters.temporal.agentCount;
 
-          if (Math.abs(targetAgents - currentAgents) > 100) {
+          if (Math.abs(targetAgents - currentAgents) > 50) {
             updateTemporalParams({ agentCount: targetAgents });
           }
         }
