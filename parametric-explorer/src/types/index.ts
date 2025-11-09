@@ -75,8 +75,12 @@ export interface UniversalParameterSet {
   resonance: ResonanceOikosParams;
 }
 
+export type BlendMode = 'additive' | 'average' | 'multiply' | 'screen';
+
 export interface VisualizationParams {
   brightness: number;       // 0.5-5.0: Output brightness
+  blendMode: BlendMode;     // Color blending mode
+  trailIntensity: number;   // 100-300: Trail visibility threshold
   colorRed: RGBColor;       // Red channel color
   colorGreen: RGBColor;     // Green channel color
   colorBlue: RGBColor;      // Blue channel color
