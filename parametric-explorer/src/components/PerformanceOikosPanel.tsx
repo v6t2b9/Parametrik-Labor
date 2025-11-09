@@ -7,10 +7,10 @@ export function PerformanceOikosPanel() {
   const { performance } = parameters;
 
   const qualityPresets: { value: QualityPreset; label: string; description: string; icon: string }[] = [
-    { value: 'low', label: 'Low', description: '~1K agents, minimal effects', icon: '⚡' },
-    { value: 'medium', label: 'Medium', description: '~2K agents, basic effects', icon: '💫' },
-    { value: 'high', label: 'High', description: '~3.5K agents, smooth effects', icon: '✨' },
-    { value: 'ultra', label: 'Ultra', description: '~6K agents, all effects', icon: '🌟' },
+    { value: 'low', label: 'Low', description: '~800 agents, minimal effects', icon: '⚡' },
+    { value: 'medium', label: 'Medium', description: '~1.5K agents, basic effects', icon: '💫' },
+    { value: 'high', label: 'High', description: '~3K agents, smooth effects', icon: '✨' },
+    { value: 'ultra', label: 'Ultra', description: '~5K agents, all effects', icon: '🌟' },
   ];
 
   return (
@@ -124,11 +124,13 @@ export function PerformanceOikosPanel() {
           <li>Optimization levels (0-10):
             <ul style={styles.subList}>
               <li>0-2: Disable expensive effects (wave, chromatic)</li>
-              <li>3-6: Reduce bloom, blur, motion blur</li>
-              <li>7-10: Reduce agent count by up to 50%</li>
+              <li>3-4: Reduce bloom, blur, motion blur</li>
+              <li>5-8: Reduce agent count progressively</li>
+              <li>9-10: Minimum agents (150) + fastest trails</li>
             </ul>
           </li>
-          <li>System automatically recovers quality when FPS improves</li>
+          <li>Aggressive mode: FPS &lt; 50% of target jumps 3 levels</li>
+          <li>System recovers quality slowly when FPS is stable</li>
         </ul>
       </div>
     </div>
