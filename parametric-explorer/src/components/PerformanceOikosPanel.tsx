@@ -3,7 +3,7 @@ import { ParameterSlider } from './ParameterSlider';
 import type { QualityPreset } from '../types/index.js';
 
 export function PerformanceOikosPanel() {
-  const { parameters, performanceMetrics, updatePerformanceParams, applyQualityPreset } = useSimulationStore();
+  const { parameters, performanceMetrics, updatePerformanceParams, applyQualityPreset, reset } = useSimulationStore();
   const { performance } = parameters;
 
   const qualityPresets: { value: QualityPreset; label: string; description: string; icon: string }[] = [
@@ -17,6 +17,18 @@ export function PerformanceOikosPanel() {
     <div style={styles.panel}>
       <h3 style={styles.title}>⚡ Performance & Quality</h3>
       <p style={styles.subtitle}>Adaptive quality for smooth fluid motion</p>
+
+      {/* Reset Parameters Button */}
+      <div style={styles.resetSection}>
+        <button onClick={reset} style={styles.resetButton}>
+          🔄 Reset All Parameters to Default
+        </button>
+        <p style={styles.resetWarning}>
+          ⚠️ This resets all parameters to default values, not just the simulation state!
+        </p>
+      </div>
+
+      <div style={styles.divider} />
 
       {/* Performance Status */}
       <div style={styles.statusSection}>
@@ -154,6 +166,30 @@ const styles = {
     fontSize: '12px',
     color: '#a0a0b0',
     marginBottom: '20px',
+  } as React.CSSProperties,
+  resetSection: {
+    marginTop: '20px',
+    marginBottom: '20px',
+  } as React.CSSProperties,
+  resetButton: {
+    width: '100%',
+    padding: '12px 20px',
+    backgroundColor: '#3a2b2b',
+    color: '#ffaaaa',
+    border: '2px solid #5a3a3a',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  } as React.CSSProperties,
+  resetWarning: {
+    fontSize: '11px',
+    color: '#ff8888',
+    marginTop: '8px',
+    marginBottom: '0',
+    textAlign: 'center',
+    lineHeight: '1.4',
   } as React.CSSProperties,
   statusSection: {
     marginBottom: '20px',

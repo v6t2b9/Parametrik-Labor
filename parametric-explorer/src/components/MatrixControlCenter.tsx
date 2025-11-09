@@ -4,8 +4,7 @@ import { PhysicalOikosPanel } from './PhysicalOikosPanel';
 import { SemioticOikosPanel } from './SemioticOikosPanel';
 import { TemporalOikosPanel } from './TemporalOikosPanel';
 import { ResonanceOikosPanel } from './ResonanceOikosPanel';
-import { VisualizationOikosPanel } from './VisualizationOikosPanel';
-import { EffectsOikosPanel } from './EffectsOikosPanel';
+import { VisualsOikosPanel } from './VisualsOikosPanel';
 import { PerformanceOikosPanel } from './PerformanceOikosPanel';
 import { PresetGallery } from './PresetGallery';
 import type { SpeciesScope, OikosTab } from '../types';
@@ -39,13 +38,12 @@ const OIKOS_TABS: OikosTabDef[] = [
   { id: 'semiotic', label: 'Semiotisch', icon: '👁️' },
   { id: 'temporal', label: 'Temporal', icon: '⏱️' },
   { id: 'resonance', label: 'Resonanz', icon: '🔗' },
-  { id: 'visualization', label: 'Visualisierung', icon: '🎨' },
-  { id: 'effects', label: 'Effects', icon: '✨' },
+  { id: 'visuals', label: 'Visuals', icon: '🎨' },
   { id: 'performance', label: 'Performance', icon: '⚡' },
 ];
 
 export function MatrixControlCenter() {
-  const { reset, ui, setActiveSpeciesScope, setActiveOikosTab } = useSimulationStore();
+  const { ui, setActiveSpeciesScope, setActiveOikosTab } = useSimulationStore();
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
 
   // Listen to window resize
@@ -63,16 +61,13 @@ export function MatrixControlCenter() {
   // For species-specific tabs, filter out presets and global tabs
   const availableOikosTabs = ui.activeSpeciesScope === 'universal'
     ? OIKOS_TABS
-    : OIKOS_TABS.filter(t => !['presets', 'visualization', 'effects', 'performance'].includes(t.id));
+    : OIKOS_TABS.filter(t => !['presets', 'visuals', 'performance'].includes(t.id));
 
   return (
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
         <h2 style={styles.title}>🎛️ Matrix Parameter Control</h2>
-        <button onClick={reset} style={styles.resetButton}>
-          🔄 Reset
-        </button>
       </div>
 
       {/* Species Scope Tabs (Vertical Axis) */}
@@ -83,7 +78,7 @@ export function MatrixControlCenter() {
             onClick={() => {
               setActiveSpeciesScope(tab.id);
               // Switch to appropriate tab if current is not available
-              if (tab.id !== 'universal' && ['presets', 'visualization', 'effects', 'performance'].includes(ui.activeOikosTab)) {
+              if (tab.id !== 'universal' && ['presets', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
                 setActiveOikosTab('physical');
               }
             }}
@@ -142,8 +137,7 @@ export function MatrixControlCenter() {
         {ui.activeOikosTab === 'semiotic' && <SemioticOikosPanel />}
         {ui.activeOikosTab === 'temporal' && <TemporalOikosPanel />}
         {ui.activeOikosTab === 'resonance' && <ResonanceOikosPanel />}
-        {ui.activeOikosTab === 'visualization' && <VisualizationOikosPanel />}
-        {ui.activeOikosTab === 'effects' && <EffectsOikosPanel />}
+        {ui.activeOikosTab === 'visuals' && <VisualsOikosPanel />}
         {ui.activeOikosTab === 'performance' && <PerformanceOikosPanel />}
       </div>
     </div>
@@ -157,9 +151,6 @@ const styles = {
     overflow: 'hidden',
   } as React.CSSProperties,
   header: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     padding: '16px 20px',
     borderBottom: '2px solid #2a2b3a',
   } as React.CSSProperties,
@@ -168,17 +159,6 @@ const styles = {
     color: '#e0e0e0',
     fontWeight: 700,
     margin: 0,
-  } as React.CSSProperties,
-  resetButton: {
-    padding: '8px 16px',
-    backgroundColor: '#2a2b3a',
-    color: '#e0e0e0',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
   } as React.CSSProperties,
 
   // Species Tabs (Vertical Axis)
