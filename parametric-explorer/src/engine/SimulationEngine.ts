@@ -173,22 +173,25 @@ export class SimulationEngine {
         for (let x = 0; x < this.gridSize; x++) {
           const idx = y * this.gridSize + x;
 
-          // Get neighbors (4-connected)
+          // Get neighbors (8-connected: includes diagonals)
           const neighbors = [
+            // 4-connected (cardinal directions)
             trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + x],
             trails[((y + 1) % this.gridSize) * this.gridSize + x],
             trails[y * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
             trails[y * this.gridSize + ((x + 1) % this.gridSize)],
+            // 4 diagonals
+            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
+            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + ((x + 1) % this.gridSize)],
+            trails[((y + 1) % this.gridSize) * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
+            trails[((y + 1) % this.gridSize) * this.gridSize + ((x + 1) % this.gridSize)],
           ];
 
-          const sum = neighbors.reduce((a, b) => a + b, 0);
-          const avg = sum / 4;
-
-          // Blend center with neighbors
-          let blurred = trails[idx] * 0.5 + avg * 0.5;
+          const sum = neighbors.reduce((a, b) => a + b, 0) + trails[idx];
+          const avg = sum / 9;
 
           // Apply decay
-          blurred *= decayRate;
+          let blurred = avg * decayRate;
 
           // Apply fade (exponential decay for high values)
           if (blurred > 100) {
