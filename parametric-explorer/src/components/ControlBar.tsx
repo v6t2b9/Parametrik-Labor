@@ -5,7 +5,7 @@ interface ControlBarProps {
 }
 
 export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
-  const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams } = useSimulationStore();
+  const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics } = useSimulationStore();
 
   const takeScreenshot = () => {
     const canvas = document.querySelector('canvas');
@@ -44,7 +44,13 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         </div>
 
         <div style={styles.right}>
-          <span style={styles.frameCount}>Frame: {frameCount.toLocaleString()}</span>
+          <span style={styles.statsLabel}>
+            FPS: <span style={styles.statsValue}>{performanceMetrics.avgFPS > 0 ? performanceMetrics.avgFPS.toFixed(0) : '-'}</span>
+          </span>
+          <span style={styles.statsSeparator}>|</span>
+          <span style={styles.statsLabel}>
+            Frame: <span style={styles.statsValue}>{frameCount.toLocaleString()}</span>
+          </span>
         </div>
       </div>
 
@@ -116,6 +122,7 @@ const styles = {
   right: {
     display: 'flex',
     alignItems: 'center',
+    gap: '12px',
   } as React.CSSProperties,
   playButton: {
     padding: '10px 20px',
@@ -154,6 +161,19 @@ const styles = {
     fontSize: '14px',
     color: '#a0a0b0',
     fontFamily: 'monospace',
+  } as React.CSSProperties,
+  statsLabel: {
+    fontSize: '13px',
+    color: '#8a8a9a',
+  } as React.CSSProperties,
+  statsValue: {
+    color: '#7d5dbd',
+    fontFamily: 'monospace',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  statsSeparator: {
+    color: '#4a4a5a',
+    fontSize: '14px',
   } as React.CSSProperties,
   slidersRow: {
     display: 'flex',
