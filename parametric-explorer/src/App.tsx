@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { CanvasPanel } from './components/CanvasPanel';
 import { ControlBar } from './components/ControlBar';
-import { ParameterControlCenter } from './components/ParameterControlCenter';
+import { MatrixControlCenter } from './components/MatrixControlCenter';
+import { useSimulationStore } from './store/useSimulationStore';
 
 function App() {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const { ui, toggleControlPanel } = useSimulationStore();
 
   // ESC key handler for fullscreen
   useEffect(() => {
@@ -17,6 +20,15 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFullscreen]);
+
+  // Mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <>
@@ -34,12 +46,25 @@ function App() {
           <div style={styles.canvasSection}>
             <CanvasPanel />
             <ControlBar onFullscreenToggle={() => setIsFullscreen(!isFullscreen)} />
+            {isMobile && (
+              <button onClick={toggleControlPanel} style={styles.mobileToggleButton}>
+                {ui.controlPanelOpen ? '✕ Close Controls' : '🎛️ Open Controls'}
+              </button>
+            )}
           </div>
 
-          {/* Controls Section - Bottom */}
-          <div style={styles.controlSection}>
-            <ParameterControlCenter />
-          </div>
+          {/* Controls Section - Bottom (Desktop) or Overlay (Mobile) */}
+          {isMobile ? (
+            ui.controlPanelOpen && (
+              <div style={styles.mobileDrawer}>
+                <MatrixControlCenter />
+              </div>
+            )
+          ) : (
+            <div style={styles.controlSection}>
+              <MatrixControlCenter />
+            </div>
+          )}
         </main>
 
         <footer style={styles.footer}>
@@ -116,6 +141,33 @@ const styles = {
   controlSection: {
     display: 'flex',
     flexDirection: 'column',
+  } as React.CSSProperties,
+  mobileToggleButton: {
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    padding: '12px 20px',
+    backgroundColor: '#7d5dbd',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+    zIndex: 1000,
+  } as React.CSSProperties,
+  mobileDrawer: {
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    maxHeight: '70vh',
+    backgroundColor: '#0a0a15',
+    borderTop: '2px solid #7d5dbd',
+    overflow: 'auto',
+    zIndex: 999,
+    boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.5)',
   } as React.CSSProperties,
   footer: {
     padding: '20px',

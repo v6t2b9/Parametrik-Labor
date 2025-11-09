@@ -37,18 +37,42 @@ export interface SemioticOikosParams {
   turnSpeed: number;        // 0.1-1.0: Response agility (radians)
 }
 
-export interface TemporalOikosParams {
-  speed: number;            // 0.5-3.0: Rate of change
-  agentCount: number;       // 500-10000: Interaction density
-  chaosInterval: number;    // 0-500: Periodic destabilization (0 = off)
-  chaosStrength: number;    // 0.1-1.0: Perturbation intensity
+// Global temporal params (not species-specific)
+export interface GlobalTemporalParams {
+  agentCount: number;       // 500-10000: Total agent count (all species)
   simulationSpeed: number;  // 0.1-5.0: Global time scale multiplier
 }
+
+// Species-specific temporal params
+export interface SpeciesTemporalParams {
+  speed: number;            // 0.5-3.0: Rate of change
+  chaosInterval: number;    // 0-500: Periodic destabilization (0 = off)
+  chaosStrength: number;    // 0.1-1.0: Perturbation intensity
+}
+
+// Combined temporal params (for backwards compatibility and convenience)
+export interface TemporalOikosParams extends GlobalTemporalParams, SpeciesTemporalParams {}
 
 export interface ResonanceOikosParams {
   attractionStrength: number;       // -2.0-2.0: Same-type reinforcement
   repulsionStrength: number;        // -2.0-2.0: Cross-type influence
   crossSpeciesInteraction: boolean; // Enable/disable cross-species
+}
+
+// Species-specific parameter overrides (all optional)
+export interface SpeciesParameterSet {
+  physical?: Partial<PhysicalOikosParams>;
+  semiotic?: Partial<SemioticOikosParams>;
+  temporal?: Partial<SpeciesTemporalParams>;
+  resonance?: Partial<ResonanceOikosParams>;
+}
+
+// Universal parameter set (complete, serves as fallback)
+export interface UniversalParameterSet {
+  physical: PhysicalOikosParams;
+  semiotic: SemioticOikosParams;
+  temporal: SpeciesTemporalParams;
+  resonance: ResonanceOikosParams;
 }
 
 export interface VisualizationParams {
@@ -102,14 +126,33 @@ export interface PerformanceMetrics {
   renderTime: number;          // ms for rendering
 }
 
+// New matrix-based parameter structure
 export interface AllParameters {
-  physical: PhysicalOikosParams;
-  semiotic: SemioticOikosParams;
-  temporal: TemporalOikosParams;
-  resonance: ResonanceOikosParams;
+  // Universal defaults (cross-species baseline)
+  universal: UniversalParameterSet;
+
+  // Species-specific overrides
+  species: {
+    red: SpeciesParameterSet;
+    green: SpeciesParameterSet;
+    blue: SpeciesParameterSet;
+  };
+
+  // Global temporal params (not species-specific)
+  globalTemporal: GlobalTemporalParams;
+
+  // Global (visual/technical) params
   visualization: VisualizationParams;
   effects: EffectsParams;
   performance: PerformanceParams;
+}
+
+// Helper type for resolved parameters (after merging universal + species)
+export interface ResolvedSpeciesParams {
+  physical: PhysicalOikosParams;
+  semiotic: SemioticOikosParams;
+  temporal: SpeciesTemporalParams;
+  resonance: ResonanceOikosParams;
 }
 
 // Preset Definition
@@ -117,7 +160,7 @@ export interface Preset {
   name: string;
   icon: string;
   description: string;
-  parameters: AllParameters;
+  parameters: AllParameters | any; // Allow legacy format
 }
 
 // Simulation State
@@ -142,8 +185,18 @@ export interface EmergentProperties {
   density: number;        // 0-100
 }
 
-// UI State
+// UI State - Matrix Navigation
+export type SpeciesScope = 'universal' | 'red' | 'green' | 'blue';
+export type OikosTab = 'presets' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization' | 'effects' | 'performance';
+
 export interface UIState {
-  activeOikosTab: 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization' | 'effects' | 'performance';
-  simulationSpeed: number; // 1x, 2x, 5x, etc.
+  // Matrix navigation
+  activeSpeciesScope: SpeciesScope;  // Vertical axis (Universal / Red / Green / Blue)
+  activeOikosTab: OikosTab;          // Horizontal axis (Physical / Semiotic / etc.)
+
+  // Mobile UI
+  controlPanelOpen: boolean;         // Drawer state on mobile
+
+  // Legacy
+  simulationSpeed: number;           // 1x, 2x, 5x, etc.
 }

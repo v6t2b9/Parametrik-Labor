@@ -6,6 +6,7 @@ interface ParameterSliderProps {
   step: number;
   onChange: (value: number) => void;
   description?: string;
+  hasOverride?: boolean; // Indicator for species-specific override
 }
 
 export function ParameterSlider({
@@ -16,11 +17,19 @@ export function ParameterSlider({
   step,
   onChange,
   description,
+  hasOverride = false,
 }: ParameterSliderProps) {
   return (
     <div style={styles.container}>
       <div style={styles.labelRow}>
-        <label style={styles.label}>{label}</label>
+        <div style={styles.labelGroup}>
+          <label style={styles.label}>{label}</label>
+          {hasOverride && (
+            <span style={styles.overrideBadge} title="Species-specific override active">
+              ⚡
+            </span>
+          )}
+        </div>
         <span style={styles.value}>{value.toFixed(3)}</span>
       </div>
       <input
@@ -47,10 +56,19 @@ const styles = {
     alignItems: 'center',
     marginBottom: '6px',
   } as React.CSSProperties,
+  labelGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  } as React.CSSProperties,
   label: {
     fontSize: '14px',
     color: '#e0e0e0',
     fontWeight: 500,
+  } as React.CSSProperties,
+  overrideBadge: {
+    fontSize: '12px',
+    opacity: 0.7,
   } as React.CSSProperties,
   value: {
     fontSize: '13px',
@@ -60,11 +78,13 @@ const styles = {
   } as React.CSSProperties,
   slider: {
     width: '100%',
-    height: '6px',
-    borderRadius: '3px',
+    height: '8px', // Slightly larger for mobile
+    borderRadius: '4px',
     outline: 'none',
     background: '#13141f',
     cursor: 'pointer',
+    WebkitAppearance: 'none', // Remove default styling
+    appearance: 'none',
   } as React.CSSProperties,
   description: {
     fontSize: '11px',

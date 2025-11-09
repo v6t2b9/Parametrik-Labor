@@ -1,6 +1,33 @@
-import type { Agent, Trails, AllParameters, AgentType } from '../types/index.js';
+import type { Agent, Trails, AllParameters, AgentType, ResolvedSpeciesParams } from '../types/index.js';
 
 const GRID_SIZE = 400;
+
+// Helper: Merge universal + species overrides
+function resolveSpeciesParams(
+  params: AllParameters,
+  species: AgentType
+): ResolvedSpeciesParams {
+  const speciesOverride = params.species[species];
+
+  return {
+    physical: {
+      ...params.universal.physical,
+      ...(speciesOverride.physical || {}),
+    },
+    semiotic: {
+      ...params.universal.semiotic,
+      ...(speciesOverride.semiotic || {}),
+    },
+    temporal: {
+      ...params.universal.temporal,
+      ...(speciesOverride.temporal || {}),
+    },
+    resonance: {
+      ...params.universal.resonance,
+      ...(speciesOverride.resonance || {}),
+    },
+  };
+}
 
 export class SimulationEngine {
   private agents: Agent[] = [];
@@ -49,19 +76,20 @@ export class SimulationEngine {
     this.trails = this.createTrails();
     this.tempTrails = this.createTrails();
     this.frameCount = 0;
-    this.initializeAgents(this.params.temporal.agentCount);
+    this.initializeAgents(this.params.globalTemporal.agentCount);
   }
 
   public update(): void {
-    const { physical } = this.params;
+    // Use universal physical params for diffusion (could be species-specific in future)
+    const universalPhysical = this.params.universal.physical;
 
-    // Update each agent
+    // Update each agent (species-specific)
     for (const agent of this.agents) {
       this.updateAgent(agent);
     }
 
     // Diffuse and decay trails
-    if (this.frameCount % physical.diffusionFreq === 0) {
+    if (this.frameCount % universalPhysical.diffusionFreq === 0) {
       this.diffuseAndDecay();
     }
 
@@ -69,7 +97,10 @@ export class SimulationEngine {
   }
 
   private updateAgent(agent: Agent): void {
-    const { semiotic, temporal, resonance, physical } = this.params;
+    // Resolve species-specific parameters
+    const speciesParams = resolveSpeciesParams(this.params, agent.type);
+    const { semiotic, temporal, resonance, physical } = speciesParams;
+    const { simulationSpeed } = this.params.globalTemporal;
 
     // Apply rhythmic perturbation (chaos injection)
     if (temporal.chaosInterval > 0 && this.frameCount % temporal.chaosInterval === 0) {
@@ -100,8 +131,8 @@ export class SimulationEngine {
     agent.angle += Math.sin(agent.rhythmPhase) * 0.05;
     agent.rhythmPhase += 0.02;
 
-    // Move agent (apply global simulation speed multiplier)
-    const effectiveSpeed = temporal.speed * temporal.simulationSpeed;
+    // Move agent (apply global simulation speed multiplier + species speed)
+    const effectiveSpeed = temporal.speed * simulationSpeed;
     agent.x += Math.cos(agent.angle) * effectiveSpeed;
     agent.y += Math.sin(agent.angle) * effectiveSpeed;
 
@@ -130,7 +161,7 @@ export class SimulationEngine {
     agent: Agent,
     angle: number,
     distance: number,
-    resonance: typeof this.params.resonance
+    resonance: ResolvedSpeciesParams['resonance']
   ): number {
     const x = agent.x + Math.cos(angle) * distance;
     const y = agent.y + Math.sin(angle) * distance;
@@ -163,7 +194,8 @@ export class SimulationEngine {
   }
 
   private diffuseAndDecay(): void {
-    const { physical } = this.params;
+    // Use universal physical params for trail dynamics
+    const { physical } = this.params.universal;
     const { decayRate, fadeStrength } = physical;
 
     for (const channel of ['red', 'green', 'blue'] as AgentType[]) {

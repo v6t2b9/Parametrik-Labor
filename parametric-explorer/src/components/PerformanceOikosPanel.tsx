@@ -40,7 +40,7 @@ export function PerformanceOikosPanel() {
           <div style={styles.statusBox}>
             <div style={styles.statusLabel}>Agents</div>
             <div style={styles.statusValue}>
-              {parameters.temporal.agentCount}
+              {parameters.globalTemporal.agentCount}
             </div>
           </div>
           <div style={styles.statusBox}>
