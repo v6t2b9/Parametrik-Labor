@@ -1,4 +1,4 @@
-import { Preset, AllParameters } from '../types';
+import type { Preset, AllParameters } from '../types/index.js';
 
 // Default/Base Parameters
 export const defaultParameters: AllParameters = {

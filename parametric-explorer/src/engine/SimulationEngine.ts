@@ -1,4 +1,4 @@
-import { Agent, Trails, AllParameters, AgentType } from '../types';
+import type { Agent, Trails, AllParameters, AgentType } from '../types/index.js';
 
 const GRID_SIZE = 400;
 

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { AllParameters, Agent, Trails, UIState } from '../types';
+import type { AllParameters, Agent, Trails, UIState } from '../types/index.js';
 import { defaultParameters } from '../presets';
 import { SimulationEngine } from '../engine/SimulationEngine';
 
