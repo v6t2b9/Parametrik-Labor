@@ -38,9 +38,9 @@ export const defaultParameters: AllParameters = {
 
   // Species-specific overrides (empty by default - all use universal)
   species: {
-    red: {},
-    green: {},
-    blue: {},
+    red: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
+    green: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
+    blue: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
   },
 
   // Global temporal params
@@ -89,9 +89,9 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       resonance: legacy.resonance,
     },
     species: {
-      red: {},
-      green: {},
-      blue: {},
+      red: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
+      green: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
+      blue: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
     },
     globalTemporal: {
       agentCount: legacy.temporal.agentCount,
