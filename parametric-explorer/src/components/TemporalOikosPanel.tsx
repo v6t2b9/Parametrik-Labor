@@ -34,8 +34,8 @@ export function TemporalOikosPanel() {
       <ParameterSlider
         label="Agent Speed"
         value={temporal.speed}
-        min={0.5}
-        max={3.0}
+        min={0.1}
+        max={6.0}
         step={0.1}
         onChange={(value) => updateTemporalParams({ speed: value })}
         description="Movement rate. High → chaotic, fluid patterns"
@@ -44,8 +44,8 @@ export function TemporalOikosPanel() {
       <ParameterSlider
         label="Agent Count"
         value={temporal.agentCount}
-        min={500}
-        max={10000}
+        min={100}
+        max={15000}
         step={100}
         onChange={(value) => updateTemporalParams({ agentCount: value })}
         description="Interaction density. High → clustering, dense trails"
@@ -55,7 +55,7 @@ export function TemporalOikosPanel() {
         label="Chaos Interval"
         value={temporal.chaosInterval}
         min={0}
-        max={500}
+        max={1000}
         step={10}
         onChange={(value) => updateTemporalParams({ chaosInterval: value })}
         description="Periodic disruption frequency (0 = off)"
@@ -64,8 +64,8 @@ export function TemporalOikosPanel() {
       <ParameterSlider
         label="Chaos Strength"
         value={temporal.chaosStrength}
-        min={0.1}
-        max={1.0}
+        min={0.0}
+        max={2.0}
         step={0.05}
         onChange={(value) => updateTemporalParams({ chaosStrength: value })}
         description="Perturbation intensity during chaos injection"
