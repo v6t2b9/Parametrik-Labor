@@ -29,6 +29,7 @@ This application transforms parameter exploration from trial-and-error into syst
   - **Temporal Oikos**: Agent speed, population density, chaos injection
   - **Resonance Oikos**: Attraction/repulsion strength, cross-species interaction
   - **Visualization Oikos**: Brightness, color customization (red/green/blue species + background)
+  - **Effects Oikos**: Post-processing effects for Lavalampen-Magie (blur, bloom, saturation, contrast, hue shift, motion blur, vignette, chromatic aberration, wave distortion)
 
 - **Global Preset Gallery**
   - **8 curated full-parameter configurations:**
@@ -41,11 +42,12 @@ This application transforms parameter exploration from trial-and-error into syst
     - 🔒 **Maximale Stabilität**: Temporally persistent structures
     - 🔥 **Dichte Hotspots**: Intensity concentration in focal points
 
-- **Tab-Specific Presets** (26 total)
+- **Tab-Specific Presets** (34 total)
   - **8 Visual Presets**: Heatmap, Tiefsee, Galaxie, Nordlicht, Neon, Pastell, Infrarot, Biolumineszenz
   - **6 Physics Presets**: Flüssig, Kristallin, Gasförmig, Klebrig, Turbulent, Stabil
   - **6 Species Presets**: Jäger, Sammler, Scouts, Tanks, Balanced, Chaotisch
   - **6 Temporal Presets**: Blitz, Marathon, Pulsierend, Eingefroren, Mega-Dichte, Minimal
+  - **8 Effects Presets**: Klar, Sanft, Traumhaft, Neon Glow, Psychedelisch, Retro CRT, Flüssig, Meditation
 
 - **Interactive Controls**
   - Play/Pause simulation
@@ -148,6 +150,20 @@ Controls visual appearance (does not affect simulation dynamics):
 
 **Tab Presets**: Heatmap (warm colors), Tiefsee (deep blue), Galaxie (purple/magenta), Nordlicht (aurora), Neon (saturated primaries), Pastell (soft), Infrarot (red-dominant), Biolumineszenz (bio-glow)
 
+#### ✨ Effects Oikos
+Controls post-processing visual effects (applied after rendering, for Lavalampen-Magie):
+- **Blur** (0-20px): Gaussian blur radius - higher = softer, dreamier
+- **Bloom** (0-1): Additive glow strength - higher = more ethereal glow
+- **Saturation** (0-3): Color saturation (1 = normal, <1 = desaturated, >1 = vivid)
+- **Contrast** (0-3): Contrast (1 = normal, <1 = flat, >1 = punchy)
+- **Hue Shift** (0-360°): Hue rotation through color spectrum
+- **Motion Blur** (0-0.95): Frame persistence / ghosting - higher = longer trails, fluid motion
+- **Vignette** (0-1): Edge darkening - higher = stronger center focus
+- **Chromatic Aberration** (0-15px): RGB channel offset for retro glitch / CRT effect
+- **Wave Distortion** (0-1): Sine wave amplitude - higher = more liquid/psychedelic warping
+
+**Tab Presets**: Klar (no effects), Sanft (subtle glow), Traumhaft (soft blur), Neon Glow (extreme saturation), Psychedelisch (RGB shift + distortion), Retro CRT (monitor look), Flüssig (high motion blur), Meditation (strong blur)
+
 ## Architecture
 
 ### Technology Stack
@@ -162,7 +178,7 @@ Controls visual appearance (does not affect simulation dynamics):
 ```
 src/
 ├── components/              # React components
-│   ├── CanvasPanel.tsx
+│   ├── CanvasPanel.tsx      # Rendering with post-processing effects
 │   ├── ControlBar.tsx
 │   ├── ParameterControlCenter.tsx
 │   ├── ParameterSlider.tsx
@@ -171,6 +187,7 @@ src/
 │   ├── TemporalOikosPanel.tsx
 │   ├── ResonanceOikosPanel.tsx
 │   ├── VisualizationOikosPanel.tsx
+│   ├── EffectsOikosPanel.tsx  # NEW: Post-processing effects
 │   └── PresetGallery.tsx
 ├── engine/                  # Simulation logic
 │   └── SimulationEngine.ts
@@ -180,7 +197,7 @@ src/
 │   └── index.ts
 ├── presets/                 # Curated configurations
 │   ├── index.ts             # Global presets (8)
-│   └── tabPresets.ts        # Tab-specific presets (26)
+│   └── tabPresets.ts        # Tab-specific presets (34)
 ├── App.tsx                  # Main application + fullscreen
 └── main.tsx                 # Entry point
 ```
@@ -195,16 +212,17 @@ src/
 - **Critical fix**: Diffusion frequency is inverted (lower value = more frequent = more diffusion)
 
 #### Parameter-Oikos Organization
-Parameters are organized into **5 "Oikos"** (ecological) dimensions based on their role in structuring emergent patterns:
+Parameters are organized into **6 "Oikos"** (ecological) dimensions based on their role in structuring emergent patterns:
 1. **Physical**: Environmental constraints (trace persistence, diffusion, saturation)
 2. **Semiotic**: Sign production and perception (species behavior)
 3. **Temporal**: Time-based dynamics (speed, population, chaos)
 4. **Resonance**: Inter-system coupling (attraction/repulsion)
 5. **Visualization**: Visual appearance (colors, brightness) - does not affect simulation
+6. **Effects**: Post-processing visual effects (blur, bloom, distortion) - applied after rendering for Lavalampen-Magie
 
 #### Preset System
 - **Global Presets**: 8 full-parameter configurations for extreme/canonical states
-- **Tab Presets**: 26 dimension-specific presets for targeted exploration
+- **Tab Presets**: 34 dimension-specific presets for targeted exploration
 - **Mix & Match**: Combine tab presets from different dimensions to discover novel patterns
 
 ### Key Improvements & Fixes
@@ -277,13 +295,14 @@ For detailed theoretical background, see `../parametrics_paper_draft.md` and `..
 
 ## Roadmap
 
-### Phase 1: Core MVP ✅ **COMPLETE**
+### Phase 1: Core MVP + Effects ✅ **COMPLETE**
 - ✅ 8-connected diffusion simulation engine
-- ✅ Canvas visualization with fullscreen mode
-- ✅ 5-dimensional parameter controls (Physical, Semiotic, Temporal, Resonance, Visualization)
-- ✅ 8 global presets + 26 tab-specific presets
+- ✅ Canvas visualization with fullscreen mode and post-processing pipeline
+- ✅ 6-dimensional parameter controls (Physical, Semiotic, Temporal, Resonance, Visualization, Effects)
+- ✅ 42 total presets (8 global + 34 tab-specific across 6 dimensions)
 - ✅ Screenshot export
 - ✅ Real-time parameter manipulation
+- ✅ Post-processing effects: blur, bloom, saturation, contrast, hue shift, motion blur, vignette, chromatic aberration, wave distortion
 - ✅ Critical fixes: inverted diffusion logic, expanded ranges, layout optimization
 
 ### Phase 2: Metrics & Analysis (Planned)
@@ -331,11 +350,23 @@ Based on research into stigmergy, self-organization, and parametric systems theo
 
 ---
 
-**Version**: 1.0.0 (Phase 1 Complete)
-**Status**: Production-ready Core MVP with 34 presets, fullscreen mode, and critical fixes
+**Version**: 1.1.0 (Phase 1 Complete + Effects)
+**Status**: Production-ready with 42 presets, fullscreen mode, and post-processing effects
 **Last Updated**: 2025-11-09
 
 ### Recent Updates (2025-11-09)
+
+**v1.1.0 - Effects Oikos Release:**
+- ✅ **NEW: Effects Oikos** - 6th parameter dimension with 9 post-processing effects
+- ✅ **NEW: 8 Effects Presets** - Klar, Sanft, Traumhaft, Neon Glow, Psychedelisch, Retro CRT, Flüssig, Meditation
+- ✅ Blur, Bloom, Saturation, Contrast, Hue Shift effects
+- ✅ Motion Blur for fluid ghosting trails
+- ✅ Vignette for atmospheric focus
+- ✅ Chromatic Aberration for retro glitch effects
+- ✅ Wave Distortion for psychedelic warping
+- ✅ Total presets: 42 (8 global + 34 tab-specific)
+
+**v1.0.0 - Initial Release:**
 - ✅ Fixed critical inverted diffusion logic bug
 - ✅ Upgraded to 8-connected diffusion algorithm
 - ✅ Expanded from 4 to 8 global presets

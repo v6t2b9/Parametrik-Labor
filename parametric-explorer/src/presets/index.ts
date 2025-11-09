@@ -32,6 +32,17 @@ export const defaultParameters: AllParameters = {
     colorBlue: { r: 50, g: 150, b: 255 },
     colorBg: { r: 10, g: 10, b: 21 },
   },
+  effects: {
+    blur: 0,
+    bloom: 0,
+    saturation: 1.0,
+    contrast: 1.0,
+    hueShift: 0,
+    motionBlur: 0,
+    vignette: 0,
+    chromaticAberration: 0,
+    waveDistortion: 0,
+  },
 };
 
 // Preset 1: Maximale Clusterbildung
@@ -69,6 +80,17 @@ const maxClusteringPreset: Preset = {
       colorGreen: { r: 80, g: 255, b: 100 },
       colorBlue: { r: 80, g: 150, b: 255 },
       colorBg: { r: 8, g: 8, b: 18 },
+    },
+    effects: {
+      blur: 1,
+      bloom: 0.3,
+      saturation: 1.1,
+      contrast: 1.05,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0,
+      chromaticAberration: 0,
+      waveDistortion: 0,
     },
   },
 };
@@ -109,6 +131,17 @@ const crystallinePreset: Preset = {
       colorBlue: { r: 100, g: 180, b: 255 },
       colorBg: { r: 5, g: 5, b: 15 },
     },
+    effects: {
+      blur: 0,
+      bloom: 0,
+      saturation: 1.0,
+      contrast: 1.1,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+    },
   },
 };
 
@@ -147,6 +180,17 @@ const maxSeparationPreset: Preset = {
       colorGreen: { r: 50, g: 255, b: 50 },
       colorBlue: { r: 50, g: 150, b: 255 },
       colorBg: { r: 10, g: 10, b: 21 },
+    },
+    effects: {
+      blur: 0,
+      bloom: 0.1,
+      saturation: 1.0,
+      contrast: 1.3,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0.2,
+      chromaticAberration: 0,
+      waveDistortion: 0,
     },
   },
 };
@@ -187,6 +231,17 @@ const maxChaosPreset: Preset = {
       colorBlue: { r: 60, g: 120, b: 255 },
       colorBg: { r: 5, g: 5, b: 10 },
     },
+    effects: {
+      blur: 3,
+      bloom: 0.4,
+      saturation: 1.5,
+      contrast: 1.1,
+      hueShift: 90,
+      motionBlur: 0.2,
+      vignette: 0,
+      chromaticAberration: 5,
+      waveDistortion: 0.3,
+    },
   },
 };
 
@@ -225,6 +280,17 @@ const networkPreset: Preset = {
       colorGreen: { r: 80, g: 255, b: 100 },
       colorBlue: { r: 80, g: 180, b: 255 },
       colorBg: { r: 3, g: 3, b: 12 },
+    },
+    effects: {
+      blur: 1,
+      bloom: 0.25,
+      saturation: 1.0,
+      contrast: 1.0,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0.1,
+      chromaticAberration: 0,
+      waveDistortion: 0,
     },
   },
 };
@@ -265,6 +331,17 @@ const fluidPreset: Preset = {
       colorBlue: { r: 100, g: 150, b: 255 },
       colorBg: { r: 4, g: 4, b: 14 },
     },
+    effects: {
+      blur: 4,
+      bloom: 0.3,
+      saturation: 1.1,
+      contrast: 0.95,
+      hueShift: 0,
+      motionBlur: 0.5,
+      vignette: 0.15,
+      chromaticAberration: 0,
+      waveDistortion: 0.1,
+    },
   },
 };
 
@@ -304,6 +381,17 @@ const maxStabilityPreset: Preset = {
       colorBlue: { r: 90, g: 160, b: 255 },
       colorBg: { r: 5, g: 5, b: 15 },
     },
+    effects: {
+      blur: 0,
+      bloom: 0.1,
+      saturation: 1.0,
+      contrast: 1.0,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+    },
   },
 };
 
@@ -342,6 +430,17 @@ const denseHotspotsPreset: Preset = {
       colorGreen: { r: 50, g: 255, b: 80 },
       colorBlue: { r: 80, g: 150, b: 255 },
       colorBg: { r: 5, g: 5, b: 12 },
+    },
+    effects: {
+      blur: 2,
+      bloom: 0.7,
+      saturation: 1.3,
+      contrast: 1.2,
+      hueShift: 0,
+      motionBlur: 0.1,
+      vignette: 0.3,
+      chromaticAberration: 0,
+      waveDistortion: 0,
     },
   },
 };

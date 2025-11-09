@@ -28,6 +28,7 @@ interface SimulationStore {
   updateTemporalParams: (params: Partial<AllParameters['temporal']>) => void;
   updateResonanceParams: (params: Partial<AllParameters['resonance']>) => void;
   updateVisualizationParams: (params: Partial<AllParameters['visualization']>) => void;
+  updateEffectsParams: (params: Partial<AllParameters['effects']>) => void;
   setActiveOikosTab: (tab: UIState['activeOikosTab']) => void;
   setSimulationSpeed: (speed: number) => void;
   tick: () => void; // Called on each animation frame
@@ -81,6 +82,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         temporal: { ...currentParams.temporal, ...(params.temporal || {}) },
         resonance: { ...currentParams.resonance, ...(params.resonance || {}) },
         visualization: { ...currentParams.visualization, ...(params.visualization || {}) },
+        effects: { ...currentParams.effects, ...(params.effects || {}) },
       };
 
       const { engine } = get();
@@ -150,6 +152,15 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       const newParams = {
         ...currentParams,
         visualization: { ...currentParams.visualization, ...params },
+      };
+      set({ parameters: newParams });
+    },
+
+    updateEffectsParams: (params: Partial<AllParameters['effects']>) => {
+      const currentParams = get().parameters;
+      const newParams = {
+        ...currentParams,
+        effects: { ...currentParams.effects, ...params },
       };
       set({ parameters: newParams });
     },

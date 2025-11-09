@@ -3,6 +3,7 @@ import type {
   PhysicalOikosParams,
   SemioticOikosParams,
   TemporalOikosParams,
+  EffectsParams,
 } from '../types/index.js';
 
 // ========================================
@@ -351,6 +352,148 @@ export const temporalPresets: TemporalPreset[] = [
       agentCount: 150,
       chaosInterval: 0,
       chaosStrength: 0.0,
+    },
+  },
+];
+
+// ========================================
+// EFFECTS PRESETS (Effects Tab)
+// ========================================
+
+export interface EffectsPreset {
+  name: string;
+  icon: string;
+  description: string;
+  params: EffectsParams;
+}
+
+export const effectsPresets: EffectsPreset[] = [
+  {
+    name: 'Klar',
+    icon: '💎',
+    description: 'Keine Effekte, kristallklare Sicht',
+    params: {
+      blur: 0,
+      bloom: 0,
+      saturation: 1.0,
+      contrast: 1.0,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+    },
+  },
+  {
+    name: 'Sanft',
+    icon: '🌸',
+    description: 'Subtile Effekte, leichter Glow',
+    params: {
+      blur: 1.5,
+      bloom: 0.15,
+      saturation: 1.1,
+      contrast: 1.05,
+      hueShift: 0,
+      motionBlur: 0.1,
+      vignette: 0.1,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+    },
+  },
+  {
+    name: 'Traumhaft',
+    icon: '☁️',
+    description: 'Weich verschwommen, hoher Bloom',
+    params: {
+      blur: 8,
+      bloom: 0.5,
+      saturation: 0.85,
+      contrast: 0.9,
+      hueShift: 0,
+      motionBlur: 0.3,
+      vignette: 0.25,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+    },
+  },
+  {
+    name: 'Neon Glow',
+    icon: '✨',
+    description: 'Extreme Sättigung, starker Bloom',
+    params: {
+      blur: 3,
+      bloom: 0.8,
+      saturation: 2.5,
+      contrast: 1.4,
+      hueShift: 0,
+      motionBlur: 0.15,
+      vignette: 0.3,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+    },
+  },
+  {
+    name: 'Psychedelisch',
+    icon: '🌈',
+    description: 'RGB-Shift, Farbrotation, Verzerrung',
+    params: {
+      blur: 4,
+      bloom: 0.4,
+      saturation: 2.0,
+      contrast: 1.2,
+      hueShift: 180,
+      motionBlur: 0.25,
+      vignette: 0,
+      chromaticAberration: 8,
+      waveDistortion: 0.6,
+    },
+  },
+  {
+    name: 'Retro CRT',
+    icon: '📺',
+    description: 'Alter Monitor-Look mit RGB-Shift',
+    params: {
+      blur: 0.5,
+      bloom: 0.2,
+      saturation: 0.9,
+      contrast: 1.3,
+      hueShift: 0,
+      motionBlur: 0.4,
+      vignette: 0.5,
+      chromaticAberration: 4,
+      waveDistortion: 0.2,
+    },
+  },
+  {
+    name: 'Flüssig',
+    icon: '💧',
+    description: 'Hoher Motion Blur, fließende Bewegungen',
+    params: {
+      blur: 6,
+      bloom: 0.35,
+      saturation: 1.2,
+      contrast: 0.95,
+      hueShift: 0,
+      motionBlur: 0.75,
+      vignette: 0.15,
+      chromaticAberration: 0,
+      waveDistortion: 0.1,
+    },
+  },
+  {
+    name: 'Meditation',
+    icon: '🧘',
+    description: 'Starker Blur, weiche Kanten, beruhigend',
+    params: {
+      blur: 15,
+      bloom: 0.6,
+      saturation: 0.7,
+      contrast: 0.8,
+      hueShift: 0,
+      motionBlur: 0.5,
+      vignette: 0.4,
+      chromaticAberration: 0,
+      waveDistortion: 0,
     },
   },
 ];
