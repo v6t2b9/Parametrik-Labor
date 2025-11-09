@@ -118,14 +118,107 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     const canvasPool = canvasPoolRef.current;
 
-    // === 1. Render base trails with WebGL (MAJOR PERFORMANCE BOOST) ===
-    if (webglRendererRef.current) {
+    // === 1. Render base trails ===
+    // CPU rendering for now to debug visual issues
+    // TODO: Re-enable WebGL once visual quality is verified
+    const USE_WEBGL = false; // Set to true to test WebGL rendering
+
+    if (USE_WEBGL && webglRendererRef.current) {
+      // WebGL rendering (fast but may have visual artifacts)
       const webglCanvas = webglRendererRef.current.render(trails, visualization);
       ctx.drawImage(webglCanvas, 0, 0);
     } else {
-      // Fallback: clear with background color
+      // CPU rendering (slower but visually accurate)
       ctx.fillStyle = `rgb(${visualization.colorBg.r}, ${visualization.colorBg.g}, ${visualization.colorBg.b})`;
       ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+      const imageData = ctx.createImageData(CANVAS_SIZE, CANVAS_SIZE);
+      const data = imageData.data;
+
+      for (let y = 0; y < GRID_SIZE; y++) {
+        for (let x = 0; x < GRID_SIZE; x++) {
+          const idx = y * GRID_SIZE + x;
+
+          const redVal = trails.red[idx];
+          const greenVal = trails.green[idx];
+          const blueVal = trails.blue[idx];
+
+          // Scale to canvas size (2x2 blocks)
+          for (let dy = 0; dy < SCALE; dy++) {
+            for (let dx = 0; dx < SCALE; dx++) {
+              const canvasX = x * SCALE + dx;
+              const canvasY = y * SCALE + dy;
+              const pixelIdx = (canvasY * CANVAS_SIZE + canvasX) * 4;
+
+              // Initialize with background
+              data[pixelIdx] = visualization.colorBg.r;
+              data[pixelIdx + 1] = visualization.colorBg.g;
+              data[pixelIdx + 2] = visualization.colorBg.b;
+              data[pixelIdx + 3] = 255;
+
+              // Apply blend mode
+              if (visualization.blendMode === 'additive') {
+                const tR = Math.min(1, redVal / visualization.trailIntensity);
+                const tG = Math.min(1, greenVal / visualization.trailIntensity);
+                const tB = Math.min(1, blueVal / visualization.trailIntensity);
+
+                const totalIntensity = tR + tG + tB;
+                const normalizationFactor = totalIntensity > 1.5 ? (1.5 / totalIntensity) : 1.0;
+                const effectiveBrightness = visualization.brightness * normalizationFactor;
+
+                data[pixelIdx] += visualization.colorRed.r * tR * effectiveBrightness;
+                data[pixelIdx + 1] += visualization.colorRed.g * tR * effectiveBrightness;
+                data[pixelIdx + 2] += visualization.colorRed.b * tR * effectiveBrightness;
+
+                data[pixelIdx] += visualization.colorGreen.r * tG * effectiveBrightness;
+                data[pixelIdx + 1] += visualization.colorGreen.g * tG * effectiveBrightness;
+                data[pixelIdx + 2] += visualization.colorGreen.b * tG * effectiveBrightness;
+
+                data[pixelIdx] += visualization.colorBlue.r * tB * effectiveBrightness;
+                data[pixelIdx + 1] += visualization.colorBlue.g * tB * effectiveBrightness;
+                data[pixelIdx + 2] += visualization.colorBlue.b * tB * effectiveBrightness;
+
+              } else if (visualization.blendMode === 'multiply' || visualization.blendMode === 'average') {
+                const totalTrail = redVal + greenVal + blueVal;
+                if (totalTrail > 0) {
+                  const t = Math.min(1, totalTrail / visualization.trailIntensity);
+                  data[pixelIdx] = (visualization.colorRed.r * redVal + visualization.colorGreen.r * greenVal + visualization.colorBlue.r * blueVal) / totalTrail * t * visualization.brightness;
+                  data[pixelIdx + 1] = (visualization.colorRed.g * redVal + visualization.colorGreen.g * greenVal + visualization.colorBlue.g * blueVal) / totalTrail * t * visualization.brightness;
+                  data[pixelIdx + 2] = (visualization.colorRed.b * redVal + visualization.colorGreen.b * greenVal + visualization.colorBlue.b * blueVal) / totalTrail * t * visualization.brightness;
+                }
+
+              } else if (visualization.blendMode === 'screen') {
+                const tR = Math.min(1, redVal / visualization.trailIntensity) * visualization.brightness;
+                const tG = Math.min(1, greenVal / visualization.trailIntensity) * visualization.brightness;
+                const tB = Math.min(1, blueVal / visualization.trailIntensity) * visualization.brightness;
+
+                const r1 = visualization.colorRed.r * tR / 255;
+                const g1 = visualization.colorRed.g * tR / 255;
+                const b1 = visualization.colorRed.b * tR / 255;
+
+                const r2 = visualization.colorGreen.r * tG / 255;
+                const g2 = visualization.colorGreen.g * tG / 255;
+                const b2 = visualization.colorGreen.b * tG / 255;
+
+                const r3 = visualization.colorBlue.r * tB / 255;
+                const g3 = visualization.colorBlue.g * tB / 255;
+                const b3 = visualization.colorBlue.b * tB / 255;
+
+                data[pixelIdx] = 255 * (1 - (1 - r1) * (1 - r2) * (1 - r3));
+                data[pixelIdx + 1] = 255 * (1 - (1 - g1) * (1 - g2) * (1 - g3));
+                data[pixelIdx + 2] = 255 * (1 - (1 - b1) * (1 - b2) * (1 - b3));
+              }
+
+              // Clamp values
+              data[pixelIdx] = Math.min(255, Math.max(0, data[pixelIdx]));
+              data[pixelIdx + 1] = Math.min(255, Math.max(0, data[pixelIdx + 1]));
+              data[pixelIdx + 2] = Math.min(255, Math.max(0, data[pixelIdx + 2]));
+            }
+          }
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
     }
 
     // === 2. Pixelation (Lo-Fi Effect) - OPTIMIZED with object pooling ===
