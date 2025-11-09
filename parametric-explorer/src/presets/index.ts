@@ -2,14 +2,10 @@ import type { Preset, AllParameters } from '../types/index.js';
 
 // Default Performance Parameters
 export const defaultPerformanceParams = {
-  autoOptimize: false,
+  autoOptimize: true,
   targetFPS: 60,
-  minAgents: 500,
-  maxAgents: 10000,
-  adjustmentSpeed: 0.05,
-  fpsCheckInterval: 60,
-  fpsLowerThreshold: 0.85,
-  fpsUpperThreshold: 1.1,
+  qualityPreset: 'high' as const,
+  _currentOptLevel: 0,
 };
 
 // Default/Base Parameters

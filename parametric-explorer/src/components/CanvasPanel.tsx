@@ -21,7 +21,6 @@ export function CanvasPanel() {
   const running = useSimulationStore((state) => state.running);
   const visualization = useSimulationStore((state) => state.parameters.visualization);
   const effects = useSimulationStore((state) => state.parameters.effects);
-  const performanceParams = useSimulationStore((state) => state.parameters.performance);
   const updatePerformanceMetrics = useSimulationStore((state) => state.updatePerformanceMetrics);
   const performAutoOptimization = useSimulationStore((state) => state.performAutoOptimization);
 
@@ -275,9 +274,9 @@ export function CanvasPanel() {
         renderTime,
       });
 
-      // Auto-optimization check (every fpsCheckInterval frames)
+      // Auto-optimization check (every 30 frames = ~0.5 seconds at 60fps)
       frameCounterRef.current++;
-      if (frameCounterRef.current >= performanceParams.fpsCheckInterval) {
+      if (frameCounterRef.current >= 30) {
         frameCounterRef.current = 0;
         performAutoOptimization();
       }
@@ -300,7 +299,7 @@ export function CanvasPanel() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [running, tick, render, performanceParams.fpsCheckInterval, updatePerformanceMetrics, performAutoOptimization]);
+  }, [running, tick, render, updatePerformanceMetrics, performAutoOptimization]);
 
   // Initial render
   useEffect(() => {

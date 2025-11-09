@@ -1,68 +1,60 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
+import type { QualityPreset } from '../types/index.js';
 
 export function PerformanceOikosPanel() {
-  const { parameters, performanceMetrics, updatePerformanceParams } = useSimulationStore();
+  const { parameters, performanceMetrics, updatePerformanceParams, applyQualityPreset } = useSimulationStore();
   const { performance } = parameters;
+
+  const qualityPresets: { value: QualityPreset; label: string; description: string; icon: string }[] = [
+    { value: 'low', label: 'Low', description: '~1K agents, minimal effects', icon: '⚡' },
+    { value: 'medium', label: 'Medium', description: '~2K agents, basic effects', icon: '💫' },
+    { value: 'high', label: 'High', description: '~3.5K agents, smooth effects', icon: '✨' },
+    { value: 'ultra', label: 'Ultra', description: '~6K agents, all effects', icon: '🌟' },
+  ];
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>⚡ Performance Oikos</h3>
-      <p style={styles.subtitle}>Adaptive performance optimization</p>
+      <h3 style={styles.title}>⚡ Performance & Quality</h3>
+      <p style={styles.subtitle}>Adaptive quality for smooth fluid motion</p>
 
-      {/* Performance Metrics Display */}
-      <div style={styles.metricsSection}>
-        <h4 style={styles.sectionTitle}>Live Metrics</h4>
-        <div style={styles.metricsGrid}>
-          <div style={styles.metricBox}>
-            <div style={styles.metricLabel}>Current FPS</div>
-            <div style={styles.metricValue}>
-              {performanceMetrics.currentFPS.toFixed(1)}
+      {/* Performance Status */}
+      <div style={styles.statusSection}>
+        <div style={styles.statusGrid}>
+          <div style={styles.statusBox}>
+            <div style={styles.statusLabel}>FPS</div>
+            <div style={{
+              ...styles.statusValue,
+              color: performanceMetrics.avgFPS >= performance.targetFPS * 0.9 ? '#50d890' :
+                     performanceMetrics.avgFPS >= performance.targetFPS * 0.7 ? '#f0ad4e' : '#ff6b6b'
+            }}>
+              {performanceMetrics.avgFPS > 0 ? performanceMetrics.avgFPS.toFixed(0) : '-'}
             </div>
           </div>
-          <div style={styles.metricBox}>
-            <div style={styles.metricLabel}>Avg FPS</div>
-            <div style={styles.metricValue}>
-              {performanceMetrics.avgFPS.toFixed(1)}
+          <div style={styles.statusBox}>
+            <div style={styles.statusLabel}>Target</div>
+            <div style={styles.statusValue}>
+              {performance.targetFPS}
             </div>
           </div>
-          <div style={styles.metricBox}>
-            <div style={styles.metricLabel}>Min FPS</div>
-            <div style={styles.metricValue}>
-              {performanceMetrics.minFPS > 0 ? performanceMetrics.minFPS.toFixed(1) : '-'}
-            </div>
-          </div>
-          <div style={styles.metricBox}>
-            <div style={styles.metricLabel}>Max FPS</div>
-            <div style={styles.metricValue}>
-              {performanceMetrics.maxFPS > 0 ? performanceMetrics.maxFPS.toFixed(1) : '-'}
-            </div>
-          </div>
-          <div style={styles.metricBox}>
-            <div style={styles.metricLabel}>Frame Time</div>
-            <div style={styles.metricValue}>
-              {performanceMetrics.frameTime.toFixed(1)}ms
-            </div>
-          </div>
-          <div style={styles.metricBox}>
-            <div style={styles.metricLabel}>Tick Time</div>
-            <div style={styles.metricValue}>
-              {performanceMetrics.tickTime.toFixed(1)}ms
-            </div>
-          </div>
-          <div style={styles.metricBox}>
-            <div style={styles.metricLabel}>Render Time</div>
-            <div style={styles.metricValue}>
-              {performanceMetrics.renderTime.toFixed(1)}ms
-            </div>
-          </div>
-          <div style={styles.metricBox}>
-            <div style={styles.metricLabel}>Agent Count</div>
-            <div style={styles.metricValue}>
+          <div style={styles.statusBox}>
+            <div style={styles.statusLabel}>Agents</div>
+            <div style={styles.statusValue}>
               {parameters.temporal.agentCount}
             </div>
           </div>
+          <div style={styles.statusBox}>
+            <div style={styles.statusLabel}>Opt Level</div>
+            <div style={styles.statusValue}>
+              {performance._currentOptLevel}/10
+            </div>
+          </div>
         </div>
+        {performanceMetrics.avgFPS > 0 && performanceMetrics.avgFPS < performance.targetFPS * 0.7 && (
+          <div style={styles.warningBox}>
+            ⚠️ Low performance detected. Try reducing quality or enabling auto-optimizer.
+          </div>
+        )}
       </div>
 
       <div style={styles.divider} />
@@ -81,91 +73,64 @@ export function PerformanceOikosPanel() {
           </span>
         </label>
         <p style={styles.toggleDescription}>
-          Automatically adjusts agent count to maintain target FPS
+          Automatically reduces effects & agent count when FPS drops below target.
+          Restores quality when performance improves.
         </p>
       </div>
 
       <div style={styles.divider} />
 
-      <h4 style={styles.sectionTitle}>Target Settings</h4>
+      {/* Quality Preset Selection */}
+      <h4 style={styles.sectionTitle}>Quality Preset</h4>
+      <div style={styles.presetGrid}>
+        {qualityPresets.map((preset) => (
+          <button
+            key={preset.value}
+            onClick={() => applyQualityPreset(preset.value)}
+            style={{
+              ...styles.presetButton,
+              ...(performance.qualityPreset === preset.value ? styles.presetButtonActive : {}),
+            }}
+          >
+            <span style={styles.presetIcon}>{preset.icon}</span>
+            <span style={styles.presetLabel}>{preset.label}</span>
+            <span style={styles.presetDescription}>{preset.description}</span>
+          </button>
+        ))}
+      </div>
 
+      <div style={styles.divider} />
+
+      {/* Target FPS */}
+      <h4 style={styles.sectionTitle}>Target Frame Rate</h4>
       <ParameterSlider
         label="Target FPS"
         value={performance.targetFPS}
         min={30}
         max={120}
-        step={5}
-        onChange={(value) => updatePerformanceParams({ targetFPS: value })}
-        description="Desired frames per second for smooth performance"
-      />
-
-      <div style={styles.divider} />
-
-      <h4 style={styles.sectionTitle}>Agent Limits</h4>
-
-      <ParameterSlider
-        label="Min Agents"
-        value={performance.minAgents}
-        min={100}
-        max={5000}
-        step={100}
-        onChange={(value) => updatePerformanceParams({ minAgents: value })}
-        description="Minimum number of agents (prevents empty simulations)"
-      />
-
-      <ParameterSlider
-        label="Max Agents"
-        value={performance.maxAgents}
-        min={1000}
-        max={20000}
-        step={500}
-        onChange={(value) => updatePerformanceParams({ maxAgents: value })}
-        description="Maximum number of agents (prevents performance collapse)"
-      />
-
-      <div style={styles.divider} />
-
-      <h4 style={styles.sectionTitle}>Optimization Behavior</h4>
-
-      <ParameterSlider
-        label="Adjustment Speed"
-        value={performance.adjustmentSpeed}
-        min={0.01}
-        max={0.5}
-        step={0.01}
-        onChange={(value) => updatePerformanceParams({ adjustmentSpeed: value })}
-        description="How quickly agent count adjusts (% per adjustment)"
-      />
-
-      <ParameterSlider
-        label="FPS Check Interval"
-        value={performance.fpsCheckInterval}
-        min={30}
-        max={300}
         step={10}
-        onChange={(value) => updatePerformanceParams({ fpsCheckInterval: value })}
-        description="Frames between optimization checks"
+        onChange={(value) => updatePerformanceParams({ targetFPS: value })}
+        description="Auto-optimizer will try to maintain this frame rate"
       />
 
-      <ParameterSlider
-        label="Lower Threshold"
-        value={performance.fpsLowerThreshold}
-        min={0.5}
-        max={1.0}
-        step={0.05}
-        onChange={(value) => updatePerformanceParams({ fpsLowerThreshold: value })}
-        description="Reduce agents when FPS < target × this value"
-      />
+      <div style={styles.divider} />
 
-      <ParameterSlider
-        label="Upper Threshold"
-        value={performance.fpsUpperThreshold}
-        min={1.0}
-        max={1.5}
-        step={0.05}
-        onChange={(value) => updatePerformanceParams({ fpsUpperThreshold: value })}
-        description="Increase agents when FPS > target × this value"
-      />
+      {/* Performance Info */}
+      <div style={styles.infoSection}>
+        <h4 style={styles.infoTitle}>💡 How it works</h4>
+        <ul style={styles.infoList}>
+          <li>Quality Preset sets base parameters for agents & effects</li>
+          <li>Auto-Optimizer dynamically reduces quality when FPS drops</li>
+          <li>Optimization levels (0-10):
+            <ul style={styles.subList}>
+              <li>0-2: Disable expensive effects (wave, chromatic)</li>
+              <li>3-6: Reduce bloom, blur, motion blur</li>
+              <li>7-10: Reduce agent count by up to 50%</li>
+            </ul>
+          </li>
+          <li>System automatically recovers quality when FPS improves</li>
+        </ul>
+      </div>
     </div>
   );
 }
@@ -188,39 +153,42 @@ const styles = {
     color: '#a0a0b0',
     marginBottom: '20px',
   } as React.CSSProperties,
-  metricsSection: {
+  statusSection: {
     marginBottom: '20px',
   } as React.CSSProperties,
-  sectionTitle: {
-    fontSize: '14px',
-    color: '#a0a0b0',
-    marginBottom: '12px',
-    fontWeight: 600,
-  } as React.CSSProperties,
-  metricsGrid: {
+  statusGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '8px',
+    gap: '10px',
+    marginBottom: '10px',
   } as React.CSSProperties,
-  metricBox: {
+  statusBox: {
     backgroundColor: '#0a0a15',
     border: '1px solid #2a2b3a',
     borderRadius: '6px',
-    padding: '10px',
+    padding: '12px',
     textAlign: 'center',
   } as React.CSSProperties,
-  metricLabel: {
+  statusLabel: {
     fontSize: '10px',
     color: '#808090',
     marginBottom: '4px',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   } as React.CSSProperties,
-  metricValue: {
-    fontSize: '16px',
-    color: '#50d890',
-    fontWeight: 600,
+  statusValue: {
+    fontSize: '20px',
+    fontWeight: 700,
     fontFamily: 'monospace',
+  } as React.CSSProperties,
+  warningBox: {
+    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    border: '1px solid rgba(255, 107, 107, 0.3)',
+    borderRadius: '6px',
+    padding: '10px',
+    color: '#ff6b6b',
+    fontSize: '12px',
+    textAlign: 'center',
   } as React.CSSProperties,
   toggleSection: {
     marginBottom: '20px',
@@ -247,10 +215,78 @@ const styles = {
     color: '#808090',
     marginLeft: '28px',
     marginTop: '0',
+    lineHeight: '1.4',
+  } as React.CSSProperties,
+  sectionTitle: {
+    fontSize: '14px',
+    color: '#a0a0b0',
+    marginBottom: '12px',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  presetGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '10px',
+  } as React.CSSProperties,
+  presetButton: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '16px 12px',
+    backgroundColor: '#0a0a15',
+    border: '2px solid #2a2b3a',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  } as React.CSSProperties,
+  presetButtonActive: {
+    backgroundColor: '#1a1a2e',
+    borderColor: '#7d5dbd',
+    boxShadow: '0 0 10px rgba(125, 93, 189, 0.3)',
+  } as React.CSSProperties,
+  presetIcon: {
+    fontSize: '28px',
+    marginBottom: '8px',
+  } as React.CSSProperties,
+  presetLabel: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#e0e0e0',
+    marginBottom: '4px',
+  } as React.CSSProperties,
+  presetDescription: {
+    fontSize: '10px',
+    color: '#808090',
+    textAlign: 'center',
+    lineHeight: '1.3',
   } as React.CSSProperties,
   divider: {
     height: '1px',
     backgroundColor: '#2a2b3a',
     marginBottom: '20px',
+  } as React.CSSProperties,
+  infoSection: {
+    backgroundColor: '#0a0a15',
+    border: '1px solid #2a2b3a',
+    borderRadius: '6px',
+    padding: '14px',
+  } as React.CSSProperties,
+  infoTitle: {
+    fontSize: '13px',
+    color: '#a0a0b0',
+    marginBottom: '10px',
+    fontWeight: 600,
+    margin: '0 0 10px 0',
+  } as React.CSSProperties,
+  infoList: {
+    fontSize: '11px',
+    color: '#808090',
+    lineHeight: '1.6',
+    margin: 0,
+    paddingLeft: '20px',
+  } as React.CSSProperties,
+  subList: {
+    marginTop: '4px',
+    paddingLeft: '16px',
   } as React.CSSProperties,
 };

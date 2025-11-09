@@ -79,22 +79,16 @@ export interface EffectsParams {
   waveDistortion: number;      // 0-1: Sine wave amplitude
 }
 
+export type QualityPreset = 'low' | 'medium' | 'high' | 'ultra';
+
 export interface PerformanceParams {
-  // Auto-Optimization
+  // Simple Controls
   autoOptimize: boolean;        // Enable/disable auto-optimizer
   targetFPS: number;            // 30-120: Desired FPS target
+  qualityPreset: QualityPreset; // Quick quality settings
 
-  // Agent Limits
-  minAgents: number;            // 100-1000: Minimum agent count
-  maxAgents: number;            // 1000-20000: Maximum agent count
-
-  // Adjustment Rates
-  adjustmentSpeed: number;      // 0.01-0.5: How fast to adjust agent count
-  fpsCheckInterval: number;     // 30-300: Frames between FPS checks
-
-  // Thresholds
-  fpsLowerThreshold: number;    // 0.8-1.0: Multiply targetFPS for lower bound
-  fpsUpperThreshold: number;    // 1.0-1.2: Multiply targetFPS for upper bound
+  // Auto-Optimizer State (internal, not for UI)
+  _currentOptLevel: number;     // 0-10: Current optimization level (0 = no opt, 10 = max opt)
 }
 
 export interface PerformanceMetrics {
