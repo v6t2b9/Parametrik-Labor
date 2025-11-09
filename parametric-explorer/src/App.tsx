@@ -220,7 +220,7 @@ const styles = {
     flexDirection: 'column',
     gap: '20px',
     padding: '20px',
-    maxWidth: '1400px',
+    maxWidth: '1600px',
     margin: '0 auto',
   } as React.CSSProperties,
   canvasSection: {

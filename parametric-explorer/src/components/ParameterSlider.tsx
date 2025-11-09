@@ -48,13 +48,13 @@ export function ParameterSlider({
 
 const styles = {
   container: {
-    marginBottom: '16px',
+    marginBottom: '20px',
   } as React.CSSProperties,
   labelRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '6px',
+    marginBottom: '8px',
   } as React.CSSProperties,
   labelGroup: {
     display: 'flex',
@@ -62,9 +62,9 @@ const styles = {
     gap: '6px',
   } as React.CSSProperties,
   label: {
-    fontSize: '14px',
+    fontSize: '13px',
     color: '#e0e0e0',
-    fontWeight: 500,
+    fontWeight: 600,
   } as React.CSSProperties,
   overrideBadge: {
     fontSize: '12px',
@@ -78,18 +78,19 @@ const styles = {
   } as React.CSSProperties,
   slider: {
     width: '100%',
-    height: '8px', // Slightly larger for mobile
+    height: '8px',
     borderRadius: '4px',
     outline: 'none',
-    background: '#13141f',
+    background: '#2a2b3a',
     cursor: 'pointer',
-    WebkitAppearance: 'none', // Remove default styling
+    WebkitAppearance: 'none',
     appearance: 'none',
+    transition: 'background 0.2s',
   } as React.CSSProperties,
   description: {
     fontSize: '11px',
-    color: '#6a6a7a',
-    marginTop: '4px',
-    lineHeight: '1.4',
+    color: '#7d7d8d',
+    marginTop: '6px',
+    lineHeight: '1.5',
   } as React.CSSProperties,
 };
