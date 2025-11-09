@@ -73,22 +73,29 @@ export function CanvasPanel() {
 
             // Apply blend mode
             if (visualization.blendMode === 'additive') {
-              // Additive blending: Add each species' color contribution
+              // Additive blending: Add each species' color contribution (normalized to prevent white-out)
               const tR = Math.min(1, redVal / visualization.trailIntensity);
               const tG = Math.min(1, greenVal / visualization.trailIntensity);
               const tB = Math.min(1, blueVal / visualization.trailIntensity);
 
-              data[pixelIdx] += visualization.colorRed.r * tR * visualization.brightness;
-              data[pixelIdx + 1] += visualization.colorRed.g * tR * visualization.brightness;
-              data[pixelIdx + 2] += visualization.colorRed.b * tR * visualization.brightness;
+              // Calculate total intensity to normalize if needed
+              const totalIntensity = tR + tG + tB;
 
-              data[pixelIdx] += visualization.colorGreen.r * tG * visualization.brightness;
-              data[pixelIdx + 1] += visualization.colorGreen.g * tG * visualization.brightness;
-              data[pixelIdx + 2] += visualization.colorGreen.b * tG * visualization.brightness;
+              // Soft normalization: reduce brightness when multiple species overlap
+              const normalizationFactor = totalIntensity > 1.5 ? (1.5 / totalIntensity) : 1.0;
+              const effectiveBrightness = visualization.brightness * normalizationFactor;
 
-              data[pixelIdx] += visualization.colorBlue.r * tB * visualization.brightness;
-              data[pixelIdx + 1] += visualization.colorBlue.g * tB * visualization.brightness;
-              data[pixelIdx + 2] += visualization.colorBlue.b * tB * visualization.brightness;
+              data[pixelIdx] += visualization.colorRed.r * tR * effectiveBrightness;
+              data[pixelIdx + 1] += visualization.colorRed.g * tR * effectiveBrightness;
+              data[pixelIdx + 2] += visualization.colorRed.b * tR * effectiveBrightness;
+
+              data[pixelIdx] += visualization.colorGreen.r * tG * effectiveBrightness;
+              data[pixelIdx + 1] += visualization.colorGreen.g * tG * effectiveBrightness;
+              data[pixelIdx + 2] += visualization.colorGreen.b * tG * effectiveBrightness;
+
+              data[pixelIdx] += visualization.colorBlue.r * tB * effectiveBrightness;
+              data[pixelIdx + 1] += visualization.colorBlue.g * tB * effectiveBrightness;
+              data[pixelIdx + 2] += visualization.colorBlue.b * tB * effectiveBrightness;
 
             } else if (visualization.blendMode === 'multiply' || visualization.blendMode === 'average') {
               // Average/Multiply blending: Weight by trail intensity

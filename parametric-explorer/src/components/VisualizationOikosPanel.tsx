@@ -38,14 +38,14 @@ export function VisualizationOikosPanel() {
       <div style={styles.section}>
         <h4 style={styles.sectionTitle}>🎭 Blend Mode</h4>
         <p style={styles.sectionDescription}>
-          Wie werden die drei Spezies-Farben gemischt?
+          Wie werden die drei Spezies-Farben gemischt? Additive = leuchtend (auto-normalisiert bei Überlappung), Average = weich ohne Übersättigung.
         </p>
         <div style={styles.blendModeGrid}>
           {[
-            { mode: 'additive' as const, label: '✨ Additive', desc: 'Farben addieren sich (hell, leuchtend)' },
-            { mode: 'average' as const, label: '🎨 Average', desc: 'Gewichteter Durchschnitt (natürlich)' },
-            { mode: 'multiply' as const, label: '🌓 Multiply', desc: 'Multiplikativ (dunkel, kontrastreich)' },
-            { mode: 'screen' as const, label: '🌟 Screen', desc: 'Helle Kombination (leuchtend, weich)' },
+            { mode: 'additive' as const, label: '✨ Additive', desc: 'Leuchtend, normalisiert bei Überlappung - ideal für hohe Brightness' },
+            { mode: 'average' as const, label: '🎨 Average', desc: 'Weicher Mix, keine Übersättigung - perfekt für Separation' },
+            { mode: 'multiply' as const, label: '🌓 Multiply', desc: 'Dunkler Mix, hoher Kontrast - für Stabilität' },
+            { mode: 'screen' as const, label: '🌟 Screen', desc: 'Helle weiche Kombination - für organische Flows' },
           ].map((item) => (
             <button
               key={item.mode}
@@ -91,7 +91,14 @@ export function VisualizationOikosPanel() {
       <div style={styles.infoBox}>
         <p style={styles.infoText}>
           💡 <strong>Tipp:</strong> Kombiniere verschiedene Blend Modes mit unterschiedlicher Trail Intensity für beeindruckende Effekte!
-          "Additive" + niedrige Intensity = glasklare Strukturen. "Multiply" + hohe Intensity = weiche Farbverläufe.
+          <br/>
+          • <strong>Additive</strong> + niedrige Intensity = glasklare leuchtende Strukturen (verhindert Auto-Übersättigung bei Überlappung)
+          <br/>
+          • <strong>Average</strong> + hohe Brightness = satte Farben ohne Weiß-Werden
+          <br/>
+          • <strong>Multiply</strong> + hohe Intensity = weiche Farbverläufe mit Kontrast
+          <br/>
+          • <strong>Screen</strong> + mittlere Intensity = organische leuchtende Flows
         </p>
       </div>
 
