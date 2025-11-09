@@ -7,6 +7,7 @@ const SCALE = CANVAS_SIZE / GRID_SIZE; // 2x scaling
 
 export function CanvasPanel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const motionBlurCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
   const tick = useSimulationStore((state) => state.tick);
@@ -14,20 +15,31 @@ export function CanvasPanel() {
   const agents = useSimulationStore((state) => state.agents);
   const running = useSimulationStore((state) => state.running);
   const visualization = useSimulationStore((state) => state.parameters.visualization);
+  const effects = useSimulationStore((state) => state.parameters.effects);
 
-  // Render function
+  // Initialize motion blur canvas
+  useEffect(() => {
+    if (!motionBlurCanvasRef.current) {
+      const mbCanvas = document.createElement('canvas');
+      mbCanvas.width = CANVAS_SIZE;
+      mbCanvas.height = CANVAS_SIZE;
+      motionBlurCanvasRef.current = mbCanvas;
+    }
+  }, []);
+
+  // Render function with post-processing effects
   const render = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
 
-    // Clear with background color and slight fade for trail effect
-    ctx.fillStyle = `rgba(${visualization.colorBg.r}, ${visualization.colorBg.g}, ${visualization.colorBg.b}, 0.1)`;
+    // Clear canvas
+    ctx.fillStyle = `rgb(${visualization.colorBg.r}, ${visualization.colorBg.g}, ${visualization.colorBg.b})`;
     ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-    // Render trails using ImageData for performance
+    // === 1. Render base trails ===
     const imageData = ctx.createImageData(CANVAS_SIZE, CANVAS_SIZE);
     const data = imageData.data;
 
@@ -51,10 +63,10 @@ export function CanvasPanel() {
             const canvasY = y * SCALE + dy;
             const pixelIdx = (canvasY * CANVAS_SIZE + canvasX) * 4;
 
-            data[pixelIdx] = r;         // R
-            data[pixelIdx + 1] = g;     // G
-            data[pixelIdx + 2] = b;     // B
-            data[pixelIdx + 3] = 255;   // A
+            data[pixelIdx] = r;
+            data[pixelIdx + 1] = g;
+            data[pixelIdx + 2] = b;
+            data[pixelIdx + 3] = 255;
           }
         }
       }
@@ -62,23 +74,151 @@ export function CanvasPanel() {
 
     ctx.putImageData(imageData, 0, 0);
 
-    // Optionally render agents as small dots
-    agents.forEach((agent) => {
-      const x = agent.x * SCALE;
-      const y = agent.y * SCALE;
+    // === 2. Motion Blur ===
+    if (effects.motionBlur > 0 && motionBlurCanvasRef.current) {
+      const mbCanvas = motionBlurCanvasRef.current;
+      const mbCtx = mbCanvas.getContext('2d');
+      if (mbCtx) {
+        // Draw current frame to motion blur canvas with opacity
+        mbCtx.globalAlpha = 1 - effects.motionBlur;
+        mbCtx.drawImage(canvas, 0, 0);
+        mbCtx.globalAlpha = 1;
 
-      ctx.fillStyle =
-        agent.type === 'red'
-          ? `rgb(${visualization.colorRed.r}, ${visualization.colorRed.g}, ${visualization.colorRed.b})`
-          : agent.type === 'green'
-          ? `rgb(${visualization.colorGreen.r}, ${visualization.colorGreen.g}, ${visualization.colorGreen.b})`
-          : `rgb(${visualization.colorBlue.r}, ${visualization.colorBlue.g}, ${visualization.colorBlue.b})`;
+        // Draw motion blur canvas back to main canvas
+        ctx.globalAlpha = effects.motionBlur;
+        ctx.drawImage(mbCanvas, 0, 0);
+        ctx.globalAlpha = 1;
+      }
+    }
 
-      ctx.beginPath();
-      ctx.arc(x, y, 1, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  }, [trails, agents, visualization]);
+    // === 3. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
+    const filters: string[] = [];
+    if (effects.blur > 0) filters.push(`blur(${effects.blur}px)`);
+    if (effects.saturation !== 1.0) filters.push(`saturate(${effects.saturation})`);
+    if (effects.contrast !== 1.0) filters.push(`contrast(${effects.contrast})`);
+    if (effects.hueShift !== 0) filters.push(`hue-rotate(${effects.hueShift}deg)`);
+
+    if (filters.length > 0) {
+      ctx.filter = filters.join(' ');
+      ctx.drawImage(canvas, 0, 0);
+      ctx.filter = 'none';
+    }
+
+    // === 4. Bloom Effect ===
+    if (effects.bloom > 0) {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = effects.bloom;
+      ctx.filter = `blur(${Math.max(8, effects.blur + 8)}px) brightness(1.5)`;
+      ctx.drawImage(canvas, 0, 0);
+      ctx.filter = 'none';
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // === 5. Chromatic Aberration ===
+    if (effects.chromaticAberration > 0) {
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = CANVAS_SIZE;
+      tempCanvas.height = CANVAS_SIZE;
+      const tempCtx = tempCanvas.getContext('2d');
+      if (tempCtx) {
+        tempCtx.drawImage(canvas, 0, 0);
+        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+        const offset = effects.chromaticAberration;
+
+        // Red channel (offset left)
+        ctx.globalCompositeOperation = 'screen';
+        tempCtx.globalCompositeOperation = 'copy';
+        tempCtx.fillStyle = 'black';
+        tempCtx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        tempCtx.globalCompositeOperation = 'lighter';
+        tempCtx.drawImage(canvas, -offset, 0);
+        ctx.drawImage(tempCanvas, 0, 0);
+
+        // Green channel (no offset)
+        tempCtx.globalCompositeOperation = 'copy';
+        tempCtx.fillStyle = 'black';
+        tempCtx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        tempCtx.globalCompositeOperation = 'lighter';
+        tempCtx.drawImage(canvas, 0, 0);
+        ctx.drawImage(tempCanvas, 0, 0);
+
+        // Blue channel (offset right)
+        tempCtx.globalCompositeOperation = 'copy';
+        tempCtx.fillStyle = 'black';
+        tempCtx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        tempCtx.globalCompositeOperation = 'lighter';
+        tempCtx.drawImage(canvas, offset, 0);
+        ctx.drawImage(tempCanvas, 0, 0);
+
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    // === 6. Wave Distortion ===
+    if (effects.waveDistortion > 0) {
+      const imgData = ctx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      const distortedData = ctx.createImageData(CANVAS_SIZE, CANVAS_SIZE);
+
+      const amplitude = effects.waveDistortion * 15;
+      const frequency = 0.02;
+
+      for (let y = 0; y < CANVAS_SIZE; y++) {
+        for (let x = 0; x < CANVAS_SIZE; x++) {
+          const offsetX = Math.sin(y * frequency) * amplitude;
+          const offsetY = Math.cos(x * frequency) * amplitude;
+
+          const srcX = Math.floor(x + offsetX);
+          const srcY = Math.floor(y + offsetY);
+
+          if (srcX >= 0 && srcX < CANVAS_SIZE && srcY >= 0 && srcY < CANVAS_SIZE) {
+            const srcIdx = (srcY * CANVAS_SIZE + srcX) * 4;
+            const dstIdx = (y * CANVAS_SIZE + x) * 4;
+
+            distortedData.data[dstIdx] = imgData.data[srcIdx];
+            distortedData.data[dstIdx + 1] = imgData.data[srcIdx + 1];
+            distortedData.data[dstIdx + 2] = imgData.data[srcIdx + 2];
+            distortedData.data[dstIdx + 3] = imgData.data[srcIdx + 3];
+          }
+        }
+      }
+
+      ctx.putImageData(distortedData, 0, 0);
+    }
+
+    // === 7. Vignette ===
+    if (effects.vignette > 0) {
+      const gradient = ctx.createRadialGradient(
+        CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.3,
+        CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.7
+      );
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      gradient.addColorStop(1, `rgba(0, 0, 0, ${effects.vignette})`);
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    }
+
+    // === 8. Render agents (optional) ===
+    if (visualization.brightness > 0.5) {
+      agents.forEach((agent) => {
+        const x = agent.x * SCALE;
+        const y = agent.y * SCALE;
+
+        ctx.fillStyle =
+          agent.type === 'red'
+            ? `rgb(${visualization.colorRed.r}, ${visualization.colorRed.g}, ${visualization.colorRed.b})`
+            : agent.type === 'green'
+            ? `rgb(${visualization.colorGreen.r}, ${visualization.colorGreen.g}, ${visualization.colorGreen.b})`
+            : `rgb(${visualization.colorBlue.r}, ${visualization.colorBlue.g}, ${visualization.colorBlue.b})`;
+
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+  }, [trails, agents, visualization, effects]);
 
   // Animation loop
   useEffect(() => {

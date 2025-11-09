@@ -58,12 +58,34 @@ export interface VisualizationParams {
   colorBg: RGBColor;        // Background color
 }
 
+export interface EffectsParams {
+  // Blur & Glow
+  blur: number;              // 0-20px: Gaussian blur radius
+  bloom: number;             // 0-1: Additive glow/bloom strength
+
+  // Color Grading
+  saturation: number;        // 0-3: Color saturation (1 = normal)
+  contrast: number;          // 0-3: Contrast (1 = normal)
+  hueShift: number;          // 0-360: Hue rotation in degrees
+
+  // Motion & Trails
+  motionBlur: number;        // 0-0.95: Frame persistence (ghosting)
+
+  // Atmospheric
+  vignette: number;          // 0-1: Edge darkening strength
+
+  // Psychedelic/Distortion
+  chromaticAberration: number; // 0-15px: RGB channel offset
+  waveDistortion: number;      // 0-1: Sine wave amplitude
+}
+
 export interface AllParameters {
   physical: PhysicalOikosParams;
   semiotic: SemioticOikosParams;
   temporal: TemporalOikosParams;
   resonance: ResonanceOikosParams;
   visualization: VisualizationParams;
+  effects: EffectsParams;
 }
 
 // Preset Definition
@@ -98,6 +120,6 @@ export interface EmergentProperties {
 
 // UI State
 export interface UIState {
-  activeOikosTab: 'physical' | 'semiotic' | 'temporal' | 'resonance';
+  activeOikosTab: 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization' | 'effects';
   simulationSpeed: number; // 1x, 2x, 5x, etc.
 }

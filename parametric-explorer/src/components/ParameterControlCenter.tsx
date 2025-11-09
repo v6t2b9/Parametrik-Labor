@@ -5,9 +5,10 @@ import { SemioticOikosPanel } from './SemioticOikosPanel';
 import { TemporalOikosPanel } from './TemporalOikosPanel';
 import { ResonanceOikosPanel } from './ResonanceOikosPanel';
 import { VisualizationOikosPanel } from './VisualizationOikosPanel';
+import { EffectsOikosPanel } from './EffectsOikosPanel';
 import { PresetGallery } from './PresetGallery';
 
-type TabType = 'presets' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization';
+type TabType = 'presets' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization' | 'effects';
 
 export function ParameterControlCenter() {
   const [activeTab, setActiveTab] = useState<TabType>('presets');
@@ -53,6 +54,11 @@ export function ParameterControlCenter() {
           onClick={() => setActiveTab('visualization')}
           label="🎨 Visualisierung"
         />
+        <Tab
+          active={activeTab === 'effects'}
+          onClick={() => setActiveTab('effects')}
+          label="✨ Effects"
+        />
       </div>
 
       <div style={styles.content}>
@@ -62,6 +68,7 @@ export function ParameterControlCenter() {
         {activeTab === 'temporal' && <TemporalOikosPanel />}
         {activeTab === 'resonance' && <ResonanceOikosPanel />}
         {activeTab === 'visualization' && <VisualizationOikosPanel />}
+        {activeTab === 'effects' && <EffectsOikosPanel />}
       </div>
     </div>
   );
