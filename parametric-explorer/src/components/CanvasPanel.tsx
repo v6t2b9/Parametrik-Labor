@@ -7,7 +7,7 @@ const SCALE = CANVAS_SIZE / GRID_SIZE; // 2x scaling
 
 export function CanvasPanel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
 
   const tick = useSimulationStore((state) => state.tick);
   const trails = useSimulationStore((state) => state.trails);
