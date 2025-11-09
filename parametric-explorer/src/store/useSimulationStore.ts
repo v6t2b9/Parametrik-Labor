@@ -205,11 +205,31 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       const newParams: AllParameters = {
         ...currentParams,
         ...params,
-        universal: { ...currentParams.universal, ...(params.universal || {}) },
+        universal: {
+          physical: { ...currentParams.universal.physical, ...(params.universal?.physical || {}) },
+          semiotic: { ...currentParams.universal.semiotic, ...(params.universal?.semiotic || {}) },
+          temporal: { ...currentParams.universal.temporal, ...(params.universal?.temporal || {}) },
+          resonance: { ...currentParams.universal.resonance, ...(params.universal?.resonance || {}) },
+        },
         species: {
-          red: { ...currentParams.species.red, ...(params.species?.red || {}) },
-          green: { ...currentParams.species.green, ...(params.species?.green || {}) },
-          blue: { ...currentParams.species.blue, ...(params.species?.blue || {}) },
+          red: {
+            physical: { ...currentParams.species.red.physical, ...(params.species?.red?.physical || {}) },
+            semiotic: { ...currentParams.species.red.semiotic, ...(params.species?.red?.semiotic || {}) },
+            temporal: { ...currentParams.species.red.temporal, ...(params.species?.red?.temporal || {}) },
+            resonance: { ...currentParams.species.red.resonance, ...(params.species?.red?.resonance || {}) },
+          },
+          green: {
+            physical: { ...currentParams.species.green.physical, ...(params.species?.green?.physical || {}) },
+            semiotic: { ...currentParams.species.green.semiotic, ...(params.species?.green?.semiotic || {}) },
+            temporal: { ...currentParams.species.green.temporal, ...(params.species?.green?.temporal || {}) },
+            resonance: { ...currentParams.species.green.resonance, ...(params.species?.green?.resonance || {}) },
+          },
+          blue: {
+            physical: { ...currentParams.species.blue.physical, ...(params.species?.blue?.physical || {}) },
+            semiotic: { ...currentParams.species.blue.semiotic, ...(params.species?.blue?.semiotic || {}) },
+            temporal: { ...currentParams.species.blue.temporal, ...(params.species?.blue?.temporal || {}) },
+            resonance: { ...currentParams.species.blue.resonance, ...(params.species?.blue?.resonance || {}) },
+          },
         },
         globalTemporal: { ...currentParams.globalTemporal, ...(params.globalTemporal || {}) },
         visualization: { ...currentParams.visualization, ...(params.visualization || {}) },

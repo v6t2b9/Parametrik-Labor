@@ -177,7 +177,7 @@ const styles = {
   } as React.CSSProperties,
   slidersRow: {
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     gap: '32px',
     paddingTop: '12px',
     borderTop: '1px solid #2a2b3a',
