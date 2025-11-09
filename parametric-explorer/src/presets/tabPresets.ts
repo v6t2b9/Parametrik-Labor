@@ -187,9 +187,9 @@ export const visualPresets: VisualPreset[] = [
     },
   },
   {
-    name: 'Matrix',
+    name: 'Matrix Code',
     icon: '💚',
-    description: 'Grüne Datenströme wie in The Matrix',
+    description: 'Grüne Datenströme mit Scanlines - The Matrix!',
     params: {
       brightness: 4.0,
       blendMode: 'additive',
@@ -516,6 +516,8 @@ export const effectsPresets: EffectsPreset[] = [
       vignette: 0,
       chromaticAberration: 0,
       waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
     },
   },
   {
@@ -532,6 +534,8 @@ export const effectsPresets: EffectsPreset[] = [
       vignette: 0.1,
       chromaticAberration: 0,
       waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
     },
   },
   {
@@ -548,6 +552,8 @@ export const effectsPresets: EffectsPreset[] = [
       vignette: 0.25,
       chromaticAberration: 0,
       waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
     },
   },
   {
@@ -564,6 +570,8 @@ export const effectsPresets: EffectsPreset[] = [
       vignette: 0.3,
       chromaticAberration: 0,
       waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
     },
   },
   {
@@ -580,12 +588,14 @@ export const effectsPresets: EffectsPreset[] = [
       vignette: 0,
       chromaticAberration: 8,
       waveDistortion: 0.6,
+      scanlines: 0,
+      pixelation: 1,
     },
   },
   {
     name: 'Retro CRT',
     icon: '📺',
-    description: 'Alter Monitor-Look mit RGB-Shift',
+    description: 'Alter Monitor-Look mit Scanlines & RGB-Shift',
     params: {
       blur: 0.5,
       bloom: 0.2,
@@ -596,6 +606,8 @@ export const effectsPresets: EffectsPreset[] = [
       vignette: 0.5,
       chromaticAberration: 4,
       waveDistortion: 0.2,
+      scanlines: 0.8,
+      pixelation: 1,
     },
   },
   {
@@ -612,6 +624,8 @@ export const effectsPresets: EffectsPreset[] = [
       vignette: 0.15,
       chromaticAberration: 0,
       waveDistortion: 0.1,
+      scanlines: 0,
+      pixelation: 1,
     },
   },
   {
@@ -628,6 +642,26 @@ export const effectsPresets: EffectsPreset[] = [
       vignette: 0.4,
       chromaticAberration: 0,
       waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
+    },
+  },
+  {
+    name: 'Pixelated',
+    icon: '🎮',
+    description: '8-bit Retro Gaming Look',
+    params: {
+      blur: 0,
+      bloom: 0.1,
+      saturation: 1.4,
+      contrast: 1.2,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0.2,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 8,
     },
   },
 ];

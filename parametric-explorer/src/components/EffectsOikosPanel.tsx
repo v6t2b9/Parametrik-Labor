@@ -140,6 +140,29 @@ export function EffectsOikosPanel() {
           description="Sine wave amplitude. Higher = more liquid/psychedelic warping"
         />
       </div>
+
+      {/* Retro / Lo-Fi */}
+      <div style={styles.section}>
+        <h4 style={styles.sectionTitle}>Retro / Lo-Fi</h4>
+        <ParameterSlider
+          label="Scanlines"
+          value={effects.scanlines}
+          min={0}
+          max={1}
+          step={0.05}
+          onChange={(value) => updateEffectsParams({ scanlines: value })}
+          description="CRT scanline effect strength. Perfect for Matrix/Retro look"
+        />
+        <ParameterSlider
+          label="Pixelation"
+          value={effects.pixelation}
+          min={1}
+          max={16}
+          step={1}
+          onChange={(value) => updateEffectsParams({ pixelation: value })}
+          description="Pixel/block size. 1 = none, higher = more retro pixelated"
+        />
+      </div>
     </div>
   );
 }
