@@ -1,7 +1,53 @@
 import { create } from 'zustand';
-import type { AllParameters, Agent, Trails, UIState, PerformanceMetrics } from '../types/index.js';
+import type { AllParameters, Agent, Trails, UIState, PerformanceMetrics, QualityPreset } from '../types/index.js';
 import { defaultParameters } from '../presets';
 import { SimulationEngine } from '../engine/SimulationEngine';
+
+// Quality preset configurations
+function getQualitySettings(preset: QualityPreset) {
+  switch (preset) {
+    case 'low':
+      return {
+        agentCount: 1000,
+        diffusionFreq: 8,
+        waveDistortion: 0,
+        chromaticAberration: 0,
+        bloom: 0,
+        blur: 0,
+        motionBlur: 0,
+      };
+    case 'medium':
+      return {
+        agentCount: 2000,
+        diffusionFreq: 5,
+        waveDistortion: 0,
+        chromaticAberration: 0,
+        bloom: 0.1,
+        blur: 0.5,
+        motionBlur: 0.1,
+      };
+    case 'high':
+      return {
+        agentCount: 3500,
+        diffusionFreq: 3,
+        waveDistortion: 0,
+        chromaticAberration: 0,
+        bloom: 0.2,
+        blur: 1,
+        motionBlur: 0.3,
+      };
+    case 'ultra':
+      return {
+        agentCount: 6000,
+        diffusionFreq: 2,
+        waveDistortion: 0.1,
+        chromaticAberration: 2,
+        bloom: 0.3,
+        blur: 2,
+        motionBlur: 0.5,
+      };
+  }
+}
 
 interface SimulationStore {
   // Simulation state
@@ -34,6 +80,7 @@ interface SimulationStore {
   updateEffectsParams: (params: Partial<AllParameters['effects']>) => void;
   updatePerformanceParams: (params: Partial<AllParameters['performance']>) => void;
   updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => void;
+  applyQualityPreset: (preset: QualityPreset) => void; // Apply quality preset and update all parameters
   setActiveOikosTab: (tab: UIState['activeOikosTab']) => void;
   setSimulationSpeed: (speed: number) => void;
   tick: () => void; // Called on each animation frame
@@ -196,30 +243,88 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       }));
     },
 
+    applyQualityPreset: (preset: QualityPreset) => {
+      const settings = getQualitySettings(preset);
+      const { updateTemporalParams, updatePhysicalParams, updateEffectsParams, updatePerformanceParams } = get();
+
+      // Update performance preset
+      updatePerformanceParams({ qualityPreset: preset, _currentOptLevel: 0 });
+
+      // Apply quality settings
+      updateTemporalParams({ agentCount: settings.agentCount });
+      updatePhysicalParams({ diffusionFreq: settings.diffusionFreq });
+      updateEffectsParams({
+        waveDistortion: settings.waveDistortion,
+        chromaticAberration: settings.chromaticAberration,
+        bloom: settings.bloom,
+        blur: settings.blur,
+        motionBlur: settings.motionBlur,
+      });
+
+      console.log(`[Quality Preset] Applied "${preset}" preset:`, settings);
+    },
+
     performAutoOptimization: () => {
-      const { parameters, performanceMetrics, updateTemporalParams } = get();
-      const { autoOptimize, targetFPS, minAgents, maxAgents, adjustmentSpeed, fpsLowerThreshold, fpsUpperThreshold } = parameters.performance;
+      const { parameters, performanceMetrics, updatePerformanceParams, updateEffectsParams, updatePhysicalParams, updateTemporalParams } = get();
+      const { autoOptimize, targetFPS, _currentOptLevel, qualityPreset } = parameters.performance;
 
       // Only optimize if enabled and we have valid FPS data
       if (!autoOptimize || performanceMetrics.avgFPS === 0) return;
 
-      const currentAgentCount = parameters.temporal.agentCount;
-      const lowerBound = targetFPS * fpsLowerThreshold;
-      const upperBound = targetFPS * fpsUpperThreshold;
+      const avgFPS = performanceMetrics.avgFPS;
+      const fpsRatio = avgFPS / targetFPS;
 
-      // FPS is too low - reduce agent count
-      if (performanceMetrics.avgFPS < lowerBound && currentAgentCount > minAgents) {
-        const reduction = Math.ceil(currentAgentCount * adjustmentSpeed);
-        const newCount = Math.max(minAgents, currentAgentCount - reduction);
-        console.log(`[Auto-Optimizer] FPS too low (${performanceMetrics.avgFPS.toFixed(1)}/${targetFPS}), reducing agents: ${currentAgentCount} → ${newCount}`);
-        updateTemporalParams({ agentCount: newCount });
+      // Get quality preset base values
+      const qualitySettings = getQualitySettings(qualityPreset);
+
+      // Determine optimization direction
+      let newOptLevel = _currentOptLevel;
+
+      // FPS too low - increase optimization (reduce quality)
+      if (fpsRatio < 0.85 && newOptLevel < 10) {
+        newOptLevel = Math.min(10, _currentOptLevel + 1);
+        console.log(`[Auto-Optimizer] FPS too low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
       }
-      // FPS is too high - increase agent count
-      else if (performanceMetrics.avgFPS > upperBound && currentAgentCount < maxAgents) {
-        const increase = Math.ceil(currentAgentCount * adjustmentSpeed);
-        const newCount = Math.min(maxAgents, currentAgentCount + increase);
-        console.log(`[Auto-Optimizer] FPS too high (${performanceMetrics.avgFPS.toFixed(1)}/${targetFPS}), increasing agents: ${currentAgentCount} → ${newCount}`);
-        updateTemporalParams({ agentCount: newCount });
+      // FPS good - decrease optimization (increase quality)
+      else if (fpsRatio > 1.1 && newOptLevel > 0) {
+        newOptLevel = Math.max(0, _currentOptLevel - 1);
+        console.log(`[Auto-Optimizer] FPS good (${avgFPS.toFixed(1)}/${targetFPS}), decreasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
+      }
+
+      // Apply optimization if level changed
+      if (newOptLevel !== _currentOptLevel) {
+        updatePerformanceParams({ _currentOptLevel: newOptLevel });
+
+        // Calculate optimization factor (0 = no opt, 1 = max opt)
+        const optFactor = newOptLevel / 10;
+
+        // Apply multi-dimensional optimizations
+        // 1. Effects (most expensive)
+        updateEffectsParams({
+          waveDistortion: qualitySettings.waveDistortion * (1 - optFactor * 1.0), // Remove completely if optimizing
+          chromaticAberration: qualitySettings.chromaticAberration * (1 - optFactor * 1.0), // Remove completely
+          bloom: qualitySettings.bloom * (1 - optFactor * 0.7), // Reduce by 70%
+          blur: qualitySettings.blur * (1 - optFactor * 0.5), // Reduce by 50%
+          motionBlur: qualitySettings.motionBlur * (1 - optFactor * 0.6), // Reduce by 60%
+        });
+
+        // 2. Physical (trail quality)
+        const baseDiffusion = qualitySettings.diffusionFreq;
+        const optimizedDiffusion = Math.min(10, baseDiffusion + Math.floor(optFactor * 5)); // Higher freq = less diffusion = faster
+        updatePhysicalParams({
+          diffusionFreq: optimizedDiffusion,
+        });
+
+        // 3. Agent count (last resort, only at high opt levels)
+        if (newOptLevel >= 7) {
+          const agentReduction = (newOptLevel - 6) / 4; // 0 at level 6, 1 at level 10
+          const targetAgents = Math.floor(qualitySettings.agentCount * (1 - agentReduction * 0.5)); // Max 50% reduction
+          const currentAgents = parameters.temporal.agentCount;
+
+          if (Math.abs(targetAgents - currentAgents) > 100) {
+            updateTemporalParams({ agentCount: targetAgents });
+          }
+        }
       }
     },
 
