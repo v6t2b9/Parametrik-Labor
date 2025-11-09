@@ -54,14 +54,9 @@ export function CanvasPanel() {
       for (let x = 0; x < GRID_SIZE; x++) {
         const idx = y * GRID_SIZE + x;
 
-        const redVal = trails.red[idx] * visualization.brightness;
-        const greenVal = trails.green[idx] * visualization.brightness;
-        const blueVal = trails.blue[idx] * visualization.brightness;
-
-        // Apply color mapping
-        const r = Math.min(255, (redVal / 255) * visualization.colorRed.r);
-        const g = Math.min(255, (greenVal / 255) * visualization.colorGreen.g);
-        const b = Math.min(255, (blueVal / 255) * visualization.colorBlue.b);
+        const redVal = trails.red[idx];
+        const greenVal = trails.green[idx];
+        const blueVal = trails.blue[idx];
 
         // Scale to canvas size (2x2 blocks)
         for (let dy = 0; dy < SCALE; dy++) {
@@ -70,10 +65,69 @@ export function CanvasPanel() {
             const canvasY = y * SCALE + dy;
             const pixelIdx = (canvasY * CANVAS_SIZE + canvasX) * 4;
 
-            data[pixelIdx] = r;
-            data[pixelIdx + 1] = g;
-            data[pixelIdx + 2] = b;
+            // Initialize with background
+            data[pixelIdx] = visualization.colorBg.r;
+            data[pixelIdx + 1] = visualization.colorBg.g;
+            data[pixelIdx + 2] = visualization.colorBg.b;
             data[pixelIdx + 3] = 255;
+
+            // Apply blend mode
+            if (visualization.blendMode === 'additive') {
+              // Additive blending: Add each species' color contribution
+              const tR = Math.min(1, redVal / visualization.trailIntensity);
+              const tG = Math.min(1, greenVal / visualization.trailIntensity);
+              const tB = Math.min(1, blueVal / visualization.trailIntensity);
+
+              data[pixelIdx] += visualization.colorRed.r * tR * visualization.brightness;
+              data[pixelIdx + 1] += visualization.colorRed.g * tR * visualization.brightness;
+              data[pixelIdx + 2] += visualization.colorRed.b * tR * visualization.brightness;
+
+              data[pixelIdx] += visualization.colorGreen.r * tG * visualization.brightness;
+              data[pixelIdx + 1] += visualization.colorGreen.g * tG * visualization.brightness;
+              data[pixelIdx + 2] += visualization.colorGreen.b * tG * visualization.brightness;
+
+              data[pixelIdx] += visualization.colorBlue.r * tB * visualization.brightness;
+              data[pixelIdx + 1] += visualization.colorBlue.g * tB * visualization.brightness;
+              data[pixelIdx + 2] += visualization.colorBlue.b * tB * visualization.brightness;
+
+            } else if (visualization.blendMode === 'multiply' || visualization.blendMode === 'average') {
+              // Average/Multiply blending: Weight by trail intensity
+              const totalTrail = redVal + greenVal + blueVal;
+              if (totalTrail > 0) {
+                const t = Math.min(1, totalTrail / visualization.trailIntensity);
+                data[pixelIdx] = (visualization.colorRed.r * redVal + visualization.colorGreen.r * greenVal + visualization.colorBlue.r * blueVal) / totalTrail * t * visualization.brightness;
+                data[pixelIdx + 1] = (visualization.colorRed.g * redVal + visualization.colorGreen.g * greenVal + visualization.colorBlue.g * blueVal) / totalTrail * t * visualization.brightness;
+                data[pixelIdx + 2] = (visualization.colorRed.b * redVal + visualization.colorGreen.b * greenVal + visualization.colorBlue.b * blueVal) / totalTrail * t * visualization.brightness;
+              }
+
+            } else if (visualization.blendMode === 'screen') {
+              // Screen blending: Invert, multiply inverted, invert back (creates bright combinations)
+              const tR = Math.min(1, redVal / visualization.trailIntensity) * visualization.brightness;
+              const tG = Math.min(1, greenVal / visualization.trailIntensity) * visualization.brightness;
+              const tB = Math.min(1, blueVal / visualization.trailIntensity) * visualization.brightness;
+
+              const r1 = visualization.colorRed.r * tR / 255;
+              const g1 = visualization.colorRed.g * tR / 255;
+              const b1 = visualization.colorRed.b * tR / 255;
+
+              const r2 = visualization.colorGreen.r * tG / 255;
+              const g2 = visualization.colorGreen.g * tG / 255;
+              const b2 = visualization.colorGreen.b * tG / 255;
+
+              const r3 = visualization.colorBlue.r * tB / 255;
+              const g3 = visualization.colorBlue.g * tB / 255;
+              const b3 = visualization.colorBlue.b * tB / 255;
+
+              // Screen formula: 1 - (1-a)(1-b)
+              data[pixelIdx] = 255 * (1 - (1 - r1) * (1 - r2) * (1 - r3));
+              data[pixelIdx + 1] = 255 * (1 - (1 - g1) * (1 - g2) * (1 - g3));
+              data[pixelIdx + 2] = 255 * (1 - (1 - b1) * (1 - b2) * (1 - b3));
+            }
+
+            // Clamp values
+            data[pixelIdx] = Math.min(255, Math.max(0, data[pixelIdx]));
+            data[pixelIdx + 1] = Math.min(255, Math.max(0, data[pixelIdx + 1]));
+            data[pixelIdx + 2] = Math.min(255, Math.max(0, data[pixelIdx + 2]));
           }
         }
       }

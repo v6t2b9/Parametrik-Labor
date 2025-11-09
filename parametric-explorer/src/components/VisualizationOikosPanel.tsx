@@ -13,7 +13,10 @@ export function VisualizationOikosPanel() {
 
       {/* Visual Presets Section */}
       <div style={styles.presetSection}>
-        <h4 style={styles.presetTitle}>Visuelle Presets</h4>
+        <h4 style={styles.presetTitle}>🌈 Visuelle Welten - Lavalampen Power!</h4>
+        <p style={styles.presetDescription}>
+          Jedes Preset kombiniert Farben, Helligkeit, Blend Mode und Trail-Intensität für einen einzigartigen Look.
+        </p>
         <div style={styles.presetGrid}>
           {visualPresets.map((preset) => (
             <button
@@ -31,28 +34,71 @@ export function VisualizationOikosPanel() {
 
       <div style={styles.divider} />
 
+      {/* Blend Mode Section */}
+      <div style={styles.section}>
+        <h4 style={styles.sectionTitle}>🎭 Blend Mode</h4>
+        <p style={styles.sectionDescription}>
+          Wie werden die drei Spezies-Farben gemischt?
+        </p>
+        <div style={styles.blendModeGrid}>
+          {[
+            { mode: 'additive' as const, label: '✨ Additive', desc: 'Farben addieren sich (hell, leuchtend)' },
+            { mode: 'average' as const, label: '🎨 Average', desc: 'Gewichteter Durchschnitt (natürlich)' },
+            { mode: 'multiply' as const, label: '🌓 Multiply', desc: 'Multiplikativ (dunkel, kontrastreich)' },
+            { mode: 'screen' as const, label: '🌟 Screen', desc: 'Helle Kombination (leuchtend, weich)' },
+          ].map((item) => (
+            <button
+              key={item.mode}
+              onClick={() => updateVisualizationParams({ blendMode: item.mode })}
+              style={{
+                ...styles.blendModeButton,
+                backgroundColor: visualization.blendMode === item.mode ? '#7d5dbd' : '#1a1a2d',
+                borderColor: visualization.blendMode === item.mode ? '#9d7dd4' : '#2a2b3a',
+              }}
+              title={item.desc}
+            >
+              <span style={styles.blendModeLabel}>{item.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={styles.divider} />
+
+      {/* Brightness and Trail Intensity */}
       <ParameterSlider
-        label="Brightness (Helligkeit)"
+        label="✨ Brightness (Helligkeit)"
         value={visualization.brightness}
         min={0.5}
         max={5.0}
         step={0.1}
         onChange={(value) => updateVisualizationParams({ brightness: value })}
-        description="Gesamthelligkeit der Darstellung"
+        description="Gesamthelligkeit der Darstellung - höher = leuchtender"
       />
+
+      <ParameterSlider
+        label="🌫️ Trail Intensity"
+        value={visualization.trailIntensity}
+        min={80}
+        max={280}
+        step={10}
+        onChange={(value) => updateVisualizationParams({ trailIntensity: value })}
+        description="Sichtbarkeitsschwelle für Trails - niedriger = mehr sichtbare Details"
+      />
+
+      <div style={styles.divider} />
 
       <div style={styles.infoBox}>
         <p style={styles.infoText}>
-          ℹ️ <strong>Hinweis:</strong> Diese Parameter ändern NUR die Darstellung,
-          nicht die zugrundeliegende Dynamik des Systems!
+          💡 <strong>Tipp:</strong> Kombiniere verschiedene Blend Modes mit unterschiedlicher Trail Intensity für beeindruckende Effekte!
+          "Additive" + niedrige Intensity = glasklare Strukturen. "Multiply" + hohe Intensity = weiche Farbverläufe.
         </p>
       </div>
 
       <div style={styles.colorSection}>
-        <h4 style={styles.colorTitle}>Farbkanäle</h4>
+        <h4 style={styles.colorTitle}>🎨 Farbkanäle</h4>
         <p style={styles.colorSubtitle}>
-          Die Farben der drei Spezies (rot, grün, blau) können hier angepasst werden.
-          Diese Einstellung beeinflusst nur die visuelle Darstellung.
+          Die Farben der drei Spezies und des Hintergrunds. Diese Einstellung beeinflusst nur die visuelle Darstellung.
         </p>
 
         <div style={styles.colorGrid}>
@@ -64,6 +110,9 @@ export function VisualizationOikosPanel() {
                 backgroundColor: `rgb(${visualization.colorRed.r}, ${visualization.colorRed.g}, ${visualization.colorRed.b})`,
               }}
             />
+            <div style={styles.colorValues}>
+              RGB({visualization.colorRed.r}, {visualization.colorRed.g}, {visualization.colorRed.b})
+            </div>
           </div>
 
           <div style={styles.colorCard}>
@@ -74,6 +123,9 @@ export function VisualizationOikosPanel() {
                 backgroundColor: `rgb(${visualization.colorGreen.r}, ${visualization.colorGreen.g}, ${visualization.colorGreen.b})`,
               }}
             />
+            <div style={styles.colorValues}>
+              RGB({visualization.colorGreen.r}, {visualization.colorGreen.g}, {visualization.colorGreen.b})
+            </div>
           </div>
 
           <div style={styles.colorCard}>
@@ -84,8 +136,31 @@ export function VisualizationOikosPanel() {
                 backgroundColor: `rgb(${visualization.colorBlue.r}, ${visualization.colorBlue.g}, ${visualization.colorBlue.b})`,
               }}
             />
+            <div style={styles.colorValues}>
+              RGB({visualization.colorBlue.r}, {visualization.colorBlue.g}, {visualization.colorBlue.b})
+            </div>
+          </div>
+
+          <div style={styles.colorCard}>
+            <div style={styles.colorLabel}>⬛ Hintergrund</div>
+            <div
+              style={{
+                ...styles.colorPreview,
+                backgroundColor: `rgb(${visualization.colorBg.r}, ${visualization.colorBg.g}, ${visualization.colorBg.b})`,
+              }}
+            />
+            <div style={styles.colorValues}>
+              RGB({visualization.colorBg.r}, {visualization.colorBg.g}, {visualization.colorBg.b})
+            </div>
           </div>
         </div>
+      </div>
+
+      <div style={styles.infoBox}>
+        <p style={styles.infoText}>
+          ℹ️ <strong>Hinweis:</strong> Diese Parameter ändern NUR die Darstellung,
+          nicht die zugrundeliegende Dynamik des Systems!
+        </p>
       </div>
     </div>
   );
@@ -113,10 +188,16 @@ const styles = {
     marginBottom: '20px',
   } as React.CSSProperties,
   presetTitle: {
-    fontSize: '14px',
-    color: '#a0a0b0',
-    marginBottom: '12px',
+    fontSize: '15px',
+    color: '#9d7dd4',
+    marginBottom: '8px',
     fontWeight: 600,
+  } as React.CSSProperties,
+  presetDescription: {
+    fontSize: '11px',
+    color: '#7d7d8d',
+    marginBottom: '12px',
+    lineHeight: '1.4',
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',
@@ -141,26 +222,60 @@ const styles = {
     marginBottom: '4px',
   } as React.CSSProperties,
   presetName: {
-    fontSize: '10px',
+    fontSize: '9px',
     textAlign: 'center',
+    lineHeight: '1.2',
   } as React.CSSProperties,
   divider: {
     height: '1px',
     backgroundColor: '#2a2b3a',
+    margin: '20px 0',
+  } as React.CSSProperties,
+  section: {
     marginBottom: '20px',
+  } as React.CSSProperties,
+  sectionTitle: {
+    fontSize: '14px',
+    color: '#e0e0e0',
+    marginBottom: '6px',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  sectionDescription: {
+    fontSize: '11px',
+    color: '#7d7d8d',
+    marginBottom: '12px',
+    lineHeight: '1.3',
+  } as React.CSSProperties,
+  blendModeGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '8px',
+  } as React.CSSProperties,
+  blendModeButton: {
+    padding: '12px',
+    border: '2px solid',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    fontWeight: 600,
+    fontSize: '12px',
+  } as React.CSSProperties,
+  blendModeLabel: {
+    display: 'block',
+    textAlign: 'center',
+    color: '#e0e0e0',
   } as React.CSSProperties,
   infoBox: {
     padding: '12px',
     backgroundColor: '#0a0a15',
     borderRadius: '6px',
-    border: '1px solid #2a2b3a',
-    marginTop: '20px',
+    border: '1px solid #3d2d5d',
     marginBottom: '20px',
   } as React.CSSProperties,
   infoText: {
-    fontSize: '12px',
+    fontSize: '11px',
     color: '#a0a0b0',
-    lineHeight: '1.5',
+    lineHeight: '1.6',
     margin: 0,
   } as React.CSSProperties,
   colorSection: {
@@ -180,7 +295,7 @@ const styles = {
   } as React.CSSProperties,
   colorGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
+    gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '12px',
   } as React.CSSProperties,
   colorCard: {
@@ -201,5 +316,12 @@ const styles = {
     height: '40px',
     borderRadius: '4px',
     border: '1px solid #2a2b3a',
+    marginBottom: '6px',
+  } as React.CSSProperties,
+  colorValues: {
+    fontSize: '9px',
+    color: '#6a6a7a',
+    textAlign: 'center',
+    fontFamily: 'monospace',
   } as React.CSSProperties,
 };

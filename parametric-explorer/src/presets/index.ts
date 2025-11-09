@@ -52,6 +52,8 @@ export const defaultParameters: AllParameters = {
   // Visual/technical params (global)
   visualization: {
     brightness: 1.5,
+    blendMode: 'additive' as const,
+    trailIntensity: 180,
     colorRed: { r: 255, g: 50, b: 50 },
     colorGreen: { r: 50, g: 255, b: 50 },
     colorBlue: { r: 50, g: 150, b: 255 },
@@ -93,7 +95,11 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       agentCount: legacy.temporal.agentCount,
       simulationSpeed: legacy.temporal.simulationSpeed,
     },
-    visualization: legacy.visualization,
+    visualization: {
+      ...legacy.visualization,
+      blendMode: legacy.visualization.blendMode || 'additive',
+      trailIntensity: legacy.visualization.trailIntensity || 180,
+    },
     effects: legacy.effects,
     performance: legacy.performance,
   };
