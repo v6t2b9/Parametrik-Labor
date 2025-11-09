@@ -58,6 +58,14 @@ export class WebGLTrailRenderer {
 
     this.gl = gl;
 
+    // Enable float texture extension (important for high-quality trail rendering)
+    const floatExt = gl.getExtension('OES_texture_float');
+    if (!floatExt) {
+      console.warn('OES_texture_float not supported - visual quality may be reduced');
+    }
+    // Enable linear filtering for float textures
+    gl.getExtension('OES_texture_float_linear');
+
     // Create shader program
     const vertexShader = this.createShader(gl.VERTEX_SHADER, vertexShaderSource);
     const fragmentShader = this.createShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -240,12 +248,8 @@ export class WebGLTrailRenderer {
     gl.activeTexture(gl.TEXTURE0 + unit);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    // Convert Float32Array to Uint8Array for texture upload
-    const uint8Data = new Uint8Array(data.length);
-    for (let i = 0; i < data.length; i++) {
-      uint8Data[i] = Math.min(255, Math.max(0, data[i]));
-    }
-
+    // Use FLOAT texture to preserve high trail intensity values (important for visual effects)
+    // This preserves the full dynamic range needed for lavalamp-like effects
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
@@ -254,8 +258,8 @@ export class WebGLTrailRenderer {
       this.gridSize,
       0,
       gl.LUMINANCE,
-      gl.UNSIGNED_BYTE,
-      uint8Data
+      gl.FLOAT,
+      data // Use original float data directly - shader will handle normalization
     );
   }
 
