@@ -44,11 +44,11 @@ export function PhysicalOikosPanel() {
       <ParameterSlider
         label="Diffusion Frequency"
         value={physical.diffusionFreq}
-        min={0}
-        max={20}
+        min={1}
+        max={10}
         step={1}
         onChange={(value) => updatePhysicalParams({ diffusionFreq: value })}
-        description="Spatial spread of trails. High → smooth gradients → fluidity"
+        description="Diffusion interval (frames). Low (1) = fast diffusion, High (10) = slow diffusion"
       />
 
       <ParameterSlider

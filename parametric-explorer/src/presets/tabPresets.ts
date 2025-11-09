@@ -133,8 +133,8 @@ export const physicsPresets: PhysicsPreset[] = [
     description: 'Hohe Diffusion, mittlerer Zerfall',
     params: {
       decayRate: 0.92,
-      diffusionFreq: 12,
-      fadeStrength: 0.15,
+      diffusionFreq: 1,  // VIEL Diffusion (jedes Frame)
+      fadeStrength: 0.12,
       trailSaturation: 220,
     },
   },
@@ -143,9 +143,9 @@ export const physicsPresets: PhysicsPreset[] = [
     icon: '💎',
     description: 'Minimal Diffusion, hohe Persistenz',
     params: {
-      decayRate: 0.995,
-      diffusionFreq: 0,
-      fadeStrength: 0.01,
+      decayRate: 0.98,
+      diffusionFreq: 8,  // WENIG Diffusion (jedes 8. Frame)
+      fadeStrength: 0.08,
       trailSaturation: 255,
     },
   },
@@ -154,9 +154,9 @@ export const physicsPresets: PhysicsPreset[] = [
     icon: '💨',
     description: 'Sehr hohe Diffusion, schneller Zerfall',
     params: {
-      decayRate: 0.75,
-      diffusionFreq: 18,
-      fadeStrength: 0.35,
+      decayRate: 0.88,
+      diffusionFreq: 1,  // VIEL Diffusion (jedes Frame)
+      fadeStrength: 0.25,
       trailSaturation: 150,
     },
   },
@@ -165,9 +165,9 @@ export const physicsPresets: PhysicsPreset[] = [
     icon: '🍯',
     description: 'Hohe Persistenz, niedrige Diffusion',
     params: {
-      decayRate: 0.98,
-      diffusionFreq: 1,
-      fadeStrength: 0.03,
+      decayRate: 0.99,
+      diffusionFreq: 5,  // WENIG Diffusion (jedes 5. Frame)
+      fadeStrength: 0.06,
       trailSaturation: 255,
     },
   },
@@ -176,20 +176,20 @@ export const physicsPresets: PhysicsPreset[] = [
     icon: '🌀',
     description: 'Extreme Diffusion, starker Zerfall',
     params: {
-      decayRate: 0.65,
-      diffusionFreq: 20,
-      fadeStrength: 0.40,
+      decayRate: 0.90,
+      diffusionFreq: 2,  // SEHR VIEL Diffusion (jedes 2. Frame)
+      fadeStrength: 0.20,
       trailSaturation: 180,
     },
   },
   {
     name: 'Stabil',
     icon: '🔒',
-    description: 'Sehr hohe Persistenz, minimale Diffusion',
+    description: 'Ausgeglichene Persistenz und Diffusion',
     params: {
-      decayRate: 0.99,
-      diffusionFreq: 0,
-      fadeStrength: 0.02,
+      decayRate: 0.97,
+      diffusionFreq: 3,  // MITTLERE Diffusion (jedes 3. Frame)
+      fadeStrength: 0.15,
       trailSaturation: 255,
     },
   },

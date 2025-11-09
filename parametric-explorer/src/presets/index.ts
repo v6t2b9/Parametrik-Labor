@@ -3,9 +3,9 @@ import type { Preset, AllParameters } from '../types/index.js';
 // Default/Base Parameters
 export const defaultParameters: AllParameters = {
   physical: {
-    decayRate: 0.94,
-    diffusionFreq: 3,
-    fadeStrength: 0.12,
+    decayRate: 0.96,
+    diffusionFreq: 3,  // MITTLERE Diffusion (jedes 3. Frame)
+    fadeStrength: 0.15,
     trailSaturation: 200,
   },
   semiotic: {
@@ -158,26 +158,26 @@ const maxChaosPreset: Preset = {
   description: 'Irreguläre, unvorhersagbare, turbulente Dynamiken. Empfohlen für: Instabilität, Nicht-Linearität.',
   parameters: {
     physical: {
-      decayRate: 0.68,
-      diffusionFreq: 18,
-      fadeStrength: 0.42,
-      trailSaturation: 150,
+      decayRate: 0.93,
+      diffusionFreq: 4,  // VIEL Diffusion (jedes 4. Frame)
+      fadeStrength: 0.18,
+      trailSaturation: 180,
     },
     semiotic: {
-      sensorDist: 45,
-      sensorAngle: 1.8,
-      deposit: 8,
-      turnSpeed: 1.8,
+      sensorDist: 18,
+      sensorAngle: 0.6,
+      deposit: 12,
+      turnSpeed: 0.8,
     },
     temporal: {
-      speed: 5.0,
-      agentCount: 5000,
-      chaosInterval: 100,
-      chaosStrength: 1.6,
+      speed: 2.2,
+      agentCount: 4000,
+      chaosInterval: 150,
+      chaosStrength: 0.9,
     },
     resonance: {
-      attractionStrength: 0.6,
-      repulsionStrength: -0.1,
+      attractionStrength: 0.7,
+      repulsionStrength: -0.6,
       crossSpeciesInteraction: true,
     },
     visualization: {
@@ -197,20 +197,20 @@ const networkPreset: Preset = {
   description: 'Verzweigte, verbundene Pfade. Empfohlen für: Konnektivität, Nicht-Cluster-Ordnung.',
   parameters: {
     physical: {
-      decayRate: 0.96,
-      diffusionFreq: 4,
-      fadeStrength: 0.08,
-      trailSaturation: 220,
+      decayRate: 0.94,
+      diffusionFreq: 3,  // MITTLERE Diffusion
+      fadeStrength: 0.12,
+      trailSaturation: 200,
     },
     semiotic: {
-      sensorDist: 55,
-      sensorAngle: 0.4,
-      deposit: 12,
-      turnSpeed: 0.7,
+      sensorDist: 35,
+      sensorAngle: 0.5,
+      deposit: 20,
+      turnSpeed: 0.4,
     },
     temporal: {
-      speed: 2.0,
-      agentCount: 3500,
+      speed: 1.5,
+      agentCount: 2500,
       chaosInterval: 0,
       chaosStrength: 0.0,
     },
@@ -236,25 +236,25 @@ const fluidPreset: Preset = {
   description: 'Kontinuierliche Formveränderung ohne Strukturkollaps. Empfohlen für: Morphogenese, lebendige Systeme.',
   parameters: {
     physical: {
-      decayRate: 0.89,
-      diffusionFreq: 15,
-      fadeStrength: 0.22,
-      trailSaturation: 200,
+      decayRate: 0.92,
+      diffusionFreq: 8,  // WENIG Diffusion (glattere Strömungen)
+      fadeStrength: 0.15,
+      trailSaturation: 220,
     },
     semiotic: {
-      sensorDist: 28,
-      sensorAngle: 1.2,
-      deposit: 10,
-      turnSpeed: 1.1,
+      sensorDist: 20,
+      sensorAngle: 0.8,
+      deposit: 15,
+      turnSpeed: 0.6,
     },
     temporal: {
-      speed: 3.5,
-      agentCount: 4500,
+      speed: 2.0,
+      agentCount: 3500,
       chaosInterval: 0,
       chaosStrength: 0.0,
     },
     resonance: {
-      attractionStrength: 1.0,
+      attractionStrength: 1.2,
       repulsionStrength: -0.4,
       crossSpeciesInteraction: true,
     },
