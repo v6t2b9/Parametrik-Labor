@@ -5,7 +5,11 @@ const CANVAS_SIZE = 800;
 const GRID_SIZE = 400;
 const SCALE = CANVAS_SIZE / GRID_SIZE; // 2x scaling
 
-export function CanvasPanel() {
+interface CanvasPanelProps {
+  isFullscreen?: boolean;
+}
+
+export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const motionBlurCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -404,13 +408,23 @@ export function CanvasPanel() {
     render();
   }, [render]);
 
+  const containerStyle: React.CSSProperties = {
+    ...styles.container,
+    ...(isFullscreen && styles.containerFullscreen),
+  };
+
+  const canvasStyle: React.CSSProperties = {
+    ...styles.canvas,
+    ...(isFullscreen && styles.canvasFullscreen),
+  };
+
   return (
-    <div style={styles.container}>
+    <div style={containerStyle}>
       <canvas
         ref={canvasRef}
         width={CANVAS_SIZE}
         height={CANVAS_SIZE}
-        style={styles.canvas}
+        style={canvasStyle}
       />
     </div>
   );
@@ -421,12 +435,30 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
     padding: '20px',
     backgroundColor: '#0a0a15',
   } as React.CSSProperties,
+  containerFullscreen: {
+    padding: '0',
+    backgroundColor: 'transparent',
+    height: '100%',
+  } as React.CSSProperties,
   canvas: {
+    // Responsive sizing: CSS scales the canvas display, not the render buffer
+    maxWidth: '100%',
+    maxHeight: '90vh',
+    width: 'auto',
+    height: 'auto',
+    objectFit: 'contain',
     border: '2px solid #2a2b3a',
     borderRadius: '8px',
     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.5)',
+  } as React.CSSProperties,
+  canvasFullscreen: {
+    maxWidth: '100vw',
+    maxHeight: '100vh',
+    border: 'none',
+    borderRadius: '0',
   } as React.CSSProperties,
 };
