@@ -1,7 +1,49 @@
 import { create } from 'zustand';
-import type { AllParameters, Agent, Trails, UIState, PerformanceMetrics, QualityPreset } from '../types/index.js';
+import type {
+  AllParameters,
+  Agent,
+  Trails,
+  UIState,
+  PerformanceMetrics,
+  QualityPreset,
+  AgentType,
+  ResolvedSpeciesParams,
+  SpeciesScope,
+  OikosTab,
+  PhysicalOikosParams,
+  SemioticOikosParams,
+  SpeciesTemporalParams,
+  ResonanceOikosParams,
+} from '../types/index.js';
 import { defaultParameters } from '../presets';
 import { SimulationEngine } from '../engine/SimulationEngine';
+
+// Helper: Merge universal + species overrides
+export function resolveSpeciesParams(
+  params: AllParameters,
+  species: AgentType
+): ResolvedSpeciesParams {
+  const speciesOverride = params.species[species];
+
+  return {
+    physical: {
+      ...params.universal.physical,
+      ...(speciesOverride.physical || {}),
+    },
+    semiotic: {
+      ...params.universal.semiotic,
+      ...(speciesOverride.semiotic || {}),
+    },
+    temporal: {
+      ...params.universal.temporal,
+      ...(speciesOverride.temporal || {}),
+    },
+    resonance: {
+      ...params.universal.resonance,
+      ...(speciesOverride.resonance || {}),
+    },
+  };
+}
 
 // Quality preset configurations
 function getQualitySettings(preset: QualityPreset) {
@@ -72,19 +114,42 @@ interface SimulationStore {
   reset: () => void;
   setParameters: (params: Partial<AllParameters>) => void;
   loadPreset: (params: AllParameters) => void;
-  updatePhysicalParams: (params: Partial<AllParameters['physical']>) => void;
-  updateSemioticParams: (params: Partial<AllParameters['semiotic']>) => void;
-  updateTemporalParams: (params: Partial<AllParameters['temporal']>) => void;
-  updateResonanceParams: (params: Partial<AllParameters['resonance']>) => void;
+
+  // Matrix-aware parameter updates
+  updateUniversalPhysicalParams: (params: Partial<PhysicalOikosParams>) => void;
+  updateUniversalSemioticParams: (params: Partial<SemioticOikosParams>) => void;
+  updateUniversalTemporalParams: (params: Partial<SpeciesTemporalParams>) => void;
+  updateUniversalResonanceParams: (params: Partial<ResonanceOikosParams>) => void;
+
+  updateSpeciesPhysicalParams: (species: AgentType, params: Partial<PhysicalOikosParams>) => void;
+  updateSpeciesSemioticParams: (species: AgentType, params: Partial<SemioticOikosParams>) => void;
+  updateSpeciesTemporalParams: (species: AgentType, params: Partial<SpeciesTemporalParams>) => void;
+  updateSpeciesResonanceParams: (species: AgentType, params: Partial<ResonanceOikosParams>) => void;
+
+  // Context-aware updates (based on current activeSpeciesScope)
+  updatePhysicalParams: (params: Partial<PhysicalOikosParams>) => void;
+  updateSemioticParams: (params: Partial<SemioticOikosParams>) => void;
+  updateTemporalParams: (params: Partial<SpeciesTemporalParams>) => void;
+  updateResonanceParams: (params: Partial<ResonanceOikosParams>) => void;
+
+  // Global updates
+  updateGlobalTemporalParams: (params: Partial<AllParameters['globalTemporal']>) => void;
   updateVisualizationParams: (params: Partial<AllParameters['visualization']>) => void;
   updateEffectsParams: (params: Partial<AllParameters['effects']>) => void;
   updatePerformanceParams: (params: Partial<AllParameters['performance']>) => void;
   updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => void;
-  applyQualityPreset: (preset: QualityPreset) => void; // Apply quality preset and update all parameters
-  setActiveOikosTab: (tab: UIState['activeOikosTab']) => void;
+  applyQualityPreset: (preset: QualityPreset) => void;
+
+  // UI actions
+  setActiveSpeciesScope: (scope: SpeciesScope) => void;
+  setActiveOikosTab: (tab: OikosTab) => void;
+  setControlPanelOpen: (open: boolean) => void;
+  toggleControlPanel: () => void;
   setSimulationSpeed: (speed: number) => void;
-  tick: () => void; // Called on each animation frame
-  performAutoOptimization: () => void; // Auto-adjust agent count based on FPS
+
+  // Simulation
+  tick: () => void;
+  performAutoOptimization: () => void;
 }
 
 const GRID_SIZE = 400;
@@ -93,7 +158,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
   // Create engine instance
   const engine = new SimulationEngine(GRID_SIZE);
   engine.setParameters(defaultParameters);
-  engine.initializeAgents(defaultParameters.temporal.agentCount);
+  engine.initializeAgents(defaultParameters.globalTemporal.agentCount);
 
   return {
     // Initial state
@@ -113,13 +178,14 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       renderTime: 0,
     },
     ui: {
+      activeSpeciesScope: 'universal',
       activeOikosTab: 'physical',
+      controlPanelOpen: false,
       simulationSpeed: 1,
     },
 
-    // Actions
+    // Basic actions
     setRunning: (running: boolean) => set({ running }),
-
     toggleRunning: () => set((state) => ({ running: !state.running })),
 
     reset: () => {
@@ -136,13 +202,16 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     setParameters: (params: Partial<AllParameters>) => {
       const currentParams = get().parameters;
-      const newParams = {
+      const newParams: AllParameters = {
         ...currentParams,
         ...params,
-        physical: { ...currentParams.physical, ...(params.physical || {}) },
-        semiotic: { ...currentParams.semiotic, ...(params.semiotic || {}) },
-        temporal: { ...currentParams.temporal, ...(params.temporal || {}) },
-        resonance: { ...currentParams.resonance, ...(params.resonance || {}) },
+        universal: { ...currentParams.universal, ...(params.universal || {}) },
+        species: {
+          red: { ...currentParams.species.red, ...(params.species?.red || {}) },
+          green: { ...currentParams.species.green, ...(params.species?.green || {}) },
+          blue: { ...currentParams.species.blue, ...(params.species?.blue || {}) },
+        },
+        globalTemporal: { ...currentParams.globalTemporal, ...(params.globalTemporal || {}) },
         visualization: { ...currentParams.visualization, ...(params.visualization || {}) },
         effects: { ...currentParams.effects, ...(params.effects || {}) },
         performance: { ...currentParams.performance, ...(params.performance || {}) },
@@ -167,29 +236,146 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       });
     },
 
-    updatePhysicalParams: (params: Partial<AllParameters['physical']>) => {
-      const currentParams = get().parameters;
-      const newParams = {
-        ...currentParams,
-        physical: { ...currentParams.physical, ...params },
-      };
-      get().setParameters(newParams);
+    // Universal parameter updates
+    updateUniversalPhysicalParams: (params) => {
+      const current = get().parameters;
+      get().setParameters({
+        universal: {
+          ...current.universal,
+          physical: { ...current.universal.physical, ...params },
+        },
+      });
     },
 
-    updateSemioticParams: (params: Partial<AllParameters['semiotic']>) => {
-      const currentParams = get().parameters;
-      const newParams = {
-        ...currentParams,
-        semiotic: { ...currentParams.semiotic, ...params },
-      };
-      get().setParameters(newParams);
+    updateUniversalSemioticParams: (params) => {
+      const current = get().parameters;
+      get().setParameters({
+        universal: {
+          ...current.universal,
+          semiotic: { ...current.universal.semiotic, ...params },
+        },
+      });
     },
 
-    updateTemporalParams: (params: Partial<AllParameters['temporal']>) => {
-      const currentParams = get().parameters;
+    updateUniversalTemporalParams: (params) => {
+      const current = get().parameters;
+      get().setParameters({
+        universal: {
+          ...current.universal,
+          temporal: { ...current.universal.temporal, ...params },
+        },
+      });
+    },
+
+    updateUniversalResonanceParams: (params) => {
+      const current = get().parameters;
+      get().setParameters({
+        universal: {
+          ...current.universal,
+          resonance: { ...current.universal.resonance, ...params },
+        },
+      });
+    },
+
+    // Species-specific parameter updates
+    updateSpeciesPhysicalParams: (species, params) => {
+      const current = get().parameters;
+      const speciesParams = current.species[species];
+      get().setParameters({
+        species: {
+          ...current.species,
+          [species]: {
+            ...speciesParams,
+            physical: { ...speciesParams.physical, ...params },
+          },
+        },
+      });
+    },
+
+    updateSpeciesSemioticParams: (species, params) => {
+      const current = get().parameters;
+      const speciesParams = current.species[species];
+      get().setParameters({
+        species: {
+          ...current.species,
+          [species]: {
+            ...speciesParams,
+            semiotic: { ...speciesParams.semiotic, ...params },
+          },
+        },
+      });
+    },
+
+    updateSpeciesTemporalParams: (species, params) => {
+      const current = get().parameters;
+      const speciesParams = current.species[species];
+      get().setParameters({
+        species: {
+          ...current.species,
+          [species]: {
+            ...speciesParams,
+            temporal: { ...speciesParams.temporal, ...params },
+          },
+        },
+      });
+    },
+
+    updateSpeciesResonanceParams: (species, params) => {
+      const current = get().parameters;
+      const speciesParams = current.species[species];
+      get().setParameters({
+        species: {
+          ...current.species,
+          [species]: {
+            ...speciesParams,
+            resonance: { ...speciesParams.resonance, ...params },
+          },
+        },
+      });
+    },
+
+    // Context-aware updates (based on activeSpeciesScope)
+    updatePhysicalParams: (params) => {
+      const { ui } = get();
+      if (ui.activeSpeciesScope === 'universal') {
+        get().updateUniversalPhysicalParams(params);
+      } else {
+        get().updateSpeciesPhysicalParams(ui.activeSpeciesScope as AgentType, params);
+      }
+    },
+
+    updateSemioticParams: (params) => {
+      const { ui } = get();
+      if (ui.activeSpeciesScope === 'universal') {
+        get().updateUniversalSemioticParams(params);
+      } else {
+        get().updateSpeciesSemioticParams(ui.activeSpeciesScope as AgentType, params);
+      }
+    },
+
+    updateTemporalParams: (params) => {
+      const { ui } = get();
+      if (ui.activeSpeciesScope === 'universal') {
+        get().updateUniversalTemporalParams(params);
+      } else {
+        get().updateSpeciesTemporalParams(ui.activeSpeciesScope as AgentType, params);
+      }
+    },
+
+    updateResonanceParams: (params) => {
+      const { ui } = get();
+      if (ui.activeSpeciesScope === 'universal') {
+        get().updateUniversalResonanceParams(params);
+      } else {
+        get().updateSpeciesResonanceParams(ui.activeSpeciesScope as AgentType, params);
+      }
+    },
+
+    // Global updates
+    updateGlobalTemporalParams: (params) => {
+      const current = get().parameters;
       const newParams = {
-        ...currentParams,
-        temporal: { ...currentParams.temporal, ...params },
+        globalTemporal: { ...current.globalTemporal, ...params },
       };
       get().setParameters(newParams);
 
@@ -201,58 +387,52 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       }
     },
 
-    updateResonanceParams: (params: Partial<AllParameters['resonance']>) => {
-      const currentParams = get().parameters;
-      const newParams = {
-        ...currentParams,
-        resonance: { ...currentParams.resonance, ...params },
-      };
-      get().setParameters(newParams);
+    updateVisualizationParams: (params) => {
+      const current = get().parameters;
+      set({
+        parameters: {
+          ...current,
+          visualization: { ...current.visualization, ...params },
+        },
+      });
     },
 
-    updateVisualizationParams: (params: Partial<AllParameters['visualization']>) => {
-      const currentParams = get().parameters;
-      const newParams = {
-        ...currentParams,
-        visualization: { ...currentParams.visualization, ...params },
-      };
-      set({ parameters: newParams });
+    updateEffectsParams: (params) => {
+      const current = get().parameters;
+      set({
+        parameters: {
+          ...current,
+          effects: { ...current.effects, ...params },
+        },
+      });
     },
 
-    updateEffectsParams: (params: Partial<AllParameters['effects']>) => {
-      const currentParams = get().parameters;
-      const newParams = {
-        ...currentParams,
-        effects: { ...currentParams.effects, ...params },
-      };
-      set({ parameters: newParams });
+    updatePerformanceParams: (params) => {
+      const current = get().parameters;
+      set({
+        parameters: {
+          ...current,
+          performance: { ...current.performance, ...params },
+        },
+      });
     },
 
-    updatePerformanceParams: (params: Partial<AllParameters['performance']>) => {
-      const currentParams = get().parameters;
-      const newParams = {
-        ...currentParams,
-        performance: { ...currentParams.performance, ...params },
-      };
-      set({ parameters: newParams });
-    },
-
-    updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => {
+    updatePerformanceMetrics: (metrics) => {
       set((state) => ({
         performanceMetrics: { ...state.performanceMetrics, ...metrics },
       }));
     },
 
-    applyQualityPreset: (preset: QualityPreset) => {
+    applyQualityPreset: (preset) => {
       const settings = getQualitySettings(preset);
-      const { updateTemporalParams, updatePhysicalParams, updateEffectsParams, updatePerformanceParams } = get();
+      const { updateGlobalTemporalParams, updateUniversalPhysicalParams, updateEffectsParams, updatePerformanceParams } = get();
 
       // Update performance preset
       updatePerformanceParams({ qualityPreset: preset, _currentOptLevel: 0 });
 
       // Apply quality settings
-      updateTemporalParams({ agentCount: settings.agentCount });
-      updatePhysicalParams({ diffusionFreq: settings.diffusionFreq });
+      updateGlobalTemporalParams({ agentCount: settings.agentCount });
+      updateUniversalPhysicalParams({ diffusionFreq: settings.diffusionFreq });
       updateEffectsParams({
         waveDistortion: settings.waveDistortion,
         chromaticAberration: settings.chromaticAberration,
@@ -265,7 +445,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     },
 
     performAutoOptimization: () => {
-      const { parameters, performanceMetrics, updatePerformanceParams, updateEffectsParams, updatePhysicalParams, updateTemporalParams } = get();
+      const { parameters, performanceMetrics, updatePerformanceParams, updateEffectsParams, updateUniversalPhysicalParams, updateGlobalTemporalParams } = get();
       const { autoOptimize, targetFPS, _currentOptLevel, qualityPreset } = parameters.performance;
 
       // Only optimize if enabled and we have valid FPS data
@@ -281,22 +461,16 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       let newOptLevel = _currentOptLevel;
 
       // FPS too low - increase optimization (reduce quality)
-      // More aggressive at very low FPS
       if (fpsRatio < 0.5 && newOptLevel < 10) {
-        // Very bad FPS - jump 3 levels
         newOptLevel = Math.min(10, _currentOptLevel + 3);
         console.log(`[Auto-Optimizer] FPS critical (${avgFPS.toFixed(1)}/${targetFPS}), jumping opt level: ${_currentOptLevel} → ${newOptLevel}`);
       } else if (fpsRatio < 0.7 && newOptLevel < 10) {
-        // Bad FPS - jump 2 levels
         newOptLevel = Math.min(10, _currentOptLevel + 2);
         console.log(`[Auto-Optimizer] FPS very low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
       } else if (fpsRatio < 0.9 && newOptLevel < 10) {
-        // Low FPS - increase 1 level
         newOptLevel = Math.min(10, _currentOptLevel + 1);
         console.log(`[Auto-Optimizer] FPS low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
-      }
-      // FPS good - decrease optimization (increase quality) - but slowly
-      else if (fpsRatio > 1.2 && newOptLevel > 0) {
+      } else if (fpsRatio > 1.2 && newOptLevel > 0) {
         newOptLevel = Math.max(0, _currentOptLevel - 1);
         console.log(`[Auto-Optimizer] FPS good (${avgFPS.toFixed(1)}/${targetFPS}), decreasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
       }
@@ -305,49 +479,63 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       if (newOptLevel !== _currentOptLevel) {
         updatePerformanceParams({ _currentOptLevel: newOptLevel });
 
-        // Calculate optimization factor (0 = no opt, 1 = max opt)
         const optFactor = newOptLevel / 10;
 
-        // Apply multi-dimensional optimizations
-        // 1. Effects (most expensive)
+        // Apply optimizations
         updateEffectsParams({
-          waveDistortion: qualitySettings.waveDistortion * (1 - optFactor * 1.0), // Remove completely if optimizing
-          chromaticAberration: qualitySettings.chromaticAberration * (1 - optFactor * 1.0), // Remove completely
-          bloom: qualitySettings.bloom * (1 - optFactor * 0.7), // Reduce by 70%
-          blur: qualitySettings.blur * (1 - optFactor * 0.5), // Reduce by 50%
-          motionBlur: qualitySettings.motionBlur * (1 - optFactor * 0.6), // Reduce by 60%
+          waveDistortion: qualitySettings.waveDistortion * (1 - optFactor * 1.0),
+          chromaticAberration: qualitySettings.chromaticAberration * (1 - optFactor * 1.0),
+          bloom: qualitySettings.bloom * (1 - optFactor * 0.7),
+          blur: qualitySettings.blur * (1 - optFactor * 0.5),
+          motionBlur: qualitySettings.motionBlur * (1 - optFactor * 0.6),
         });
 
-        // 2. Physical (trail quality)
         const baseDiffusion = qualitySettings.diffusionFreq;
-        const optimizedDiffusion = Math.min(10, baseDiffusion + Math.floor(optFactor * 5)); // Higher freq = less diffusion = faster
-        updatePhysicalParams({
-          diffusionFreq: optimizedDiffusion,
-        });
+        const optimizedDiffusion = Math.min(10, baseDiffusion + Math.floor(optFactor * 5));
+        updateUniversalPhysicalParams({ diffusionFreq: optimizedDiffusion });
 
-        // 3. Agent count (aggressive reduction at high opt levels)
         if (newOptLevel >= 5) {
-          const agentReduction = (newOptLevel - 4) / 6; // 0 at level 4, 1 at level 10
-          const targetAgents = Math.max(150, Math.floor(qualitySettings.agentCount * (1 - agentReduction * 0.85))); // Max 85% reduction, min 150 agents
-          const currentAgents = parameters.temporal.agentCount;
+          const agentReduction = (newOptLevel - 4) / 6;
+          const targetAgents = Math.max(150, Math.floor(qualitySettings.agentCount * (1 - agentReduction * 0.85)));
+          const currentAgents = parameters.globalTemporal.agentCount;
 
           if (Math.abs(targetAgents - currentAgents) > 50) {
-            updateTemporalParams({ agentCount: targetAgents });
+            updateGlobalTemporalParams({ agentCount: targetAgents });
           }
         }
       }
     },
 
-    setActiveOikosTab: (tab: UIState['activeOikosTab']) => {
+    // UI actions
+    setActiveSpeciesScope: (scope) => {
+      set((state) => ({
+        ui: { ...state.ui, activeSpeciesScope: scope },
+      }));
+    },
+
+    setActiveOikosTab: (tab) => {
       set((state) => ({
         ui: { ...state.ui, activeOikosTab: tab },
       }));
     },
 
-    setSimulationSpeed: (speed: number) => {
-      get().updateTemporalParams({ simulationSpeed: speed });
+    setControlPanelOpen: (open) => {
+      set((state) => ({
+        ui: { ...state.ui, controlPanelOpen: open },
+      }));
     },
 
+    toggleControlPanel: () => {
+      set((state) => ({
+        ui: { ...state.ui, controlPanelOpen: !state.ui.controlPanelOpen },
+      }));
+    },
+
+    setSimulationSpeed: (speed) => {
+      get().updateGlobalTemporalParams({ simulationSpeed: speed });
+    },
+
+    // Simulation tick
     tick: () => {
       const { engine, running } = get();
 

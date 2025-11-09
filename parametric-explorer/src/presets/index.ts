@@ -8,32 +8,48 @@ export const defaultPerformanceParams = {
   _currentOptLevel: 0,
 };
 
-// Default/Base Parameters
+// Default/Base Parameters (New Matrix Structure)
 export const defaultParameters: AllParameters = {
-  physical: {
-    decayRate: 0.96,
-    diffusionFreq: 3,  // MITTLERE Diffusion (jedes 3. Frame)
-    fadeStrength: 0.15,
-    trailSaturation: 200,
+  // Universal defaults (cross-species baseline)
+  universal: {
+    physical: {
+      decayRate: 0.96,
+      diffusionFreq: 3,  // MITTLERE Diffusion (jedes 3. Frame)
+      fadeStrength: 0.15,
+      trailSaturation: 200,
+    },
+    semiotic: {
+      sensorDist: 25,
+      sensorAngle: 0.6,
+      deposit: 15,
+      turnSpeed: 0.4,
+    },
+    temporal: {
+      speed: 1.0,
+      chaosInterval: 0,
+      chaosStrength: 0.5,
+    },
+    resonance: {
+      attractionStrength: 1.2,
+      repulsionStrength: -0.3,
+      crossSpeciesInteraction: true,
+    },
   },
-  semiotic: {
-    sensorDist: 25,
-    sensorAngle: 0.6,
-    deposit: 15,
-    turnSpeed: 0.4,
+
+  // Species-specific overrides (empty by default - all use universal)
+  species: {
+    red: {},
+    green: {},
+    blue: {},
   },
-  temporal: {
-    speed: 1.0,
+
+  // Global temporal params
+  globalTemporal: {
     agentCount: 2000,
-    chaosInterval: 0,
-    chaosStrength: 0.5,
     simulationSpeed: 1.0,
   },
-  resonance: {
-    attractionStrength: 1.2,
-    repulsionStrength: -0.3,
-    crossSpeciesInteraction: true,
-  },
+
+  // Visual/technical params (global)
   visualization: {
     brightness: 1.5,
     colorRed: { r: 255, g: 50, b: 50 },
@@ -54,6 +70,34 @@ export const defaultParameters: AllParameters = {
   },
   performance: defaultPerformanceParams,
 };
+
+// Legacy format converter for old presets
+export function convertLegacyPreset(legacy: any): AllParameters {
+  return {
+    universal: {
+      physical: legacy.physical,
+      semiotic: legacy.semiotic,
+      temporal: {
+        speed: legacy.temporal.speed,
+        chaosInterval: legacy.temporal.chaosInterval,
+        chaosStrength: legacy.temporal.chaosStrength,
+      },
+      resonance: legacy.resonance,
+    },
+    species: {
+      red: {},
+      green: {},
+      blue: {},
+    },
+    globalTemporal: {
+      agentCount: legacy.temporal.agentCount,
+      simulationSpeed: legacy.temporal.simulationSpeed,
+    },
+    visualization: legacy.visualization,
+    effects: legacy.effects,
+    performance: legacy.performance,
+  };
+}
 
 // Preset 1: Maximale Clusterbildung
 const maxClusteringPreset: Preset = {
@@ -471,8 +515,8 @@ const denseHotspotsPreset: Preset = {
   },
 };
 
-// Export all presets
-export const builtInPresets: Preset[] = [
+// Convert all legacy presets to new format
+const legacyPresets = [
   maxClusteringPreset,
   crystallinePreset,
   maxSeparationPreset,
@@ -482,6 +526,12 @@ export const builtInPresets: Preset[] = [
   maxStabilityPreset,
   denseHotspotsPreset,
 ];
+
+// Export all presets (converted to new format)
+export const builtInPresets: Preset[] = legacyPresets.map(preset => ({
+  ...preset,
+  parameters: convertLegacyPreset(preset.parameters),
+}));
 
 // Helper function to get preset by name
 export function getPresetByName(name: string): Preset | undefined {
