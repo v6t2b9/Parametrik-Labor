@@ -27,6 +27,7 @@ export const defaultParameters: AllParameters = {
     agentCount: 2000,
     chaosInterval: 0,
     chaosStrength: 0.5,
+    simulationSpeed: 1.0,
   },
   resonance: {
     attractionStrength: 1.2,
@@ -77,6 +78,7 @@ const maxClusteringPreset: Preset = {
       agentCount: 5000,
       chaosInterval: 0,
       chaosStrength: 0.5,
+      simulationSpeed: 1.0,
     },
     resonance: {
       attractionStrength: 1.8,
@@ -128,6 +130,7 @@ const crystallinePreset: Preset = {
       agentCount: 2000,
       chaosInterval: 0,
       chaosStrength: 0.0,
+      simulationSpeed: 1.0,
     },
     resonance: {
       attractionStrength: 1.6,
@@ -179,6 +182,7 @@ const maxSeparationPreset: Preset = {
       agentCount: 3000,
       chaosInterval: 0,
       chaosStrength: 0.5,
+      simulationSpeed: 1.0,
     },
     resonance: {
       attractionStrength: 1.2,
@@ -230,6 +234,7 @@ const maxChaosPreset: Preset = {
       agentCount: 4000,
       chaosInterval: 150,
       chaosStrength: 0.9,
+      simulationSpeed: 1.0,
     },
     resonance: {
       attractionStrength: 0.7,
@@ -281,6 +286,7 @@ const networkPreset: Preset = {
       agentCount: 2500,
       chaosInterval: 0,
       chaosStrength: 0.0,
+      simulationSpeed: 1.0,
     },
     resonance: {
       attractionStrength: 1.0,
@@ -332,6 +338,7 @@ const fluidPreset: Preset = {
       agentCount: 3500,
       chaosInterval: 0,
       chaosStrength: 0.0,
+      simulationSpeed: 1.0,
     },
     resonance: {
       attractionStrength: 1.2,
@@ -383,6 +390,7 @@ const maxStabilityPreset: Preset = {
       agentCount: 2000,
       chaosInterval: 0,
       chaosStrength: 0.0,
+      simulationSpeed: 1.0,
     },
     resonance: {
       attractionStrength: 1.5,
@@ -434,6 +442,7 @@ const denseHotspotsPreset: Preset = {
       agentCount: 6000,
       chaosInterval: 0,
       chaosStrength: 0.5,
+      simulationSpeed: 1.0,
     },
     resonance: {
       attractionStrength: 1.8,

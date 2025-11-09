@@ -42,6 +42,7 @@ export interface TemporalOikosParams {
   agentCount: number;       // 500-10000: Interaction density
   chaosInterval: number;    // 0-500: Periodic destabilization (0 = off)
   chaosStrength: number;    // 0.1-1.0: Perturbation intensity
+  simulationSpeed: number;  // 0.1-5.0: Global time scale multiplier
 }
 
 export interface ResonanceOikosParams {

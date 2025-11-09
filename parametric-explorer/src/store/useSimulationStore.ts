@@ -345,9 +345,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     },
 
     setSimulationSpeed: (speed: number) => {
-      set((state) => ({
-        ui: { ...state.ui, simulationSpeed: speed },
-      }));
+      get().updateTemporalParams({ simulationSpeed: speed });
     },
 
     tick: () => {

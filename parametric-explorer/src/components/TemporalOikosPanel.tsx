@@ -42,6 +42,16 @@ export function TemporalOikosPanel() {
       />
 
       <ParameterSlider
+        label="Simulation Speed"
+        value={temporal.simulationSpeed}
+        min={0.1}
+        max={5.0}
+        step={0.1}
+        onChange={(value) => updateTemporalParams({ simulationSpeed: value })}
+        description="Global time scale multiplier. 0.5x = slow motion, 2x = fast forward"
+      />
+
+      <ParameterSlider
         label="Agent Count"
         value={temporal.agentCount}
         min={100}
