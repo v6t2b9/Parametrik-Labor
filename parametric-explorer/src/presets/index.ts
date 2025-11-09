@@ -1,5 +1,17 @@
 import type { Preset, AllParameters } from '../types/index.js';
 
+// Default Performance Parameters
+export const defaultPerformanceParams = {
+  autoOptimize: false,
+  targetFPS: 60,
+  minAgents: 500,
+  maxAgents: 10000,
+  adjustmentSpeed: 0.05,
+  fpsCheckInterval: 60,
+  fpsLowerThreshold: 0.85,
+  fpsUpperThreshold: 1.1,
+};
+
 // Default/Base Parameters
 export const defaultParameters: AllParameters = {
   physical: {
@@ -43,6 +55,7 @@ export const defaultParameters: AllParameters = {
     chromaticAberration: 0,
     waveDistortion: 0,
   },
+  performance: defaultPerformanceParams,
 };
 
 // Preset 1: Maximale Clusterbildung
@@ -92,6 +105,7 @@ const maxClusteringPreset: Preset = {
       chromaticAberration: 0,
       waveDistortion: 0,
     },
+    performance: defaultPerformanceParams,
   },
 };
 
@@ -142,6 +156,7 @@ const crystallinePreset: Preset = {
       chromaticAberration: 0,
       waveDistortion: 0,
     },
+    performance: defaultPerformanceParams,
   },
 };
 
@@ -192,6 +207,7 @@ const maxSeparationPreset: Preset = {
       chromaticAberration: 0,
       waveDistortion: 0,
     },
+    performance: defaultPerformanceParams,
   },
 };
 
@@ -242,6 +258,7 @@ const maxChaosPreset: Preset = {
       chromaticAberration: 5,
       waveDistortion: 0.3,
     },
+    performance: defaultPerformanceParams,
   },
 };
 
@@ -292,6 +309,7 @@ const networkPreset: Preset = {
       chromaticAberration: 0,
       waveDistortion: 0,
     },
+    performance: defaultPerformanceParams,
   },
 };
 
@@ -342,6 +360,7 @@ const fluidPreset: Preset = {
       chromaticAberration: 0,
       waveDistortion: 0.1,
     },
+    performance: defaultPerformanceParams,
   },
 };
 
@@ -392,6 +411,7 @@ const maxStabilityPreset: Preset = {
       chromaticAberration: 0,
       waveDistortion: 0,
     },
+    performance: defaultPerformanceParams,
   },
 };
 
@@ -442,6 +462,7 @@ const denseHotspotsPreset: Preset = {
       chromaticAberration: 0,
       waveDistortion: 0,
     },
+    performance: defaultPerformanceParams,
   },
 };
 

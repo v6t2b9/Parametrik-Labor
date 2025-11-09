@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { AllParameters, Agent, Trails, UIState } from '../types/index.js';
+import type { AllParameters, Agent, Trails, UIState, PerformanceMetrics } from '../types/index.js';
 import { defaultParameters } from '../presets';
 import { SimulationEngine } from '../engine/SimulationEngine';
 
@@ -13,6 +13,9 @@ interface SimulationStore {
 
   // Parameters
   parameters: AllParameters;
+
+  // Performance metrics
+  performanceMetrics: PerformanceMetrics;
 
   // UI state
   ui: UIState;
@@ -29,9 +32,12 @@ interface SimulationStore {
   updateResonanceParams: (params: Partial<AllParameters['resonance']>) => void;
   updateVisualizationParams: (params: Partial<AllParameters['visualization']>) => void;
   updateEffectsParams: (params: Partial<AllParameters['effects']>) => void;
+  updatePerformanceParams: (params: Partial<AllParameters['performance']>) => void;
+  updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => void;
   setActiveOikosTab: (tab: UIState['activeOikosTab']) => void;
   setSimulationSpeed: (speed: number) => void;
   tick: () => void; // Called on each animation frame
+  performAutoOptimization: () => void; // Auto-adjust agent count based on FPS
 }
 
 const GRID_SIZE = 400;
@@ -50,6 +56,15 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     trails: engine.getTrails(),
     engine,
     parameters: defaultParameters,
+    performanceMetrics: {
+      currentFPS: 0,
+      avgFPS: 0,
+      minFPS: 0,
+      maxFPS: 0,
+      frameTime: 0,
+      tickTime: 0,
+      renderTime: 0,
+    },
     ui: {
       activeOikosTab: 'physical',
       simulationSpeed: 1,
@@ -83,6 +98,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         resonance: { ...currentParams.resonance, ...(params.resonance || {}) },
         visualization: { ...currentParams.visualization, ...(params.visualization || {}) },
         effects: { ...currentParams.effects, ...(params.effects || {}) },
+        performance: { ...currentParams.performance, ...(params.performance || {}) },
       };
 
       const { engine } = get();
@@ -163,6 +179,48 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         effects: { ...currentParams.effects, ...params },
       };
       set({ parameters: newParams });
+    },
+
+    updatePerformanceParams: (params: Partial<AllParameters['performance']>) => {
+      const currentParams = get().parameters;
+      const newParams = {
+        ...currentParams,
+        performance: { ...currentParams.performance, ...params },
+      };
+      set({ parameters: newParams });
+    },
+
+    updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => {
+      set((state) => ({
+        performanceMetrics: { ...state.performanceMetrics, ...metrics },
+      }));
+    },
+
+    performAutoOptimization: () => {
+      const { parameters, performanceMetrics, updateTemporalParams } = get();
+      const { autoOptimize, targetFPS, minAgents, maxAgents, adjustmentSpeed, fpsLowerThreshold, fpsUpperThreshold } = parameters.performance;
+
+      // Only optimize if enabled and we have valid FPS data
+      if (!autoOptimize || performanceMetrics.avgFPS === 0) return;
+
+      const currentAgentCount = parameters.temporal.agentCount;
+      const lowerBound = targetFPS * fpsLowerThreshold;
+      const upperBound = targetFPS * fpsUpperThreshold;
+
+      // FPS is too low - reduce agent count
+      if (performanceMetrics.avgFPS < lowerBound && currentAgentCount > minAgents) {
+        const reduction = Math.ceil(currentAgentCount * adjustmentSpeed);
+        const newCount = Math.max(minAgents, currentAgentCount - reduction);
+        console.log(`[Auto-Optimizer] FPS too low (${performanceMetrics.avgFPS.toFixed(1)}/${targetFPS}), reducing agents: ${currentAgentCount} → ${newCount}`);
+        updateTemporalParams({ agentCount: newCount });
+      }
+      // FPS is too high - increase agent count
+      else if (performanceMetrics.avgFPS > upperBound && currentAgentCount < maxAgents) {
+        const increase = Math.ceil(currentAgentCount * adjustmentSpeed);
+        const newCount = Math.min(maxAgents, currentAgentCount + increase);
+        console.log(`[Auto-Optimizer] FPS too high (${performanceMetrics.avgFPS.toFixed(1)}/${targetFPS}), increasing agents: ${currentAgentCount} → ${newCount}`);
+        updateTemporalParams({ agentCount: newCount });
+      }
     },
 
     setActiveOikosTab: (tab: UIState['activeOikosTab']) => {

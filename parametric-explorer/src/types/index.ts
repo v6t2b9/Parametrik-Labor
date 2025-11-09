@@ -79,6 +79,34 @@ export interface EffectsParams {
   waveDistortion: number;      // 0-1: Sine wave amplitude
 }
 
+export interface PerformanceParams {
+  // Auto-Optimization
+  autoOptimize: boolean;        // Enable/disable auto-optimizer
+  targetFPS: number;            // 30-120: Desired FPS target
+
+  // Agent Limits
+  minAgents: number;            // 100-1000: Minimum agent count
+  maxAgents: number;            // 1000-20000: Maximum agent count
+
+  // Adjustment Rates
+  adjustmentSpeed: number;      // 0.01-0.5: How fast to adjust agent count
+  fpsCheckInterval: number;     // 30-300: Frames between FPS checks
+
+  // Thresholds
+  fpsLowerThreshold: number;    // 0.8-1.0: Multiply targetFPS for lower bound
+  fpsUpperThreshold: number;    // 1.0-1.2: Multiply targetFPS for upper bound
+}
+
+export interface PerformanceMetrics {
+  currentFPS: number;
+  avgFPS: number;
+  minFPS: number;
+  maxFPS: number;
+  frameTime: number;           // ms per frame
+  tickTime: number;            // ms for engine update
+  renderTime: number;          // ms for rendering
+}
+
 export interface AllParameters {
   physical: PhysicalOikosParams;
   semiotic: SemioticOikosParams;
@@ -86,6 +114,7 @@ export interface AllParameters {
   resonance: ResonanceOikosParams;
   visualization: VisualizationParams;
   effects: EffectsParams;
+  performance: PerformanceParams;
 }
 
 // Preset Definition
@@ -120,6 +149,6 @@ export interface EmergentProperties {
 
 // UI State
 export interface UIState {
-  activeOikosTab: 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization' | 'effects';
+  activeOikosTab: 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization' | 'effects' | 'performance';
   simulationSpeed: number; // 1x, 2x, 5x, etc.
 }
