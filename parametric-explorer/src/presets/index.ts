@@ -34,38 +34,76 @@ export const defaultParameters: AllParameters = {
   },
 };
 
-// Preset 1: Crystal Growth Niche
-// High decay + Low diffusion + Low fade → Stable, geometric structures
-const crystalGrowthPreset: Preset = {
-  name: 'Crystal Growth',
-  icon: '💎',
-  description: 'Stable, geometric structures with sharp boundaries. High persistence creates crystalline patterns.',
+// Preset 1: Maximale Clusterbildung
+const maxClusteringPreset: Preset = {
+  name: 'Maximale Clusterbildung',
+  icon: '🎯',
+  description: 'Agents sammeln sich in dichten, räumlich konzentrierten Gruppen. Empfohlen für: Selbstverstärkung, Attractor-Dynamiken.',
   parameters: {
     physical: {
-      decayRate: 0.98,        // +++ Stability, +++ Crystallinity
-      diffusionFreq: 1,       // -- Crystallinity (low is good!)
-      fadeStrength: 0.08,     // --- Crystallinity (low is good!)
-      trailSaturation: 220,
+      decayRate: 0.99,
+      diffusionFreq: 5,
+      fadeStrength: 0.05,
+      trailSaturation: 255,
     },
     semiotic: {
-      sensorDist: 30,
-      sensorAngle: 0.3,       // Narrow FOV for sharp patterns
-      deposit: 25,            // ++ Density, ++ Crystallinity
-      turnSpeed: 0.2,         // Slower turns for geometric forms
+      sensorDist: 15,
+      sensorAngle: 0.45,
+      deposit: 25,
+      turnSpeed: 0.3,
     },
     temporal: {
-      speed: 0.8,
-      agentCount: 3000,
-      chaosInterval: 0,       // No chaos injection
-      chaosStrength: 0.0,
+      speed: 1.5,
+      agentCount: 5000,
+      chaosInterval: 0,
+      chaosStrength: 0.5,
     },
     resonance: {
-      attractionStrength: 1.5,
-      repulsionStrength: -0.2,
+      attractionStrength: 1.8,
+      repulsionStrength: -0.3,
       crossSpeciesInteraction: true,
     },
     visualization: {
-      brightness: 1.8,
+      brightness: 1.7,
+      colorRed: { r: 255, g: 60, b: 80 },
+      colorGreen: { r: 80, g: 255, b: 100 },
+      colorBlue: { r: 80, g: 150, b: 255 },
+      colorBg: { r: 8, g: 8, b: 18 },
+    },
+  },
+};
+
+// Preset 2: Kristalline Ordnung
+const crystallinePreset: Preset = {
+  name: 'Kristalline Ordnung',
+  icon: '💎',
+  description: 'Geometrisch präzise, starre Strukturen. Empfohlen für: Symmetrie, minimale Oberflächen.',
+  parameters: {
+    physical: {
+      decayRate: 0.99,
+      diffusionFreq: 1,
+      fadeStrength: 0.05,
+      trailSaturation: 255,
+    },
+    semiotic: {
+      sensorDist: 12,
+      sensorAngle: 0.2,
+      deposit: 25,
+      turnSpeed: 0.2,
+    },
+    temporal: {
+      speed: 1.0,
+      agentCount: 2000,
+      chaosInterval: 0,
+      chaosStrength: 0.0,
+    },
+    resonance: {
+      attractionStrength: 1.6,
+      repulsionStrength: -0.5,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 1.9,
       colorRed: { r: 255, g: 80, b: 120 },
       colorGreen: { r: 80, g: 255, b: 140 },
       colorBlue: { r: 100, g: 180, b: 255 },
@@ -74,114 +112,72 @@ const crystalGrowthPreset: Preset = {
   },
 };
 
-// Preset 2: Fluid Dynamics Niche
-// Low decay + High diffusion + High fade → Flowing, organic forms
-const fluidDynamicsPreset: Preset = {
-  name: 'Fluid Dynamics',
-  icon: '🌊',
-  description: 'Flowing, organic forms with continuous reformation. High diffusion creates smooth gradients.',
+// Preset 3: Maximale Separation
+const maxSeparationPreset: Preset = {
+  name: 'Maximale Separation',
+  icon: '🔲',
+  description: 'Räumlich getrennte Territorien verschiedener Spezies. Empfohlen für: Grenzen, Segregation, Nischen.',
   parameters: {
     physical: {
-      decayRate: 0.92,        // --- Stability (low for fluidity)
-      diffusionFreq: 8,       // +++ Fluidity
-      fadeStrength: 0.20,     // ++ Fluidity, +++ Chaos
-      trailSaturation: 180,
+      decayRate: 0.95,
+      diffusionFreq: 2,
+      fadeStrength: 0.1,
+      trailSaturation: 255,
     },
     semiotic: {
-      sensorDist: 20,
-      sensorAngle: 0.9,       // Wide FOV for flowing movement
-      deposit: 12,
-      turnSpeed: 0.7,         // +++ Fluidity
+      sensorDist: 40,
+      sensorAngle: 0.6,
+      deposit: 20,
+      turnSpeed: 0.3,
     },
     temporal: {
-      speed: 2.0,             // +++ Fluidity, +++ Chaos
-      agentCount: 2500,
+      speed: 1.5,
+      agentCount: 3000,
       chaosInterval: 0,
-      chaosStrength: 0.0,
+      chaosStrength: 0.5,
     },
     resonance: {
-      attractionStrength: 0.8,
-      repulsionStrength: -0.1,
-      crossSpeciesInteraction: true,
-    },
-    visualization: {
-      brightness: 1.3,
-      colorRed: { r: 255, g: 100, b: 50 },
-      colorGreen: { r: 50, g: 220, b: 180 },
-      colorBlue: { r: 100, g: 150, b: 255 },
-      colorBg: { r: 8, g: 8, b: 18 },
-    },
-  },
-};
-
-// Preset 3: Network Formation Niche
-// Medium decay + Medium diffusion + Large sensor range → Branching structures
-const networkFormationPreset: Preset = {
-  name: 'Network Formation',
-  icon: '🕸️',
-  description: 'Branching structures resembling neural or vascular networks. Large sensor range creates connections.',
-  parameters: {
-    physical: {
-      decayRate: 0.94,        // ++ Network
-      diffusionFreq: 3,
-      fadeStrength: 0.12,
-      trailSaturation: 200,
-    },
-    semiotic: {
-      sensorDist: 38,         // +++ Network, +++ Separation
-      sensorAngle: 0.5,
-      deposit: 20,            // ++ Network
-      turnSpeed: 0.4,
-    },
-    temporal: {
-      speed: 1.2,
-      agentCount: 2800,       // ++ Network
-      chaosInterval: 300,     // Moderate chaos for diversity
-      chaosStrength: 0.3,
-    },
-    resonance: {
-      attractionStrength: 1.0,
-      repulsionStrength: -0.4,
+      attractionStrength: 1.2,
+      repulsionStrength: -0.9,
       crossSpeciesInteraction: true,
     },
     visualization: {
       brightness: 1.6,
-      colorRed: { r: 255, g: 50, b: 80 },
-      colorGreen: { r: 80, g: 255, b: 100 },
-      colorBlue: { r: 80, g: 180, b: 255 },
-      colorBg: { r: 6, g: 6, b: 16 },
+      colorRed: { r: 255, g: 50, b: 50 },
+      colorGreen: { r: 50, g: 255, b: 50 },
+      colorBlue: { r: 50, g: 150, b: 255 },
+      colorBg: { r: 10, g: 10, b: 21 },
     },
   },
 };
 
-// Preset 4: Adaptive Disruption (Chaos)
-// High fade + High speed + Chaos injection → Maximum irregularity
-const adaptiveDisruptionPreset: Preset = {
-  name: 'Adaptive Disruption',
+// Preset 4: Chaotische Turbulenz
+const maxChaosPreset: Preset = {
+  name: 'Chaotische Turbulenz',
   icon: '🌀',
-  description: 'Irregularly changing patterns with high turbulence. Chaos injection prevents stabilization.',
+  description: 'Irreguläre, unvorhersagbare, turbulente Dynamiken. Empfohlen für: Instabilität, Nicht-Linearität.',
   parameters: {
     physical: {
-      decayRate: 0.90,
-      diffusionFreq: 5,       // ++ Chaos
-      fadeStrength: 0.25,     // +++ Chaos
-      trailSaturation: 160,
+      decayRate: 0.88,
+      diffusionFreq: 8,
+      fadeStrength: 0.3,
+      trailSaturation: 180,
     },
     semiotic: {
-      sensorDist: 22,
-      sensorAngle: 0.8,       // ++ Chaos
+      sensorDist: 20,
+      sensorAngle: 0.9,
       deposit: 10,
-      turnSpeed: 0.8,         // +++ Chaos, +++ Fluidity
+      turnSpeed: 0.8,
     },
     temporal: {
-      speed: 2.5,             // +++ Chaos
-      agentCount: 3500,
-      chaosInterval: 150,     // +++ Chaos (frequent)
-      chaosStrength: 0.9,     // +++ Chaos (strong)
+      speed: 3.0,
+      agentCount: 4000,
+      chaosInterval: 150,
+      chaosStrength: 0.9,
     },
     resonance: {
-      attractionStrength: 0.6,
-      repulsionStrength: -0.7, // ++ Chaos, +++ Separation
+      attractionStrength: 0.8,
+      repulsionStrength: -0.2,
       crossSpeciesInteraction: true,
     },
     visualization: {
@@ -194,12 +190,172 @@ const adaptiveDisruptionPreset: Preset = {
   },
 };
 
+// Preset 5: Netzwerk-Strukturen
+const networkPreset: Preset = {
+  name: 'Netzwerk-Strukturen',
+  icon: '🕸️',
+  description: 'Verzweigte, verbundene Pfade. Empfohlen für: Konnektivität, Nicht-Cluster-Ordnung.',
+  parameters: {
+    physical: {
+      decayRate: 0.94,
+      diffusionFreq: 3,
+      fadeStrength: 0.12,
+      trailSaturation: 200,
+    },
+    semiotic: {
+      sensorDist: 35,
+      sensorAngle: 0.5,
+      deposit: 20,
+      turnSpeed: 0.4,
+    },
+    temporal: {
+      speed: 1.5,
+      agentCount: 2500,
+      chaosInterval: 0,
+      chaosStrength: 0.5,
+    },
+    resonance: {
+      attractionStrength: 1.0,
+      repulsionStrength: -0.3,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 1.6,
+      colorRed: { r: 255, g: 50, b: 80 },
+      colorGreen: { r: 80, g: 255, b: 100 },
+      colorBlue: { r: 80, g: 180, b: 255 },
+      colorBg: { r: 6, g: 6, b: 16 },
+    },
+  },
+};
+
+// Preset 6: Fließende Organik
+const fluidPreset: Preset = {
+  name: 'Fließende Organik',
+  icon: '🌊',
+  description: 'Kontinuierliche Formveränderung ohne Strukturkollaps. Empfohlen für: Morphogenese, lebendige Systeme.',
+  parameters: {
+    physical: {
+      decayRate: 0.92,
+      diffusionFreq: 8,
+      fadeStrength: 0.15,
+      trailSaturation: 220,
+    },
+    semiotic: {
+      sensorDist: 20,
+      sensorAngle: 0.8,
+      deposit: 15,
+      turnSpeed: 0.6,
+    },
+    temporal: {
+      speed: 2.0,
+      agentCount: 3500,
+      chaosInterval: 0,
+      chaosStrength: 0.5,
+    },
+    resonance: {
+      attractionStrength: 1.2,
+      repulsionStrength: -0.4,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 1.3,
+      colorRed: { r: 255, g: 100, b: 50 },
+      colorGreen: { r: 50, g: 220, b: 180 },
+      colorBlue: { r: 100, g: 150, b: 255 },
+      colorBg: { r: 8, g: 8, b: 18 },
+    },
+  },
+};
+
+// Preset 7: Maximale Stabilität
+const maxStabilityPreset: Preset = {
+  name: 'Maximale Stabilität',
+  icon: '🔒',
+  description: 'Zeitlich persistente, unveränderliche Strukturen. Empfohlen für: Gedächtnis, Pfadabhängigkeit.',
+  parameters: {
+    physical: {
+      decayRate: 0.98,
+      diffusionFreq: 1,
+      fadeStrength: 0.05,
+      trailSaturation: 255,
+    },
+    semiotic: {
+      sensorDist: 15,
+      sensorAngle: 0.2,
+      deposit: 30,
+      turnSpeed: 0.2,
+    },
+    temporal: {
+      speed: 1.0,
+      agentCount: 2000,
+      chaosInterval: 0,
+      chaosStrength: 0.0,
+    },
+    resonance: {
+      attractionStrength: 1.5,
+      repulsionStrength: -0.4,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 1.8,
+      colorRed: { r: 255, g: 70, b: 100 },
+      colorGreen: { r: 70, g: 255, b: 120 },
+      colorBlue: { r: 90, g: 160, b: 255 },
+      colorBg: { r: 5, g: 5, b: 15 },
+    },
+  },
+};
+
+// Preset 8: Dichte Hotspots
+const denseHotspotsPreset: Preset = {
+  name: 'Dichte Hotspots',
+  icon: '🔥',
+  description: 'Konzentration von Intensität in fokalen Punkten. Empfohlen für: Akkumulation, kritische Masse.',
+  parameters: {
+    physical: {
+      decayRate: 0.96,
+      diffusionFreq: 2,
+      fadeStrength: 0.08,
+      trailSaturation: 255,
+    },
+    semiotic: {
+      sensorDist: 15,
+      sensorAngle: 0.4,
+      deposit: 30,
+      turnSpeed: 0.25,
+    },
+    temporal: {
+      speed: 1.2,
+      agentCount: 6000,
+      chaosInterval: 0,
+      chaosStrength: 0.5,
+    },
+    resonance: {
+      attractionStrength: 1.8,
+      repulsionStrength: -0.3,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 2.0,
+      colorRed: { r: 255, g: 50, b: 50 },
+      colorGreen: { r: 50, g: 255, b: 80 },
+      colorBlue: { r: 80, g: 150, b: 255 },
+      colorBg: { r: 5, g: 5, b: 12 },
+    },
+  },
+};
+
 // Export all presets
 export const builtInPresets: Preset[] = [
-  crystalGrowthPreset,
-  fluidDynamicsPreset,
-  networkFormationPreset,
-  adaptiveDisruptionPreset,
+  maxClusteringPreset,
+  crystallinePreset,
+  maxSeparationPreset,
+  maxChaosPreset,
+  networkPreset,
+  fluidPreset,
+  maxStabilityPreset,
+  denseHotspotsPreset,
 ];
 
 // Helper function to get preset by name

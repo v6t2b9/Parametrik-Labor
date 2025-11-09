@@ -4,9 +4,10 @@ import { PhysicalOikosPanel } from './PhysicalOikosPanel';
 import { SemioticOikosPanel } from './SemioticOikosPanel';
 import { TemporalOikosPanel } from './TemporalOikosPanel';
 import { ResonanceOikosPanel } from './ResonanceOikosPanel';
+import { VisualizationOikosPanel } from './VisualizationOikosPanel';
 import { PresetGallery } from './PresetGallery';
 
-type TabType = 'presets' | 'physical' | 'semiotic' | 'temporal' | 'resonance';
+type TabType = 'presets' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization';
 
 export function ParameterControlCenter() {
   const [activeTab, setActiveTab] = useState<TabType>('presets');
@@ -25,17 +26,17 @@ export function ParameterControlCenter() {
         <Tab
           active={activeTab === 'presets'}
           onClick={() => setActiveTab('presets')}
-          label="📚 Presets"
+          label="🎯 Presets"
         />
         <Tab
           active={activeTab === 'physical'}
           onClick={() => setActiveTab('physical')}
-          label="🌍 Physical"
+          label="🌊 Physikalisch"
         />
         <Tab
           active={activeTab === 'semiotic'}
           onClick={() => setActiveTab('semiotic')}
-          label="🔣 Semiotic"
+          label="👁️ Semiotisch"
         />
         <Tab
           active={activeTab === 'temporal'}
@@ -45,7 +46,12 @@ export function ParameterControlCenter() {
         <Tab
           active={activeTab === 'resonance'}
           onClick={() => setActiveTab('resonance')}
-          label="🎵 Resonance"
+          label="🔗 Resonanz"
+        />
+        <Tab
+          active={activeTab === 'visualization'}
+          onClick={() => setActiveTab('visualization')}
+          label="🎨 Visualisierung"
         />
       </div>
 
@@ -55,6 +61,7 @@ export function ParameterControlCenter() {
         {activeTab === 'semiotic' && <SemioticOikosPanel />}
         {activeTab === 'temporal' && <TemporalOikosPanel />}
         {activeTab === 'resonance' && <ResonanceOikosPanel />}
+        {activeTab === 'visualization' && <VisualizationOikosPanel />}
       </div>
     </div>
   );
