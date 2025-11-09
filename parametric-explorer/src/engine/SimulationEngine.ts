@@ -53,7 +53,7 @@ export class SimulationEngine {
   }
 
   public update(): void {
-    const { temporal, physical, semiotic } = this.params;
+    const { physical } = this.params;
 
     // Update each agent
     for (const agent of this.agents) {

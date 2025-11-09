@@ -1,5 +1,6 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
+import { temporalPresets } from '../presets/tabPresets';
 
 export function TemporalOikosPanel() {
   const { parameters, updateTemporalParams } = useSimulationStore();
@@ -9,6 +10,26 @@ export function TemporalOikosPanel() {
     <div style={styles.panel}>
       <h3 style={styles.title}>⏱️ Temporal Oikos</h3>
       <p style={styles.subtitle}>Dynamics and temporal structuring</p>
+
+      {/* Temporal Presets Section */}
+      <div style={styles.presetSection}>
+        <h4 style={styles.presetTitle}>Temporal Presets</h4>
+        <div style={styles.presetGrid}>
+          {temporalPresets.map((preset) => (
+            <button
+              key={preset.name}
+              onClick={() => updateTemporalParams(preset.params)}
+              style={styles.presetButton}
+              title={preset.description}
+            >
+              <span style={styles.presetIcon}>{preset.icon}</span>
+              <span style={styles.presetName}>{preset.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={styles.divider} />
 
       <ParameterSlider
         label="Agent Speed"
@@ -69,6 +90,46 @@ const styles = {
   subtitle: {
     fontSize: '12px',
     color: '#a0a0b0',
+    marginBottom: '20px',
+  } as React.CSSProperties,
+  presetSection: {
+    marginBottom: '20px',
+  } as React.CSSProperties,
+  presetTitle: {
+    fontSize: '14px',
+    color: '#a0a0b0',
+    marginBottom: '12px',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  presetGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '8px',
+  } as React.CSSProperties,
+  presetButton: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '10px 8px',
+    backgroundColor: '#0a0a15',
+    border: '1px solid #2a2b3a',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    fontSize: '11px',
+    color: '#e0e0e0',
+  } as React.CSSProperties,
+  presetIcon: {
+    fontSize: '20px',
+    marginBottom: '4px',
+  } as React.CSSProperties,
+  presetName: {
+    fontSize: '10px',
+    textAlign: 'center',
+  } as React.CSSProperties,
+  divider: {
+    height: '1px',
+    backgroundColor: '#2a2b3a',
     marginBottom: '20px',
   } as React.CSSProperties,
 };
