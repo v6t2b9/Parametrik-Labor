@@ -34,8 +34,8 @@ export function SemioticOikosPanel() {
       <ParameterSlider
         label="Sensor Distance"
         value={semiotic.sensorDist}
-        min={10}
-        max={40}
+        min={3}
+        max={80}
         step={1}
         onChange={(value) => updateSemioticParams({ sensorDist: value })}
         description="Perceptual range. Large → network formation, separation"
@@ -44,8 +44,8 @@ export function SemioticOikosPanel() {
       <ParameterSlider
         label="Sensor Angle"
         value={semiotic.sensorAngle}
-        min={0.2}
-        max={1.2}
+        min={0.1}
+        max={2.5}
         step={0.05}
         onChange={(value) => updateSemioticParams({ sensorAngle: value })}
         description="Field of view (radians). Wide → chaotic, fluid movement"
@@ -54,8 +54,8 @@ export function SemioticOikosPanel() {
       <ParameterSlider
         label="Deposit Amount"
         value={semiotic.deposit}
-        min={5}
-        max={30}
+        min={1}
+        max={50}
         step={1}
         onChange={(value) => updateSemioticParams({ deposit: value })}
         description="Trace intensity per step. High → dense, stable structures"
@@ -64,8 +64,8 @@ export function SemioticOikosPanel() {
       <ParameterSlider
         label="Turn Speed"
         value={semiotic.turnSpeed}
-        min={0.1}
-        max={1.0}
+        min={0.05}
+        max={2.5}
         step={0.05}
         onChange={(value) => updateSemioticParams({ turnSpeed: value })}
         description="Response agility (radians). High → erratic, fluid motion"

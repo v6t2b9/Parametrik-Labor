@@ -34,7 +34,7 @@ export function PhysicalOikosPanel() {
       <ParameterSlider
         label="Decay Rate"
         value={physical.decayRate}
-        min={0.85}
+        min={0.5}
         max={0.999}
         step={0.001}
         onChange={(value) => updatePhysicalParams({ decayRate: value })}
@@ -45,7 +45,7 @@ export function PhysicalOikosPanel() {
         label="Diffusion Frequency"
         value={physical.diffusionFreq}
         min={0}
-        max={10}
+        max={20}
         step={1}
         onChange={(value) => updatePhysicalParams({ diffusionFreq: value })}
         description="Spatial spread of trails. High → smooth gradients → fluidity"
@@ -54,8 +54,8 @@ export function PhysicalOikosPanel() {
       <ParameterSlider
         label="Fade Strength"
         value={physical.fadeStrength}
-        min={0.05}
-        max={0.3}
+        min={0.01}
+        max={0.5}
         step={0.01}
         onChange={(value) => updatePhysicalParams({ fadeStrength: value })}
         description="Acceleration of forgetting. High → rapid decay → chaos"
@@ -64,7 +64,7 @@ export function PhysicalOikosPanel() {
       <ParameterSlider
         label="Trail Saturation"
         value={physical.trailSaturation}
-        min={100}
+        min={50}
         max={255}
         step={5}
         onChange={(value) => updatePhysicalParams({ trailSaturation: value })}
