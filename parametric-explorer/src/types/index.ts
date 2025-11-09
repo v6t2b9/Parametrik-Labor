@@ -106,6 +106,10 @@ export interface EffectsParams {
   // Psychedelic/Distortion
   chromaticAberration: number; // 0-15px: RGB channel offset
   waveDistortion: number;      // 0-1: Sine wave amplitude
+
+  // Retro/Lo-Fi
+  scanlines: number;         // 0-1: CRT scanline effect strength
+  pixelation: number;        // 1-16: Pixelation/downsampling factor (1 = none)
 }
 
 export type QualityPreset = 'low' | 'medium' | 'high' | 'ultra';

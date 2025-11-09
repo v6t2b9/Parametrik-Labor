@@ -8,29 +8,29 @@ export const defaultPerformanceParams = {
   _currentOptLevel: 0,
 };
 
-// Default/Base Parameters (New Matrix Structure)
+// Default/Base Parameters - Using "Plasma Dream" for impressive startup!
 export const defaultParameters: AllParameters = {
   // Universal defaults (cross-species baseline)
   universal: {
     physical: {
-      decayRate: 0.96,
-      diffusionFreq: 3,  // MITTLERE Diffusion (jedes 3. Frame)
+      decayRate: 0.93,
+      diffusionFreq: 3,  // Mittlere Diffusion für fluid flow
       fadeStrength: 0.15,
-      trailSaturation: 200,
+      trailSaturation: 220,
     },
     semiotic: {
-      sensorDist: 25,
-      sensorAngle: 0.6,
-      deposit: 15,
-      turnSpeed: 0.4,
+      sensorDist: 22,
+      sensorAngle: 0.7,
+      deposit: 18,
+      turnSpeed: 0.5,
     },
     temporal: {
-      speed: 1.0,
+      speed: 1.8,
       chaosInterval: 0,
-      chaosStrength: 0.5,
+      chaosStrength: 0.0,
     },
     resonance: {
-      attractionStrength: 1.2,
+      attractionStrength: 1.1,
       repulsionStrength: -0.3,
       crossSpeciesInteraction: true,
     },
@@ -45,30 +45,32 @@ export const defaultParameters: AllParameters = {
 
   // Global temporal params
   globalTemporal: {
-    agentCount: 2000,
+    agentCount: 3000,
     simulationSpeed: 1.0,
   },
 
-  // Visual/technical params (global)
+  // Visual/technical params (global) - Plasma Dream colors!
   visualization: {
-    brightness: 1.5,
-    blendMode: 'additive' as const,
-    trailIntensity: 180,
-    colorRed: { r: 255, g: 50, b: 50 },
-    colorGreen: { r: 50, g: 255, b: 50 },
-    colorBlue: { r: 50, g: 150, b: 255 },
-    colorBg: { r: 10, g: 10, b: 21 },
+    brightness: 3.8,
+    blendMode: 'screen' as const,
+    trailIntensity: 150,
+    colorRed: { r: 255, g: 50, b: 150 },    // Vibrant Pink
+    colorGreen: { r: 50, g: 255, b: 255 },  // Cyan
+    colorBlue: { r: 255, g: 255, b: 50 },   // Yellow
+    colorBg: { r: 5, g: 5, b: 15 },
   },
   effects: {
     blur: 0,
-    bloom: 0,
+    bloom: 0.4,
     saturation: 1.0,
     contrast: 1.0,
     hueShift: 0,
-    motionBlur: 0,
+    motionBlur: 0.4,
     vignette: 0,
     chromaticAberration: 0,
     waveDistortion: 0,
+    scanlines: 0,
+    pixelation: 1,
   },
   performance: defaultPerformanceParams,
 };
@@ -100,355 +102,259 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       blendMode: legacy.visualization.blendMode || 'additive',
       trailIntensity: legacy.visualization.trailIntensity || 180,
     },
-    effects: legacy.effects,
+    effects: {
+      ...legacy.effects,
+      scanlines: legacy.effects.scanlines || 0,
+      pixelation: legacy.effects.pixelation || 1,
+    },
     performance: legacy.performance,
   };
 }
 
-// Preset 1: Maximale Clusterbildung
-const maxClusteringPreset: Preset = {
-  name: 'Maximale Clusterbildung',
-  icon: '🎯',
-  description: 'Agents sammeln sich in dichten, räumlich konzentrierten Gruppen. Empfohlen für: Selbstverstärkung, Attractor-Dynamiken.',
-  parameters: {
-    physical: {
-      decayRate: 0.99,
-      diffusionFreq: 5,
-      fadeStrength: 0.05,
-      trailSaturation: 255,
-    },
-    semiotic: {
-      sensorDist: 15,
-      sensorAngle: 0.45,
-      deposit: 25,
-      turnSpeed: 0.3,
-    },
-    temporal: {
-      speed: 1.5,
-      agentCount: 5000,
-      chaosInterval: 0,
-      chaosStrength: 0.5,
-      simulationSpeed: 1.0,
-    },
-    resonance: {
-      attractionStrength: 1.8,
-      repulsionStrength: -0.3,
-      crossSpeciesInteraction: true,
-    },
-    visualization: {
-      brightness: 3.2,
-      blendMode: 'additive',
-      trailIntensity: 140,
-      colorRed: { r: 255, g: 30, b: 100 },
-      colorGreen: { r: 50, g: 255, b: 120 },
-      colorBlue: { r: 80, g: 180, b: 255 },
-      colorBg: { r: 2, g: 2, b: 10 },
-    },
-    effects: {
-      blur: 1,
-      bloom: 0.3,
-      saturation: 1.1,
-      contrast: 1.05,
-      hueShift: 0,
-      motionBlur: 0,
-      vignette: 0,
-      chromaticAberration: 0,
-      waveDistortion: 0,
-    },
-    performance: defaultPerformanceParams,
-  },
-};
-
-// Preset 2: Kristalline Ordnung
-const crystallinePreset: Preset = {
-  name: 'Kristalline Ordnung',
-  icon: '💎',
-  description: 'Geometrisch präzise, starre Strukturen. Empfohlen für: Symmetrie, minimale Oberflächen.',
-  parameters: {
-    physical: {
-      decayRate: 0.99,
-      diffusionFreq: 1,
-      fadeStrength: 0.05,
-      trailSaturation: 255,
-    },
-    semiotic: {
-      sensorDist: 12,
-      sensorAngle: 0.2,
-      deposit: 25,
-      turnSpeed: 0.2,
-    },
-    temporal: {
-      speed: 1.0,
-      agentCount: 2000,
-      chaosInterval: 0,
-      chaosStrength: 0.0,
-      simulationSpeed: 1.0,
-    },
-    resonance: {
-      attractionStrength: 1.6,
-      repulsionStrength: -0.5,
-      crossSpeciesInteraction: true,
-    },
-    visualization: {
-      brightness: 4.0,
-      blendMode: 'additive',
-      trailIntensity: 95,
-      colorRed: { r: 255, g: 100, b: 200 },
-      colorGreen: { r: 100, g: 255, b: 220 },
-      colorBlue: { r: 150, g: 200, b: 255 },
-      colorBg: { r: 0, g: 0, b: 5 },
-    },
-    effects: {
-      blur: 0,
-      bloom: 0,
-      saturation: 1.0,
-      contrast: 1.1,
-      hueShift: 0,
-      motionBlur: 0,
-      vignette: 0,
-      chromaticAberration: 0,
-      waveDistortion: 0,
-    },
-    performance: defaultPerformanceParams,
-  },
-};
-
-// Preset 3: Maximale Separation
-const maxSeparationPreset: Preset = {
-  name: 'Maximale Separation',
-  icon: '🔲',
-  description: 'Räumlich getrennte Territorien verschiedener Spezies. Empfohlen für: Grenzen, Segregation, Nischen.',
-  parameters: {
-    physical: {
-      decayRate: 0.95,
-      diffusionFreq: 2,
-      fadeStrength: 0.1,
-      trailSaturation: 255,
-    },
-    semiotic: {
-      sensorDist: 40,
-      sensorAngle: 0.6,
-      deposit: 20,
-      turnSpeed: 0.3,
-    },
-    temporal: {
-      speed: 1.5,
-      agentCount: 3000,
-      chaosInterval: 0,
-      chaosStrength: 0.5,
-      simulationSpeed: 1.0,
-    },
-    resonance: {
-      attractionStrength: 1.2,
-      repulsionStrength: -0.9,
-      crossSpeciesInteraction: true,
-    },
-    visualization: {
-      brightness: 2.8,
-      blendMode: 'average',
-      trailIntensity: 160,
-      colorRed: { r: 255, g: 0, b: 0 },
-      colorGreen: { r: 0, g: 255, b: 0 },
-      colorBlue: { r: 0, g: 100, b: 255 },
-      colorBg: { r: 5, g: 5, b: 12 },
-    },
-    effects: {
-      blur: 0,
-      bloom: 0.1,
-      saturation: 1.0,
-      contrast: 1.3,
-      hueShift: 0,
-      motionBlur: 0,
-      vignette: 0.2,
-      chromaticAberration: 0,
-      waveDistortion: 0,
-    },
-    performance: defaultPerformanceParams,
-  },
-};
-
-// Preset 4: Chaotische Turbulenz
-const maxChaosPreset: Preset = {
-  name: 'Chaotische Turbulenz',
-  icon: '🌀',
-  description: 'Irreguläre, unvorhersagbare, turbulente Dynamiken. Empfohlen für: Instabilität, Nicht-Linearität.',
+// Preset 1: Plasma Dream
+const plasmaDreamPreset: Preset = {
+  name: 'Plasma Dream',
+  icon: '🌈',
+  description: 'Fließende organische Plasma-Wellen mit weichen leuchtenden Übergängen - perfekte Lavalampen-Ästhetik!',
   parameters: {
     physical: {
       decayRate: 0.93,
-      diffusionFreq: 4,  // VIEL Diffusion (jedes 4. Frame)
-      fadeStrength: 0.18,
-      trailSaturation: 180,
+      diffusionFreq: 3,  // Mittlere Diffusion für fluid flow
+      fadeStrength: 0.15,
+      trailSaturation: 220,
     },
     semiotic: {
-      sensorDist: 18,
-      sensorAngle: 0.6,
-      deposit: 12,
-      turnSpeed: 0.8,
+      sensorDist: 22,
+      sensorAngle: 0.7,
+      deposit: 18,
+      turnSpeed: 0.5,
     },
     temporal: {
-      speed: 2.2,
-      agentCount: 4000,
-      chaosInterval: 150,
-      chaosStrength: 0.9,
-      simulationSpeed: 1.0,
-    },
-    resonance: {
-      attractionStrength: 0.7,
-      repulsionStrength: -0.6,
-      crossSpeciesInteraction: true,
-    },
-    visualization: {
-      brightness: 4.5,
-      blendMode: 'screen',
-      trailIntensity: 85,
-      colorRed: { r: 255, g: 0, b: 150 },
-      colorGreen: { r: 150, g: 255, b: 0 },
-      colorBlue: { r: 0, g: 200, b: 255 },
-      colorBg: { r: 0, g: 0, b: 0 },
-    },
-    effects: {
-      blur: 3,
-      bloom: 0.4,
-      saturation: 1.5,
-      contrast: 1.1,
-      hueShift: 90,
-      motionBlur: 0.2,
-      vignette: 0,
-      chromaticAberration: 5,
-      waveDistortion: 0.3,
-    },
-    performance: defaultPerformanceParams,
-  },
-};
-
-// Preset 5: Netzwerk-Strukturen
-const networkPreset: Preset = {
-  name: 'Netzwerk-Strukturen',
-  icon: '🕸️',
-  description: 'Verzweigte, verbundene Pfade. Empfohlen für: Konnektivität, Nicht-Cluster-Ordnung.',
-  parameters: {
-    physical: {
-      decayRate: 0.94,
-      diffusionFreq: 3,  // MITTLERE Diffusion
-      fadeStrength: 0.12,
-      trailSaturation: 200,
-    },
-    semiotic: {
-      sensorDist: 35,
-      sensorAngle: 0.5,
-      deposit: 20,
-      turnSpeed: 0.4,
-    },
-    temporal: {
-      speed: 1.5,
-      agentCount: 2500,
+      speed: 1.8,
+      agentCount: 3000,
       chaosInterval: 0,
       chaosStrength: 0.0,
       simulationSpeed: 1.0,
     },
     resonance: {
-      attractionStrength: 1.0,
+      attractionStrength: 1.1,
       repulsionStrength: -0.3,
       crossSpeciesInteraction: true,
     },
     visualization: {
       brightness: 3.8,
-      blendMode: 'additive',
-      trailIntensity: 110,
-      colorRed: { r: 255, g: 80, b: 120 },
-      colorGreen: { r: 80, g: 255, b: 180 },
-      colorBlue: { r: 120, g: 200, b: 255 },
-      colorBg: { r: 0, g: 0, b: 5 },
+      blendMode: 'screen',
+      trailIntensity: 150,
+      colorRed: { r: 255, g: 50, b: 150 },    // Vibrant Pink
+      colorGreen: { r: 50, g: 255, b: 255 },  // Cyan
+      colorBlue: { r: 255, g: 255, b: 50 },   // Yellow
+      colorBg: { r: 5, g: 5, b: 15 },
     },
     effects: {
-      blur: 1,
-      bloom: 0.25,
+      blur: 0,
+      bloom: 0.4,
       saturation: 1.0,
       contrast: 1.0,
       hueShift: 0,
-      motionBlur: 0,
-      vignette: 0.1,
+      motionBlur: 0.4,
+      vignette: 0,
       chromaticAberration: 0,
       waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
     },
     performance: defaultPerformanceParams,
   },
 };
 
-// Preset 6: Fließende Organik
-const fluidPreset: Preset = {
-  name: 'Fließende Organik',
-  icon: '🌊',
-  description: 'Kontinuierliche Formveränderung ohne Strukturkollaps. Empfohlen für: Morphogenese, lebendige Systeme.',
+// Preset 2: Neon Jungle
+const neonJunglePreset: Preset = {
+  name: 'Neon Jungle',
+  icon: '🔥',
+  description: 'Wilde, gesättigte Neon-Energie mit maximaler Leuchtkraft - intensiv und elektrisierend!',
   parameters: {
     physical: {
-      decayRate: 0.92,
-      diffusionFreq: 8,  // WENIG Diffusion (glattere Strömungen)
-      fadeStrength: 0.15,
-      trailSaturation: 220,
+      decayRate: 0.91,
+      diffusionFreq: 4,  // Höhere Diffusion für chaotische Energie
+      fadeStrength: 0.2,
+      trailSaturation: 180,
     },
     semiotic: {
-      sensorDist: 20,
-      sensorAngle: 0.8,
-      deposit: 15,
-      turnSpeed: 0.6,
+      sensorDist: 18,
+      sensorAngle: 0.65,
+      deposit: 12,
+      turnSpeed: 0.75,
     },
     temporal: {
-      speed: 2.0,
+      speed: 2.5,
+      agentCount: 4000,
+      chaosInterval: 100,
+      chaosStrength: 0.7,
+      simulationSpeed: 1.0,
+    },
+    resonance: {
+      attractionStrength: 0.9,
+      repulsionStrength: -0.5,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 4.5,
+      blendMode: 'additive',
+      trailIntensity: 100,
+      colorRed: { r: 255, g: 0, b: 200 },     // Neon Magenta
+      colorGreen: { r: 150, g: 255, b: 0 },   // Lime
+      colorBlue: { r: 0, g: 255, b: 255 },    // Cyan
+      colorBg: { r: 0, g: 0, b: 0 },
+    },
+    effects: {
+      blur: 0,
+      bloom: 0.7,
+      saturation: 1.8,
+      contrast: 1.0,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
+    },
+    performance: defaultPerformanceParams,
+  },
+};
+
+// Preset 3: Digital Rain
+const digitalRainPreset: Preset = {
+  name: 'Digital Rain',
+  icon: '💚',
+  description: 'Matrix Code mit Scanlines - grüne Datenströme im CRT-Stil!',
+  parameters: {
+    physical: {
+      decayRate: 0.94,
+      diffusionFreq: 3,
+      fadeStrength: 0.12,
+      trailSaturation: 210,
+    },
+    semiotic: {
+      sensorDist: 28,
+      sensorAngle: 0.4,
+      deposit: 16,
+      turnSpeed: 0.35,
+    },
+    temporal: {
+      speed: 1.6,
       agentCount: 3500,
       chaosInterval: 0,
       chaosStrength: 0.0,
       simulationSpeed: 1.0,
     },
     resonance: {
-      attractionStrength: 1.2,
-      repulsionStrength: -0.4,
+      attractionStrength: 1.1,
+      repulsionStrength: -0.2,
       crossSpeciesInteraction: true,
     },
     visualization: {
-      brightness: 3.5,
-      blendMode: 'screen',
-      trailIntensity: 180,
-      colorRed: { r: 255, g: 120, b: 80 },
-      colorGreen: { r: 80, g: 255, b: 200 },
-      colorBlue: { r: 150, g: 180, b: 255 },
-      colorBg: { r: 2, g: 2, b: 8 },
+      brightness: 4.2,
+      blendMode: 'additive',
+      trailIntensity: 110,
+      colorRed: { r: 50, g: 200, b: 50 },     // Dark Green
+      colorGreen: { r: 100, g: 255, b: 100 }, // Medium Green
+      colorBlue: { r: 150, g: 255, b: 150 },  // Light Green
+      colorBg: { r: 0, g: 5, b: 0 },
     },
     effects: {
-      blur: 4,
-      bloom: 0.3,
-      saturation: 1.1,
-      contrast: 0.95,
+      blur: 0,
+      bloom: 0,
+      saturation: 1.0,
+      contrast: 1.0,
       hueShift: 0,
-      motionBlur: 0.5,
-      vignette: 0.15,
+      motionBlur: 0.3,
+      vignette: 0,
       chromaticAberration: 0,
-      waveDistortion: 0.1,
+      waveDistortion: 0,
+      scanlines: 0.7,
+      pixelation: 1,
     },
     performance: defaultPerformanceParams,
   },
 };
 
-// Preset 7: Maximale Stabilität
-const maxStabilityPreset: Preset = {
-  name: 'Maximale Stabilität',
-  icon: '🔒',
-  description: 'Zeitlich persistente, unveränderliche Strukturen. Empfohlen für: Gedächtnis, Pfadabhängigkeit.',
+// Preset 4: Aurora Sky
+const auroraSkyPreset: Preset = {
+  name: 'Aurora Sky',
+  icon: '🌌',
+  description: 'Nordlicht-Zauber mit langsam fließenden, ätherischen Wellen - magisch und beruhigend!',
   parameters: {
     physical: {
-      decayRate: 0.98,
-      diffusionFreq: 1,
-      fadeStrength: 0.05,
-      trailSaturation: 255,
+      decayRate: 0.95,
+      diffusionFreq: 2,
+      fadeStrength: 0.1,
+      trailSaturation: 230,
     },
     semiotic: {
-      sensorDist: 15,
-      sensorAngle: 0.2,
-      deposit: 30,
-      turnSpeed: 0.2,
+      sensorDist: 30,
+      sensorAngle: 0.55,
+      deposit: 20,
+      turnSpeed: 0.4,
     },
     temporal: {
-      speed: 1.0,
+      speed: 1.2,
+      agentCount: 2500,
+      chaosInterval: 0,
+      chaosStrength: 0.0,
+      simulationSpeed: 1.0,
+    },
+    resonance: {
+      attractionStrength: 1.3,
+      repulsionStrength: -0.2,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 3.5,
+      blendMode: 'additive',
+      trailIntensity: 140,
+      colorRed: { r: 50, g: 255, b: 150 },    // Grün
+      colorGreen: { r: 100, g: 255, b: 220 }, // Türkis
+      colorBlue: { r: 180, g: 100, b: 255 },  // Violett
+      colorBg: { r: 2, g: 2, b: 12 },
+    },
+    effects: {
+      blur: 0,
+      bloom: 0.5,
+      saturation: 1.3,
+      contrast: 1.0,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
+    },
+    performance: defaultPerformanceParams,
+  },
+};
+
+// Preset 5: Lava Flow
+const lavaFlowPreset: Preset = {
+  name: 'Lava Flow',
+  icon: '🌋',
+  description: 'Geschmolzenes Gestein mit dunklem Multiply-Blend - klassische Lavalampen-Ästhetik!',
+  parameters: {
+    physical: {
+      decayRate: 0.97,
+      diffusionFreq: 8,  // Wenig Diffusion für klebrige Konsistenz
+      fadeStrength: 0.08,
+      trailSaturation: 240,
+    },
+    semiotic: {
+      sensorDist: 20,
+      sensorAngle: 0.45,
+      deposit: 22,
+      turnSpeed: 0.25,
+    },
+    temporal: {
+      speed: 0.8,
       agentCount: 2000,
       chaosInterval: 0,
       chaosStrength: 0.0,
@@ -456,21 +362,77 @@ const maxStabilityPreset: Preset = {
     },
     resonance: {
       attractionStrength: 1.5,
-      repulsionStrength: -0.4,
+      repulsionStrength: -0.2,
       crossSpeciesInteraction: true,
     },
     visualization: {
-      brightness: 3.0,
+      brightness: 3.2,
       blendMode: 'multiply',
-      trailIntensity: 200,
-      colorRed: { r: 255, g: 100, b: 150 },
-      colorGreen: { r: 100, g: 255, b: 180 },
-      colorBlue: { r: 150, g: 180, b: 255 },
-      colorBg: { r: 8, g: 8, b: 18 },
+      trailIntensity: 180,
+      colorRed: { r: 255, g: 100, b: 0 },     // Orange
+      colorGreen: { r: 255, g: 50, b: 0 },    // Rot
+      colorBlue: { r: 255, g: 200, b: 0 },    // Gelb
+      colorBg: { r: 20, g: 15, b: 10 },
+    },
+    effects: {
+      blur: 3,
+      bloom: 0,
+      saturation: 1.0,
+      contrast: 1.0,
+      hueShift: 0,
+      motionBlur: 0.6,
+      vignette: 0,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
+    },
+    performance: defaultPerformanceParams,
+  },
+};
+
+// Preset 6: Crystal Cave
+const crystalCavePreset: Preset = {
+  name: 'Crystal Cave',
+  icon: '💎',
+  description: 'Geometrisch-kristalline Strukturen mit glasklarer Sicht - präzise und elegant!',
+  parameters: {
+    physical: {
+      decayRate: 0.98,
+      diffusionFreq: 1,  // Minimal Diffusion für hohe Stabilität
+      fadeStrength: 0.06,
+      trailSaturation: 255,
+    },
+    semiotic: {
+      sensorDist: 15,
+      sensorAngle: 0.25,
+      deposit: 28,
+      turnSpeed: 0.2,
+    },
+    temporal: {
+      speed: 1.3,
+      agentCount: 2000,
+      chaosInterval: 0,
+      chaosStrength: 0.0,
+      simulationSpeed: 1.0,
+    },
+    resonance: {
+      attractionStrength: 1.7,
+      repulsionStrength: -0.5,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 4.5,
+      blendMode: 'additive',
+      trailIntensity: 85,
+      colorRed: { r: 100, g: 200, b: 255 },   // Eisblau
+      colorGreen: { r: 255, g: 100, b: 200 }, // Pink
+      colorBlue: { r: 255, g: 255, b: 255 },  // Weiß
+      colorBg: { r: 0, g: 0, b: 5 },
     },
     effects: {
       blur: 0,
-      bloom: 0.1,
+      bloom: 0,
       saturation: 1.0,
       contrast: 1.0,
       hueShift: 0,
@@ -478,75 +440,135 @@ const maxStabilityPreset: Preset = {
       vignette: 0,
       chromaticAberration: 0,
       waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
     },
     performance: defaultPerformanceParams,
   },
 };
 
-// Preset 8: Dichte Hotspots
-const denseHotspotsPreset: Preset = {
-  name: 'Dichte Hotspots',
-  icon: '🔥',
-  description: 'Konzentration von Intensität in fokalen Punkten. Empfohlen für: Akkumulation, kritische Masse.',
+// Preset 7: Electric Storm
+const electricStormPreset: Preset = {
+  name: 'Electric Storm',
+  icon: '⚡',
+  description: 'Chaotische Energie-Entladungen mit turbulenten Bewegungen - wild und elektrisierend!',
   parameters: {
     physical: {
-      decayRate: 0.96,
-      diffusionFreq: 2,
-      fadeStrength: 0.08,
-      trailSaturation: 255,
+      decayRate: 0.9,
+      diffusionFreq: 5,  // Höhere Diffusion für Turbulenz
+      fadeStrength: 0.22,
+      trailSaturation: 160,
     },
     semiotic: {
-      sensorDist: 15,
-      sensorAngle: 0.4,
-      deposit: 30,
-      turnSpeed: 0.25,
+      sensorDist: 16,
+      sensorAngle: 0.7,
+      deposit: 10,
+      turnSpeed: 0.9,
     },
     temporal: {
-      speed: 1.2,
-      agentCount: 6000,
-      chaosInterval: 0,
-      chaosStrength: 0.5,
+      speed: 3.0,
+      agentCount: 5000,
+      chaosInterval: 80,
+      chaosStrength: 0.95,
       simulationSpeed: 1.0,
     },
     resonance: {
-      attractionStrength: 1.8,
-      repulsionStrength: -0.3,
+      attractionStrength: 0.6,
+      repulsionStrength: -0.7,
       crossSpeciesInteraction: true,
     },
     visualization: {
       brightness: 5.0,
-      blendMode: 'additive',
+      blendMode: 'screen',
       trailIntensity: 80,
-      colorRed: { r: 255, g: 0, b: 100 },
-      colorGreen: { r: 100, g: 255, b: 0 },
-      colorBlue: { r: 0, g: 150, b: 255 },
+      colorRed: { r: 100, g: 200, b: 255 },   // Electric Blue
+      colorGreen: { r: 255, g: 255, b: 100 }, // Yellow
+      colorBlue: { r: 255, g: 255, b: 255 },  // White
       colorBg: { r: 0, g: 0, b: 0 },
     },
     effects: {
-      blur: 2,
-      bloom: 0.7,
-      saturation: 1.3,
-      contrast: 1.2,
+      blur: 0,
+      bloom: 0.8,
+      saturation: 1.0,
+      contrast: 1.0,
       hueShift: 0,
-      motionBlur: 0.1,
-      vignette: 0.3,
-      chromaticAberration: 0,
+      motionBlur: 0,
+      vignette: 0,
+      chromaticAberration: 3,
       waveDistortion: 0,
+      scanlines: 0,
+      pixelation: 1,
     },
     performance: defaultPerformanceParams,
   },
 };
 
-// Convert all legacy presets to new format
+// Preset 8: Retro Arcade
+const retroArcadePreset: Preset = {
+  name: 'Retro Arcade',
+  icon: '🎮',
+  description: '8-bit Gaming Nostalgie mit Pixelation und Scanlines - retro Perfektion!',
+  parameters: {
+    physical: {
+      decayRate: 0.95,
+      diffusionFreq: 3,
+      fadeStrength: 0.12,
+      trailSaturation: 210,
+    },
+    semiotic: {
+      sensorDist: 24,
+      sensorAngle: 0.5,
+      deposit: 18,
+      turnSpeed: 0.4,
+    },
+    temporal: {
+      speed: 1.5,
+      agentCount: 3000,
+      chaosInterval: 0,
+      chaosStrength: 0.0,
+      simulationSpeed: 1.0,
+    },
+    resonance: {
+      attractionStrength: 1.2,
+      repulsionStrength: -0.3,
+      crossSpeciesInteraction: true,
+    },
+    visualization: {
+      brightness: 2.5,
+      blendMode: 'average',
+      trailIntensity: 160,
+      colorRed: { r: 255, g: 0, b: 0 },       // Primary Red
+      colorGreen: { r: 0, g: 255, b: 0 },     // Primary Green
+      colorBlue: { r: 0, g: 0, b: 255 },      // Primary Blue
+      colorBg: { r: 10, g: 10, b: 10 },
+    },
+    effects: {
+      blur: 0,
+      bloom: 0,
+      saturation: 1.0,
+      contrast: 1.0,
+      hueShift: 0,
+      motionBlur: 0,
+      vignette: 0,
+      chromaticAberration: 0,
+      waveDistortion: 0,
+      scanlines: 0.5,
+      pixelation: 6,
+    },
+    performance: defaultPerformanceParams,
+  },
+};
+
+// All new showpiece presets
 const legacyPresets = [
-  maxClusteringPreset,
-  crystallinePreset,
-  maxSeparationPreset,
-  maxChaosPreset,
-  networkPreset,
-  fluidPreset,
-  maxStabilityPreset,
-  denseHotspotsPreset,
+  plasmaDreamPreset,
+  neonJunglePreset,
+  digitalRainPreset,
+  auroraSkyPreset,
+  lavaFlowPreset,
+  crystalCavePreset,
+  electricStormPreset,
+  retroArcadePreset,
 ];
 
 // Export all presets (converted to new format)

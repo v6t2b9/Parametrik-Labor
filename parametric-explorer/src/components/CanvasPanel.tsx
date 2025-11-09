@@ -142,7 +142,31 @@ export function CanvasPanel() {
 
     ctx.putImageData(imageData, 0, 0);
 
-    // === 2. Motion Blur ===
+    // === 2. Pixelation (Lo-Fi Effect) ===
+    if (effects.pixelation > 1) {
+      const pixelSize = Math.floor(effects.pixelation);
+      const tempCanvas = document.createElement('canvas');
+      const smallWidth = Math.floor(CANVAS_SIZE / pixelSize);
+      const smallHeight = Math.floor(CANVAS_SIZE / pixelSize);
+
+      tempCanvas.width = smallWidth;
+      tempCanvas.height = smallHeight;
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx) {
+        // Downsample
+        tempCtx.imageSmoothingEnabled = false;
+        tempCtx.drawImage(canvas, 0, 0, smallWidth, smallHeight);
+
+        // Upsample back
+        ctx.imageSmoothingEnabled = false;
+        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        ctx.drawImage(tempCanvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        ctx.imageSmoothingEnabled = true;
+      }
+    }
+
+    // === 3. Motion Blur ===
     if (effects.motionBlur > 0 && motionBlurCanvasRef.current) {
       const mbCanvas = motionBlurCanvasRef.current;
       const mbCtx = mbCanvas.getContext('2d');
@@ -159,7 +183,7 @@ export function CanvasPanel() {
       }
     }
 
-    // === 3. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
+    // === 4. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
     const filters: string[] = [];
     if (effects.blur > 0) filters.push(`blur(${effects.blur}px)`);
     if (effects.saturation !== 1.0) filters.push(`saturate(${effects.saturation})`);
@@ -172,7 +196,7 @@ export function CanvasPanel() {
       ctx.filter = 'none';
     }
 
-    // === 4. Bloom Effect ===
+    // === 5. Bloom Effect ===
     if (effects.bloom > 0) {
       ctx.globalCompositeOperation = 'lighter';
       ctx.globalAlpha = effects.bloom;
@@ -183,7 +207,7 @@ export function CanvasPanel() {
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    // === 5. Chromatic Aberration ===
+    // === 6. Chromatic Aberration ===
     if (effects.chromaticAberration > 0) {
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = CANVAS_SIZE;
@@ -224,7 +248,7 @@ export function CanvasPanel() {
       }
     }
 
-    // === 6. Wave Distortion ===
+    // === 7. Wave Distortion ===
     if (effects.waveDistortion > 0) {
       const imgData = ctx.getImageData(0, 0, CANVAS_SIZE, CANVAS_SIZE);
       const distortedData = ctx.createImageData(CANVAS_SIZE, CANVAS_SIZE);
@@ -255,7 +279,7 @@ export function CanvasPanel() {
       ctx.putImageData(distortedData, 0, 0);
     }
 
-    // === 7. Vignette ===
+    // === 8. Vignette ===
     if (effects.vignette > 0) {
       const gradient = ctx.createRadialGradient(
         CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.3,
@@ -268,7 +292,20 @@ export function CanvasPanel() {
       ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
     }
 
-    // === 8. Render agents (optional) ===
+    // === 9. Scanlines (CRT Effect) ===
+    if (effects.scanlines > 0) {
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = `rgba(0, 0, 0, ${effects.scanlines * 0.3})`;
+
+      // Draw horizontal scanlines
+      for (let y = 0; y < CANVAS_SIZE; y += 2) {
+        ctx.fillRect(0, y, CANVAS_SIZE, 1);
+      }
+
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // === 10. Render agents (optional) ===
     if (visualization.brightness > 0.5) {
       agents.forEach((agent) => {
         const x = agent.x * SCALE;
