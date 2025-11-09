@@ -100,9 +100,10 @@ export class SimulationEngine {
     agent.angle += Math.sin(agent.rhythmPhase) * 0.05;
     agent.rhythmPhase += 0.02;
 
-    // Move agent
-    agent.x += Math.cos(agent.angle) * temporal.speed;
-    agent.y += Math.sin(agent.angle) * temporal.speed;
+    // Move agent (apply global simulation speed multiplier)
+    const effectiveSpeed = temporal.speed * temporal.simulationSpeed;
+    agent.x += Math.cos(agent.angle) * effectiveSpeed;
+    agent.y += Math.sin(agent.angle) * effectiveSpeed;
 
     // Wrap around edges
     if (agent.x < 0) agent.x += this.gridSize;
