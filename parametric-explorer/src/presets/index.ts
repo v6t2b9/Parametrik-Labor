@@ -45,7 +45,7 @@ export const defaultParameters: AllParameters = {
 
   // Global temporal params
   globalTemporal: {
-    agentCount: 3000,
+    agentCount: 2000,
     simulationSpeed: 1.0,
   },
 
@@ -131,7 +131,7 @@ const plasmaDreamPreset: Preset = {
     },
     temporal: {
       speed: 1.8,
-      agentCount: 3000,
+      agentCount: 2000,
       chaosInterval: 0,
       chaosStrength: 0.0,
       simulationSpeed: 1.0,
@@ -187,7 +187,7 @@ const neonJunglePreset: Preset = {
     },
     temporal: {
       speed: 2.5,
-      agentCount: 4000,
+      agentCount: 2000,
       chaosInterval: 100,
       chaosStrength: 0.7,
       simulationSpeed: 1.0,
@@ -243,7 +243,7 @@ const digitalRainPreset: Preset = {
     },
     temporal: {
       speed: 1.6,
-      agentCount: 3500,
+      agentCount: 2000,
       chaosInterval: 0,
       chaosStrength: 0.0,
       simulationSpeed: 1.0,
@@ -467,7 +467,7 @@ const electricStormPreset: Preset = {
     },
     temporal: {
       speed: 3.0,
-      agentCount: 5000,
+      agentCount: 2000,
       chaosInterval: 80,
       chaosStrength: 0.95,
       simulationSpeed: 1.0,
@@ -523,7 +523,7 @@ const retroArcadePreset: Preset = {
     },
     temporal: {
       speed: 1.5,
-      agentCount: 3000,
+      agentCount: 2000,
       chaosInterval: 0,
       chaosStrength: 0.0,
       simulationSpeed: 1.0,

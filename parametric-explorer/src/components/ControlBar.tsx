@@ -59,7 +59,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           <input
             type="range"
             min={150}
-            max={15000}
+            max={2400}
             step={50}
             value={parameters.globalTemporal.agentCount}
             onChange={(e) => updateGlobalTemporalParams({ agentCount: parseInt(e.target.value) })}
@@ -76,9 +76,9 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           </div>
           <input
             type="range"
-            min={0.5}
-            max={10}
-            step={0.5}
+            min={0.1}
+            max={5}
+            step={0.1}
             value={parameters.globalTemporal.simulationSpeed}
             onChange={(e) => updateGlobalTemporalParams({ simulationSpeed: parseFloat(e.target.value) })}
             style={styles.slider}
@@ -156,16 +156,20 @@ const styles = {
     fontFamily: 'monospace',
   } as React.CSSProperties,
   slidersRow: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '20px',
-    paddingTop: '8px',
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '32px',
+    paddingTop: '12px',
     borderTop: '1px solid #2a2b3a',
+    flexWrap: 'wrap',
   } as React.CSSProperties,
   sliderContainer: {
     display: 'flex',
     flexDirection: 'column',
     gap: '6px',
+    minWidth: '280px',
+    maxWidth: '360px',
+    flex: 1,
   } as React.CSSProperties,
   sliderHeader: {
     display: 'flex',

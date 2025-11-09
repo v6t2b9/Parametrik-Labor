@@ -7,10 +7,10 @@ export function PerformanceOikosPanel() {
   const { performance } = parameters;
 
   const qualityPresets: { value: QualityPreset; label: string; description: string; icon: string }[] = [
-    { value: 'low', label: 'Low', description: '~800 agents, minimal effects', icon: '⚡' },
-    { value: 'medium', label: 'Medium', description: '~1.5K agents, basic effects', icon: '💫' },
-    { value: 'high', label: 'High', description: '~3K agents, smooth effects', icon: '✨' },
-    { value: 'ultra', label: 'Ultra', description: '~5K agents, all effects', icon: '🌟' },
+    { value: 'low', label: 'Low', description: '~600 agents, minimal effects', icon: '⚡' },
+    { value: 'medium', label: 'Medium', description: '~1200 agents, basic effects', icon: '💫' },
+    { value: 'high', label: 'High', description: '~1800 agents, smooth effects', icon: '✨' },
+    { value: 'ultra', label: 'Ultra', description: '~2400 agents, all effects', icon: '🌟' },
   ];
 
   return (
