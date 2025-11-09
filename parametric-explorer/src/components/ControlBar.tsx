@@ -1,6 +1,10 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 
-export function ControlBar() {
+interface ControlBarProps {
+  onFullscreenToggle?: () => void;
+}
+
+export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const { running, toggleRunning, reset, frameCount } = useSimulationStore();
 
   const takeScreenshot = () => {
@@ -30,6 +34,11 @@ export function ControlBar() {
         <button onClick={takeScreenshot} style={styles.button}>
           📸 Screenshot
         </button>
+        {onFullscreenToggle && (
+          <button onClick={onFullscreenToggle} style={styles.fullscreenButton}>
+            ⛶ Fullscreen
+          </button>
+        )}
       </div>
 
       <div style={styles.right}>
@@ -79,6 +88,17 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
     transition: 'background-color 0.2s',
+  } as React.CSSProperties,
+  fullscreenButton: {
+    padding: '10px 16px',
+    backgroundColor: '#3a3b4a',
+    color: '#e0e0e0',
+    border: '1px solid #5d5dbd',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
   } as React.CSSProperties,
   frameCount: {
     fontSize: '14px',
