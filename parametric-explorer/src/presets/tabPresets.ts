@@ -422,7 +422,7 @@ export const temporalPresets: TemporalPreset[] = [
     description: 'Extrem schnell, starker Chaos',
     params: {
       speed: 5.5,
-      agentCount: 3000,
+      agentCount: 2000,
       chaosInterval: 80,
       chaosStrength: 1.5,
       simulationSpeed: 1.0,
@@ -434,7 +434,7 @@ export const temporalPresets: TemporalPreset[] = [
     description: 'Mittlere Geschwindigkeit, viele Agents',
     params: {
       speed: 1.5,
-      agentCount: 8000,
+      agentCount: 2400,
       chaosInterval: 0,
       chaosStrength: 0.0,
       simulationSpeed: 1.0,
@@ -446,7 +446,7 @@ export const temporalPresets: TemporalPreset[] = [
     description: 'Regelmäßige starke Störungen',
     params: {
       speed: 1.2,
-      agentCount: 5000,
+      agentCount: 2000,
       chaosInterval: 150,
       chaosStrength: 1.2,
       simulationSpeed: 1.0,
@@ -467,10 +467,10 @@ export const temporalPresets: TemporalPreset[] = [
   {
     name: 'Mega-Dichte',
     icon: '🏙️',
-    description: 'Extrem viele Agents',
+    description: 'Maximum Agents für dichte Strukturen',
     params: {
       speed: 1.0,
-      agentCount: 14000,
+      agentCount: 2400,
       chaosInterval: 0,
       chaosStrength: 0.0,
       simulationSpeed: 1.0,

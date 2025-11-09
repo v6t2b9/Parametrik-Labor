@@ -50,7 +50,7 @@ function getQualitySettings(preset: QualityPreset) {
   switch (preset) {
     case 'low':
       return {
-        agentCount: 800,
+        agentCount: 600,
         diffusionFreq: 10,
         waveDistortion: 0,
         chromaticAberration: 0,
@@ -60,7 +60,7 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'medium':
       return {
-        agentCount: 1500,
+        agentCount: 1200,
         diffusionFreq: 6,
         waveDistortion: 0,
         chromaticAberration: 0,
@@ -70,7 +70,7 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'high':
       return {
-        agentCount: 3000,
+        agentCount: 1800,
         diffusionFreq: 3,
         waveDistortion: 0,
         chromaticAberration: 0,
@@ -80,7 +80,7 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'ultra':
       return {
-        agentCount: 5000,
+        agentCount: 2400,
         diffusionFreq: 2,
         waveDistortion: 0.1,
         chromaticAberration: 2,
