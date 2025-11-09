@@ -297,6 +297,7 @@ export const temporalPresets: TemporalPreset[] = [
       agentCount: 3000,
       chaosInterval: 80,
       chaosStrength: 1.5,
+      simulationSpeed: 1.0,
     },
   },
   {
@@ -308,6 +309,7 @@ export const temporalPresets: TemporalPreset[] = [
       agentCount: 8000,
       chaosInterval: 0,
       chaosStrength: 0.0,
+      simulationSpeed: 1.0,
     },
   },
   {
@@ -319,6 +321,7 @@ export const temporalPresets: TemporalPreset[] = [
       agentCount: 5000,
       chaosInterval: 150,
       chaosStrength: 1.2,
+      simulationSpeed: 1.0,
     },
   },
   {
@@ -330,6 +333,7 @@ export const temporalPresets: TemporalPreset[] = [
       agentCount: 2000,
       chaosInterval: 0,
       chaosStrength: 0.0,
+      simulationSpeed: 1.0,
     },
   },
   {
@@ -341,6 +345,7 @@ export const temporalPresets: TemporalPreset[] = [
       agentCount: 14000,
       chaosInterval: 0,
       chaosStrength: 0.0,
+      simulationSpeed: 1.0,
     },
   },
   {
@@ -352,6 +357,7 @@ export const temporalPresets: TemporalPreset[] = [
       agentCount: 150,
       chaosInterval: 0,
       chaosStrength: 0.0,
+      simulationSpeed: 1.0,
     },
   },
 ];
