@@ -195,7 +195,7 @@ export interface EmergentProperties {
 
 // UI State - Matrix Navigation
 export type SpeciesScope = 'universal' | 'red' | 'green' | 'blue';
-export type OikosTab = 'presets' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization' | 'effects' | 'performance';
+export type OikosTab = 'presets' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visuals' | 'performance';
 
 export interface UIState {
   // Matrix navigation

@@ -5,7 +5,7 @@ interface ControlBarProps {
 }
 
 export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
-  const { running, toggleRunning, reset, frameCount } = useSimulationStore();
+  const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams } = useSimulationStore();
 
   const takeScreenshot = () => {
     const canvas = document.querySelector('canvas');
@@ -24,25 +24,67 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
   return (
     <div style={styles.container}>
-      <div style={styles.left}>
-        <button onClick={toggleRunning} style={styles.playButton}>
-          {running ? '⏸️ Pause' : '▶️ Play'}
-        </button>
-        <button onClick={reset} style={styles.button}>
-          🔄 Reset
-        </button>
-        <button onClick={takeScreenshot} style={styles.button}>
-          📸 Screenshot
-        </button>
-        {onFullscreenToggle && (
-          <button onClick={onFullscreenToggle} style={styles.fullscreenButton}>
-            ⛶ Fullscreen
+      {/* Top Row: Buttons and Frame Count */}
+      <div style={styles.topRow}>
+        <div style={styles.left}>
+          <button onClick={toggleRunning} style={styles.playButton}>
+            {running ? '⏸️ Pause' : '▶️ Play'}
           </button>
-        )}
+          <button onClick={reset} style={styles.button}>
+            🔄 Reset Simulation
+          </button>
+          <button onClick={takeScreenshot} style={styles.button}>
+            📸 Screenshot
+          </button>
+          {onFullscreenToggle && (
+            <button onClick={onFullscreenToggle} style={styles.fullscreenButton}>
+              ⛶ Fullscreen
+            </button>
+          )}
+        </div>
+
+        <div style={styles.right}>
+          <span style={styles.frameCount}>Frame: {frameCount.toLocaleString()}</span>
+        </div>
       </div>
 
-      <div style={styles.right}>
-        <span style={styles.frameCount}>Frame: {frameCount.toLocaleString()}</span>
+      {/* Bottom Row: Global Parameter Sliders */}
+      <div style={styles.slidersRow}>
+        {/* Agent Count Slider */}
+        <div style={styles.sliderContainer}>
+          <div style={styles.sliderHeader}>
+            <label style={styles.sliderLabel}>🔢 Agent Count</label>
+            <span style={styles.sliderValue}>{parameters.globalTemporal.agentCount.toLocaleString()}</span>
+          </div>
+          <input
+            type="range"
+            min={150}
+            max={15000}
+            step={50}
+            value={parameters.globalTemporal.agentCount}
+            onChange={(e) => updateGlobalTemporalParams({ agentCount: parseInt(e.target.value) })}
+            style={styles.slider}
+            title="Number of agents in the simulation"
+          />
+        </div>
+
+        {/* Simulation Speed Slider */}
+        <div style={styles.sliderContainer}>
+          <div style={styles.sliderHeader}>
+            <label style={styles.sliderLabel}>⚡ Simulation Speed</label>
+            <span style={styles.sliderValue}>{parameters.globalTemporal.simulationSpeed.toFixed(1)}x</span>
+          </div>
+          <input
+            type="range"
+            min={0.5}
+            max={10}
+            step={0.5}
+            value={parameters.globalTemporal.simulationSpeed}
+            onChange={(e) => updateGlobalTemporalParams({ simulationSpeed: parseFloat(e.target.value) })}
+            style={styles.slider}
+            title="Speed multiplier for the simulation"
+          />
+        </div>
       </div>
     </div>
   );
@@ -51,17 +93,25 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 const styles = {
   container: {
     display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'column',
+    gap: '16px',
     padding: '16px 20px',
     backgroundColor: '#13141f',
     borderRadius: '8px',
     border: '1px solid #2a2b3a',
     marginBottom: '20px',
   } as React.CSSProperties,
+  topRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '12px',
+  } as React.CSSProperties,
   left: {
     display: 'flex',
     gap: '12px',
+    flexWrap: 'wrap',
   } as React.CSSProperties,
   right: {
     display: 'flex',
@@ -104,5 +154,43 @@ const styles = {
     fontSize: '14px',
     color: '#a0a0b0',
     fontFamily: 'monospace',
+  } as React.CSSProperties,
+  slidersRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '20px',
+    paddingTop: '8px',
+    borderTop: '1px solid #2a2b3a',
+  } as React.CSSProperties,
+  sliderContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+  } as React.CSSProperties,
+  sliderHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  } as React.CSSProperties,
+  sliderLabel: {
+    fontSize: '13px',
+    color: '#e0e0e0',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  sliderValue: {
+    fontSize: '13px',
+    color: '#7d5dbd',
+    fontFamily: 'monospace',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  slider: {
+    width: '100%',
+    height: '8px',
+    borderRadius: '4px',
+    outline: 'none',
+    background: 'linear-gradient(to right, #7d5dbd 0%, #7d5dbd 50%, #2a2b3a 50%, #2a2b3a 100%)',
+    cursor: 'pointer',
+    WebkitAppearance: 'none',
+    appearance: 'none',
   } as React.CSSProperties,
 };
