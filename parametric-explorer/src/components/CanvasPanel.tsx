@@ -10,12 +10,20 @@ export function CanvasPanel() {
   const motionBlurCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
+  // FPS tracking
+  const lastFrameTimeRef = useRef<number>(performance.now());
+  const fpsHistoryRef = useRef<number[]>([]);
+  const frameCounterRef = useRef<number>(0);
+
   const tick = useSimulationStore((state) => state.tick);
   const trails = useSimulationStore((state) => state.trails);
   const agents = useSimulationStore((state) => state.agents);
   const running = useSimulationStore((state) => state.running);
   const visualization = useSimulationStore((state) => state.parameters.visualization);
   const effects = useSimulationStore((state) => state.parameters.effects);
+  const performanceParams = useSimulationStore((state) => state.parameters.performance);
+  const updatePerformanceMetrics = useSimulationStore((state) => state.updatePerformanceMetrics);
+  const performAutoOptimization = useSimulationStore((state) => state.performAutoOptimization);
 
   // Initialize motion blur canvas
   useEffect(() => {
@@ -223,8 +231,57 @@ export function CanvasPanel() {
   // Animation loop
   useEffect(() => {
     const animate = () => {
+      const frameStartTime = performance.now();
+
+      // Measure tick time
+      const tickStartTime = performance.now();
       tick();
+      const tickEndTime = performance.now();
+      const tickTime = tickEndTime - tickStartTime;
+
+      // Measure render time
+      const renderStartTime = performance.now();
       render();
+      const renderEndTime = performance.now();
+      const renderTime = renderEndTime - renderStartTime;
+
+      const frameEndTime = performance.now();
+      const frameTime = frameEndTime - frameStartTime;
+
+      // Calculate FPS
+      const deltaTime = frameEndTime - lastFrameTimeRef.current;
+      lastFrameTimeRef.current = frameEndTime;
+      const currentFPS = deltaTime > 0 ? 1000 / deltaTime : 0;
+
+      // Update FPS history (rolling window of last 60 frames)
+      fpsHistoryRef.current.push(currentFPS);
+      if (fpsHistoryRef.current.length > 60) {
+        fpsHistoryRef.current.shift();
+      }
+
+      // Calculate average, min, max FPS
+      const avgFPS = fpsHistoryRef.current.reduce((a, b) => a + b, 0) / fpsHistoryRef.current.length;
+      const minFPS = Math.min(...fpsHistoryRef.current);
+      const maxFPS = Math.max(...fpsHistoryRef.current);
+
+      // Update performance metrics
+      updatePerformanceMetrics({
+        currentFPS,
+        avgFPS,
+        minFPS,
+        maxFPS,
+        frameTime,
+        tickTime,
+        renderTime,
+      });
+
+      // Auto-optimization check (every fpsCheckInterval frames)
+      frameCounterRef.current++;
+      if (frameCounterRef.current >= performanceParams.fpsCheckInterval) {
+        frameCounterRef.current = 0;
+        performAutoOptimization();
+      }
+
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
@@ -243,7 +300,7 @@ export function CanvasPanel() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [running, tick, render]);
+  }, [running, tick, render, performanceParams.fpsCheckInterval, updatePerformanceMetrics, performAutoOptimization]);
 
   // Initial render
   useEffect(() => {
