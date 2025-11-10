@@ -354,8 +354,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    // === 10. Render agents (optional) ===
-    if (visualization.brightness > 0.5) {
+    // === 10. Render agents (optional - Lab Mode) ===
+    // Default: Hidden for pure lavalamp aesthetics
+    // Lab Mode: Show as directional triangles
+    const SHOW_AGENTS = false; // Set to true for lab mode
+    const USE_TRIANGLES = true; // Triangles show direction, circles don't
+
+    if (SHOW_AGENTS && visualization.brightness > 0.5) {
       agents.forEach((agent) => {
         const x = agent.x * SCALE;
         const y = agent.y * SCALE;
@@ -367,9 +372,27 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
             ? `rgb(${visualization.colorGreen.r}, ${visualization.colorGreen.g}, ${visualization.colorGreen.b})`
             : `rgb(${visualization.colorBlue.r}, ${visualization.colorBlue.g}, ${visualization.colorBlue.b})`;
 
-        ctx.beginPath();
-        ctx.arc(x, y, 1, 0, Math.PI * 2);
-        ctx.fill();
+        if (USE_TRIANGLES) {
+          // Draw directional triangle (points in movement direction)
+          const size = 3;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(agent.angle);
+
+          ctx.beginPath();
+          ctx.moveTo(size, 0);           // tip (front)
+          ctx.lineTo(-size, -size/2);    // back-left
+          ctx.lineTo(-size, size/2);     // back-right
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.restore();
+        } else {
+          // Draw simple dot (no direction info)
+          ctx.beginPath();
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
       });
     }
 
