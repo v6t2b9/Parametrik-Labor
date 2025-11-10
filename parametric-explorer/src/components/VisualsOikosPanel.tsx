@@ -111,6 +111,72 @@ export function VisualsOikosPanel() {
             ))}
           </div>
         </div>
+
+        {/* Lab Mode / Lavalamp Mode Toggle */}
+        <div style={styles.labModeSection}>
+          <label style={styles.paramLabel}>🔬 Visualization Mode</label>
+          <p style={styles.paramDescription}>
+            Switch between pure lavalamp aesthetics and scientific agent view
+          </p>
+          <div style={styles.toggleGroup}>
+            <button
+              onClick={() => updateVisualizationParams({ showAgents: false })}
+              style={{
+                ...styles.toggleButton,
+                backgroundColor: !visualization.showAgents ? '#7d5dbd' : '#1a1a2d',
+                borderColor: !visualization.showAgents ? '#9d7dd4' : '#2a2b3a',
+              }}
+              title="Pure trail visualization - meditative lavalamp experience"
+            >
+              🌈 Lavalamp Mode
+            </button>
+            <button
+              onClick={() => updateVisualizationParams({ showAgents: true })}
+              style={{
+                ...styles.toggleButton,
+                backgroundColor: visualization.showAgents ? '#7d5dbd' : '#1a1a2d',
+                borderColor: visualization.showAgents ? '#9d7dd4' : '#2a2b3a',
+              }}
+              title="Show agent markers - scientific analysis mode"
+            >
+              🔬 Lab Mode
+            </button>
+          </div>
+
+          {/* Agent Display Type (only visible in Lab Mode) */}
+          {visualization.showAgents && (
+            <div style={{ marginTop: '12px' }}>
+              <label style={styles.paramLabel}>Agent Display</label>
+              <p style={styles.paramDescription}>
+                How agents are visualized in Lab Mode
+              </p>
+              <div style={styles.toggleGroup}>
+                <button
+                  onClick={() => updateVisualizationParams({ useTriangles: false })}
+                  style={{
+                    ...styles.toggleButton,
+                    backgroundColor: !visualization.useTriangles ? '#7d5dbd' : '#1a1a2d',
+                    borderColor: !visualization.useTriangles ? '#9d7dd4' : '#2a2b3a',
+                  }}
+                  title="Simple circular dots"
+                >
+                  ⚫ Dots
+                </button>
+                <button
+                  onClick={() => updateVisualizationParams({ useTriangles: true })}
+                  style={{
+                    ...styles.toggleButton,
+                    backgroundColor: visualization.useTriangles ? '#7d5dbd' : '#1a1a2d',
+                    borderColor: visualization.useTriangles ? '#9d7dd4' : '#2a2b3a',
+                  }}
+                  title="Directional triangles showing movement orientation"
+                >
+                  🔺 Triangles
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div style={styles.divider} />
@@ -435,6 +501,24 @@ const styles = {
   blendModeLabel: {
     display: 'block',
     textAlign: 'center',
+    color: '#e0e0e0',
+  } as React.CSSProperties,
+  labModeSection: {
+    marginTop: '20px',
+  } as React.CSSProperties,
+  toggleGroup: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '8px',
+  } as React.CSSProperties,
+  toggleButton: {
+    padding: '12px',
+    border: '2px solid',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    fontWeight: 600,
+    fontSize: '12px',
     color: '#e0e0e0',
   } as React.CSSProperties,
   colorGrid: {

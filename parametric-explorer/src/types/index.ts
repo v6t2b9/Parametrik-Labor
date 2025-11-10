@@ -85,6 +85,8 @@ export interface VisualizationParams {
   colorGreen: RGBColor;     // Green channel color
   colorBlue: RGBColor;      // Blue channel color
   colorBg: RGBColor;        // Background color
+  showAgents: boolean;      // Show agents in Lab Mode (false = pure lavalamp)
+  useTriangles: boolean;    // Show agents as directional triangles (true) or dots (false)
 }
 
 export interface EffectsParams {

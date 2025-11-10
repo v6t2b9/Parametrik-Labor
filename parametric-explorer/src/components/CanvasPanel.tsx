@@ -355,12 +355,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     }
 
     // === 10. Render agents (optional - Lab Mode) ===
-    // Default: Hidden for pure lavalamp aesthetics
-    // Lab Mode: Show as directional triangles
-    const SHOW_AGENTS = false; // Set to true for lab mode
-    const USE_TRIANGLES = true; // Triangles show direction, circles don't
-
-    if (SHOW_AGENTS && visualization.brightness > 0.5) {
+    // Controlled via visualization.showAgents and visualization.useTriangles
+    if (visualization.showAgents && visualization.brightness > 0.5) {
       agents.forEach((agent) => {
         const x = agent.x * SCALE;
         const y = agent.y * SCALE;
@@ -372,7 +368,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
             ? `rgb(${visualization.colorGreen.r}, ${visualization.colorGreen.g}, ${visualization.colorGreen.b})`
             : `rgb(${visualization.colorBlue.r}, ${visualization.colorBlue.g}, ${visualization.colorBlue.b})`;
 
-        if (USE_TRIANGLES) {
+        if (visualization.useTriangles) {
           // Draw directional triangle (points in movement direction)
           const size = 3;
           ctx.save();

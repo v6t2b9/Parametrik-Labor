@@ -58,6 +58,8 @@ export const defaultParameters: AllParameters = {
     colorGreen: { r: 50, g: 255, b: 255 },  // Cyan
     colorBlue: { r: 255, g: 255, b: 50 },   // Yellow
     colorBg: { r: 5, g: 5, b: 15 },
+    showAgents: false,     // Default: Lavalamp Mode (pure trails)
+    useTriangles: true,    // Lab Mode: Show directional triangles
   },
   effects: {
     blur: 0,
@@ -101,6 +103,8 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       ...legacy.visualization,
       blendMode: legacy.visualization.blendMode || 'additive',
       trailIntensity: legacy.visualization.trailIntensity || 180,
+      showAgents: legacy.visualization.showAgents ?? false,  // Default: Lavalamp mode
+      useTriangles: legacy.visualization.useTriangles ?? true,  // Default: Directional triangles
     },
     effects: {
       ...legacy.effects,

@@ -14,7 +14,7 @@ export interface VisualPreset {
   name: string;
   icon: string;
   description: string;
-  params: VisualizationParams;
+  params: Partial<VisualizationParams>;  // Partial so we don't have to specify showAgents/useTriangles every time
 }
 
 export const visualPresets: VisualPreset[] = [
@@ -577,17 +577,17 @@ export const effectsPresets: EffectsPreset[] = [
   {
     name: 'Psychedelisch',
     icon: '🌈',
-    description: 'RGB-Shift, Farbrotation, Verzerrung',
+    description: 'RGB-Shift, Farbrotation, extreme Sättigung',
     params: {
       blur: 4,
-      bloom: 0.4,
-      saturation: 2.0,
-      contrast: 1.2,
+      bloom: 0.6,
+      saturation: 2.2,
+      contrast: 1.3,
       hueShift: 180,
       motionBlur: 0.25,
       vignette: 0,
       chromaticAberration: 8,
-      waveDistortion: 0.6,
+      waveDistortion: 0,  // Removed for performance
       scanlines: 0,
       pixelation: 1,
     },
@@ -605,7 +605,7 @@ export const effectsPresets: EffectsPreset[] = [
       motionBlur: 0.4,
       vignette: 0.5,
       chromaticAberration: 4,
-      waveDistortion: 0.2,
+      waveDistortion: 0,  // Removed for performance
       scanlines: 0.8,
       pixelation: 1,
     },
@@ -623,7 +623,7 @@ export const effectsPresets: EffectsPreset[] = [
       motionBlur: 0.75,
       vignette: 0.15,
       chromaticAberration: 0,
-      waveDistortion: 0.1,
+      waveDistortion: 0,  // Removed for performance
       scanlines: 0,
       pixelation: 1,
     },
