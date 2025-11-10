@@ -119,12 +119,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     const canvasPool = canvasPoolRef.current;
 
     // === 1. Render base trails ===
-    // CPU rendering for now to debug visual issues
-    // TODO: Re-enable WebGL once visual quality is verified
-    const USE_WEBGL = false; // Set to true to test WebGL rendering
+    // Hybrid approach: WebGL for trails (fast, smooth lavalamp effects)
+    //                  CPU for agent pixels (precise positioning)
+    const USE_WEBGL = true;
 
     if (USE_WEBGL && webglRendererRef.current) {
-      // WebGL rendering (fast but may have visual artifacts)
+      // WebGL rendering for trails - perfect for lavalamp/schlieren effects
       const webglCanvas = webglRendererRef.current.render(trails, visualization);
       ctx.drawImage(webglCanvas, 0, 0);
     } else {
