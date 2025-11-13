@@ -75,6 +75,21 @@ export const defaultParameters: AllParameters = {
     pixelation: 1,
   },
   performance: defaultPerformanceParams,
+  // Quantum-inspired stigmergy model params
+  modelParams: {
+    model: 'M1' as const, // Default: Classical stigmergy
+    m2: {
+      highThreshold: 120,
+      lowThreshold: 30,
+      explorationNoise: 0.3,
+    },
+    m3: {
+      phaseRotationRate: 0.005,
+      amplitudeCoupling: 0.15,
+      contextThreshold: 250,
+      phaseNoise: 0.05,
+    },
+  },
 };
 
 // Legacy format converter for old presets
@@ -112,6 +127,7 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       pixelation: legacy.effects.pixelation || 1,
     },
     performance: legacy.performance,
+    modelParams: legacy.modelParams || defaultParameters.modelParams,
   };
 }
 

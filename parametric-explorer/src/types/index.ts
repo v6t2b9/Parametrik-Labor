@@ -2,15 +2,45 @@
 
 export type AgentType = 'red' | 'green' | 'blue';
 
+// Complex number type for quantum amplitudes
+export interface ComplexNumber {
+  re: number;  // Real part
+  im: number;  // Imaginary part
+}
+
+// Quantum state amplitudes for direction choices
+export interface QuantumAmplitudes {
+  left: ComplexNumber;
+  forward: ComplexNumber;
+  right: ComplexNumber;
+}
+
+// Context mode for M2 (classical + context-switching)
+export type ContextMode = 'explore' | 'exploit';
+
 export interface Agent {
   x: number;
   y: number;
   angle: number;
   type: AgentType;
   rhythmPhase: number;
+
+  // M2: Context-switching state
+  contextMode?: ContextMode;
+
+  // M3: Quantum-inspired state
+  quantumAmplitudes?: QuantumAmplitudes;
+  internalPhase?: number;  // For phase evolution
 }
 
 export interface Trails {
+  red: Float32Array;
+  green: Float32Array;
+  blue: Float32Array;
+}
+
+// Pheromone phase data for M3 (quantum-inspired model)
+export interface PheromonePhases {
   red: Float32Array;
   green: Float32Array;
   blue: Float32Array;
@@ -57,6 +87,31 @@ export interface ResonanceOikosParams {
   attractionStrength: number;       // -2.0-2.0: Same-type reinforcement
   repulsionStrength: number;        // -2.0-2.0: Cross-type influence
   crossSpeciesInteraction: boolean; // Enable/disable cross-species
+}
+
+// Stigmergy model types for computational validation
+export type StigmergyModel = 'M1' | 'M2' | 'M3';
+
+// M2: Context-switching parameters
+export interface ContextSwitchingParams {
+  highThreshold: number;      // 50-200: Density to switch to exploit
+  lowThreshold: number;       // 10-50: Density to switch to explore
+  explorationNoise: number;   // 0.1-1.0: Noise magnitude in explore mode
+}
+
+// M3: Quantum-inspired parameters
+export interface QuantumParams {
+  phaseRotationRate: number;  // 0.001-0.01: How fast trails "age"
+  amplitudeCoupling: number;  // 0.05-0.3: Coupling between directions
+  contextThreshold: number;   // 100-500: Food collected before context switch
+  phaseNoise: number;         // 0.01-0.1: Environmental phase fluctuations
+}
+
+// Model selection and parameters
+export interface ModelParams {
+  model: StigmergyModel;      // M1, M2, or M3
+  m2: ContextSwitchingParams; // Parameters for M2
+  m3: QuantumParams;          // Parameters for M3
 }
 
 // Species-specific parameter overrides (all optional)
@@ -155,6 +210,9 @@ export interface AllParameters {
   visualization: VisualizationParams;
   effects: EffectsParams;
   performance: PerformanceParams;
+
+  // Quantum-inspired stigmergy model selection
+  modelParams: ModelParams;
 }
 
 // Helper type for resolved parameters (after merging universal + species)
@@ -197,7 +255,7 @@ export interface EmergentProperties {
 
 // UI State - Matrix Navigation
 export type SpeciesScope = 'universal' | 'red' | 'green' | 'blue';
-export type OikosTab = 'presets' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visuals' | 'performance';
+export type OikosTab = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visuals' | 'performance';
 
 export interface UIState {
   // Matrix navigation

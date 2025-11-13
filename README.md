@@ -70,7 +70,24 @@ Transform your simulations into stunning visual experiences:
 
 ### Parameter Control System
 
-Parameters are organized into **7 "Oikos"** (ecological) dimensions:
+Parameters are organized into **8 "Oikos"** (ecological) dimensions:
+
+#### 🧬 Model Oikos
+**NEW!** Quantum-Inspired Stigmergy Computational Models:
+- **M1: Classical Stigmergy** (Baseline) - Standard pheromone-based navigation (7 parameters)
+- **M2: Context-Switching** - Classical + explore/exploit modes (10 parameters)
+- **M3: Quantum-Inspired** ⚛️ - Superposition states + phase-dependent trails + interference (11 parameters)
+
+Based on **Supplement B: Computational Model Protocol** for quantum biosemiotics research. Allows computational validation of quantum-inspired dynamics in stigmergic systems.
+
+**Model-Specific Parameters:**
+- **M2 Parameters**: High/Low Thresholds, Exploration Noise
+- **M3 Parameters**: Phase Rotation Rate, Amplitude Coupling, Context Threshold, Phase Noise
+
+**Expected M3 Behaviors:**
+- Order effects: A→B ≠ B→A (asymmetric exploration)
+- Interference: Trail combinations show non-additive responses
+- Context-dependence: Same trail = different response based on history
 
 #### 🌍 Physical Oikos
 Controls trace materiality and environmental properties:
@@ -124,6 +141,180 @@ Post-processing effects for Lavalampen-Magie (see Post-Processing Effects sectio
 #### ⚡ Performance Oikos
 Performance optimization and quality settings (see Performance Optimization section above).
 
+---
+
+## Quantum-Inspired Stigmergy Models
+
+### Background
+
+This implementation extends classical stigmergy with three computational models for validating quantum-inspired dynamics in biological coordination systems. Based on the research protocol described in **Supplement B: Computational Model Protocol** from the quantum biosemiotics research program.
+
+### The Three Models
+
+**M1: Classical Stigmergy (Baseline)**
+- Standard agent-based model with pheromone trails
+- Agents sense environment → turn toward strongest signal → move → deposit trail
+- Symmetric exploration: A→B ≈ B→A
+- Additive trail strength: Trail(A+B) ≈ Trail(A) + Trail(B)
+- Context-independent response
+- **Parameters**: 7 base parameters (sensor angle/distance, turn speed, deposit, decay, etc.)
+
+**M2: Classical + Context-Switching**
+- Extends M1 with explore/exploit behavioral modes
+- Agents switch modes based on local pheromone density:
+  - **Explore mode**: High noise, seeking new areas
+  - **Exploit mode**: Low noise, following strong trails
+- Some asymmetry from state persistence
+- Still additive (no true interference)
+- **Parameters**: 10 total (7 base + 3 context: high/low thresholds, exploration noise)
+
+**M3: Quantum-Inspired Stigmergy** ⚛️
+- **Superposition states**: Agents maintain probability amplitudes for directions (left, forward, right)
+- **Phase-dependent trails**: Pheromone trails have complex phases that evolve over time
+  - Fresh trails (phase ≈ 0): Attractive (cos(0) = +1)
+  - Stale trails (phase ≈ π): Repulsive (cos(π) = -1)
+  - Neutral trails (phase ≈ π/2): No influence
+- **Amplitude coupling**: Direction choices influence each other via quantum-like coupling
+- **Measurement/collapse**: Agents "measure" their quantum state, collapsing to classical choice
+- **Interference patterns**: Trail combinations show destructive/constructive interference
+- **Context operators**: Colony-level state changes trail interpretation
+- **Parameters**: 11 total (7 base + 4 quantum: phase rotation, amplitude coupling, context threshold, phase noise)
+
+### Key Quantum Features (M3)
+
+**1. Phase Evolution**
+```
+θ(t+1) = θ(t) + ω_phase * Δt + noise
+effectiveStrength = magnitude * cos(phase)
+```
+Trails "age" and become repulsive over time, forcing exploration even in established patterns.
+
+**2. Superposition & Measurement**
+```
+|ψ⟩ = α_left|L⟩ + α_forward|F⟩ + α_right|R⟩
+P(direction) = |α_direction|²
+```
+Agents exist in superposition of movement choices until "measurement" collapses to action.
+
+**3. Amplitude Coupling**
+```
+δψ_left = κ * ψ_forward * exp(iφ_forward)
+```
+Prior measurements affect future amplitude evolution → **order effects** (A→B ≠ B→A).
+
+**4. Complex Number Operations**
+- Magnitude: |z| = sqrt(re² + im²)
+- Multiplication: (a+bi)(c+di) = (ac-bd) + (ad+bc)i
+- Exponential: exp(iφ) = cos(φ) + i*sin(φ)
+- Normalization: Σ|α|² = 1
+
+### Expected Predictions
+
+**Empirical Benchmarks** (from Phase 1 scoping review):
+- **Bee learning order effects**: d = 0.40 (Kheradmand et al., 2025)
+- **Plant VOC destructive interference**: d = -0.50 (Leon-Reyes et al., 2010)
+- **Ant foraging reallocation**: t = 10 min faster than exponential decay
+
+**Model Predictions:**
+- **M1**: d ≈ 0, I ≈ 0, t ≈ 30 min (symmetric, additive, slow)
+- **M2**: d ≈ 0.15, I ≈ -0.10, t ≈ 20 min (slight asymmetry, some saturation)
+- **M3**: d ≈ 0.40, I ≈ -0.29, t ≈ 10 min (matches empirical)
+
+**Validation Strategy:**
+Compare model fits using AIC (Akaike Information Criterion). If M3 does not outperform M2 by ΔAIC > 10 in ≥2/3 test cases, quantum hypothesis is not supported.
+
+### Implementation Details
+
+**Files:**
+- `src/types/index.ts` - Type definitions (ComplexNumber, QuantumAmplitudes, ModelParams)
+- `src/engine/ComplexMath.ts` - Complex number utilities
+- `src/engine/QuantumStigmergyEngine.ts` - Main simulation engine with M1/M2/M3
+- `src/components/ModelOikosPanel.tsx` - Model selection UI
+- `src/presets/index.ts` - Default model parameters
+
+**Core Classes:**
+```typescript
+class QuantumStigmergyEngine {
+  updateAgentM1(agent) { /* Classical stigmergy */ }
+  updateAgentM2(agent) { /* Context-switching */ }
+  updateAgentM3(agent) { /* Quantum-inspired */ }
+
+  senseM1(agent, angle, distance) { /* Magnitude only */ }
+  senseM3(agent, angle, distance) { /* Magnitude + phase */ }
+
+  diffuseAndDecay() { /* Classical diffusion */ }
+  diffuseAndDecayM3() { /* With phase evolution */ }
+}
+```
+
+**Complex Math Utilities:**
+- `complex(re, im)` - Create complex number
+- `cmul(z1, z2)` - Complex multiplication
+- `cexp(phase)` - Complex exponential
+- `normalizeAmplitudes(ψ)` - Normalize to unit magnitude
+- `measureDirection(ψ)` - Born rule measurement
+- `effectiveStrengthWithPhase(mag, phase)` - Phase-dependent strength
+
+### Usage
+
+1. **Select Model**: Go to 🧬 Model Oikos tab
+2. **Choose M1/M2/M3**: Click on model button to switch
+3. **Adjust Parameters**:
+   - M1: Use standard Physical/Semiotic/Temporal tabs
+   - M2: Adjust high/low thresholds and exploration noise
+   - M3: Tune phase rotation, amplitude coupling, context threshold, phase noise
+4. **Observe Behaviors**:
+   - M1: Stable trails, simple patterns
+   - M2: Dynamic explore/exploit switching
+   - M3: Complex interference, order-dependent patterns, trail aging
+5. **Compare**: Run same preset with different models to see differences
+
+### Research Applications
+
+**Computational Validation:**
+- Test quantum-inspired models against empirical data
+- Calculate AIC/BIC for model comparison
+- Cross-validation for generalization performance
+- Parameter optimization using Bayesian methods
+
+**Hypothesis Testing:**
+- Can quantum formalism explain order effects in bee learning?
+- Do interference patterns match plant VOC data?
+- Does phase-driven repulsion explain ant reallocation?
+
+**Educational:**
+- Demonstrate quantum concepts (superposition, measurement, interference)
+- Show emergence of non-classical behaviors
+- Compare classical vs. quantum predictions
+
+**Exploratory:**
+- Discover novel parameter regimes
+- Identify signatures of quantum-like dynamics
+- Generate predictions for future experiments
+
+### Falsification Criteria
+
+**M3 (quantum-inspired) is NOT SUPPORTED if:**
+1. ΔAIC(M3 vs M2) < 10 in ≥2/3 test cases
+2. M3 requires >15 parameters (excessive flexibility)
+3. M3 fails cross-validation (overfits)
+4. M3 predictions deviate >50% from empirical benchmarks
+
+**Transparency:** All results published regardless of outcome. Negative results (falsification) are scientifically valuable.
+
+### References
+
+- Supplement B: Computational Model Protocol (Quantum Biosemiotics Research Program)
+- Kheradmand et al. (2025). Honey bees can use sequence learning. *iScience*.
+- Leon-Reyes et al. (2010). Salicylate-mediated suppression. *Planta*.
+- Grassé (1959). La reconstruction du nid. *Insectes Sociaux*.
+- Dorigo & Stützle (2004). *Ant Colony Optimization*. MIT Press.
+
+---
+
+#### ⚡ Performance Oikos
+Performance optimization and quality settings (see Performance Optimization section above).
+
 ### Global Preset Gallery
 
 **8 curated full-parameter configurations** for instant visual impact:
@@ -139,12 +330,13 @@ Performance optimization and quality settings (see Performance Optimization sect
 
 ### Tab-Specific Presets
 
-**43 dimension-specific presets** for targeted exploration:
+**43+ dimension-specific presets** for targeted exploration:
 - **16 Visual Presets** (Visualization Oikos)
 - **6 Physics Presets** (Physical Oikos)
 - **6 Species Presets** (Semiotic Oikos)
 - **6 Temporal Presets** (Temporal Oikos)
 - **9 Effects Presets** (Effects Oikos)
+- **Model Presets** (M1/M2/M3 with curated parameters)
 
 ### Interactive Controls
 - Play/Pause simulation
@@ -448,10 +640,11 @@ For detailed theoretical background, see `parametrics_paper_draft.md` and `Param
 
 ## Roadmap
 
-### Phase 1: Core MVP ✅ **COMPLETE**
+### Phase 1: Core MVP + Quantum Extension ✅ **COMPLETE**
 - ✅ 8-connected diffusion simulation engine
 - ✅ Canvas visualization with fullscreen mode
-- ✅ 7-dimensional parameter controls (Physical, Semiotic, Temporal, Resonance, Visualization, Effects, Performance)
+- ✅ **8-dimensional parameter controls** (Model, Physical, Semiotic, Temporal, Resonance, Visualization, Effects, Performance)
+- ✅ **Quantum-Inspired Stigmergy Models** (M1, M2, M3)
 - ✅ 8 global presets + 43 tab-specific presets (51 total!)
 - ✅ Screenshot export
 - ✅ Real-time parameter manipulation
@@ -460,6 +653,9 @@ For detailed theoretical background, see `parametrics_paper_draft.md` and `Param
 - ✅ Auto-optimizer with 10-level adaptive quality
 - ✅ 4 quality presets (low, medium, high, ultra)
 - ✅ Critical fixes: inverted diffusion logic, expanded ranges, layout optimization
+- ✅ **Complex number operations for quantum amplitudes**
+- ✅ **Phase-dependent trail interpretation**
+- ✅ **Superposition states and measurement**
 
 ### Phase 2: Metrics & Analysis (Planned)
 - Real-time emergent property calculation
