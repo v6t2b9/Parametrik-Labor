@@ -19,7 +19,6 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const recordedChunksRef = useRef<Blob[]>([]);
   const gifEncoderRef = useRef<any>(null);
   const recordingIntervalRef = useRef<number | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const takeScreenshot = () => {
     const canvas = document.querySelector('canvas');
