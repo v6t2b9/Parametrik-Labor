@@ -1,13 +1,18 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { WebGLTrailRenderer } from './WebGLTrailRenderer';
 
-const CANVAS_SIZE = 800;
+const DEFAULT_CANVAS_SIZE = 800;
 const GRID_SIZE = 400;
-const SCALE = CANVAS_SIZE / GRID_SIZE; // 2x scaling
 
 interface CanvasPanelProps {
   isFullscreen?: boolean;
+}
+
+// Helper: Convert aspect ratio string to [width, height] multipliers
+function getAspectRatioMultipliers(ratio: string): [number, number] {
+  const [w, h] = ratio.split(':').map(Number);
+  return [w, h];
 }
 
 // Canvas pool for reusable temporary canvases
@@ -43,6 +48,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const motionBlurCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
+  // Responsive canvas size (based on window size in fullscreen and aspect ratio)
+  const [canvasWidth, setCanvasWidth] = useState(DEFAULT_CANVAS_SIZE);
+  const [canvasHeight, setCanvasHeight] = useState(DEFAULT_CANVAS_SIZE);
+  const [scaleX, setScaleX] = useState(DEFAULT_CANVAS_SIZE / GRID_SIZE);
+  const [scaleY, setScaleY] = useState(DEFAULT_CANVAS_SIZE / GRID_SIZE);
+
   // WebGL renderer for trails (major performance boost)
   const webglRendererRef = useRef<WebGLTrailRenderer | null>(null);
 
@@ -65,24 +76,111 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const effects = useSimulationStore((state) => state.parameters.effects);
   const updatePerformanceMetrics = useSimulationStore((state) => state.updatePerformanceMetrics);
   const performAutoOptimization = useSimulationStore((state) => state.performAutoOptimization);
+  const playbackSpeed = useSimulationStore((state) => state.ui.playbackSpeed);
+  const aspectRatio = useSimulationStore((state) => state.ui.aspectRatio);
 
-  // Initialize WebGL renderer, motion blur canvas, and scanline pattern
+  // Responsive canvas sizing based on fullscreen mode and aspect ratio
   useEffect(() => {
-    // WebGL renderer
-    if (!webglRendererRef.current) {
-      webglRendererRef.current = new WebGLTrailRenderer(CANVAS_SIZE, GRID_SIZE);
-    }
+    const updateCanvasSize = () => {
+      const [ratioW, ratioH] = getAspectRatioMultipliers(aspectRatio);
 
-    // Motion blur canvas
-    if (!motionBlurCanvasRef.current) {
-      const mbCanvas = document.createElement('canvas');
-      mbCanvas.width = CANVAS_SIZE;
-      mbCanvas.height = CANVAS_SIZE;
-      motionBlurCanvasRef.current = mbCanvas;
+      if (isFullscreen) {
+        // In fullscreen: use window dimensions, maintaining aspect ratio
+        const maxWidth = window.innerWidth;
+        const maxHeight = window.innerHeight;
+
+        // Use device pixel ratio for sharp rendering on high-DPI displays
+        const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2x for performance
+
+        // Calculate size that fits the screen while maintaining aspect ratio
+        const widthBasedSize = maxWidth * dpr;
+        const heightBasedSize = maxHeight * dpr;
+
+        // Determine which dimension is limiting
+        const widthLimitedHeight = (widthBasedSize / ratioW) * ratioH;
+        const heightLimitedWidth = (heightBasedSize / ratioH) * ratioW;
+
+        let finalWidth, finalHeight;
+        if (widthLimitedHeight <= heightBasedSize) {
+          // Width is the limiting factor
+          finalWidth = widthBasedSize;
+          finalHeight = widthLimitedHeight;
+        } else {
+          // Height is the limiting factor
+          finalWidth = heightLimitedWidth;
+          finalHeight = heightBasedSize;
+        }
+
+        // Cap maximum size at 2400px for longest dimension
+        const maxDimension = Math.max(finalWidth, finalHeight);
+        if (maxDimension > 2400) {
+          const scaleFactor = 2400 / maxDimension;
+          finalWidth *= scaleFactor;
+          finalHeight *= scaleFactor;
+        }
+
+        // Ensure minimum size
+        const minSize = GRID_SIZE;
+        finalWidth = Math.max(minSize, Math.floor(finalWidth));
+        finalHeight = Math.max(minSize, Math.floor(finalHeight));
+
+        setCanvasWidth(finalWidth);
+        setCanvasHeight(finalHeight);
+        setScaleX(finalWidth / GRID_SIZE);
+        setScaleY(finalHeight / GRID_SIZE);
+      } else {
+        // Normal mode: calculate canvas size based on aspect ratio
+        const baseSize = DEFAULT_CANVAS_SIZE;
+        let width, height;
+
+        if (ratioW > ratioH) {
+          // Landscape
+          width = baseSize;
+          height = (baseSize / ratioW) * ratioH;
+        } else if (ratioH > ratioW) {
+          // Portrait
+          height = baseSize;
+          width = (baseSize / ratioH) * ratioW;
+        } else {
+          // Square
+          width = baseSize;
+          height = baseSize;
+        }
+
+        setCanvasWidth(Math.floor(width));
+        setCanvasHeight(Math.floor(height));
+        setScaleX(width / GRID_SIZE);
+        setScaleY(height / GRID_SIZE);
+      }
+    };
+
+    updateCanvasSize();
+
+    if (isFullscreen) {
+      window.addEventListener('resize', updateCanvasSize);
+      return () => window.removeEventListener('resize', updateCanvasSize);
     }
+  }, [isFullscreen, aspectRatio]);
+
+  // Initialize/update WebGL renderer, motion blur canvas, and scanline pattern when canvas size changes
+  useEffect(() => {
+    // WebGL renderer - recreate when canvas size changes
+    // Note: WebGL renderer uses square canvas based on max dimension
+    const maxSize = Math.max(canvasWidth, canvasHeight);
+    if (webglRendererRef.current) {
+      webglRendererRef.current.destroy();
+    }
+    webglRendererRef.current = new WebGLTrailRenderer(maxSize, GRID_SIZE);
+
+    // Motion blur canvas - resize when canvas size changes
+    if (!motionBlurCanvasRef.current) {
+      motionBlurCanvasRef.current = document.createElement('canvas');
+    }
+    motionBlurCanvasRef.current.width = canvasWidth;
+    motionBlurCanvasRef.current.height = canvasHeight;
 
     // Scanline pattern (cached for performance)
-    if (!scanlinePatternRef.current && canvasRef.current) {
+    if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
         const patternCanvas = document.createElement('canvas');
@@ -106,7 +204,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         webglRendererRef.current = null;
       }
     };
-  }, []);
+  }, [canvasWidth, canvasHeight]);
 
   // Render function with post-processing effects (OPTIMIZED)
   const render = useCallback(() => {
@@ -130,9 +228,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     } else {
       // CPU rendering (slower but visually accurate)
       ctx.fillStyle = `rgb(${visualization.colorBg.r}, ${visualization.colorBg.g}, ${visualization.colorBg.b})`;
-      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-      const imageData = ctx.createImageData(CANVAS_SIZE, CANVAS_SIZE);
+      const imageData = ctx.createImageData(canvasWidth, canvasHeight);
       const data = imageData.data;
 
       for (let y = 0; y < GRID_SIZE; y++) {
@@ -143,12 +241,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
           const greenVal = trails.green[idx];
           const blueVal = trails.blue[idx];
 
-          // Scale to canvas size (2x2 blocks)
-          for (let dy = 0; dy < SCALE; dy++) {
-            for (let dx = 0; dx < SCALE; dx++) {
-              const canvasX = x * SCALE + dx;
-              const canvasY = y * SCALE + dy;
-              const pixelIdx = (canvasY * CANVAS_SIZE + canvasX) * 4;
+          // Scale to canvas size (scaleX/scaleY blocks)
+          for (let dy = 0; dy < scaleY; dy++) {
+            for (let dx = 0; dx < scaleX; dx++) {
+              const canvasX = x * scaleX + dx;
+              const canvasY = y * scaleY + dy;
+              const pixelIdx = (canvasY * canvasWidth + canvasX) * 4;
 
               // Initialize with background
               data[pixelIdx] = visualization.colorBg.r;
@@ -224,8 +322,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // === 2. Pixelation (Lo-Fi Effect) - OPTIMIZED with object pooling ===
     if (effects.pixelation > 1) {
       const pixelSize = Math.floor(effects.pixelation);
-      const smallWidth = Math.floor(CANVAS_SIZE / pixelSize);
-      const smallHeight = Math.floor(CANVAS_SIZE / pixelSize);
+      const smallWidth = Math.floor(canvasWidth / pixelSize);
+      const smallHeight = Math.floor(canvasHeight / pixelSize);
 
       const tempCanvas = canvasPool.acquire(smallWidth, smallHeight);
       const tempCtx = tempCanvas.getContext('2d');
@@ -237,8 +335,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
         // Upsample back
         ctx.imageSmoothingEnabled = false;
-        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-        ctx.drawImage(tempCanvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        ctx.drawImage(tempCanvas, 0, 0, canvasWidth, canvasHeight);
         ctx.imageSmoothingEnabled = true;
       }
 
@@ -288,7 +386,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // === 6. Chromatic Aberration - OPTIMIZED with object pooling ===
     if (effects.chromaticAberration > 0) {
-      const savedCanvas = canvasPool.acquire(CANVAS_SIZE, CANVAS_SIZE);
+      const savedCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
       const savedCtx = savedCanvas.getContext('2d');
 
       if (savedCtx) {
@@ -296,7 +394,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         savedCtx.drawImage(canvas, 0, 0);
 
         // Clear main canvas
-        ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
         const offset = effects.chromaticAberration;
 
@@ -328,15 +426,18 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // === 8. Vignette ===
     if (effects.vignette > 0) {
+      const centerX = canvasWidth / 2;
+      const centerY = canvasHeight / 2;
+      const maxRadius = Math.max(canvasWidth, canvasHeight) * 0.7;
       const gradient = ctx.createRadialGradient(
-        CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.3,
-        CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE * 0.7
+        centerX, centerY, Math.min(canvasWidth, canvasHeight) * 0.3,
+        centerX, centerY, maxRadius
       );
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
       gradient.addColorStop(1, `rgba(0, 0, 0, ${effects.vignette})`);
 
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
     }
 
     // === 9. Scanlines (CRT Effect) - OPTIMIZED with cached pattern ===
@@ -344,7 +445,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       ctx.globalCompositeOperation = 'multiply';
       ctx.globalAlpha = effects.scanlines;
       ctx.fillStyle = scanlinePatternRef.current;
-      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
     }
@@ -353,8 +454,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // Controlled via visualization.showAgents and visualization.useTriangles
     if (visualization.showAgents && visualization.brightness > 0.5) {
       agents.forEach((agent) => {
-        const x = agent.x * SCALE;
-        const y = agent.y * SCALE;
+        const x = agent.x * scaleX;
+        const y = agent.y * scaleY;
 
         ctx.fillStyle =
           agent.type === 'red'
@@ -389,10 +490,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Release all pooled canvases
     canvasPool.releaseAll();
-  }, [trails, agents, visualization, effects]);
+  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scaleX, scaleY]);
 
-  // Animation loop
+  // Animation loop with playback speed control
   useEffect(() => {
+    let timeoutId: number | undefined;
+
     const animate = () => {
       const frameStartTime = performance.now();
 
@@ -445,7 +548,19 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         performAutoOptimization();
       }
 
-      animationFrameRef.current = requestAnimationFrame(animate);
+      // Schedule next frame based on playback speed
+      // playbackSpeed: 1.0 = 60fps, 0.5 = 30fps, 2.0 = 120fps (capped by display)
+      if (playbackSpeed >= 0.95) {
+        // Normal or faster speed: use requestAnimationFrame
+        animationFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        // Slower speed: use setTimeout to delay frames
+        const targetFrameTime = (1000 / 60) / playbackSpeed; // 60fps base, adjusted by playback speed
+        const delay = Math.max(0, targetFrameTime - frameTime);
+        timeoutId = window.setTimeout(() => {
+          animationFrameRef.current = requestAnimationFrame(animate);
+        }, delay);
+      }
     };
 
     if (running) {
@@ -453,6 +568,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     } else {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
+      }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
       // Render one frame when paused
       render();
@@ -462,8 +580,11 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
     };
-  }, [running, tick, render, updatePerformanceMetrics, performAutoOptimization]);
+  }, [running, tick, render, updatePerformanceMetrics, performAutoOptimization, playbackSpeed]);
 
   // Initial render
   useEffect(() => {
@@ -484,8 +605,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     <div style={containerStyle}>
       <canvas
         ref={canvasRef}
-        width={CANVAS_SIZE}
-        height={CANVAS_SIZE}
+        width={canvasWidth}
+        height={canvasHeight}
         style={canvasStyle}
       />
     </div>
