@@ -11,7 +11,8 @@ export class WebGLTrailRenderer {
   private program: WebGLProgram | null = null;
   private canvas: HTMLCanvasElement;
   private gridSize: number;
-  private canvasSize: number;
+  private canvasWidth: number;
+  private canvasHeight: number;
 
   // Textures for trail data
   private redTexture: WebGLTexture | null = null;
@@ -35,12 +36,13 @@ export class WebGLTrailRenderer {
     brightness?: WebGLUniformLocation | null;
   } = {};
 
-  constructor(canvasSize: number, gridSize: number) {
-    this.canvasSize = canvasSize;
+  constructor(canvasWidth: number, canvasHeight: number, gridSize: number) {
+    this.canvasWidth = canvasWidth;
+    this.canvasHeight = canvasHeight;
     this.gridSize = gridSize;
     this.canvas = document.createElement('canvas');
-    this.canvas.width = canvasSize;
-    this.canvas.height = canvasSize;
+    this.canvas.width = canvasWidth;
+    this.canvas.height = canvasHeight;
 
     this.initWebGL();
   }
@@ -227,7 +229,7 @@ export class WebGLTrailRenderer {
     gl.uniform1f(this.uniformLocations.brightness!, visualization.brightness);
 
     // Clear and draw
-    gl.viewport(0, 0, this.canvasSize, this.canvasSize);
+    gl.viewport(0, 0, this.canvasWidth, this.canvasHeight);
     gl.clearColor(
       visualization.colorBg.r / 255,
       visualization.colorBg.g / 255,

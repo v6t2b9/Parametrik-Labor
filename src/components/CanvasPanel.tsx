@@ -165,12 +165,11 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // Initialize/update WebGL renderer, motion blur canvas, and scanline pattern when canvas size changes
   useEffect(() => {
     // WebGL renderer - recreate when canvas size changes
-    // Note: WebGL renderer uses square canvas based on max dimension
-    const maxSize = Math.max(canvasWidth, canvasHeight);
+    // Use actual canvas dimensions (not square) for correct aspect ratio
     if (webglRendererRef.current) {
       webglRendererRef.current.destroy();
     }
-    webglRendererRef.current = new WebGLTrailRenderer(maxSize, GRID_SIZE);
+    webglRendererRef.current = new WebGLTrailRenderer(canvasWidth, canvasHeight, GRID_SIZE);
 
     // Motion blur canvas - resize when canvas size changes
     if (!motionBlurCanvasRef.current) {
