@@ -242,13 +242,15 @@ const styles = {
   stickyCanvasSection: {
     position: 'sticky',
     // Negative top value: canvas will stick but move up, leaving bottom part visible
-    // Adjust this value to control how much of the canvas remains visible
-    top: '-400px',
+    // Larger negative value = less canvas visible when scrolling
+    top: '-650px',
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
     zIndex: 10,
     marginBottom: '20px',
+    backgroundColor: '#0a0a15', // Solid background to prevent controls showing through
+    paddingBottom: '20px', // Extra padding at bottom for cleaner separation
   } as React.CSSProperties,
   // Controls section - scrollable
   controlsSection: {
