@@ -7,6 +7,7 @@ import { useSimulationStore } from './store/useSimulationStore';
 function App() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [canvasHeight, setCanvasHeight] = useState(800); // Track canvas height for sticky offset
   const fullscreenContainerRef = useRef<HTMLDivElement>(null);
   const { ui, toggleControlPanel } = useSimulationStore();
 
@@ -97,14 +98,35 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFullscreen]);
 
-  // Mobile detection
+  // Mobile detection and canvas height tracking
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
+
+      // Calculate canvas height based on aspect ratio
+      const aspectRatio = ui.aspectRatio;
+      const [w, h] = aspectRatio.split(':').map(Number);
+      const baseSize = 800; // DEFAULT_CANVAS_SIZE from CanvasPanel
+
+      let height;
+      if (w > h) {
+        // Landscape
+        height = (baseSize / w) * h;
+      } else if (h > w) {
+        // Portrait
+        height = baseSize;
+      } else {
+        // Square
+        height = baseSize;
+      }
+
+      setCanvasHeight(Math.floor(height));
     };
+
+    handleResize(); // Initial call
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [ui.aspectRatio]);
 
   return (
     <>
@@ -163,7 +185,11 @@ function App() {
                 // Desktop Layout: Vertical with Sticky Peek Canvas
                 <>
                   {/* Sticky Canvas Section - peeks out when scrolling */}
-                  <div style={styles.stickyCanvasSection}>
+                  <div style={{
+                    ...styles.stickyCanvasSection,
+                    // Dynamic top based on canvas height: leave ~150px visible (peek)
+                    top: `${-(canvasHeight + 100 - 150)}px`, // +100 for control bar, -150 for peek
+                  }}>
                     <CanvasPanel isFullscreen={false} />
                     <ControlBar onFullscreenToggle={toggleFullscreen} />
                   </div>
@@ -241,9 +267,7 @@ const styles = {
   // Desktop: Sticky canvas that peeks out when scrolling
   stickyCanvasSection: {
     position: 'sticky',
-    // Negative top value: canvas will stick but move up, leaving bottom part visible
-    // Larger negative value = less canvas visible when scrolling
-    top: '-650px',
+    // Note: top value is set dynamically based on canvas height
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
