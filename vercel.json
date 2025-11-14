@@ -1,9 +1,13 @@
 {
-  "buildCommand": "cd parametric-explorer && npm install && npm run build",
-  "outputDirectory": "parametric-explorer/dist",
-  "installCommand": "cd parametric-explorer && npm install",
-  "framework": null,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
