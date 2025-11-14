@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
-import UPNG from '@pdf-lib/upng';
+import GIF from 'gif.js.optimized';
 
 interface ControlBarProps {
   onFullscreenToggle?: () => void;
@@ -9,12 +9,15 @@ interface ControlBarProps {
 export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics, ui, setPlaybackSpeed, setAspectRatio } = useSimulationStore();
 
-  // APNG recording state
+  // Video recording state
   const [isRecording, setIsRecording] = useState(false);
+  const [recordingFormat, setRecordingFormat] = useState<'webm' | 'gif'>('webm');
   const [recordedFrameCount, setRecordedFrameCount] = useState(0);
-  const recordedFramesRef = useRef<ImageData[]>([]);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const gifEncoderRef = useRef<any>(null);
   const recordingIntervalRef = useRef<number | null>(null);
-  const maxFrames = 120; // 2 seconds at 60fps, or 4 seconds at 30fps
+  const maxFrames = 90; // 3 seconds at 30fps
 
   const takeScreenshot = () => {
     const canvas = document.querySelector('canvas');
@@ -35,75 +38,124 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     const canvas = document.querySelector('canvas') as HTMLCanvasElement;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Reset recording state
-    recordedFramesRef.current = [];
     setRecordedFrameCount(0);
     setIsRecording(true);
 
-    // Capture frames at 30 FPS
-    recordingIntervalRef.current = window.setInterval(() => {
-      const currentCount = recordedFramesRef.current.length;
-      if (currentCount >= maxFrames) {
-        stopRecording();
-        return;
-      }
+    if (recordingFormat === 'webm') {
+      // WebM recording with MediaRecorder
+      try {
+        const stream = canvas.captureStream(30); // 30 FPS
+        const options: MediaRecorderOptions = {
+          mimeType: 'video/webm;codecs=vp9',
+          videoBitsPerSecond: 5000000, // 5 Mbps
+        };
 
-      // Capture current frame as ImageData
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      recordedFramesRef.current.push(imageData);
-      setRecordedFrameCount(recordedFramesRef.current.length);
-    }, 1000 / 30); // 30 FPS
+        // Fallback to vp8 if vp9 not supported
+        if (!MediaRecorder.isTypeSupported(options.mimeType!)) {
+          options.mimeType = 'video/webm;codecs=vp8';
+        }
+
+        const mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorderRef.current = mediaRecorder;
+        recordedChunksRef.current = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            recordedChunksRef.current.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `parametric-explorer-${Date.now()}.webm`;
+          a.click();
+          URL.revokeObjectURL(url);
+          recordedChunksRef.current = [];
+          setIsRecording(false);
+        };
+
+        mediaRecorder.start();
+
+        // Auto-stop after 3 seconds
+        setTimeout(() => {
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            mediaRecorderRef.current.stop();
+          }
+        }, 3000);
+      } catch (error) {
+        console.error('WebM recording error:', error);
+        alert('WebM recording not supported. Try GIF format instead.');
+        setIsRecording(false);
+      }
+    } else {
+      // GIF recording with gif.js
+      try {
+        const gif = new GIF({
+          workers: 2,
+          quality: 10,
+          width: canvas.width,
+          height: canvas.height,
+          workerScript: '/gif.worker.js', // Need to copy this to public
+        });
+
+        gifEncoderRef.current = gif;
+
+        gif.on('finished', (blob: Blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `parametric-explorer-${Date.now()}.gif`;
+          a.click();
+          URL.revokeObjectURL(url);
+          setIsRecording(false);
+          setRecordedFrameCount(0);
+        });
+
+        // Capture frames at 30 FPS
+        let frameCount = 0;
+        recordingIntervalRef.current = window.setInterval(() => {
+          if (frameCount >= maxFrames) {
+            stopRecording();
+            return;
+          }
+
+          gif.addFrame(canvas, { copy: true, delay: 33 }); // 33ms = ~30fps
+          frameCount++;
+          setRecordedFrameCount(frameCount);
+        }, 33);
+      } catch (error) {
+        console.error('GIF recording error:', error);
+        alert('GIF recording failed. Please try again.');
+        setIsRecording(false);
+      }
+    }
   };
 
-  const stopRecording = async () => {
+  const stopRecording = () => {
     if (!isRecording) return;
 
-    // Stop capturing frames
-    if (recordingIntervalRef.current) {
-      clearInterval(recordingIntervalRef.current);
-      recordingIntervalRef.current = null;
+    if (recordingFormat === 'webm') {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+    } else {
+      // Stop GIF frame capture
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current);
+        recordingIntervalRef.current = null;
+      }
+
+      // Render GIF
+      if (gifEncoderRef.current) {
+        gifEncoderRef.current.render();
+        gifEncoderRef.current = null;
+      }
     }
 
     setIsRecording(false);
-
-    if (recordedFramesRef.current.length === 0) {
-      alert('No frames recorded');
-      return;
-    }
-
-    try {
-      // Convert frames to APNG
-      const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-      if (!canvas) return;
-
-      const width = canvas.width;
-      const height = canvas.height;
-
-      // Convert ImageData frames to raw RGBA buffers
-      const frames = recordedFramesRef.current.map(imageData => imageData.data.buffer);
-
-      // Encode as APNG with 30 FPS (33ms delay per frame)
-      const apng = UPNG.encode(frames, width, height, 0, Array(frames.length).fill(33));
-
-      // Create blob and download
-      const blob = new Blob([apng], { type: 'image/apng' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `parametric-explorer-${Date.now()}.apng`;
-      a.click();
-      URL.revokeObjectURL(url);
-
-      // Clean up
-      recordedFramesRef.current = [];
-      setRecordedFrameCount(0);
-    } catch (error) {
-      console.error('Error creating APNG:', error);
-      alert('Failed to create APNG. Try recording a shorter clip.');
-    }
   };
 
   return (
@@ -120,11 +172,26 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           <button onClick={takeScreenshot} style={styles.button}>
             📸 Screenshot
           </button>
+          <select
+            value={recordingFormat}
+            onChange={(e) => setRecordingFormat(e.target.value as 'webm' | 'gif')}
+            disabled={isRecording}
+            style={styles.formatSelect}
+            title="Video export format"
+          >
+            <option value="webm">WebM (Best Quality)</option>
+            <option value="gif">GIF (Universal)</option>
+          </select>
           <button
             onClick={isRecording ? stopRecording : startRecording}
             style={isRecording ? styles.recordingButton : styles.button}
           >
-            {isRecording ? `⏹️ Stop (${recordedFrameCount}/${maxFrames})` : '🎥 Record APNG (4s)'}
+            {isRecording
+              ? recordingFormat === 'webm'
+                ? '⏹️ Stop Recording'
+                : `⏹️ Stop (${recordedFrameCount}/${maxFrames})`
+              : `🎥 Record ${recordingFormat.toUpperCase()} (3s)`
+            }
           </button>
           {onFullscreenToggle && (
             <button onClick={onFullscreenToggle} style={styles.fullscreenButton}>
@@ -370,6 +437,18 @@ const styles = {
     borderRadius: '6px',
     fontSize: '13px',
     fontWeight: 500,
+    cursor: 'pointer',
+    outline: 'none',
+    transition: 'all 0.2s',
+  } as React.CSSProperties,
+  formatSelect: {
+    padding: '10px 12px',
+    backgroundColor: '#2a2b3a',
+    color: '#e0e0e0',
+    border: '1px solid #3a3b4a',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 600,
     cursor: 'pointer',
     outline: 'none',
     transition: 'all 0.2s',
