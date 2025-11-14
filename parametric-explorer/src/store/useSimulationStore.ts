@@ -14,9 +14,10 @@ import type {
   SemioticOikosParams,
   SpeciesTemporalParams,
   ResonanceOikosParams,
+  ModelParams,
 } from '../types/index.js';
 import { defaultParameters } from '../presets';
-import { SimulationEngine } from '../engine/SimulationEngine';
+import { QuantumStigmergyEngine } from '../engine/QuantumStigmergyEngine';
 
 // Helper: Merge universal + species overrides
 export function resolveSpeciesParams(
@@ -97,7 +98,7 @@ interface SimulationStore {
   frameCount: number;
   agents: Agent[];
   trails: Trails;
-  engine: SimulationEngine;
+  engine: QuantumStigmergyEngine;
 
   // Parameters
   parameters: AllParameters;
@@ -137,6 +138,7 @@ interface SimulationStore {
   updateVisualizationParams: (params: Partial<AllParameters['visualization']>) => void;
   updateEffectsParams: (params: Partial<AllParameters['effects']>) => void;
   updatePerformanceParams: (params: Partial<AllParameters['performance']>) => void;
+  updateModelParams: (params: Partial<ModelParams>) => void;
   updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => void;
   applyQualityPreset: (preset: QualityPreset) => void;
 
@@ -156,7 +158,7 @@ const GRID_SIZE = 400;
 
 export const useSimulationStore = create<SimulationStore>((set, get) => {
   // Create engine instance
-  const engine = new SimulationEngine(GRID_SIZE);
+  const engine = new QuantumStigmergyEngine(GRID_SIZE);
   engine.setParameters(defaultParameters);
   engine.initializeAgents(defaultParameters.globalTemporal.agentCount);
 
@@ -235,6 +237,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         visualization: { ...currentParams.visualization, ...(params.visualization || {}) },
         effects: { ...currentParams.effects, ...(params.effects || {}) },
         performance: { ...currentParams.performance, ...(params.performance || {}) },
+        modelParams: { ...currentParams.modelParams, ...(params.modelParams || {}) },
       };
 
       const { engine } = get();
@@ -434,6 +437,32 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
           ...current,
           performance: { ...current.performance, ...params },
         },
+      });
+    },
+
+    updateModelParams: (params) => {
+      const current = get().parameters;
+      const newParams = {
+        ...current,
+        modelParams: {
+          ...current.modelParams,
+          ...params,
+          // Preserve nested m2 and m3 params if not provided
+          m2: { ...current.modelParams.m2, ...(params.m2 || {}) },
+          m3: { ...current.modelParams.m3, ...(params.m3 || {}) },
+        },
+      };
+
+      // Update engine and reinitialize agents (model change requires reset)
+      const { engine } = get();
+      engine.setParameters(newParams);
+      engine.initializeAgents(newParams.globalTemporal.agentCount);
+
+      set({
+        parameters: newParams,
+        frameCount: 0,
+        agents: engine.getAgents(),
+        trails: engine.getTrails(),
       });
     },
 
