@@ -257,6 +257,9 @@ export interface EmergentProperties {
 export type SpeciesScope = 'universal' | 'red' | 'green' | 'blue';
 export type OikosTab = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visuals' | 'performance';
 
+// Aspect Ratio options
+export type AspectRatio = '1:1' | '16:9' | '9:16' | '3:2' | '2:3' | '4:3' | '3:4' | '21:9' | '9:21';
+
 export interface UIState {
   // Matrix navigation
   activeSpeciesScope: SpeciesScope;  // Vertical axis (Universal / Red / Green / Blue)
@@ -270,4 +273,7 @@ export interface UIState {
 
   // Playback speed (overall animation speed multiplier)
   playbackSpeed: number;             // 0.1x to 2x, controls frame rate
+
+  // Canvas aspect ratio
+  aspectRatio: AspectRatio;          // Canvas dimensions ratio
 }

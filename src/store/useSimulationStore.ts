@@ -15,6 +15,7 @@ import type {
   SpeciesTemporalParams,
   ResonanceOikosParams,
   ModelParams,
+  AspectRatio,
 } from '../types/index.js';
 import { defaultParameters } from '../presets';
 import { QuantumStigmergyEngine } from '../engine/QuantumStigmergyEngine';
@@ -149,6 +150,7 @@ interface SimulationStore {
   toggleControlPanel: () => void;
   setSimulationSpeed: (speed: number) => void;
   setPlaybackSpeed: (speed: number) => void;
+  setAspectRatio: (ratio: AspectRatio) => void;
 
   // Simulation
   tick: () => void;
@@ -186,6 +188,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       controlPanelOpen: false,
       simulationSpeed: 1,
       playbackSpeed: 1.0,
+      aspectRatio: '1:1',
     },
 
     // Basic actions
@@ -589,6 +592,12 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     setPlaybackSpeed: (speed) => {
       set((state) => ({
         ui: { ...state.ui, playbackSpeed: speed },
+      }));
+    },
+
+    setAspectRatio: (ratio) => {
+      set((state) => ({
+        ui: { ...state.ui, aspectRatio: ratio },
       }));
     },
 
