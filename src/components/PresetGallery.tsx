@@ -1,5 +1,6 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { builtInPresets } from '../presets';
+import { useState, useRef } from 'react';
 
 // Categorize presets by their pattern formation characteristics
 const presetCategories = {
@@ -26,7 +27,36 @@ const presetCategories = {
 };
 
 export function PresetGallery() {
-  const { loadPreset } = useSimulationStore();
+  const { loadPreset, exportCurrentPreset, importPresetFromFile } = useSimulationStore();
+  const [presetName, setPresetName] = useState('my-preset');
+  const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = () => {
+    exportCurrentPreset(presetName);
+    setImportStatus({ type: 'success', message: `Preset "${presetName}" wurde erfolgreich exportiert!` });
+    setTimeout(() => setImportStatus(null), 3000);
+  };
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const result = await importPresetFromFile(file);
+
+    if (result.success) {
+      setImportStatus({ type: 'success', message: 'Preset wurde erfolgreich geladen!' });
+    } else {
+      setImportStatus({ type: 'error', message: result.error || 'Fehler beim Laden des Presets' });
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+
+    setTimeout(() => setImportStatus(null), 5000);
+  };
 
   return (
     <div style={styles.container}>
@@ -35,6 +65,54 @@ export function PresetGallery() {
         <p style={styles.subtitle}>
           Erkunde die beeindruckende Vielfalt der Musterbildung - jedes Preset zeigt einzigartige emergente Strukturen
         </p>
+      </div>
+
+      {/* Custom Preset Management Section */}
+      <div style={styles.customSection}>
+        <div style={styles.categoryHeader}>
+          <h4 style={styles.categoryTitle}>💾 Eigene Presets verwalten</h4>
+          <p style={styles.categoryDescription}>Speichere deine aktuellen Einstellungen oder lade eigene Presets</p>
+        </div>
+
+        <div style={styles.customControls}>
+          <div style={styles.exportSection}>
+            <label style={styles.inputLabel}>Preset-Name:</label>
+            <input
+              type="text"
+              value={presetName}
+              onChange={(e) => setPresetName(e.target.value)}
+              style={styles.input}
+              placeholder="mein-preset"
+            />
+            <button onClick={handleExport} style={styles.exportButton}>
+              ⬇️ Aktuelles Preset exportieren
+            </button>
+          </div>
+
+          <div style={styles.importSection}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              style={styles.fileInput}
+              id="preset-file-input"
+            />
+            <label htmlFor="preset-file-input" style={styles.importButton}>
+              ⬆️ Preset importieren (.json)
+            </label>
+          </div>
+        </div>
+
+        {importStatus && (
+          <div style={{
+            ...styles.statusMessage,
+            backgroundColor: importStatus.type === 'success' ? '#0a3d0a' : '#3d0a0a',
+            borderColor: importStatus.type === 'success' ? '#2d8f2d' : '#8f2d2d',
+          }}>
+            {importStatus.message}
+          </div>
+        )}
       </div>
 
       {Object.entries(presetCategories).map(([categoryKey, category]) => {
@@ -88,6 +166,78 @@ const styles = {
     backgroundColor: '#13141f',
     borderRadius: '8px',
     border: '1px solid #2a2b3a',
+  } as React.CSSProperties,
+  customSection: {
+    marginBottom: '32px',
+    padding: '20px',
+    backgroundColor: '#0a0a15',
+    borderRadius: '8px',
+    border: '2px solid #3d2d5d',
+  } as React.CSSProperties,
+  customControls: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+  } as React.CSSProperties,
+  exportSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  } as React.CSSProperties,
+  importSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  } as React.CSSProperties,
+  inputLabel: {
+    fontSize: '12px',
+    color: '#a0a0b0',
+    fontWeight: 500,
+  } as React.CSSProperties,
+  input: {
+    padding: '10px 12px',
+    backgroundColor: '#13141f',
+    border: '1px solid #2a2b3a',
+    borderRadius: '6px',
+    color: '#e0e0e0',
+    fontSize: '13px',
+    fontFamily: 'inherit',
+  } as React.CSSProperties,
+  exportButton: {
+    padding: '12px 16px',
+    backgroundColor: '#5d8fbd',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  } as React.CSSProperties,
+  fileInput: {
+    display: 'none',
+  } as React.CSSProperties,
+  importButton: {
+    display: 'inline-block',
+    padding: '12px 16px',
+    backgroundColor: '#5dbd7d',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    textAlign: 'center',
+  } as React.CSSProperties,
+  statusMessage: {
+    marginTop: '16px',
+    padding: '12px 16px',
+    borderRadius: '6px',
+    border: '1px solid',
+    fontSize: '13px',
+    color: '#e0e0e0',
+    textAlign: 'center',
   } as React.CSSProperties,
   header: {
     marginBottom: '32px',

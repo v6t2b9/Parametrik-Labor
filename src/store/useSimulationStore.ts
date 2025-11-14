@@ -19,6 +19,7 @@ import type {
 } from '../types/index.js';
 import { defaultParameters } from '../presets';
 import { QuantumStigmergyEngine } from '../engine/QuantumStigmergyEngine';
+import { exportPresetAsJSON, importPresetFromJSON } from '../utils/presetIO';
 
 // Helper: Merge universal + species overrides
 export function resolveSpeciesParams(
@@ -155,6 +156,10 @@ interface SimulationStore {
   // Simulation
   tick: () => void;
   performAutoOptimization: () => void;
+
+  // Preset Export/Import
+  exportCurrentPreset: (presetName?: string) => void;
+  importPresetFromFile: (file: File) => Promise<{ success: boolean; error?: string }>;
 }
 
 const GRID_SIZE = 400;
@@ -614,6 +619,28 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         agents: engine.getAgents(),
         trails: engine.getTrails(),
       });
+    },
+
+    // Preset Export/Import
+    exportCurrentPreset: (presetName = 'custom-preset') => {
+      const { parameters } = get();
+      exportPresetAsJSON(parameters, presetName);
+    },
+
+    importPresetFromFile: async (file: File) => {
+      const { preset, error } = await importPresetFromJSON(file);
+
+      if (error) {
+        return { success: false, error };
+      }
+
+      if (preset && preset.parameters) {
+        const { loadPreset } = get();
+        loadPreset(preset.parameters);
+        return { success: true };
+      }
+
+      return { success: false, error: 'Ungültiges Preset-Format' };
     },
   };
 });
