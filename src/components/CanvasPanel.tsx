@@ -288,42 +288,37 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // === 6. Chromatic Aberration - OPTIMIZED with object pooling ===
     if (effects.chromaticAberration > 0) {
-      const tempCanvas = canvasPool.acquire(CANVAS_SIZE, CANVAS_SIZE);
-      const tempCtx = tempCanvas.getContext('2d');
-      if (tempCtx) {
-        tempCtx.drawImage(canvas, 0, 0);
+      const savedCanvas = canvasPool.acquire(CANVAS_SIZE, CANVAS_SIZE);
+      const savedCtx = savedCanvas.getContext('2d');
+
+      if (savedCtx) {
+        // Save the original image before any modifications
+        savedCtx.drawImage(canvas, 0, 0);
+
+        // Clear main canvas
         ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
         const offset = effects.chromaticAberration;
 
-        // Red channel (offset left)
-        ctx.globalCompositeOperation = 'screen';
-        tempCtx.globalCompositeOperation = 'copy';
-        tempCtx.fillStyle = 'black';
-        tempCtx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-        tempCtx.globalCompositeOperation = 'lighter';
-        tempCtx.drawImage(canvas, -offset, 0);
-        ctx.drawImage(tempCanvas, 0, 0);
+        // Use lighter composite to combine offset images for RGB shift effect
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.4;  // Reduce brightness since we're drawing 3 times
 
-        // Green channel (no offset)
-        tempCtx.globalCompositeOperation = 'copy';
-        tempCtx.fillStyle = 'black';
-        tempCtx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-        tempCtx.globalCompositeOperation = 'lighter';
-        tempCtx.drawImage(canvas, 0, 0);
-        ctx.drawImage(tempCanvas, 0, 0);
+        // Draw shifted left (red channel effect)
+        ctx.drawImage(savedCanvas, -offset, 0);
 
-        // Blue channel (offset right)
-        tempCtx.globalCompositeOperation = 'copy';
-        tempCtx.fillStyle = 'black';
-        tempCtx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
-        tempCtx.globalCompositeOperation = 'lighter';
-        tempCtx.drawImage(canvas, offset, 0);
-        ctx.drawImage(tempCanvas, 0, 0);
+        // Draw center (green channel effect)
+        ctx.drawImage(savedCanvas, 0, 0);
 
+        // Draw shifted right (blue channel effect)
+        ctx.drawImage(savedCanvas, offset, 0);
+
+        // Reset composite mode and alpha
+        ctx.globalAlpha = 1.0;
         ctx.globalCompositeOperation = 'source-over';
       }
-      canvasPool.release(tempCanvas);
+
+      canvasPool.release(savedCanvas);
     }
 
     // === 7. Wave Distortion - REMOVED FOR PERFORMANCE ===
