@@ -1,0 +1,39 @@
+GNU AFFERO GENERAL PUBLIC LICENSE
+Version 3, 19 November 2007
+
+Copyright (C) 2025 Parametrik-Labor Contributors
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+---
+
+IMPORTANT: This software is licensed under the AGPL v3, which means:
+
+✅ You are FREE to:
+  - Use this software for any purpose
+  - Study how it works and modify it
+  - Distribute copies
+  - Distribute modified versions
+
+⚠️ You MUST:
+  - Keep the same AGPL v3 license for any derivative work
+  - Make source code available for any modifications
+  - Include copyright and license notices
+  - State significant changes made to the software
+  - If you run a modified version on a network/web server, make the
+    source code available to users of that service
+
+📄 This ensures the software remains open source forever with attribution.
+
+For the full license text, see: https://www.gnu.org/licenses/agpl-3.0.txt

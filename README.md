@@ -50,14 +50,15 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ✅ **Smart Recording Workflow** - Automatic capture with real-time progress indicators
 
 #### UX & Interface
-✅ **Sticky Canvas (Desktop)** - Canvas remains visible while scrolling through parameters
-✅ **2-Column Layout** - Side-by-side parameter controls with live visual feedback
+✅ **Sticky Peek Canvas (Desktop)** - Canvas partially visible at top while scrolling through parameters
+✅ **Vertical Layout** - Natural top-to-bottom flow with sticky visual feedback
 ✅ **Mobile-Optimized** - Responsive drawer interface with touch controls
 ✅ **Fullscreen Mode** - Distraction-free visualization with ESC exit
 
 #### Open Science
-✅ **MIT Licensed** - Full code transparency and reusability
+✅ **AGPL v3 Licensed** - Strong copyleft ensures derivatives remain open source forever
 ✅ **Pre-registered Protocols** - Falsification criteria and validation benchmarks
+✅ **Full Attribution** - All derivatives must credit original work
 
 ---
 
@@ -134,7 +135,7 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 - **Export:** gif.js (GIF encoding), MediaRecorder API (WebM)
 - **Performance:** Object pooling, WebGL shaders, requestAnimationFrame
 - **Deployment:** Vercel
-- **License:** MIT
+- **License:** AGPL v3 (Strong Copyleft)
 
 ---
 
@@ -185,11 +186,11 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 
 ### Desktop Layout
 
-On desktop (≥768px width), the interface uses a **2-column sticky layout**:
-- **Left:** Canvas + controls (stays visible while scrolling)
-- **Right:** Parameter panels (scrollable)
+On desktop (≥768px width), the interface uses a **vertical sticky peek layout**:
+- **Top:** Canvas + control bar (sticky, peeks out ~400-500px when scrolling)
+- **Bottom:** Parameter panels (scrollable)
 
-This allows you to **see parameter changes in real-time** without scrolling back to the canvas!
+When you scroll down through the parameter controls, the **canvas remains partially visible at the top**, allowing you to **see parameter changes in real-time** without scrolling back!
 
 ### Aspect Ratios
 
@@ -210,7 +211,19 @@ Contributions welcome! This is an open science project. See [CONTRIBUTING.md](./
 
 ## 📄 License
 
-MIT License - See [LICENSE](./LICENSE) for details.
+**GNU Affero General Public License v3.0 (AGPL v3)**
+
+This project is licensed under AGPL v3, ensuring:
+- ✅ The software remains **open source forever**
+- ✅ All derivatives must **share their source code**
+- ✅ **Network/web service** deployments must provide source code to users
+- ✅ **Attribution required** in all derivative works
+- ✅ Same freedoms guaranteed for all future versions
+
+See [LICENSE](./LICENSE) for full details.
+
+**Why AGPL v3?**
+As an open science project for biosemiotics research, we believe in maximum transparency. AGPL v3 ensures that all improvements and modifications remain accessible to the research community, even when deployed as web services.
 
 ---
 
