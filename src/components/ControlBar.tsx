@@ -11,10 +11,12 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
   // Video recording state
   const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [exportMode, setExportMode] = useState<'gif-loop' | 'video'>('video');
   const [videoFormat, setVideoFormat] = useState<'webm' | 'gif'>('webm');
   const [videoDuration, setVideoDuration] = useState<3 | 8 | 12>(3);
   const [recordedFrameCount, setRecordedFrameCount] = useState(0);
+  const [processingProgress, setProcessingProgress] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const gifEncoderRef = useRef<any>(null);
@@ -83,6 +85,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         gifEncoderRef.current = gif;
 
         gif.on('progress', (progress: number) => {
+          setProcessingProgress(Math.round(progress * 100));
           console.log('GIF encoding progress:', (progress * 100).toFixed(1) + '%');
         });
 
@@ -91,7 +94,9 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           if (!blob || blob.size === 0) {
             alert('GIF rendering failed: Empty file. Please try again.');
             setIsRecording(false);
+            setIsProcessing(false);
             setRecordedFrameCount(0);
+            setProcessingProgress(0);
             return;
           }
 
@@ -107,10 +112,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           setTimeout(() => {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            setIsRecording(false);
+            setIsProcessing(false);
+            setRecordedFrameCount(0);
+            setProcessingProgress(0);
           }, 100);
-
-          setIsRecording(false);
-          setRecordedFrameCount(0);
         });
 
         // Capture frames at 30 FPS with fade effects
@@ -118,7 +124,15 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         recordingIntervalRef.current = window.setInterval(() => {
           if (frameCount >= totalFrames) {
             console.log('All frames captured, starting render...');
-            stopRecording();
+            // Auto-stop and start rendering
+            if (recordingIntervalRef.current) {
+              clearInterval(recordingIntervalRef.current);
+              recordingIntervalRef.current = null;
+            }
+            setIsRecording(false);
+            setIsProcessing(true);
+            setProcessingProgress(0);
+            gif.render();
             return;
           }
 
@@ -183,10 +197,18 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             const a = document.createElement('a');
             a.href = url;
             a.download = `parametric-video-${Date.now()}.webm`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
             a.click();
-            URL.revokeObjectURL(url);
-            recordedChunksRef.current = [];
-            setIsRecording(false);
+
+            // Delay cleanup to ensure download starts
+            setTimeout(() => {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              recordedChunksRef.current = [];
+              setIsRecording(false);
+              setIsProcessing(false);
+            }, 100);
           };
 
           mediaRecorder.start();
@@ -217,6 +239,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           gifEncoderRef.current = gif;
 
           gif.on('progress', (progress: number) => {
+            setProcessingProgress(Math.round(progress * 100));
             console.log('GIF video encoding progress:', (progress * 100).toFixed(1) + '%');
           });
 
@@ -225,7 +248,9 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             if (!blob || blob.size === 0) {
               alert('GIF rendering failed: Empty file. Please try again.');
               setIsRecording(false);
+              setIsProcessing(false);
               setRecordedFrameCount(0);
+              setProcessingProgress(0);
               return;
             }
 
@@ -241,10 +266,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             setTimeout(() => {
               document.body.removeChild(a);
               URL.revokeObjectURL(url);
+              setIsRecording(false);
+              setIsProcessing(false);
+              setRecordedFrameCount(0);
+              setProcessingProgress(0);
             }, 100);
-
-            setIsRecording(false);
-            setRecordedFrameCount(0);
           });
 
           // Capture frames at 30 FPS
@@ -252,7 +278,15 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           recordingIntervalRef.current = window.setInterval(() => {
             if (frameCount >= maxFrames) {
               console.log('All video frames captured, starting render...');
-              stopRecording();
+              // Auto-stop and start rendering
+              if (recordingIntervalRef.current) {
+                clearInterval(recordingIntervalRef.current);
+                recordingIntervalRef.current = null;
+              }
+              setIsRecording(false);
+              setIsProcessing(true);
+              setProcessingProgress(0);
+              gif.render();
               return;
             }
 
@@ -273,31 +307,29 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     }
   };
 
-  const stopRecording = () => {
-    if (!isRecording) return;
+  // Get button label based on current state
+  const getButtonLabel = () => {
+    if (isProcessing) {
+      return `⏳ Processing GIF... ${processingProgress}%`;
+    }
 
-    console.log('Stopping recording, mode:', exportMode, 'format:', videoFormat);
-
-    if (exportMode === 'video' && videoFormat === 'webm') {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-        mediaRecorderRef.current.stop();
-      }
-    } else {
-      // Stop GIF frame capture (both loop and video GIF modes)
-      if (recordingIntervalRef.current) {
-        clearInterval(recordingIntervalRef.current);
-        recordingIntervalRef.current = null;
-      }
-
-      // Render GIF
-      if (gifEncoderRef.current) {
-        console.log('Starting GIF render process...');
-        gifEncoderRef.current.render();
-        gifEncoderRef.current = null;
+    if (isRecording) {
+      if (exportMode === 'gif-loop') {
+        return `🔴 Capturing... ${recordedFrameCount}/60`;
+      } else if (videoFormat === 'webm') {
+        return `🔴 Recording WebM... ${videoDuration}s`;
+      } else {
+        const maxFrames = videoDuration * 30;
+        return `🔴 Capturing... ${recordedFrameCount}/${maxFrames}`;
       }
     }
 
-    setIsRecording(false);
+    // Not recording
+    if (exportMode === 'gif-loop') {
+      return '🎥 Record GIF Loop (2s)';
+    } else {
+      return `🎥 Record ${videoFormat.toUpperCase()} (${videoDuration}s)`;
+    }
   };
 
   return (
@@ -319,7 +351,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           <select
             value={exportMode}
             onChange={(e) => setExportMode(e.target.value as 'gif-loop' | 'video')}
-            disabled={isRecording}
+            disabled={isRecording || isProcessing}
             style={styles.formatSelect}
             title="Export mode"
           >
@@ -332,7 +364,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             <select
               value={videoFormat}
               onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif')}
-              disabled={isRecording}
+              disabled={isRecording || isProcessing}
               style={styles.formatSelect}
               title="Video format"
             >
@@ -346,7 +378,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             <select
               value={videoDuration}
               onChange={(e) => setVideoDuration(parseInt(e.target.value) as 3 | 8 | 12)}
-              disabled={isRecording}
+              disabled={isRecording || isProcessing}
               style={styles.formatSelect}
               title="Video duration"
             >
@@ -357,19 +389,15 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           )}
 
           <button
-            onClick={isRecording ? stopRecording : startRecording}
-            style={isRecording ? styles.recordingButton : styles.button}
-          >
-            {isRecording
-              ? exportMode === 'gif-loop'
-                ? `⏹️ Stop (${recordedFrameCount}/60)`
-                : exportMode === 'video' && videoFormat === 'webm'
-                ? '⏹️ Stop Recording'
-                : `⏹️ Stop (${recordedFrameCount}/${videoDuration * 30})`
-              : exportMode === 'gif-loop'
-              ? '🎥 Record GIF Loop'
-              : `🎥 Record ${videoFormat.toUpperCase()} (${videoDuration}s)`
+            onClick={startRecording}
+            disabled={isRecording || isProcessing}
+            style={
+              isRecording || isProcessing
+                ? styles.recordingButton
+                : styles.button
             }
+          >
+            {getButtonLabel()}
           </button>
           {onFullscreenToggle && (
             <button onClick={onFullscreenToggle} style={styles.fullscreenButton}>
@@ -542,9 +570,9 @@ const styles = {
     borderRadius: '6px',
     fontSize: '14px',
     fontWeight: 600,
-    cursor: 'pointer',
+    cursor: 'not-allowed',
     transition: 'all 0.2s',
-    animation: 'pulse 1.5s infinite',
+    opacity: 0.9,
   } as React.CSSProperties,
   frameCount: {
     fontSize: '14px',
