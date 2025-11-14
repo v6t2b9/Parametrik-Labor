@@ -267,4 +267,7 @@ export interface UIState {
 
   // Legacy
   simulationSpeed: number;           // 1x, 2x, 5x, etc.
+
+  // Playback speed (overall animation speed multiplier)
+  playbackSpeed: number;             // 0.1x to 2x, controls frame rate
 }

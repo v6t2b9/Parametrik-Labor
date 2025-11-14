@@ -1,3 +1,4 @@
+import { useState, useRef } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 
 interface ControlBarProps {
@@ -5,7 +6,12 @@ interface ControlBarProps {
 }
 
 export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
-  const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics } = useSimulationStore();
+  const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics, ui, setPlaybackSpeed } = useSimulationStore();
+
+  // Video recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
 
   const takeScreenshot = () => {
     const canvas = document.querySelector('canvas');
@@ -22,6 +28,61 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     });
   };
 
+  const startRecording = () => {
+    const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    try {
+      // Create a stream from the canvas
+      const stream = canvas.captureStream(60); // 60 FPS
+
+      // Create MediaRecorder with high quality settings
+      const options: MediaRecorderOptions = {
+        mimeType: 'video/webm;codecs=vp9',
+        videoBitsPerSecond: 8000000, // 8 Mbps for high quality
+      };
+
+      // Fallback to vp8 if vp9 is not supported
+      if (!MediaRecorder.isTypeSupported(options.mimeType!)) {
+        options.mimeType = 'video/webm;codecs=vp8';
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, options);
+      mediaRecorderRef.current = mediaRecorder;
+      recordedChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          recordedChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `parametric-explorer-${Date.now()}.webm`;
+        a.click();
+        URL.revokeObjectURL(url);
+        recordedChunksRef.current = [];
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error('Error starting video recording:', error);
+      alert('Video recording not supported in this browser');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       {/* Top Row: Buttons and Frame Count */}
@@ -35,6 +96,12 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           </button>
           <button onClick={takeScreenshot} style={styles.button}>
             📸 Screenshot
+          </button>
+          <button
+            onClick={isRecording ? stopRecording : startRecording}
+            style={isRecording ? styles.recordingButton : styles.button}
+          >
+            {isRecording ? '⏹️ Stop Recording' : '🎥 Record Video'}
           </button>
           {onFullscreenToggle && (
             <button onClick={onFullscreenToggle} style={styles.fullscreenButton}>
@@ -65,7 +132,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           <input
             type="range"
             min={150}
-            max={2400}
+            max={4800}
             step={50}
             value={parameters.globalTemporal.agentCount}
             onChange={(e) => updateGlobalTemporalParams({ agentCount: parseInt(e.target.value) })}
@@ -77,7 +144,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         {/* Simulation Speed Slider */}
         <div style={styles.sliderContainer}>
           <div style={styles.sliderHeader}>
-            <label style={styles.sliderLabel}>⚡ Simulation Speed</label>
+            <label style={styles.sliderLabel}>⚡ Simulation Speed (Agent Movement)</label>
             <span style={styles.sliderValue}>{parameters.globalTemporal.simulationSpeed.toFixed(1)}x</span>
           </div>
           <input
@@ -88,7 +155,25 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             value={parameters.globalTemporal.simulationSpeed}
             onChange={(e) => updateGlobalTemporalParams({ simulationSpeed: parseFloat(e.target.value) })}
             style={styles.slider}
-            title="Speed multiplier for the simulation"
+            title="Speed multiplier for agent movement"
+          />
+        </div>
+
+        {/* Playback Speed Slider */}
+        <div style={styles.sliderContainer}>
+          <div style={styles.sliderHeader}>
+            <label style={styles.sliderLabel}>🎬 Playback Speed (Animation)</label>
+            <span style={styles.sliderValue}>{ui.playbackSpeed.toFixed(1)}x</span>
+          </div>
+          <input
+            type="range"
+            min={0.1}
+            max={2}
+            step={0.1}
+            value={ui.playbackSpeed}
+            onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
+            style={styles.slider}
+            title="Overall animation playback speed"
           />
         </div>
       </div>
@@ -156,6 +241,18 @@ const styles = {
     fontWeight: 600,
     cursor: 'pointer',
     transition: 'all 0.2s',
+  } as React.CSSProperties,
+  recordingButton: {
+    padding: '10px 16px',
+    backgroundColor: '#bd5d5d',
+    color: '#ffffff',
+    border: '1px solid #ff6b6b',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    animation: 'pulse 1.5s infinite',
   } as React.CSSProperties,
   frameCount: {
     fontSize: '14px',

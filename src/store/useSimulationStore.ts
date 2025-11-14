@@ -51,7 +51,7 @@ function getQualitySettings(preset: QualityPreset) {
   switch (preset) {
     case 'low':
       return {
-        agentCount: 600,
+        agentCount: 800,
         diffusionFreq: 10,
         waveDistortion: 0,
         chromaticAberration: 0,
@@ -61,7 +61,7 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'medium':
       return {
-        agentCount: 1200,
+        agentCount: 1600,
         diffusionFreq: 6,
         waveDistortion: 0,
         chromaticAberration: 0,
@@ -71,7 +71,7 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'high':
       return {
-        agentCount: 1800,
+        agentCount: 2400,
         diffusionFreq: 3,
         waveDistortion: 0,
         chromaticAberration: 0,
@@ -81,7 +81,7 @@ function getQualitySettings(preset: QualityPreset) {
       };
     case 'ultra':
       return {
-        agentCount: 2400,
+        agentCount: 3600,
         diffusionFreq: 2,
         waveDistortion: 0.1,
         chromaticAberration: 2,
@@ -148,6 +148,7 @@ interface SimulationStore {
   setControlPanelOpen: (open: boolean) => void;
   toggleControlPanel: () => void;
   setSimulationSpeed: (speed: number) => void;
+  setPlaybackSpeed: (speed: number) => void;
 
   // Simulation
   tick: () => void;
@@ -184,6 +185,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       activeOikosTab: 'physical',
       controlPanelOpen: false,
       simulationSpeed: 1,
+      playbackSpeed: 1.0,
     },
 
     // Basic actions
@@ -582,6 +584,12 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     setSimulationSpeed: (speed) => {
       get().updateGlobalTemporalParams({ simulationSpeed: speed });
+    },
+
+    setPlaybackSpeed: (speed) => {
+      set((state) => ({
+        ui: { ...state.ui, playbackSpeed: speed },
+      }));
     },
 
     // Simulation tick
