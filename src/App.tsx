@@ -138,7 +138,7 @@ function App() {
               <p style={styles.subtitle}>
                 Exploring emergent coordination through parameter manipulation
               </p>
-              <p style={styles.version}>v1.0 | Phase 1: Core MVP</p>
+              <p style={styles.version}>v2.0 | Quantum Stigmergy Models (M1, M2, M3)</p>
             </header>
 
             <main style={styles.main}>
