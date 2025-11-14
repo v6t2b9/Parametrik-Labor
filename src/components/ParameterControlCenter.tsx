@@ -8,7 +8,7 @@ import { VisualizationOikosPanel } from './VisualizationOikosPanel';
 import { EffectsOikosPanel } from './EffectsOikosPanel';
 import { PerformanceOikosPanel } from './PerformanceOikosPanel';
 import { PresetGallery } from './PresetGallery';
-import ModelOikosPanel from './ModelOikosPanel';
+import { ModelOikosPanel } from './ModelOikosPanel';
 
 type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'visualization' | 'effects' | 'performance';
 

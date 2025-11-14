@@ -7,7 +7,7 @@ import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { StigmergyModel } from '../types/index';
 
-export default function ModelOikosPanel() {
+export function ModelOikosPanel() {
   const { parameters, updateModelParams } = useSimulationStore();
   const { model, m2, m3 } = parameters.modelParams;
 
