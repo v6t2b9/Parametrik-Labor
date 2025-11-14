@@ -185,7 +185,7 @@ function App() {
                 // Desktop Layout: Everything sticky together, content scrolls internally
                 <div style={{
                   ...styles.stickyCanvasSection,
-                  top: `${-(canvasHeight + 120 - 180)}px`, // +120 for control bar height, -180 for peek
+                  top: `${-(canvasHeight + 100)}px`, // Compact sticky elements below canvas, 150px canvas peek
                 }}>
                   <CanvasPanel isFullscreen={false} />
                   <ControlBar onFullscreenToggle={toggleFullscreen} />
@@ -269,9 +269,9 @@ const styles = {
     // Note: top value is set dynamically based on canvas height
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
+    gap: '12px',
     zIndex: 100,
-    paddingBottom: '20px',
+    paddingBottom: '16px',
     backgroundColor: '#0a0a15',
     boxShadow: '0 6px 16px rgba(0, 0, 0, 0.4)',
   } as React.CSSProperties,

@@ -157,11 +157,11 @@ const styles = {
     overflow: 'hidden',
   } as React.CSSProperties,
   header: {
-    padding: '16px 20px',
+    padding: '10px 16px',
     borderBottom: '1px solid #2a2b3a',
   } as React.CSSProperties,
   title: {
-    fontSize: '20px',
+    fontSize: '15px',
     color: '#e0e0e0',
     fontWeight: 700,
     margin: 0,
@@ -170,8 +170,8 @@ const styles = {
   // Species Tabs (Vertical Axis)
   speciesTabs: {
     display: 'flex',
-    gap: '8px',
-    padding: '12px 20px',
+    gap: '6px',
+    padding: '8px 16px',
     borderBottom: '1px solid #2a2b3a',
     overflowX: 'auto',
     scrollbarWidth: 'thin',
@@ -179,13 +179,13 @@ const styles = {
   speciesTab: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    padding: '10px 16px',
+    gap: '6px',
+    padding: '8px 12px',
     backgroundColor: 'transparent',
     color: '#a0a0b0',
     border: 'none',
-    borderRadius: '8px 8px 0 0',
-    fontSize: '14px',
+    borderRadius: '6px 6px 0 0',
+    fontSize: '13px',
     fontWeight: 600,
     cursor: 'pointer',
     transition: 'all 0.2s',
@@ -198,41 +198,41 @@ const styles = {
     borderBottom: '3px solid #7d5dbd',
   } as React.CSSProperties,
   speciesIcon: {
-    fontSize: '18px',
+    fontSize: '16px',
   } as React.CSSProperties,
   speciesLabel: {
-    fontSize: '13px',
+    fontSize: '12px',
   } as React.CSSProperties,
 
   // Scope Info
   scopeInfo: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    padding: '16px 20px',
-    margin: '12px 20px',
-    borderRadius: '6px',
+    gap: '8px',
+    padding: '8px 16px',
+    margin: '6px 16px',
+    borderRadius: '4px',
   } as React.CSSProperties,
   scopeIcon: {
-    fontSize: '24px',
+    fontSize: '18px',
   } as React.CSSProperties,
   scopeTitle: {
-    fontSize: '14px',
+    fontSize: '12px',
     fontWeight: 600,
     color: '#e0e0e0',
     marginBottom: '2px',
   } as React.CSSProperties,
   scopeDesc: {
-    fontSize: '11px',
+    fontSize: '10px',
     color: '#a0a0b0',
-    lineHeight: 1.4,
+    lineHeight: 1.3,
   } as React.CSSProperties,
 
   // Oikos Tabs (Horizontal Axis)
   oikosTabs: {
     display: 'flex',
-    gap: '8px',
-    padding: '12px 20px',
+    gap: '6px',
+    padding: '8px 16px',
     borderBottom: '2px solid #2a2b3a',
     overflowX: 'auto',
     scrollbarWidth: 'thin',
@@ -241,13 +241,13 @@ const styles = {
   oikosTab: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    padding: '10px 14px',
+    gap: '6px',
+    padding: '8px 12px',
     backgroundColor: '#13141f',
     color: '#a0a0b0',
     border: '1px solid #2a2b3a',
     borderRadius: '6px',
-    fontSize: '13px',
+    fontSize: '12px',
     fontWeight: 600,
     cursor: 'pointer',
     transition: 'all 0.2s',
@@ -260,12 +260,12 @@ const styles = {
     borderColor: '#7d5dbd',
   } as React.CSSProperties,
   tabIcon: {
-    fontSize: '16px',
+    fontSize: '14px',
   } as React.CSSProperties,
 
   // Content
   content: {
-    padding: '20px',
+    padding: '16px',
     maxHeight: '400px',
     overflowY: 'auto',
     flex: 1,
