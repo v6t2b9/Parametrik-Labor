@@ -182,23 +182,20 @@ function App() {
                   )}
                 </>
               ) : (
-                // Desktop Layout: Vertical with Sticky Peek Canvas
-                <>
-                  {/* Sticky Canvas Section - peeks out when scrolling */}
+                // Desktop Layout: Sticky peek canvas + sticky navigation + scrollable content
+                <div style={styles.desktopContainer}>
+                  {/* Sticky Canvas + ControlBar - peeks at top */}
                   <div style={{
                     ...styles.stickyCanvasSection,
-                    // Dynamic top based on canvas height: leave ~150px visible (peek)
-                    top: `${-(canvasHeight + 100 - 150)}px`, // +100 for control bar, -150 for peek
+                    top: `${-(canvasHeight + 120 - 180)}px`, // +120 for control bar height, -180 for peek
                   }}>
                     <CanvasPanel isFullscreen={false} />
                     <ControlBar onFullscreenToggle={toggleFullscreen} />
                   </div>
 
-                  {/* Controls Section - scrollable */}
-                  <div style={styles.controlsSection}>
-                    <MatrixControlCenter />
-                  </div>
-                </>
+                  {/* Controls with internal sticky header */}
+                  <MatrixControlCenter />
+                </div>
               )}
             </main>
 
@@ -250,36 +247,38 @@ const styles = {
     color: '#6a6a7a',
     margin: 0,
   } as React.CSSProperties,
-  // Main container - vertical layout
+  // Main container
   main: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
     padding: '20px',
     maxWidth: '1600px',
     margin: '0 auto',
   } as React.CSSProperties,
+
+  // Mobile canvas section
   canvasSection: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: '16px',
   } as React.CSSProperties,
-  // Desktop: Sticky canvas that peeks out when scrolling
+
+  // Desktop container
+  desktopContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0', // No gap, sticky elements handle spacing
+  } as React.CSSProperties,
+
+  // Desktop: Sticky canvas section (peeks at top)
   stickyCanvasSection: {
     position: 'sticky',
     // Note: top value is set dynamically based on canvas height
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
-    zIndex: 10,
-    marginBottom: '20px',
-    backgroundColor: '#0a0a15', // Solid background to prevent controls showing through
-    paddingBottom: '20px', // Extra padding at bottom for cleaner separation
-  } as React.CSSProperties,
-  // Controls section - scrollable
-  controlsSection: {
-    display: 'flex',
-    flexDirection: 'column',
+    gap: '16px',
+    zIndex: 100,
+    paddingBottom: '20px',
+    backgroundColor: '#0a0a15',
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.4)',
   } as React.CSSProperties,
   mobileToggleButton: {
     position: 'fixed',

@@ -152,20 +152,21 @@ export function MatrixControlCenter() {
 
 const styles = {
   container: {
-    backgroundColor: '#0a0a15',
+    backgroundColor: '#13141f',
     borderRadius: '8px',
     overflow: 'hidden',
+    border: '1px solid #2a2b3a',
   } as React.CSSProperties,
   stickyHeader: {
     position: 'sticky',
-    top: '0',
-    backgroundColor: '#0a0a15',
-    zIndex: 5,
-    borderBottom: '2px solid #2a2b3a',
+    top: '0px',
+    backgroundColor: '#13141f',
+    zIndex: 50,
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
   } as React.CSSProperties,
   header: {
-    padding: '16px 20px',
-    borderBottom: '2px solid #2a2b3a',
+    padding: '20px',
+    borderBottom: '1px solid #2a2b3a',
   } as React.CSSProperties,
   title: {
     fontSize: '20px',
@@ -177,10 +178,11 @@ const styles = {
   // Species Tabs (Vertical Axis)
   speciesTabs: {
     display: 'flex',
-    gap: '6px',
-    padding: '12px 12px 0 12px',
-    borderBottom: '1px solid #1a1a25',
+    gap: '8px',
+    padding: '20px 20px 0 20px',
+    borderBottom: '1px solid #2a2b3a',
     overflowX: 'auto',
+    scrollbarWidth: 'thin',
   } as React.CSSProperties,
   speciesTab: {
     display: 'flex',
@@ -215,8 +217,8 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
-    padding: '12px 16px',
-    margin: '12px 12px 0 12px',
+    padding: '16px 20px',
+    margin: '20px 20px 0 20px',
     borderRadius: '6px',
   } as React.CSSProperties,
   scopeIcon: {
@@ -237,16 +239,17 @@ const styles = {
   // Oikos Tabs (Horizontal Axis)
   oikosTabs: {
     display: 'flex',
-    gap: '6px',
-    padding: '12px',
+    gap: '8px',
+    padding: '20px',
     borderBottom: '2px solid #2a2b3a',
     overflowX: 'auto',
+    scrollbarWidth: 'thin',
     WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
   } as React.CSSProperties,
   oikosTab: {
     display: 'flex',
     alignItems: 'center',
-    gap: '6px',
+    gap: '8px',
     padding: '10px 14px',
     backgroundColor: '#13141f',
     color: '#a0a0b0',
@@ -270,7 +273,7 @@ const styles = {
 
   // Content
   content: {
-    padding: '16px',
-    minHeight: '350px',
+    padding: '20px',
+    minHeight: '400px',
   } as React.CSSProperties,
 };
