@@ -141,29 +141,40 @@ function App() {
               <p style={styles.version}>v2.0 | Quantum Stigmergy Models (M1, M2, M3)</p>
             </header>
 
-            <main style={styles.main}>
-              {/* Canvas Section - Top */}
-              <div style={styles.canvasSection}>
-                <CanvasPanel isFullscreen={false} />
-                <ControlBar onFullscreenToggle={toggleFullscreen} />
-                {isMobile && (
-                  <button onClick={toggleControlPanel} style={styles.mobileToggleButton}>
-                    {ui.controlPanelOpen ? '✕ Close Controls' : '🎛️ Open Controls'}
-                  </button>
-                )}
-              </div>
-
-              {/* Controls Section - Bottom (Desktop) or Overlay (Mobile) */}
+            <main style={isMobile ? styles.mainMobile : styles.mainDesktop}>
               {isMobile ? (
-                ui.controlPanelOpen && (
-                  <div style={styles.mobileDrawer}>
+                // Mobile Layout: Vertical Stack with Drawer
+                <>
+                  <div style={styles.canvasSection}>
+                    <CanvasPanel isFullscreen={false} />
+                    <ControlBar onFullscreenToggle={toggleFullscreen} />
+                    <button onClick={toggleControlPanel} style={styles.mobileToggleButton}>
+                      {ui.controlPanelOpen ? '✕ Close Controls' : '🎛️ Open Controls'}
+                    </button>
+                  </div>
+
+                  {ui.controlPanelOpen && (
+                    <div style={styles.mobileDrawer}>
+                      <MatrixControlCenter />
+                    </div>
+                  )}
+                </>
+              ) : (
+                // Desktop Layout: 2-Column with Sticky Canvas
+                <>
+                  {/* Left Column: Sticky Canvas */}
+                  <div style={styles.desktopCanvasColumn}>
+                    <div style={styles.stickyCanvasWrapper}>
+                      <CanvasPanel isFullscreen={false} />
+                      <ControlBar onFullscreenToggle={toggleFullscreen} />
+                    </div>
+                  </div>
+
+                  {/* Right Column: Scrollable Controls */}
+                  <div style={styles.desktopControlsColumn}>
                     <MatrixControlCenter />
                   </div>
-                )
-              ) : (
-                <div style={styles.controlSection}>
-                  <MatrixControlCenter />
-                </div>
+                </>
               )}
             </main>
 
@@ -215,22 +226,47 @@ const styles = {
     color: '#6a6a7a',
     margin: 0,
   } as React.CSSProperties,
-  main: {
+  // Mobile: Vertical stack
+  mainMobile: {
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
     padding: '20px',
-    maxWidth: '1600px',
+  } as React.CSSProperties,
+  // Desktop: 2-column layout
+  mainDesktop: {
+    display: 'grid',
+    gridTemplateColumns: 'minmax(400px, 1fr) minmax(400px, 1.2fr)',
+    gap: '24px',
+    padding: '20px',
+    maxWidth: '1800px',
     margin: '0 auto',
+    alignItems: 'start',
   } as React.CSSProperties,
   canvasSection: {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
   } as React.CSSProperties,
-  controlSection: {
+  // Desktop Canvas Column (Left)
+  desktopCanvasColumn: {
+    position: 'relative',
+    minHeight: '100vh',
+  } as React.CSSProperties,
+  // Sticky wrapper for canvas
+  stickyCanvasWrapper: {
+    position: 'sticky',
+    top: '20px',
     display: 'flex',
     flexDirection: 'column',
+    gap: '12px',
+    maxHeight: 'calc(100vh - 40px)',
+  } as React.CSSProperties,
+  // Desktop Controls Column (Right - scrollable)
+  desktopControlsColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh',
   } as React.CSSProperties,
   mobileToggleButton: {
     position: 'fixed',
