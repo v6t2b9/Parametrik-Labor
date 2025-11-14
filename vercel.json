@@ -1,0 +1,9 @@
+{
+  "buildCommand": "cd parametric-explorer && npm install && npm run build",
+  "outputDirectory": "parametric-explorer/dist",
+  "installCommand": "cd parametric-explorer && npm install",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
