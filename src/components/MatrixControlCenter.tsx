@@ -67,72 +67,75 @@ export function MatrixControlCenter() {
 
   return (
     <div style={styles.container}>
-      {/* Header */}
-      <div style={styles.header}>
-        <h2 style={styles.title}>🎛️ Matrix Parameter Control</h2>
-      </div>
+      {/* Sticky Header Section - stays visible while scrolling */}
+      <div style={styles.stickyHeader}>
+        {/* Header */}
+        <div style={styles.header}>
+          <h2 style={styles.title}>🎛️ Matrix Parameter Control</h2>
+        </div>
 
-      {/* Species Scope Tabs (Vertical Axis) */}
-      <div style={styles.speciesTabs}>
-        {SPECIES_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => {
-              setActiveSpeciesScope(tab.id);
-              // Switch to appropriate tab if current is not available
-              if (tab.id !== 'universal' && ['presets', 'model', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
-                setActiveOikosTab('physical');
-              }
-            }}
-            style={{
-              ...styles.speciesTab,
-              ...(ui.activeSpeciesScope === tab.id ? {
-                ...styles.speciesTabActive,
-                borderBottomColor: tab.color,
-              } : {}),
-            }}
-          >
-            <span style={styles.speciesIcon}>{tab.icon}</span>
-            {!isMobile && <span style={styles.speciesLabel}>{tab.label}</span>}
-          </button>
-        ))}
-      </div>
+        {/* Species Scope Tabs (Vertical Axis) */}
+        <div style={styles.speciesTabs}>
+          {SPECIES_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveSpeciesScope(tab.id);
+                // Switch to appropriate tab if current is not available
+                if (tab.id !== 'universal' && ['presets', 'model', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
+                  setActiveOikosTab('physical');
+                }
+              }}
+              style={{
+                ...styles.speciesTab,
+                ...(ui.activeSpeciesScope === tab.id ? {
+                  ...styles.speciesTabActive,
+                  borderBottomColor: tab.color,
+                } : {}),
+              }}
+            >
+              <span style={styles.speciesIcon}>{tab.icon}</span>
+              {!isMobile && <span style={styles.speciesLabel}>{tab.label}</span>}
+            </button>
+          ))}
+        </div>
 
-      {/* Species Scope Info */}
-      <div style={{
-        ...styles.scopeInfo,
-        backgroundColor: activeSpeciesTab.color + '11',
-        borderLeft: `3px solid ${activeSpeciesTab.color}`,
-      }}>
-        <span style={styles.scopeIcon}>{activeSpeciesTab.icon}</span>
-        <div>
-          <div style={styles.scopeTitle}>{activeSpeciesTab.label} Scope</div>
-          <div style={styles.scopeDesc}>
-            {ui.activeSpeciesScope === 'universal'
-              ? 'Cross-species baseline parameters (fallback for all species)'
-              : `Species-specific overrides for ${activeSpeciesTab.label} agents`}
+        {/* Species Scope Info */}
+        <div style={{
+          ...styles.scopeInfo,
+          backgroundColor: activeSpeciesTab.color + '11',
+          borderLeft: `3px solid ${activeSpeciesTab.color}`,
+        }}>
+          <span style={styles.scopeIcon}>{activeSpeciesTab.icon}</span>
+          <div>
+            <div style={styles.scopeTitle}>{activeSpeciesTab.label} Scope</div>
+            <div style={styles.scopeDesc}>
+              {ui.activeSpeciesScope === 'universal'
+                ? 'Cross-species baseline parameters (fallback for all species)'
+                : `Species-specific overrides for ${activeSpeciesTab.label} agents`}
+            </div>
           </div>
+        </div>
+
+        {/* Oikos Tabs (Horizontal Axis) */}
+        <div style={styles.oikosTabs}>
+          {availableOikosTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveOikosTab(tab.id)}
+              style={{
+                ...styles.oikosTab,
+                ...(activeOikosTabId === tab.id ? styles.oikosTabActive : {}),
+              }}
+            >
+              <span style={styles.tabIcon}>{tab.icon}</span>
+              {!isMobile && <span>{tab.label}</span>}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Oikos Tabs (Horizontal Axis) */}
-      <div style={styles.oikosTabs}>
-        {availableOikosTabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveOikosTab(tab.id)}
-            style={{
-              ...styles.oikosTab,
-              ...(activeOikosTabId === tab.id ? styles.oikosTabActive : {}),
-            }}
-          >
-            <span style={styles.tabIcon}>{tab.icon}</span>
-            {!isMobile && <span>{tab.label}</span>}
-          </button>
-        ))}
-      </div>
-
-      {/* Content Area */}
+      {/* Scrollable Content Area */}
       <div style={styles.content}>
         {ui.activeOikosTab === 'presets' && <PresetGallery />}
         {ui.activeOikosTab === 'model' && <ModelOikosPanel />}
@@ -152,6 +155,13 @@ const styles = {
     backgroundColor: '#0a0a15',
     borderRadius: '8px',
     overflow: 'hidden',
+  } as React.CSSProperties,
+  stickyHeader: {
+    position: 'sticky',
+    top: '0',
+    backgroundColor: '#0a0a15',
+    zIndex: 5,
+    borderBottom: '2px solid #2a2b3a',
   } as React.CSSProperties,
   header: {
     padding: '16px 20px',
