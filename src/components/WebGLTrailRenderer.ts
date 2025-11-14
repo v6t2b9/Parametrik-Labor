@@ -217,12 +217,12 @@ export class WebGLTrailRenderer {
       visualization.colorBg.b / 255
     );
 
-    // Set blend mode (0=additive, 1=average, 2=screen)
+    // Set blend mode (0=additive, 1=average, 2=screen, 3=multiply)
     const blendModeIndex =
       visualization.blendMode === 'additive' ? 0 :
       visualization.blendMode === 'average' ? 1 :
-      visualization.blendMode === 'multiply' ? 1 : // same as average
-      visualization.blendMode === 'screen' ? 2 : 0;
+      visualization.blendMode === 'screen' ? 2 :
+      visualization.blendMode === 'multiply' ? 3 : 0;
     gl.uniform1i(this.uniformLocations.blendMode!, blendModeIndex);
 
     gl.uniform1f(this.uniformLocations.trailIntensity!, visualization.trailIntensity);
@@ -303,7 +303,7 @@ const fragmentShaderSource = `
   uniform vec3 u_colorBlue;
   uniform vec3 u_colorBg;
 
-  uniform int u_blendMode; // 0=additive, 1=average, 2=screen
+  uniform int u_blendMode; // 0=additive, 1=average, 2=screen, 3=multiply
   uniform float u_trailIntensity;
   uniform float u_brightness;
 
@@ -330,7 +330,7 @@ const fragmentShaderSource = `
       color += u_colorBlue * tB * effectiveBrightness;
 
     } else if (u_blendMode == 1) {
-      // Average/Multiply blending
+      // Average blending
       float totalTrail = redVal + greenVal + blueVal;
       if (totalTrail > 0.0) {
         float t = min(1.0, totalTrail / u_trailIntensity);
@@ -350,6 +350,24 @@ const fragmentShaderSource = `
 
       // Screen formula: 1 - (1-a)(1-b)(1-c)
       color = vec3(1.0) - (vec3(1.0) - c1) * (vec3(1.0) - c2) * (vec3(1.0) - c3);
+
+    } else if (u_blendMode == 3) {
+      // Multiply blending
+      float tR = min(1.0, redVal / u_trailIntensity);
+      float tG = min(1.0, greenVal / u_trailIntensity);
+      float tB = min(1.0, blueVal / u_trailIntensity);
+
+      // Start with white background for multiply (darker result)
+      vec3 result = vec3(1.0);
+
+      // Multiply each color channel contribution
+      if (tR > 0.01) result *= mix(vec3(1.0), u_colorRed, tR * u_brightness);
+      if (tG > 0.01) result *= mix(vec3(1.0), u_colorGreen, tG * u_brightness);
+      if (tB > 0.01) result *= mix(vec3(1.0), u_colorBlue, tB * u_brightness);
+
+      // Blend with background
+      float totalIntensity = (tR + tG + tB) / 3.0;
+      color = mix(u_colorBg, result, min(1.0, totalIntensity * 2.0));
     }
 
     gl_FragColor = vec4(clamp(color, 0.0, 1.0), 1.0);
