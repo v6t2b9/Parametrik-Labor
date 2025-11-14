@@ -141,7 +141,7 @@ function App() {
               <p style={styles.version}>v2.0 | Quantum Stigmergy Models (M1, M2, M3)</p>
             </header>
 
-            <main style={isMobile ? styles.mainMobile : styles.mainDesktop}>
+            <main style={styles.main}>
               {isMobile ? (
                 // Mobile Layout: Vertical Stack with Drawer
                 <>
@@ -160,18 +160,16 @@ function App() {
                   )}
                 </>
               ) : (
-                // Desktop Layout: 2-Column with Sticky Canvas
+                // Desktop Layout: Vertical with Sticky Peek Canvas
                 <>
-                  {/* Left Column: Sticky Canvas */}
-                  <div style={styles.desktopCanvasColumn}>
-                    <div style={styles.stickyCanvasWrapper}>
-                      <CanvasPanel isFullscreen={false} />
-                      <ControlBar onFullscreenToggle={toggleFullscreen} />
-                    </div>
+                  {/* Sticky Canvas Section - peeks out when scrolling */}
+                  <div style={styles.stickyCanvasSection}>
+                    <CanvasPanel isFullscreen={false} />
+                    <ControlBar onFullscreenToggle={toggleFullscreen} />
                   </div>
 
-                  {/* Right Column: Scrollable Controls */}
-                  <div style={styles.desktopControlsColumn}>
+                  {/* Controls Section - scrollable */}
+                  <div style={styles.controlsSection}>
                     <MatrixControlCenter />
                   </div>
                 </>
@@ -226,47 +224,36 @@ const styles = {
     color: '#6a6a7a',
     margin: 0,
   } as React.CSSProperties,
-  // Mobile: Vertical stack
-  mainMobile: {
+  // Main container - vertical layout
+  main: {
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
     padding: '20px',
-  } as React.CSSProperties,
-  // Desktop: 2-column layout
-  mainDesktop: {
-    display: 'grid',
-    gridTemplateColumns: 'minmax(400px, 1fr) minmax(400px, 1.2fr)',
-    gap: '24px',
-    padding: '20px',
-    maxWidth: '1800px',
+    maxWidth: '1600px',
     margin: '0 auto',
-    alignItems: 'start',
   } as React.CSSProperties,
   canvasSection: {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
   } as React.CSSProperties,
-  // Desktop Canvas Column (Left)
-  desktopCanvasColumn: {
-    position: 'relative',
-    minHeight: '100vh',
-  } as React.CSSProperties,
-  // Sticky wrapper for canvas
-  stickyCanvasWrapper: {
+  // Desktop: Sticky canvas that peeks out when scrolling
+  stickyCanvasSection: {
     position: 'sticky',
-    top: '20px',
+    // Negative top value: canvas will stick but move up, leaving bottom part visible
+    // Adjust this value to control how much of the canvas remains visible
+    top: '-400px',
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
-    maxHeight: 'calc(100vh - 40px)',
+    zIndex: 10,
+    marginBottom: '20px',
   } as React.CSSProperties,
-  // Desktop Controls Column (Right - scrollable)
-  desktopControlsColumn: {
+  // Controls section - scrollable
+  controlsSection: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100vh',
   } as React.CSSProperties,
   mobileToggleButton: {
     position: 'fixed',
