@@ -182,18 +182,13 @@ function App() {
                   )}
                 </>
               ) : (
-                // Desktop Layout: Sticky peek canvas + sticky navigation + scrollable content
-                <div style={styles.desktopContainer}>
-                  {/* Sticky Canvas + ControlBar - peeks at top */}
-                  <div style={{
-                    ...styles.stickyCanvasSection,
-                    top: `${-(canvasHeight + 120 - 180)}px`, // +120 for control bar height, -180 for peek
-                  }}>
-                    <CanvasPanel isFullscreen={false} />
-                    <ControlBar onFullscreenToggle={toggleFullscreen} />
-                  </div>
-
-                  {/* Controls with internal sticky header */}
+                // Desktop Layout: Everything sticky together, content scrolls internally
+                <div style={{
+                  ...styles.stickyCanvasSection,
+                  top: `${-(canvasHeight + 120 - 180)}px`, // +120 for control bar height, -180 for peek
+                }}>
+                  <CanvasPanel isFullscreen={false} />
+                  <ControlBar onFullscreenToggle={toggleFullscreen} />
                   <MatrixControlCenter />
                 </div>
               )}
