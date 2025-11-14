@@ -29,13 +29,35 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 
 ### Key Features
 
+#### Core Simulation
 ✅ **8-Dimensional Parameter Control** - Model, Physical, Semiotic, Temporal, Resonance, Visual, Effects, Performance
 ✅ **3 Stigmergy Models** - Classical (M1), Context-Switching (M2), Quantum-Inspired (M3)
 ✅ **Quantum Mechanics** - Superposition states, phase-dependent trails, interference patterns
-✅ **Real-time Visualization** - 800×800 canvas with 4 blend modes, 11 post-processing effects
 ✅ **51+ Presets** - 8 global + 43 dimension-specific curated configurations
 ✅ **Auto-Optimizer** - Adaptive performance scaling (30-120 FPS targets)
-✅ **Open Science** - MIT licensed, full code transparency, pre-registered protocols
+
+#### Visualization & Rendering
+✅ **WebGL-Accelerated Rendering** - GPU-based trail rendering for high performance
+✅ **Flexible Aspect Ratios** - 1:1, 16:9, 9:16, 3:2, 4:3, 21:9, and more
+✅ **4 Blend Modes** - Additive, Average, Multiply, Screen
+✅ **11+ Post-Processing Effects** - Motion blur, bloom, chromatic aberration, vignette, scanlines, pixelation
+✅ **High-DPI Support** - Sharp rendering on retina displays (up to 2x devicePixelRatio)
+
+#### Export & Sharing
+✅ **GIF Loop Export** - 2-second looping GIFs with automatic fade-in/fade-out transitions
+✅ **Video Export** - WebM (high quality) or GIF format with configurable duration (3s/8s/12s)
+✅ **Screenshot Capture** - One-click PNG export of current canvas state
+✅ **Smart Recording Workflow** - Automatic capture with real-time progress indicators
+
+#### UX & Interface
+✅ **Sticky Canvas (Desktop)** - Canvas remains visible while scrolling through parameters
+✅ **2-Column Layout** - Side-by-side parameter controls with live visual feedback
+✅ **Mobile-Optimized** - Responsive drawer interface with touch controls
+✅ **Fullscreen Mode** - Distraction-free visualization with ESC exit
+
+#### Open Science
+✅ **MIT Licensed** - Full code transparency and reusability
+✅ **Pre-registered Protocols** - Falsification criteria and validation benchmarks
 
 ---
 
@@ -106,10 +128,12 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 ## 💻 Technology Stack
 
 - **Frontend:** React 19 + TypeScript
-- **State:** Zustand
-- **Build:** Vite
-- **Rendering:** Canvas 2D API
-- **Deploy:** Vercel
+- **State Management:** Zustand
+- **Build Tool:** Vite
+- **Rendering:** Canvas 2D API + WebGL (hybrid approach)
+- **Export:** gif.js (GIF encoding), MediaRecorder API (WebM)
+- **Performance:** Object pooling, WebGL shaders, requestAnimationFrame
+- **Deployment:** Vercel
 - **License:** MIT
 
 ---
@@ -125,6 +149,8 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 
 ## 🎯 Usage
 
+### Basic Workflow
+
 1. **Select Model:** Go to 🧬 Model Oikos tab
 2. **Choose M1/M2/M3:** Click model button to switch
 3. **Adjust Parameters:** Tune quantum parameters (phase rotation, amplitude coupling, etc.)
@@ -133,6 +159,46 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
    - M1: Stable trails, simple patterns
    - M2: Dynamic explore/exploit switching
    - M3: Complex interference, order-dependent patterns, trail aging
+
+### Export & Capture
+
+**Screenshot:**
+- Click `📸 Screenshot` to capture current frame as PNG
+
+**GIF Loop (Recommended for social media):**
+1. Select `🔁 GIF Loop (2s with fade)` from export mode
+2. Click `🎥 Record GIF Loop (2s)`
+3. Wait for automatic capture (60 frames) → rendering → download
+4. Result: Seamlessly looping 2-second GIF with fade transitions
+
+**Video Export:**
+1. Select `🎬 Video` from export mode
+2. Choose format: `WebM (Best Quality)` or `GIF (Universal)`
+3. Select duration: `3s`, `8s`, or `12s`
+4. Click `🎥 Record [FORMAT] ([DURATION]s)`
+5. Wait for automatic capture → processing (GIF only) → download
+
+**Status Indicators:**
+- `🔴 Capturing... X/Y` - Frames being captured
+- `⏳ Processing GIF... X%` - GIF encoding in progress
+- Download starts automatically when complete
+
+### Desktop Layout
+
+On desktop (≥768px width), the interface uses a **2-column sticky layout**:
+- **Left:** Canvas + controls (stays visible while scrolling)
+- **Right:** Parameter panels (scrollable)
+
+This allows you to **see parameter changes in real-time** without scrolling back to the canvas!
+
+### Aspect Ratios
+
+Available aspect ratios for export and display:
+- **Square:** 1:1
+- **Landscape:** 16:9, 3:2, 4:3, 21:9 (ultrawide)
+- **Portrait:** 9:16, 2:3, 3:4, 9:21 (ultra portrait)
+
+Select from the `📐 Aspect Ratio` dropdown in the control bar.
 
 ---
 
