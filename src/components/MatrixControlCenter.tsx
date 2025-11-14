@@ -159,7 +159,7 @@ const styles = {
   } as React.CSSProperties,
   stickyHeader: {
     position: 'sticky',
-    top: '0px',
+    top: '180px', // Position below the sticky ControlBar peek (180px visible)
     backgroundColor: '#13141f',
     zIndex: 50,
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
