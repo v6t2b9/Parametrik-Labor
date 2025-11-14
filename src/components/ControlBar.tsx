@@ -68,6 +68,8 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       const totalFrames = 60; // 2 seconds at 30fps
       const fps = 30;
 
+      console.log('Starting GIF Loop recording...');
+
       try {
         const gif = new GIF({
           workers: 2,
@@ -80,13 +82,33 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
         gifEncoderRef.current = gif;
 
+        gif.on('progress', (progress: number) => {
+          console.log('GIF encoding progress:', (progress * 100).toFixed(1) + '%');
+        });
+
         gif.on('finished', (blob: Blob) => {
+          console.log('GIF rendering finished, blob size:', blob.size);
+          if (!blob || blob.size === 0) {
+            alert('GIF rendering failed: Empty file. Please try again.');
+            setIsRecording(false);
+            setRecordedFrameCount(0);
+            return;
+          }
+
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
           a.download = `parametric-loop-${Date.now()}.gif`;
+          a.style.display = 'none';
+          document.body.appendChild(a);
           a.click();
-          URL.revokeObjectURL(url);
+
+          // Delay cleanup to ensure download starts
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 100);
+
           setIsRecording(false);
           setRecordedFrameCount(0);
         });
@@ -95,6 +117,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         let frameCount = 0;
         recordingIntervalRef.current = window.setInterval(() => {
           if (frameCount >= totalFrames) {
+            console.log('All frames captured, starting render...');
             stopRecording();
             return;
           }
@@ -103,7 +126,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
           // Fade in at the beginning
           if (frameCount < fadeFrames) {
-            fadeAlpha = frameCount / fadeFrames;
+            fadeAlpha = (frameCount + 1) / fadeFrames;
           }
           // Fade out at the end
           else if (frameCount >= totalFrames - fadeFrames) {
@@ -115,6 +138,10 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
           frameCount++;
           setRecordedFrameCount(frameCount);
+
+          if (frameCount % 10 === 0) {
+            console.log(`Captured ${frameCount}/${totalFrames} frames`);
+          }
         }, 1000 / fps);
       } catch (error) {
         console.error('GIF Loop recording error:', error);
@@ -177,6 +204,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         }
       } else {
         // GIF recording with gif.js (no fade effects for video mode)
+        console.log('Starting GIF video recording...');
         try {
           const gif = new GIF({
             workers: 2,
@@ -188,13 +216,33 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
           gifEncoderRef.current = gif;
 
+          gif.on('progress', (progress: number) => {
+            console.log('GIF video encoding progress:', (progress * 100).toFixed(1) + '%');
+          });
+
           gif.on('finished', (blob: Blob) => {
+            console.log('GIF video rendering finished, blob size:', blob.size);
+            if (!blob || blob.size === 0) {
+              alert('GIF rendering failed: Empty file. Please try again.');
+              setIsRecording(false);
+              setRecordedFrameCount(0);
+              return;
+            }
+
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = `parametric-video-${Date.now()}.gif`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
             a.click();
-            URL.revokeObjectURL(url);
+
+            // Delay cleanup to ensure download starts
+            setTimeout(() => {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }, 100);
+
             setIsRecording(false);
             setRecordedFrameCount(0);
           });
@@ -203,6 +251,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           let frameCount = 0;
           recordingIntervalRef.current = window.setInterval(() => {
             if (frameCount >= maxFrames) {
+              console.log('All video frames captured, starting render...');
               stopRecording();
               return;
             }
@@ -210,6 +259,10 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             gif.addFrame(canvas, { copy: true, delay: 33 }); // 33ms = ~30fps
             frameCount++;
             setRecordedFrameCount(frameCount);
+
+            if (frameCount % 30 === 0) {
+              console.log(`Captured ${frameCount}/${maxFrames} video frames`);
+            }
           }, 33);
         } catch (error) {
           console.error('GIF recording error:', error);
@@ -222,6 +275,8 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
   const stopRecording = () => {
     if (!isRecording) return;
+
+    console.log('Stopping recording, mode:', exportMode, 'format:', videoFormat);
 
     if (exportMode === 'video' && videoFormat === 'webm') {
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
@@ -236,6 +291,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
       // Render GIF
       if (gifEncoderRef.current) {
+        console.log('Starting GIF render process...');
         gifEncoderRef.current.render();
         gifEncoderRef.current = null;
       }
