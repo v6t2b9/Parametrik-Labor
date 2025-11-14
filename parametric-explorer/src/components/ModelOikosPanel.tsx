@@ -4,7 +4,7 @@
  */
 
 import { useSimulationStore } from '../store/useSimulationStore';
-import ParameterSlider from './ParameterSlider';
+import { ParameterSlider } from './ParameterSlider';
 import type { StigmergyModel } from '../types/index';
 
 export default function ModelOikosPanel() {
@@ -183,7 +183,7 @@ export default function ModelOikosPanel() {
               min={50}
               max={200}
               step={5}
-              onChange={(val) => updateModelParams({ m2: { ...m2, highThreshold: val } })}
+              onChange={(val: number) => updateModelParams({ m2: { ...m2, highThreshold: val } })}
               description="Density to switch to exploit mode"
             />
 
@@ -193,7 +193,7 @@ export default function ModelOikosPanel() {
               min={10}
               max={50}
               step={5}
-              onChange={(val) => updateModelParams({ m2: { ...m2, lowThreshold: val } })}
+              onChange={(val: number) => updateModelParams({ m2: { ...m2, lowThreshold: val } })}
               description="Density to switch to explore mode"
             />
 
@@ -203,7 +203,7 @@ export default function ModelOikosPanel() {
               min={0.1}
               max={1.0}
               step={0.05}
-              onChange={(val) => updateModelParams({ m2: { ...m2, explorationNoise: val } })}
+              onChange={(val: number) => updateModelParams({ m2: { ...m2, explorationNoise: val } })}
               description="Noise magnitude in explore mode"
             />
 
@@ -240,7 +240,7 @@ export default function ModelOikosPanel() {
               min={0.001}
               max={0.01}
               step={0.001}
-              onChange={(val) => updateModelParams({ m3: { ...m3, phaseRotationRate: val } })}
+              onChange={(val: number) => updateModelParams({ m3: { ...m3, phaseRotationRate: val } })}
               description="How fast trails 'age' (phase evolution)"
             />
 
@@ -250,7 +250,7 @@ export default function ModelOikosPanel() {
               min={0.05}
               max={0.3}
               step={0.01}
-              onChange={(val) => updateModelParams({ m3: { ...m3, amplitudeCoupling: val } })}
+              onChange={(val: number) => updateModelParams({ m3: { ...m3, amplitudeCoupling: val } })}
               description="Coupling between direction amplitudes"
             />
 
@@ -260,7 +260,7 @@ export default function ModelOikosPanel() {
               min={100}
               max={500}
               step={25}
-              onChange={(val) => updateModelParams({ m3: { ...m3, contextThreshold: val } })}
+              onChange={(val: number) => updateModelParams({ m3: { ...m3, contextThreshold: val } })}
               description="Food collected before context switch"
             />
 
@@ -270,7 +270,7 @@ export default function ModelOikosPanel() {
               min={0.01}
               max={0.1}
               step={0.01}
-              onChange={(val) => updateModelParams({ m3: { ...m3, phaseNoise: val } })}
+              onChange={(val: number) => updateModelParams({ m3: { ...m3, phaseNoise: val } })}
               description="Environmental phase fluctuations"
             />
 

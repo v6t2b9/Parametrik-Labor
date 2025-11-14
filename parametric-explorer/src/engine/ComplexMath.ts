@@ -114,7 +114,6 @@ export function initializeQuantumState(): QuantumAmplitudes {
 export function measureDirection(ψ: QuantumAmplitudes): 'left' | 'forward' | 'right' {
   const P_left = cabs2(ψ.left);
   const P_forward = cabs2(ψ.forward);
-  const P_right = cabs2(ψ.right);
 
   // Sample from probability distribution
   const rand = Math.random();

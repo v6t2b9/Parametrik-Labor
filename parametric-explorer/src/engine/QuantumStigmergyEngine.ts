@@ -11,9 +11,6 @@ import type {
   AllParameters,
   AgentType,
   ResolvedSpeciesParams,
-  StigmergyModel,
-  ContextMode,
-  QuantumAmplitudes,
 } from '../types/index.js';
 
 import {
@@ -25,7 +22,6 @@ import {
   cadd,
   cscale,
   cexp,
-  cabs2,
 } from './ComplexMath.js';
 
 const GRID_SIZE = 400;
@@ -66,7 +62,6 @@ export class QuantumStigmergyEngine {
   private gridSize: number;
   private frameCount: number = 0;
   private params: AllParameters;
-  private totalFoodCollected: number = 0; // For M3 context switching
 
   constructor(gridSize: number = GRID_SIZE) {
     this.gridSize = gridSize;
@@ -134,7 +129,6 @@ export class QuantumStigmergyEngine {
     this.tempTrails = this.createTrails();
     this.tempPhases = this.createPhases();
     this.frameCount = 0;
-    this.totalFoodCollected = 0;
     this.initializeAgents(this.params.globalTemporal.agentCount);
   }
 
@@ -300,7 +294,7 @@ export class QuantumStigmergyEngine {
     const speciesParams = resolveSpeciesParams(this.params, agent.type);
     const { semiotic, temporal, resonance, physical } = speciesParams;
     const { simulationSpeed } = this.params.globalTemporal;
-    const { phaseRotationRate, amplitudeCoupling, contextThreshold, phaseNoise } =
+    const { phaseRotationRate, amplitudeCoupling, phaseNoise } =
       this.params.modelParams.m3;
 
     // Initialize quantum state if needed
@@ -639,7 +633,7 @@ export class QuantumStigmergyEngine {
     return this.gridSize;
   }
 
-  public getModel(): StigmergyModel {
+  public getModel() {
     return this.params.modelParams.model;
   }
 }
