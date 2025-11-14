@@ -505,23 +505,22 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
-    padding: '16px 20px',
+    gap: '12px',
+    padding: '12px 16px',
     backgroundColor: '#13141f',
     borderRadius: '8px',
     border: '1px solid #2a2b3a',
-    marginBottom: '20px',
   } as React.CSSProperties,
   topRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: '12px',
+    gap: '8px',
   } as React.CSSProperties,
   left: {
     display: 'flex',
-    gap: '12px',
+    gap: '8px',
     flexWrap: 'wrap',
   } as React.CSSProperties,
   right: {
