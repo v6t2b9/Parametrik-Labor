@@ -165,7 +165,7 @@ const styles = {
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
   } as React.CSSProperties,
   header: {
-    padding: '20px',
+    padding: '16px 20px',
     borderBottom: '1px solid #2a2b3a',
   } as React.CSSProperties,
   title: {
@@ -179,7 +179,7 @@ const styles = {
   speciesTabs: {
     display: 'flex',
     gap: '8px',
-    padding: '20px 20px 0 20px',
+    padding: '12px 20px',
     borderBottom: '1px solid #2a2b3a',
     overflowX: 'auto',
     scrollbarWidth: 'thin',
@@ -218,7 +218,7 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
     padding: '16px 20px',
-    margin: '20px 20px 0 20px',
+    margin: '12px 20px',
     borderRadius: '6px',
   } as React.CSSProperties,
   scopeIcon: {
@@ -240,7 +240,7 @@ const styles = {
   oikosTabs: {
     display: 'flex',
     gap: '8px',
-    padding: '20px',
+    padding: '12px 20px',
     borderBottom: '2px solid #2a2b3a',
     overflowX: 'auto',
     scrollbarWidth: 'thin',
