@@ -367,9 +367,21 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     if (effects.hueShift !== 0) filters.push(`hue-rotate(${effects.hueShift}deg)`);
 
     if (filters.length > 0) {
-      ctx.filter = filters.join(' ');
-      ctx.drawImage(canvas, 0, 0);
-      ctx.filter = 'none';
+      // Use temp canvas to apply filters (can't draw canvas onto itself with filter)
+      const tempCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx) {
+        // Copy current canvas to temp
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // Apply filters and draw back to main canvas
+        ctx.filter = filters.join(' ');
+        ctx.drawImage(tempCanvas, 0, 0);
+        ctx.filter = 'none';
+      }
+
+      canvasPool.release(tempCanvas);
     }
 
     // === 5. Bloom Effect ===

@@ -387,17 +387,17 @@ export function ControlBar({ }: ControlBarProps) {
         <div style={styles.sliderContainer}>
           <div style={styles.sliderHeader}>
             <label style={styles.sliderLabel}>⚡ Agent Speed</label>
-            <span style={styles.sliderValue}>{parameters.globalTemporal.simulationSpeed.toFixed(1)}x</span>
+            <span style={styles.sliderValue}>{parameters.globalTemporal.simulationSpeed.toFixed(2)}x</span>
           </div>
           <input
             type="range"
-            min={0.1}
-            max={5}
-            step={0.1}
+            min={0.05}
+            max={2.0}
+            step={0.05}
             value={parameters.globalTemporal.simulationSpeed}
             onChange={(e) => updateGlobalTemporalParams({ simulationSpeed: parseFloat(e.target.value) })}
             style={styles.slider}
-            title="Speed multiplier for agent movement"
+            title="Speed multiplier for agent movement (sweetspot around 0.3x)"
           />
         </div>
 
