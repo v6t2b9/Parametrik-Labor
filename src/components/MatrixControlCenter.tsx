@@ -72,47 +72,49 @@ export function MatrixControlCenter() {
         <h2 style={styles.title}>🎛️ Matrix Parameter Control</h2>
       </div>
 
-      {/* Species Scope Tabs (Vertical Axis) */}
-      <div style={styles.speciesTabs}>
-        {SPECIES_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => {
-              setActiveSpeciesScope(tab.id);
-              // Switch to appropriate tab if current is not available
-              if (tab.id !== 'universal' && ['presets', 'model', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
-                setActiveOikosTab('physical');
-              }
-            }}
-            style={{
-              ...styles.speciesTab,
-              ...(ui.activeSpeciesScope === tab.id ? {
-                ...styles.speciesTabActive,
-                borderBottomColor: tab.color,
-              } : {}),
-            }}
-          >
-            <span style={styles.speciesIcon}>{tab.icon}</span>
-            {!isMobile && <span style={styles.speciesLabel}>{tab.label}</span>}
-          </button>
-        ))}
-      </div>
-
-      {/* Species Scope Info */}
-      <div style={{
-        ...styles.scopeInfo,
-        backgroundColor: activeSpeciesTab.color + '11',
-        borderLeft: `3px solid ${activeSpeciesTab.color}`,
-      }}>
-        <span style={styles.scopeIcon}>{activeSpeciesTab.icon}</span>
-        <div>
-          <div style={styles.scopeTitle}>{activeSpeciesTab.label} Scope</div>
-          <div style={styles.scopeDesc}>
-            {ui.activeSpeciesScope === 'universal'
-              ? 'Cross-species baseline parameters (fallback for all species)'
-              : `Species-specific overrides for ${activeSpeciesTab.label} agents`}
-          </div>
+      {/* Species Scope Tabs Row (Tabs + Info inline) */}
+      <div style={styles.speciesTabsRow}>
+        {/* Species Tabs */}
+        <div style={styles.speciesTabs}>
+          {SPECIES_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveSpeciesScope(tab.id);
+                // Switch to appropriate tab if current is not available
+                if (tab.id !== 'universal' && ['presets', 'model', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
+                  setActiveOikosTab('physical');
+                }
+              }}
+              style={{
+                ...styles.speciesTab,
+                ...(ui.activeSpeciesScope === tab.id ? {
+                  ...styles.speciesTabActive,
+                  borderBottomColor: tab.color,
+                } : {}),
+              }}
+            >
+              <span style={styles.speciesIcon}>{tab.icon}</span>
+              {!isMobile && <span style={styles.speciesLabel}>{tab.label}</span>}
+            </button>
+          ))}
         </div>
+
+        {/* Scope Info inline (rechts) */}
+        {!isMobile && (
+          <div style={{
+            ...styles.scopeInfoInline,
+            borderLeft: `3px solid ${activeSpeciesTab.color}`,
+          }}>
+            <span style={styles.scopeIcon}>{activeSpeciesTab.icon}</span>
+            <span style={styles.scopeTextInline}>
+              <strong>{activeSpeciesTab.label} Scope</strong> · {' '}
+              {ui.activeSpeciesScope === 'universal'
+                ? 'Cross-species baseline (fallback for all)'
+                : `Species-specific overrides for ${activeSpeciesTab.label}`}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Oikos Tabs (Horizontal Axis) */}
@@ -167,14 +169,23 @@ const styles = {
     margin: 0,
   } as React.CSSProperties,
 
-  // Species Tabs (Vertical Axis)
-  speciesTabs: {
+  // Species Tabs Row (contains tabs + inline info)
+  speciesTabsRow: {
     display: 'flex',
-    gap: '6px',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '16px',
     padding: '8px 16px',
     borderBottom: '1px solid #2a2b3a',
     overflowX: 'auto',
     scrollbarWidth: 'thin',
+  } as React.CSSProperties,
+
+  // Species Tabs
+  speciesTabs: {
+    display: 'flex',
+    gap: '6px',
+    flex: '0 0 auto', // Don't grow, don't shrink
   } as React.CSSProperties,
   speciesTab: {
     display: 'flex',
@@ -204,28 +215,28 @@ const styles = {
     fontSize: '12px',
   } as React.CSSProperties,
 
-  // Scope Info
-  scopeInfo: {
+  // Scope Info inline (rechts neben Tabs)
+  scopeInfoInline: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    padding: '8px 16px',
-    margin: '6px 16px',
+    padding: '6px 12px',
+    paddingLeft: '10px',
     borderRadius: '4px',
+    flex: '1 1 auto', // Can grow and shrink
+    minWidth: 0, // Allow text truncation
   } as React.CSSProperties,
   scopeIcon: {
-    fontSize: '18px',
+    fontSize: '16px',
+    flex: '0 0 auto',
   } as React.CSSProperties,
-  scopeTitle: {
-    fontSize: '12px',
-    fontWeight: 600,
-    color: '#e0e0e0',
-    marginBottom: '2px',
-  } as React.CSSProperties,
-  scopeDesc: {
-    fontSize: '10px',
+  scopeTextInline: {
+    fontSize: '11px',
     color: '#a0a0b0',
     lineHeight: 1.3,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   } as React.CSSProperties,
 
   // Oikos Tabs (Horizontal Axis)
