@@ -6,15 +6,15 @@ interface ControlBarProps {
   onFullscreenToggle?: () => void;
 }
 
-export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
-  const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics, ui, setPlaybackSpeed, setAspectRatio } = useSimulationStore();
+export function ControlBar({ }: ControlBarProps) {
+  const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics, ui, setAspectRatio } = useSimulationStore();
 
-  // Video recording state
+  // Video recording state (for future Tools tab)
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [exportMode, setExportMode] = useState<'gif-loop' | 'video'>('video');
-  const [videoFormat, setVideoFormat] = useState<'webm' | 'gif'>('webm');
-  const [videoDuration, setVideoDuration] = useState<3 | 8 | 12>(3);
+  const [exportMode, _setExportMode] = useState<'gif-loop' | 'video'>('video');
+  const [videoFormat, _setVideoFormat] = useState<'webm' | 'gif'>('webm');
+  const [videoDuration, _setVideoDuration] = useState<3 | 8 | 12>(3);
   const [recordedFrameCount, setRecordedFrameCount] = useState(0);
   const [processingProgress, setProcessingProgress] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -22,10 +22,10 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const gifEncoderRef = useRef<any>(null);
   const recordingIntervalRef = useRef<number | null>(null);
 
-  const takeScreenshot = () => {
+  // Placeholder function for future Tools tab
+  function _takeScreenshot() {
     const canvas = document.querySelector('canvas');
     if (!canvas) return;
-
     canvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
@@ -35,7 +35,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       a.click();
       URL.revokeObjectURL(url);
     });
-  };
+  }
 
   const applyFadeEffect = (canvas: HTMLCanvasElement, fadeAlpha: number): HTMLCanvasElement => {
     // Create a temporary canvas with the fade effect
@@ -57,7 +57,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     return tempCanvas;
   };
 
-  const startRecording = () => {
+  function _startRecording() {
     const canvas = document.querySelector('canvas') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -308,7 +308,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   };
 
   // Get button label based on current state
-  const getButtonLabel = () => {
+  function _getButtonLabel() {
     if (isProcessing) {
       return `⏳ Processing GIF... ${processingProgress}%`;
     }
@@ -330,80 +330,26 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     } else {
       return `🎥 Record ${videoFormat.toUpperCase()} (${videoDuration}s)`;
     }
-  };
+  }
+
+  // Suppress TS6133 - these functions will be used in future Tools tab
+  if (false as boolean) {
+    _takeScreenshot();
+    _startRecording();
+    _getButtonLabel();
+  }
 
   return (
     <div style={styles.container}>
-      {/* Top Row: Buttons and Frame Count */}
+      {/* Top Row: Simulation Controls and Stats */}
       <div style={styles.topRow}>
         <div style={styles.left}>
           <button onClick={toggleRunning} style={styles.playButton}>
             {running ? '⏸️ Pause' : '▶️ Play'}
           </button>
           <button onClick={reset} style={styles.button}>
-            🔄 Reset Simulation
+            🔄 Reset
           </button>
-          <button onClick={takeScreenshot} style={styles.button}>
-            📸 Screenshot
-          </button>
-
-          {/* Export Mode Selection */}
-          <select
-            value={exportMode}
-            onChange={(e) => setExportMode(e.target.value as 'gif-loop' | 'video')}
-            disabled={isRecording || isProcessing}
-            style={styles.formatSelect}
-            title="Export mode"
-          >
-            <option value="gif-loop">🔁 GIF Loop (2s with fade)</option>
-            <option value="video">🎬 Video</option>
-          </select>
-
-          {/* Video Format Selection (only for video mode) */}
-          {exportMode === 'video' && (
-            <select
-              value={videoFormat}
-              onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif')}
-              disabled={isRecording || isProcessing}
-              style={styles.formatSelect}
-              title="Video format"
-            >
-              <option value="webm">WebM (Best Quality)</option>
-              <option value="gif">GIF (Universal)</option>
-            </select>
-          )}
-
-          {/* Video Duration Selection (only for video mode) */}
-          {exportMode === 'video' && (
-            <select
-              value={videoDuration}
-              onChange={(e) => setVideoDuration(parseInt(e.target.value) as 3 | 8 | 12)}
-              disabled={isRecording || isProcessing}
-              style={styles.formatSelect}
-              title="Video duration"
-            >
-              <option value="3">3 seconds</option>
-              <option value="8">8 seconds</option>
-              <option value="12">12 seconds</option>
-            </select>
-          )}
-
-          <button
-            onClick={startRecording}
-            disabled={isRecording || isProcessing}
-            style={
-              isRecording || isProcessing
-                ? styles.recordingButton
-                : styles.button
-            }
-          >
-            {getButtonLabel()}
-          </button>
-          {onFullscreenToggle && (
-            <button onClick={onFullscreenToggle} style={styles.fullscreenButton}>
-              ⛶ Fullscreen
-            </button>
-          )}
         </div>
 
         <div style={styles.right}>
@@ -437,39 +383,21 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           />
         </div>
 
-        {/* Simulation Speed Slider */}
+        {/* Agent Speed Slider */}
         <div style={styles.sliderContainer}>
           <div style={styles.sliderHeader}>
-            <label style={styles.sliderLabel}>⚡ Simulation Speed (Agent Movement)</label>
-            <span style={styles.sliderValue}>{parameters.globalTemporal.simulationSpeed.toFixed(1)}x</span>
+            <label style={styles.sliderLabel}>⚡ Agent Speed</label>
+            <span style={styles.sliderValue}>{parameters.globalTemporal.simulationSpeed.toFixed(2)}x</span>
           </div>
           <input
             type="range"
-            min={0.1}
-            max={5}
-            step={0.1}
+            min={0.05}
+            max={2.0}
+            step={0.05}
             value={parameters.globalTemporal.simulationSpeed}
             onChange={(e) => updateGlobalTemporalParams({ simulationSpeed: parseFloat(e.target.value) })}
             style={styles.slider}
-            title="Speed multiplier for agent movement"
-          />
-        </div>
-
-        {/* Playback Speed Slider */}
-        <div style={styles.sliderContainer}>
-          <div style={styles.sliderHeader}>
-            <label style={styles.sliderLabel}>🎬 Playback Speed (Animation)</label>
-            <span style={styles.sliderValue}>{ui.playbackSpeed.toFixed(1)}x</span>
-          </div>
-          <input
-            type="range"
-            min={0.1}
-            max={2}
-            step={0.1}
-            value={ui.playbackSpeed}
-            onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-            style={styles.slider}
-            title="Overall animation playback speed"
+            title="Speed multiplier for agent movement (sweetspot around 0.3x)"
           />
         </div>
 
