@@ -6,7 +6,7 @@ interface ControlBarProps {
   onFullscreenToggle?: () => void;
 }
 
-export function ControlBar({ }: ControlBarProps) {
+export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics, ui, setAspectRatio } = useSimulationStore();
 
   // Video recording state (for future Tools tab)
@@ -350,6 +350,11 @@ export function ControlBar({ }: ControlBarProps) {
           <button onClick={reset} style={styles.button}>
             🔄 Reset
           </button>
+          {onFullscreenToggle && (
+            <button onClick={onFullscreenToggle} style={styles.button}>
+              ⛶ Fullscreen
+            </button>
+          )}
         </div>
 
         <div style={styles.right}>

@@ -20,12 +20,13 @@ export function PhysicalOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>🌍 Physical Oikos</h3>
-      <p style={styles.subtitle}>Trace materiality and environmental properties</p>
+      <h3 style={styles.title}>🌊 Physical Oikos</h3>
+      <p style={styles.subtitle}>Trace materiality and environmental dynamics</p>
 
       {/* Physics Presets Section */}
       <div style={styles.presetSection}>
-        <h4 style={styles.presetTitle}>Physik Presets</h4>
+        <h4 style={styles.presetTitle}>📦 Physics Presets</h4>
+        <p style={styles.presetDescription}>Quick configurations for different physical behaviors</p>
         <div style={styles.presetGrid}>
           {physicsPresets.map((preset) => (
             <button
@@ -50,7 +51,7 @@ export function PhysicalOikosPanel() {
         max={0.999}
         step={0.001}
         onChange={(value) => updatePhysicalParams({ decayRate: value })}
-        description="Trail persistence over time. High → long memory → stable structures"
+        description="Trail persistence · High = long memory & stable structures · Sweetspot: 0.95-0.99"
         hasOverride={hasOverride('decayRate')}
       />
 
@@ -61,7 +62,7 @@ export function PhysicalOikosPanel() {
         max={10}
         step={1}
         onChange={(value) => updatePhysicalParams({ diffusionFreq: value })}
-        description="Diffusion interval (frames). Low (1) = fast diffusion, High (10) = slow diffusion"
+        description="Blur interval in frames · Low = fast smoothing, High = crisp trails · Range: 1-10"
         hasOverride={hasOverride('diffusionFreq')}
       />
 
@@ -72,7 +73,7 @@ export function PhysicalOikosPanel() {
         max={0.5}
         step={0.01}
         onChange={(value) => updatePhysicalParams({ fadeStrength: value })}
-        description="Acceleration of forgetting. High → rapid decay → chaos"
+        description="Forgetting acceleration · High = rapid decay & chaos · Sweetspot: 0.05-0.15"
         hasOverride={hasOverride('fadeStrength')}
       />
 
@@ -83,7 +84,7 @@ export function PhysicalOikosPanel() {
         max={255}
         step={5}
         onChange={(value) => updatePhysicalParams({ trailSaturation: value })}
-        description="Maximum trail intensity capacity"
+        description="Maximum trail intensity · Affects glow brightness · Range: 50-255"
         hasOverride={hasOverride('trailSaturation')}
       />
     </div>
@@ -113,9 +114,15 @@ const styles = {
   } as React.CSSProperties,
   presetTitle: {
     fontSize: '13px',
+    color: '#e0e0e0',
+    marginBottom: '6px',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  presetDescription: {
+    fontSize: '10px',
     color: '#a0a0b0',
     marginBottom: '10px',
-    fontWeight: 600,
+    lineHeight: 1.4,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',

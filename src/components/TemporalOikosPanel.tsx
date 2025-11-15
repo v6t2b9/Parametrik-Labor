@@ -25,7 +25,8 @@ export function TemporalOikosPanel() {
       <p style={styles.subtitle}>Time-dependent dynamics and rhythm</p>
 
       <div style={styles.presetSection}>
-        <h4 style={styles.presetTitle}>Temporal Presets</h4>
+        <h4 style={styles.presetTitle}>📦 Temporal Presets</h4>
+        <p style={styles.presetDescription}>Quick configurations for different temporal dynamics</p>
         <div style={styles.presetGrid}>
           {temporalPresets.map((preset) => (
             <button
@@ -45,7 +46,7 @@ export function TemporalOikosPanel() {
 
       {ui.activeSpeciesScope === 'universal' && (
         <>
-          <div style={styles.sectionHeader}>Global Parameters</div>
+          <div style={styles.sectionHeader}>🌍 Global Parameters</div>
           <ParameterSlider
             label="Agent Count"
             value={globalValues.agentCount}
@@ -53,19 +54,19 @@ export function TemporalOikosPanel() {
             max={10000}
             step={100}
             onChange={(value) => updateGlobalTemporalParams({ agentCount: value })}
-            description="Total population density"
+            description="Total population · More agents = denser patterns · Range: 500-10000"
           />
           <ParameterSlider
-            label="Simulation Speed"
+            label="Agent Speed"
             value={globalValues.simulationSpeed}
-            min={0.1}
-            max={5.0}
-            step={0.1}
+            min={0.05}
+            max={2.0}
+            step={0.05}
             onChange={(value) => updateGlobalTemporalParams({ simulationSpeed: value })}
-            description="Global time scale multiplier"
+            description="Movement speed multiplier · Sweetspot around 0.3x · Range: 0.05-2.0"
           />
           <div style={styles.divider} />
-          <div style={styles.sectionHeader}>Species-Specific Parameters</div>
+          <div style={styles.sectionHeader}>🎯 Species-Specific Parameters</div>
         </>
       )}
 
@@ -76,7 +77,7 @@ export function TemporalOikosPanel() {
         max={3.0}
         step={0.1}
         onChange={(value) => updateTemporalParams({ speed: value })}
-        description="Movement rate"
+        description="Movement rate · Higher = faster agents · Range: 0.5-3.0"
         hasOverride={hasOverride('speed')}
       />
 
@@ -87,7 +88,7 @@ export function TemporalOikosPanel() {
         max={500}
         step={10}
         onChange={(value) => updateTemporalParams({ chaosInterval: value })}
-        description="Periodic destabilization (0 = off)"
+        description="Periodic disruption · 0 = off, Low = frequent chaos · Range: 0-500 frames"
         hasOverride={hasOverride('chaosInterval')}
       />
 
@@ -98,7 +99,7 @@ export function TemporalOikosPanel() {
         max={1.0}
         step={0.05}
         onChange={(value) => updateTemporalParams({ chaosStrength: value })}
-        description="Perturbation intensity"
+        description="Disruption intensity · High = dramatic bursts · Range: 0.1-1.0"
         hasOverride={hasOverride('chaosStrength')}
       />
     </div>
@@ -128,9 +129,15 @@ const styles = {
   } as React.CSSProperties,
   presetTitle: {
     fontSize: '13px',
+    color: '#e0e0e0',
+    marginBottom: '6px',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  presetDescription: {
+    fontSize: '10px',
     color: '#a0a0b0',
     marginBottom: '10px',
-    fontWeight: 600,
+    lineHeight: 1.4,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',
