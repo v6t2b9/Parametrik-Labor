@@ -20,12 +20,13 @@ export function SemioticOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>🔣 Semiotic Oikos</h3>
+      <h3 style={styles.title}>👁️ Semiotic Oikos</h3>
       <p style={styles.subtitle}>Perception-action coupling and sign production</p>
 
       {/* Species Presets Section */}
       <div style={styles.presetSection}>
-        <h4 style={styles.presetTitle}>Spezies Presets</h4>
+        <h4 style={styles.presetTitle}>📦 Species Presets</h4>
+        <p style={styles.presetDescription}>Quick configurations for different agent behaviors</p>
         <div style={styles.presetGrid}>
           {speciesPresets.map((preset) => (
             <button
@@ -50,7 +51,7 @@ export function SemioticOikosPanel() {
         max={80}
         step={1}
         onChange={(value) => updateSemioticParams({ sensorDist: value })}
-        description="Perceptual range. Large → network formation, separation"
+        description="Perceptual range · Large = network formation · Sweetspot: 15-30"
         hasOverride={hasOverride('sensorDist')}
       />
 
@@ -61,7 +62,7 @@ export function SemioticOikosPanel() {
         max={2.5}
         step={0.05}
         onChange={(value) => updateSemioticParams({ sensorAngle: value })}
-        description="Field of view (radians). Wide → chaotic, fluid movement"
+        description="Field of view in radians · Wide = chaotic fluid motion · Range: 0.1-2.5"
         hasOverride={hasOverride('sensorAngle')}
       />
 
@@ -72,7 +73,7 @@ export function SemioticOikosPanel() {
         max={50}
         step={1}
         onChange={(value) => updateSemioticParams({ deposit: value })}
-        description="Trace intensity per step. High → dense, stable structures"
+        description="Trace intensity per step · High = dense stable structures · Range: 1-50"
         hasOverride={hasOverride('deposit')}
       />
 
@@ -83,7 +84,7 @@ export function SemioticOikosPanel() {
         max={2.5}
         step={0.05}
         onChange={(value) => updateSemioticParams({ turnSpeed: value })}
-        description="Response agility (radians). High → erratic, fluid motion"
+        description="Response agility in radians · High = erratic fluid motion · Range: 0.05-2.5"
         hasOverride={hasOverride('turnSpeed')}
       />
     </div>
@@ -113,9 +114,15 @@ const styles = {
   } as React.CSSProperties,
   presetTitle: {
     fontSize: '13px',
+    color: '#e0e0e0',
+    marginBottom: '6px',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  presetDescription: {
+    fontSize: '10px',
     color: '#a0a0b0',
     marginBottom: '10px',
-    fontWeight: 600,
+    lineHeight: 1.4,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',

@@ -27,7 +27,7 @@ export function ResonanceOikosPanel() {
         max={2.0}
         step={0.1}
         onChange={(value) => updateResonanceParams({ attractionStrength: value })}
-        description="Same-type trail following. High → clustering"
+        description="Same-type trail following · Positive = clustering · Range: -2.0 to 2.0"
         hasOverride={hasOverride('attractionStrength')}
       />
 
@@ -38,7 +38,7 @@ export function ResonanceOikosPanel() {
         max={2.0}
         step={0.1}
         onChange={(value) => updateResonanceParams({ repulsionStrength: value })}
-        description="Cross-type influence. Negative → avoidance"
+        description="Cross-type influence · Negative = avoidance · Range: -2.0 to 2.0"
         hasOverride={hasOverride('repulsionStrength')}
       />
 
