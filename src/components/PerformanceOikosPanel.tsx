@@ -93,7 +93,8 @@ export function PerformanceOikosPanel() {
       <div style={styles.divider} />
 
       {/* Quality Preset Selection */}
-      <h4 style={styles.sectionTitle}>Quality Preset</h4>
+      <h4 style={styles.sectionTitle}>📦 Quality Presets</h4>
+      <p style={styles.sectionDescription}>Balanced configurations for different hardware capabilities</p>
       <div style={styles.presetGrid}>
         {qualityPresets.map((preset) => (
           <button
@@ -257,9 +258,15 @@ const styles = {
   } as React.CSSProperties,
   sectionTitle: {
     fontSize: '14px',
-    color: '#a0a0b0',
-    marginBottom: '12px',
+    color: '#e0e0e0',
+    marginBottom: '6px',
     fontWeight: 600,
+  } as React.CSSProperties,
+  sectionDescription: {
+    fontSize: '10px',
+    color: '#a0a0b0',
+    marginBottom: '10px',
+    lineHeight: 1.4,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',

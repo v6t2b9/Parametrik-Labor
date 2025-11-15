@@ -38,7 +38,7 @@ export function ModelOikosPanel() {
         color: '#b0b0b0',
         lineHeight: '1.6',
       }}>
-        Quantum-Inspired Stigmergy Computational Model (Supplement B)
+        Quantum-inspired stigmergy computational models
       </p>
 
       {/* Model Selection */}
@@ -50,7 +50,7 @@ export function ModelOikosPanel() {
           fontWeight: 'bold',
           color: '#90caf9',
         }}>
-          Stigmergy Model
+          📦 Model Selection
         </label>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
