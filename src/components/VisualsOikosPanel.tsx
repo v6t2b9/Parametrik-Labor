@@ -15,7 +15,7 @@ export function VisualsOikosPanel() {
 
       {/* Visual Presets Section */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>🌈 Visual Worlds - Quick Apply</h4>
+        <h4 style={styles.sectionTitle}>📦 Visual Presets</h4>
         <p style={styles.sectionDescription}>
           Pre-configured color schemes with matching blend modes and trail settings
         </p>
@@ -38,9 +38,9 @@ export function VisualsOikosPanel() {
 
       {/* Effect Presets Section */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>✨ Effect Presets - Quick Apply</h4>
+        <h4 style={styles.sectionTitle}>📦 Effect Presets</h4>
         <p style={styles.sectionDescription}>
-          Pre-configured post-processing effect combinations for different moods
+          Pre-configured post-processing combinations for different moods
         </p>
         <div style={styles.presetGrid}>
           {effectsPresets.map((preset) => (
