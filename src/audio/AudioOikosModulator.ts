@@ -444,3 +444,491 @@ export const AUDIO_OIKOS_PRESETS = {
     },
   },
 };
+
+// ============================================================================
+// VII. RHYTHMIC OSCILLATOR SYSTEM
+// ============================================================================
+
+/**
+ * PHASE-LOCKED MODULATION
+ *
+ * Kontinuierliche Oszillation statt nur Beat-Impulse!
+ * Parameter PUMPEN synchron zur Musik - kein "Totzeit" zwischen Beats.
+ */
+
+export type WaveformType = 'sine' | 'sawtooth' | 'square' | 'triangle' | 'pulse';
+
+export interface OscillatorConfig {
+  frequency: number;        // Hz (from BPM: frequency = BPM / 60)
+  waveform: WaveformType;
+  amplitude: number;        // 0-1
+  offset: number;           // DC offset (0-1)
+  phase: number;            // Initial phase (0-2π)
+}
+
+export class PhaseLockedOscillator {
+  private phase: number = 0;
+  private frequency: number;
+  private waveform: WaveformType;
+  private amplitude: number;
+  private offset: number;
+
+  // Phase correction for beat synchronization
+  private targetPhase: number = 0;
+  private phaseCorrection: number = 0;
+  private phaseLockStrength: number = 0.1; // How fast to correct phase
+
+  constructor(config: OscillatorConfig) {
+    this.frequency = config.frequency;
+    this.waveform = config.waveform;
+    this.amplitude = config.amplitude;
+    this.offset = config.offset;
+    this.phase = config.phase;
+  }
+
+  /**
+   * Update oscillator and return current value (0-1 range)
+   */
+  update(deltaTime: number): number {
+    // Apply phase correction (smooth convergence to beat phase)
+    this.phase += this.phaseCorrection * this.phaseLockStrength;
+    this.phaseCorrection *= (1 - this.phaseLockStrength);
+
+    // Advance phase based on frequency
+    const phaseIncrement = 2 * Math.PI * this.frequency * deltaTime;
+    this.phase += phaseIncrement;
+
+    // Wrap phase to [0, 2π]
+    while (this.phase > 2 * Math.PI) {
+      this.phase -= 2 * Math.PI;
+    }
+
+    // Generate waveform
+    const waveValue = this.generateWaveform(this.phase);
+
+    // Apply amplitude and offset
+    return this.offset + waveValue * this.amplitude;
+  }
+
+  /**
+   * Synchronize to detected beat by correcting phase
+   */
+  onBeatDetected(): void {
+    // Target phase is 0 (or 2π) at beat
+    this.targetPhase = 0;
+
+    // Calculate shortest phase correction
+    let correction = this.targetPhase - this.phase;
+
+    // Ensure shortest path (handle wrap-around)
+    if (correction > Math.PI) {
+      correction -= 2 * Math.PI;
+    } else if (correction < -Math.PI) {
+      correction += 2 * Math.PI;
+    }
+
+    // Apply correction gradually over next few frames
+    this.phaseCorrection = correction;
+  }
+
+  /**
+   * Update frequency (from BPM)
+   */
+  setFrequency(bpm: number): void {
+    this.frequency = bpm / 60; // Convert BPM to Hz
+  }
+
+  /**
+   * Generate waveform value at given phase
+   */
+  private generateWaveform(phase: number): number {
+    const normalizedPhase = phase / (2 * Math.PI); // 0-1 range
+
+    switch (this.waveform) {
+      case 'sine':
+        // Smooth oscillation: 0 → 1 → 0 → -1 → 0
+        return (Math.sin(phase) + 1) / 2; // Normalized to 0-1
+
+      case 'sawtooth':
+        // Linear rise, sharp drop: 0 → 1 → 0 (buildup effect)
+        return normalizedPhase;
+
+      case 'square':
+        // Hard on/off: 0 → 0 → 1 → 1 → 0
+        return normalizedPhase < 0.5 ? 0 : 1;
+
+      case 'triangle':
+        // Linear rise and fall: 0 → 1 → 0 (symmetric breathing)
+        return normalizedPhase < 0.5
+          ? normalizedPhase * 2
+          : 2 - normalizedPhase * 2;
+
+      case 'pulse':
+        // Short pulse at beat: 1 → 0 → 0 → 0 → 1
+        return normalizedPhase < 0.1 ? 1 : 0;
+
+      default:
+        return 0.5;
+    }
+  }
+
+  /**
+   * Get current phase (for visualization/debugging)
+   */
+  getPhase(): number {
+    return this.phase;
+  }
+}
+
+// ============================================================================
+// VIII. MULTI-OSCILLATOR BANK
+// ============================================================================
+
+export interface OscillatorBankConfig {
+  baseBPM: number;
+  oscillators: {
+    [key: string]: {
+      frequencyMultiplier: number; // Relative to baseBPM (1x, 2x, 4x, etc.)
+      waveform: WaveformType;
+      amplitude: number;
+      offset: number;
+    };
+  };
+}
+
+export class OscillatorBank {
+  private oscillators: Map<string, PhaseLockedOscillator> = new Map();
+  private baseBPM: number;
+  private oscillatorConfigs: Map<string, { frequencyMultiplier: number }> = new Map();
+
+  constructor(config: OscillatorBankConfig) {
+    this.baseBPM = config.baseBPM;
+
+    // Create oscillators
+    for (const [name, oscConfig] of Object.entries(config.oscillators)) {
+      const frequency = (config.baseBPM / 60) * oscConfig.frequencyMultiplier;
+
+      this.oscillators.set(
+        name,
+        new PhaseLockedOscillator({
+          frequency,
+          waveform: oscConfig.waveform,
+          amplitude: oscConfig.amplitude,
+          offset: oscConfig.offset,
+          phase: 0,
+        })
+      );
+
+      // Store config for later tempo updates
+      this.oscillatorConfigs.set(name, {
+        frequencyMultiplier: oscConfig.frequencyMultiplier,
+      });
+    }
+  }
+
+  /**
+   * Update all oscillators
+   */
+  update(deltaTime: number): Map<string, number> {
+    const values = new Map<string, number>();
+
+    for (const [name, oscillator] of this.oscillators.entries()) {
+      values.set(name, oscillator.update(deltaTime));
+    }
+
+    return values;
+  }
+
+  /**
+   * Sync all oscillators to beat
+   */
+  onBeatDetected(): void {
+    for (const oscillator of this.oscillators.values()) {
+      oscillator.onBeatDetected();
+    }
+  }
+
+  /**
+   * Update base tempo
+   */
+  setTempo(bpm: number): void {
+    this.baseBPM = bpm;
+
+    // Update all oscillator frequencies
+    for (const [name, oscillator] of this.oscillators.entries()) {
+      const config = this.oscillatorConfigs.get(name);
+      if (config) {
+        oscillator.setFrequency(bpm * config.frequencyMultiplier);
+      }
+    }
+  }
+
+  /**
+   * Get current base BPM
+   */
+  getBaseBPM(): number {
+    return this.baseBPM;
+  }
+}
+
+// ============================================================================
+// IX. RHYTHMIC PARAMETER MODULATOR
+// ============================================================================
+
+export interface RhythmicModulationConfig {
+  // Which parameters to modulate
+  targets: {
+    [paramName: string]: {
+      oscillatorName: string;  // Which oscillator to use
+      baseValue: number;       // Base parameter value
+      modulationDepth: number; // How much to modulate (0-1)
+    };
+  };
+}
+
+export class RhythmicParameterModulator {
+  private oscillatorBank: OscillatorBank;
+  private config: RhythmicModulationConfig;
+
+  // Tempo tracking
+  private currentBPM: number = 120;
+  private bpmHistory: number[] = [];
+  private bpmHistorySize: number = 8;
+
+  constructor(
+    oscillatorBankConfig: OscillatorBankConfig,
+    modulationConfig: RhythmicModulationConfig
+  ) {
+    this.oscillatorBank = new OscillatorBank(oscillatorBankConfig);
+    this.config = modulationConfig;
+  }
+
+  /**
+   * Update and get modulated parameter values
+   */
+  modulate(deltaTime: number): { [paramName: string]: number } {
+    // Update all oscillators
+    const oscillatorValues = this.oscillatorBank.update(deltaTime);
+
+    // Apply to parameters
+    const modulatedParams: { [key: string]: number } = {};
+
+    for (const [paramName, targetConfig] of Object.entries(this.config.targets)) {
+      const oscillatorValue = oscillatorValues.get(targetConfig.oscillatorName);
+
+      if (oscillatorValue !== undefined) {
+        // Modulate around base value
+        // oscillatorValue is 0-1, we want to scale by modulationDepth
+        const modulation = (oscillatorValue - 0.5) * 2 * targetConfig.modulationDepth;
+        modulatedParams[paramName] = targetConfig.baseValue * (1 + modulation);
+      }
+    }
+
+    return modulatedParams;
+  }
+
+  /**
+   * Called when beat is detected - syncs oscillators
+   */
+  onBeatDetected(detectedBPM?: number): void {
+    // Sync oscillator phases
+    this.oscillatorBank.onBeatDetected();
+
+    // Update tempo if provided
+    if (detectedBPM !== undefined) {
+      this.updateTempo(detectedBPM);
+    }
+  }
+
+  /**
+   * Smooth tempo updates (running average)
+   */
+  private updateTempo(newBPM: number): void {
+    this.bpmHistory.push(newBPM);
+    if (this.bpmHistory.length > this.bpmHistorySize) {
+      this.bpmHistory.shift();
+    }
+
+    // Calculate average BPM
+    const avgBPM = this.bpmHistory.reduce((sum, bpm) => sum + bpm, 0) / this.bpmHistory.length;
+
+    // Only update if significantly different (avoid jitter)
+    if (Math.abs(avgBPM - this.currentBPM) > 2) {
+      this.currentBPM = avgBPM;
+      this.oscillatorBank.setTempo(avgBPM);
+    }
+  }
+}
+
+// ============================================================================
+// X. RHYTHMIC PRESETS
+// ============================================================================
+
+export const RHYTHMIC_PRESETS = {
+  /**
+   * DEEP BREATHING - Slow sine wave pumping
+   */
+  deepBreathing: {
+    name: 'Deep Breathing',
+    description: 'Slow sine wave pumping - meditative flow',
+    oscillatorBank: {
+      baseBPM: 120,
+      oscillators: {
+        main: {
+          frequencyMultiplier: 1,      // 1x BPM
+          waveform: 'sine' as WaveformType,
+          amplitude: 0.5,
+          offset: 0.5,
+        },
+        harmonic: {
+          frequencyMultiplier: 2,      // 2x BPM
+          waveform: 'sine' as WaveformType,
+          amplitude: 0.3,
+          offset: 0.5,
+        },
+      },
+    },
+    modulation: {
+      targets: {
+        depositRate: {
+          oscillatorName: 'main',
+          baseValue: 1.0,
+          modulationDepth: 0.8,        // Strong modulation
+        },
+        pheromoneDiffusionRate: {
+          oscillatorName: 'harmonic',
+          baseValue: 0.1,
+          modulationDepth: 0.5,
+        },
+      },
+    },
+  },
+
+  /**
+   * EDM PUMP - Sawtooth buildup and drop
+   */
+  edmPump: {
+    name: 'EDM Pump',
+    description: 'Sawtooth buildup and drop - festival energy',
+    oscillatorBank: {
+      baseBPM: 128,
+      oscillators: {
+        buildup: {
+          frequencyMultiplier: 0.25,   // Every 4 beats
+          waveform: 'sawtooth' as WaveformType,
+          amplitude: 0.7,
+          offset: 0.3,
+        },
+        pulse: {
+          frequencyMultiplier: 1,      // Every beat
+          waveform: 'pulse' as WaveformType,
+          amplitude: 1.0,
+          offset: 0,
+        },
+      },
+    },
+    modulation: {
+      targets: {
+        crossSpeciesCoupling: {
+          oscillatorName: 'buildup',
+          baseValue: 1.0,
+          modulationDepth: 1.5,        // Extreme modulation
+        },
+        depositRate: {
+          oscillatorName: 'pulse',
+          baseValue: 1.0,
+          modulationDepth: 3.0,        // Massive pulses
+        },
+      },
+    },
+  },
+
+  /**
+   * POLYRHYTHMIC - Multiple independent oscillators
+   */
+  polyrhythmic: {
+    name: 'Polyrhythmic',
+    description: 'Multiple independent rhythms - complex patterns',
+    oscillatorBank: {
+      baseBPM: 120,
+      oscillators: {
+        slow: {
+          frequencyMultiplier: 0.5,    // Half tempo
+          waveform: 'triangle' as WaveformType,
+          amplitude: 0.4,
+          offset: 0.5,
+        },
+        medium: {
+          frequencyMultiplier: 1,      // Base tempo
+          waveform: 'sine' as WaveformType,
+          amplitude: 0.5,
+          offset: 0.5,
+        },
+        fast: {
+          frequencyMultiplier: 2,      // Double tempo
+          waveform: 'square' as WaveformType,
+          amplitude: 0.3,
+          offset: 0.5,
+        },
+      },
+    },
+    modulation: {
+      targets: {
+        pheromoneDiffusionRate: {
+          oscillatorName: 'slow',
+          baseValue: 0.1,
+          modulationDepth: 1.0,
+        },
+        depositRate: {
+          oscillatorName: 'medium',
+          baseValue: 1.0,
+          modulationDepth: 0.8,
+        },
+        turnSpeed: {
+          oscillatorName: 'fast',
+          baseValue: 1.0,
+          modulationDepth: 0.5,
+        },
+      },
+    },
+  },
+
+  /**
+   * HEARTBEAT - Strong on-beat pulse
+   */
+  heartbeat: {
+    name: 'Heartbeat',
+    description: 'Strong on-beat pulse - living organism',
+    oscillatorBank: {
+      baseBPM: 120,
+      oscillators: {
+        systole: {
+          frequencyMultiplier: 1,
+          waveform: 'pulse' as WaveformType,
+          amplitude: 1.0,
+          offset: 0,
+        },
+        diastole: {
+          frequencyMultiplier: 1,
+          waveform: 'triangle' as WaveformType,
+          amplitude: 0.4,
+          offset: 0.5,
+        },
+      },
+    },
+    modulation: {
+      targets: {
+        depositRate: {
+          oscillatorName: 'systole',
+          baseValue: 1.0,
+          modulationDepth: 5.0,        // Massive pulse
+        },
+        crossSpeciesCoupling: {
+          oscillatorName: 'diastole',
+          baseValue: 1.0,
+          modulationDepth: 0.6,
+        },
+      },
+    },
+  },
+};
