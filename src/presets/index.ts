@@ -60,6 +60,12 @@ export const defaultParameters: AllParameters = {
     colorBg: { r: 5, g: 5, b: 15 },
     showAgents: false,     // Default: Lavalamp Mode (pure trails)
     useTriangles: true,    // Lab Mode: Show directional triangles
+    hueCycling: {
+      enabled: false,
+      startHue: 0,
+      endHue: 360,
+      speed: 1.0,
+    },
   },
   effects: {
     blur: 0,
@@ -120,6 +126,12 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       trailIntensity: legacy.visualization.trailIntensity || 180,
       showAgents: legacy.visualization.showAgents ?? false,  // Default: Lavalamp mode
       useTriangles: legacy.visualization.useTriangles ?? true,  // Default: Directional triangles
+      hueCycling: legacy.visualization.hueCycling || {
+        enabled: false,
+        startHue: 0,
+        endHue: 360,
+        speed: 1.0,
+      },
     },
     effects: {
       ...legacy.effects,

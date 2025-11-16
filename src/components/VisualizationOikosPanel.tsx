@@ -1,5 +1,6 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
+import { ColorPicker } from './ColorPicker';
 import { visualPresets } from '../presets/tabPresets';
 
 export function VisualizationOikosPanel() {
@@ -102,65 +103,116 @@ export function VisualizationOikosPanel() {
         </p>
       </div>
 
+      {/* Color Channels Section */}
       <div style={styles.colorSection}>
         <h4 style={styles.colorTitle}>🎨 Farbkanäle</h4>
         <p style={styles.colorSubtitle}>
-          Die Farben der drei Spezies und des Hintergrunds. Diese Einstellung beeinflusst nur die visuelle Darstellung.
+          RGB-Slider und Hex-Werte für jeden Kanal. Diese Einstellung beeinflusst nur die visuelle Darstellung.
         </p>
 
         <div style={styles.colorGrid}>
-          <div style={styles.colorCard}>
-            <div style={styles.colorLabel}>🔴 Rot-Kanal</div>
-            <div
-              style={{
-                ...styles.colorPreview,
-                backgroundColor: `rgb(${visualization.colorRed.r}, ${visualization.colorRed.g}, ${visualization.colorRed.b})`,
-              }}
-            />
-            <div style={styles.colorValues}>
-              RGB({visualization.colorRed.r}, {visualization.colorRed.g}, {visualization.colorRed.b})
-            </div>
-          </div>
+          <ColorPicker
+            label="🔴 Rot-Kanal"
+            color={visualization.colorRed}
+            onChange={(color) => updateVisualizationParams({ colorRed: color })}
+          />
 
-          <div style={styles.colorCard}>
-            <div style={styles.colorLabel}>🟢 Grün-Kanal</div>
-            <div
-              style={{
-                ...styles.colorPreview,
-                backgroundColor: `rgb(${visualization.colorGreen.r}, ${visualization.colorGreen.g}, ${visualization.colorGreen.b})`,
-              }}
-            />
-            <div style={styles.colorValues}>
-              RGB({visualization.colorGreen.r}, {visualization.colorGreen.g}, {visualization.colorGreen.b})
-            </div>
-          </div>
+          <ColorPicker
+            label="🟢 Grün-Kanal"
+            color={visualization.colorGreen}
+            onChange={(color) => updateVisualizationParams({ colorGreen: color })}
+          />
 
-          <div style={styles.colorCard}>
-            <div style={styles.colorLabel}>🔵 Blau-Kanal</div>
-            <div
-              style={{
-                ...styles.colorPreview,
-                backgroundColor: `rgb(${visualization.colorBlue.r}, ${visualization.colorBlue.g}, ${visualization.colorBlue.b})`,
-              }}
-            />
-            <div style={styles.colorValues}>
-              RGB({visualization.colorBlue.r}, {visualization.colorBlue.g}, {visualization.colorBlue.b})
-            </div>
-          </div>
+          <ColorPicker
+            label="🔵 Blau-Kanal"
+            color={visualization.colorBlue}
+            onChange={(color) => updateVisualizationParams({ colorBlue: color })}
+          />
 
-          <div style={styles.colorCard}>
-            <div style={styles.colorLabel}>⬛ Hintergrund</div>
-            <div
-              style={{
-                ...styles.colorPreview,
-                backgroundColor: `rgb(${visualization.colorBg.r}, ${visualization.colorBg.g}, ${visualization.colorBg.b})`,
-              }}
-            />
-            <div style={styles.colorValues}>
-              RGB({visualization.colorBg.r}, {visualization.colorBg.g}, {visualization.colorBg.b})
-            </div>
-          </div>
+          <ColorPicker
+            label="⬛ Hintergrund"
+            color={visualization.colorBg}
+            onChange={(color) => updateVisualizationParams({ colorBg: color })}
+          />
         </div>
+      </div>
+
+      <div style={styles.divider} />
+
+      {/* Hue Cycling Section */}
+      <div style={styles.section}>
+        <h4 style={styles.sectionTitle}>🌈 Hue Cycling</h4>
+        <p style={styles.sectionDescription}>
+          Automatische Farbübergänge für fließende Animationen. Aktiviere Hue Cycling und stelle Start/End-Punkte sowie Speed ein.
+        </p>
+
+        {/* Enable Toggle */}
+        <div style={styles.toggleContainer}>
+          <label style={styles.toggleLabel}>
+            <input
+              type="checkbox"
+              checked={visualization.hueCycling.enabled}
+              onChange={(e) => updateVisualizationParams({
+                hueCycling: { ...visualization.hueCycling, enabled: e.target.checked }
+              })}
+              style={styles.checkbox}
+            />
+            <span>Hue Cycling aktivieren</span>
+          </label>
+        </div>
+
+        {/* Hue Cycling Controls (only shown when enabled) */}
+        {visualization.hueCycling.enabled && (
+          <div style={styles.hueCyclingControls}>
+            <ParameterSlider
+              label="🎨 Start Hue"
+              value={visualization.hueCycling.startHue}
+              min={0}
+              max={360}
+              step={1}
+              onChange={(value) => updateVisualizationParams({
+                hueCycling: { ...visualization.hueCycling, startHue: value }
+              })}
+              description="Start-Farbton (0-360 Grad im Farbkreis)"
+            />
+
+            <ParameterSlider
+              label="🎨 End Hue"
+              value={visualization.hueCycling.endHue}
+              min={0}
+              max={360}
+              step={1}
+              onChange={(value) => updateVisualizationParams({
+                hueCycling: { ...visualization.hueCycling, endHue: value }
+              })}
+              description="End-Farbton (0-360 Grad im Farbkreis)"
+            />
+
+            <ParameterSlider
+              label="⚡ Cycle Speed"
+              value={visualization.hueCycling.speed}
+              min={0.1}
+              max={10.0}
+              step={0.1}
+              onChange={(value) => updateVisualizationParams({
+                hueCycling: { ...visualization.hueCycling, speed: value }
+              })}
+              description="Geschwindigkeit des Farbübergangs (niedriger = langsamer)"
+            />
+
+            <div style={styles.infoBox}>
+              <p style={styles.infoText}>
+                💡 <strong>Tipp:</strong> Der Hue-Wert oszilliert zwischen Start und End.
+                <br/>
+                • <strong>0° = Rot</strong>, 120° = Grün, 240° = Blau, 360° = wieder Rot
+                <br/>
+                • Nutze kleine Bereiche (z.B. 0-60) für subtile Übergänge
+                <br/>
+                • Nutze große Bereiche (z.B. 0-360) für den vollen Regenbogen
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <div style={styles.infoBox}>
@@ -305,30 +357,28 @@ const styles = {
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '12px',
   } as React.CSSProperties,
-  colorCard: {
-    padding: '12px',
+  toggleContainer: {
+    marginBottom: '16px',
+  } as React.CSSProperties,
+  toggleLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    fontSize: '13px',
+    color: '#e0e0e0',
+    cursor: 'pointer',
+  } as React.CSSProperties,
+  checkbox: {
+    width: '18px',
+    height: '18px',
+    cursor: 'pointer',
+    accentColor: '#7d5dbd',
+  } as React.CSSProperties,
+  hueCyclingControls: {
+    marginTop: '16px',
+    padding: '16px',
     backgroundColor: '#0a0a15',
     borderRadius: '6px',
-    border: '1px solid #2a2b3a',
-  } as React.CSSProperties,
-  colorLabel: {
-    fontSize: '12px',
-    color: '#e0e0e0',
-    marginBottom: '8px',
-    textAlign: 'center',
-    fontWeight: 600,
-  } as React.CSSProperties,
-  colorPreview: {
-    width: '100%',
-    height: '40px',
-    borderRadius: '4px',
-    border: '1px solid #2a2b3a',
-    marginBottom: '6px',
-  } as React.CSSProperties,
-  colorValues: {
-    fontSize: '9px',
-    color: '#6a6a7a',
-    textAlign: 'center',
-    fontFamily: 'monospace',
+    border: '1px solid #3d2d5d',
   } as React.CSSProperties,
 };
