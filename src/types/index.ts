@@ -132,6 +132,13 @@ export interface UniversalParameterSet {
 
 export type BlendMode = 'additive' | 'average' | 'multiply' | 'screen';
 
+export interface HueCyclingParams {
+  enabled: boolean;         // Enable/disable hue cycling
+  startHue: number;         // 0-360: Starting hue value
+  endHue: number;           // 0-360: Ending hue value
+  speed: number;            // 0.1-10: Cycle speed (lower = slower)
+}
+
 export interface VisualizationParams {
   brightness: number;       // 0.5-5.0: Output brightness
   blendMode: BlendMode;     // Color blending mode
@@ -142,6 +149,7 @@ export interface VisualizationParams {
   colorBg: RGBColor;        // Background color
   showAgents: boolean;      // Show agents in Lab Mode (false = pure lavalamp)
   useTriangles: boolean;    // Show agents as directional triangles (true) or dots (false)
+  hueCycling: HueCyclingParams; // Hue cycling animation
 }
 
 export interface EffectsParams {

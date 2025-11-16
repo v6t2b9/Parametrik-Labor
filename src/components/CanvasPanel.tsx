@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { WebGLTrailRenderer } from './WebGLTrailRenderer';
+import { applyHueCycling } from '../utils/colorUtils';
 
 const DEFAULT_CANVAS_SIZE = 800;
 const GRID_SIZE = 400;
@@ -215,6 +216,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     const canvasPool = canvasPoolRef.current;
 
+    // Apply hue cycling if enabled (using performance.now() for smooth animation)
+    const currentVisualization = applyHueCycling(visualization, performance.now());
+
     // === 1. Render base trails ===
     // Hybrid approach: WebGL for trails (fast, smooth lavalamp effects)
     //                  CPU for agent pixels (precise positioning)
@@ -222,11 +226,11 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     if (USE_WEBGL && webglRendererRef.current) {
       // WebGL rendering for trails - perfect for lavalamp/schlieren effects
-      const webglCanvas = webglRendererRef.current.render(trails, visualization);
+      const webglCanvas = webglRendererRef.current.render(trails, currentVisualization);
       ctx.drawImage(webglCanvas, 0, 0);
     } else {
       // CPU rendering (slower but visually accurate)
-      ctx.fillStyle = `rgb(${visualization.colorBg.r}, ${visualization.colorBg.g}, ${visualization.colorBg.b})`;
+      ctx.fillStyle = `rgb(${currentVisualization.colorBg.r}, ${currentVisualization.colorBg.g}, ${currentVisualization.colorBg.b})`;
       ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
       const imageData = ctx.createImageData(canvasWidth, canvasHeight);
@@ -248,58 +252,58 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
               const pixelIdx = (canvasY * canvasWidth + canvasX) * 4;
 
               // Initialize with background
-              data[pixelIdx] = visualization.colorBg.r;
-              data[pixelIdx + 1] = visualization.colorBg.g;
-              data[pixelIdx + 2] = visualization.colorBg.b;
+              data[pixelIdx] = currentVisualization.colorBg.r;
+              data[pixelIdx + 1] = currentVisualization.colorBg.g;
+              data[pixelIdx + 2] = currentVisualization.colorBg.b;
               data[pixelIdx + 3] = 255;
 
               // Apply blend mode
-              if (visualization.blendMode === 'additive') {
-                const tR = Math.min(1, redVal / visualization.trailIntensity);
-                const tG = Math.min(1, greenVal / visualization.trailIntensity);
-                const tB = Math.min(1, blueVal / visualization.trailIntensity);
+              if (currentVisualization.blendMode === 'additive') {
+                const tR = Math.min(1, redVal / currentVisualization.trailIntensity);
+                const tG = Math.min(1, greenVal / currentVisualization.trailIntensity);
+                const tB = Math.min(1, blueVal / currentVisualization.trailIntensity);
 
                 const totalIntensity = tR + tG + tB;
                 const normalizationFactor = totalIntensity > 1.5 ? (1.5 / totalIntensity) : 1.0;
-                const effectiveBrightness = visualization.brightness * normalizationFactor;
+                const effectiveBrightness = currentVisualization.brightness * normalizationFactor;
 
-                data[pixelIdx] += visualization.colorRed.r * tR * effectiveBrightness;
-                data[pixelIdx + 1] += visualization.colorRed.g * tR * effectiveBrightness;
-                data[pixelIdx + 2] += visualization.colorRed.b * tR * effectiveBrightness;
+                data[pixelIdx] += currentVisualization.colorRed.r * tR * effectiveBrightness;
+                data[pixelIdx + 1] += currentVisualization.colorRed.g * tR * effectiveBrightness;
+                data[pixelIdx + 2] += currentVisualization.colorRed.b * tR * effectiveBrightness;
 
-                data[pixelIdx] += visualization.colorGreen.r * tG * effectiveBrightness;
-                data[pixelIdx + 1] += visualization.colorGreen.g * tG * effectiveBrightness;
-                data[pixelIdx + 2] += visualization.colorGreen.b * tG * effectiveBrightness;
+                data[pixelIdx] += currentVisualization.colorGreen.r * tG * effectiveBrightness;
+                data[pixelIdx + 1] += currentVisualization.colorGreen.g * tG * effectiveBrightness;
+                data[pixelIdx + 2] += currentVisualization.colorGreen.b * tG * effectiveBrightness;
 
-                data[pixelIdx] += visualization.colorBlue.r * tB * effectiveBrightness;
-                data[pixelIdx + 1] += visualization.colorBlue.g * tB * effectiveBrightness;
-                data[pixelIdx + 2] += visualization.colorBlue.b * tB * effectiveBrightness;
+                data[pixelIdx] += currentVisualization.colorBlue.r * tB * effectiveBrightness;
+                data[pixelIdx + 1] += currentVisualization.colorBlue.g * tB * effectiveBrightness;
+                data[pixelIdx + 2] += currentVisualization.colorBlue.b * tB * effectiveBrightness;
 
-              } else if (visualization.blendMode === 'multiply' || visualization.blendMode === 'average') {
+              } else if (currentVisualization.blendMode === 'multiply' || currentVisualization.blendMode === 'average') {
                 const totalTrail = redVal + greenVal + blueVal;
                 if (totalTrail > 0) {
-                  const t = Math.min(1, totalTrail / visualization.trailIntensity);
-                  data[pixelIdx] = (visualization.colorRed.r * redVal + visualization.colorGreen.r * greenVal + visualization.colorBlue.r * blueVal) / totalTrail * t * visualization.brightness;
-                  data[pixelIdx + 1] = (visualization.colorRed.g * redVal + visualization.colorGreen.g * greenVal + visualization.colorBlue.g * blueVal) / totalTrail * t * visualization.brightness;
-                  data[pixelIdx + 2] = (visualization.colorRed.b * redVal + visualization.colorGreen.b * greenVal + visualization.colorBlue.b * blueVal) / totalTrail * t * visualization.brightness;
+                  const t = Math.min(1, totalTrail / currentVisualization.trailIntensity);
+                  data[pixelIdx] = (currentVisualization.colorRed.r * redVal + currentVisualization.colorGreen.r * greenVal + currentVisualization.colorBlue.r * blueVal) / totalTrail * t * currentVisualization.brightness;
+                  data[pixelIdx + 1] = (currentVisualization.colorRed.g * redVal + currentVisualization.colorGreen.g * greenVal + currentVisualization.colorBlue.g * blueVal) / totalTrail * t * currentVisualization.brightness;
+                  data[pixelIdx + 2] = (currentVisualization.colorRed.b * redVal + currentVisualization.colorGreen.b * greenVal + currentVisualization.colorBlue.b * blueVal) / totalTrail * t * currentVisualization.brightness;
                 }
 
-              } else if (visualization.blendMode === 'screen') {
-                const tR = Math.min(1, redVal / visualization.trailIntensity) * visualization.brightness;
-                const tG = Math.min(1, greenVal / visualization.trailIntensity) * visualization.brightness;
-                const tB = Math.min(1, blueVal / visualization.trailIntensity) * visualization.brightness;
+              } else if (currentVisualization.blendMode === 'screen') {
+                const tR = Math.min(1, redVal / currentVisualization.trailIntensity) * currentVisualization.brightness;
+                const tG = Math.min(1, greenVal / currentVisualization.trailIntensity) * currentVisualization.brightness;
+                const tB = Math.min(1, blueVal / currentVisualization.trailIntensity) * currentVisualization.brightness;
 
-                const r1 = visualization.colorRed.r * tR / 255;
-                const g1 = visualization.colorRed.g * tR / 255;
-                const b1 = visualization.colorRed.b * tR / 255;
+                const r1 = currentVisualization.colorRed.r * tR / 255;
+                const g1 = currentVisualization.colorRed.g * tR / 255;
+                const b1 = currentVisualization.colorRed.b * tR / 255;
 
-                const r2 = visualization.colorGreen.r * tG / 255;
-                const g2 = visualization.colorGreen.g * tG / 255;
-                const b2 = visualization.colorGreen.b * tG / 255;
+                const r2 = currentVisualization.colorGreen.r * tG / 255;
+                const g2 = currentVisualization.colorGreen.g * tG / 255;
+                const b2 = currentVisualization.colorGreen.b * tG / 255;
 
-                const r3 = visualization.colorBlue.r * tB / 255;
-                const g3 = visualization.colorBlue.g * tB / 255;
-                const b3 = visualization.colorBlue.b * tB / 255;
+                const r3 = currentVisualization.colorBlue.r * tB / 255;
+                const g3 = currentVisualization.colorBlue.g * tB / 255;
+                const b3 = currentVisualization.colorBlue.b * tB / 255;
 
                 data[pixelIdx] = 255 * (1 - (1 - r1) * (1 - r2) * (1 - r3));
                 data[pixelIdx + 1] = 255 * (1 - (1 - g1) * (1 - g2) * (1 - g3));
@@ -462,20 +466,20 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     }
 
     // === 10. Render agents (optional - Lab Mode) ===
-    // Controlled via visualization.showAgents and visualization.useTriangles
-    if (visualization.showAgents && visualization.brightness > 0.5) {
+    // Controlled via currentVisualization.showAgents and currentVisualization.useTriangles
+    if (currentVisualization.showAgents && currentVisualization.brightness > 0.5) {
       agents.forEach((agent) => {
         const x = agent.x * scaleX;
         const y = agent.y * scaleY;
 
         ctx.fillStyle =
           agent.type === 'red'
-            ? `rgb(${visualization.colorRed.r}, ${visualization.colorRed.g}, ${visualization.colorRed.b})`
+            ? `rgb(${currentVisualization.colorRed.r}, ${currentVisualization.colorRed.g}, ${currentVisualization.colorRed.b})`
             : agent.type === 'green'
-            ? `rgb(${visualization.colorGreen.r}, ${visualization.colorGreen.g}, ${visualization.colorGreen.b})`
-            : `rgb(${visualization.colorBlue.r}, ${visualization.colorBlue.g}, ${visualization.colorBlue.b})`;
+            ? `rgb(${currentVisualization.colorGreen.r}, ${currentVisualization.colorGreen.g}, ${currentVisualization.colorGreen.b})`
+            : `rgb(${currentVisualization.colorBlue.r}, ${currentVisualization.colorBlue.g}, ${currentVisualization.colorBlue.b})`;
 
-        if (visualization.useTriangles) {
+        if (currentVisualization.useTriangles) {
           // Draw directional triangle (points in movement direction)
           const size = 3;
           ctx.save();
