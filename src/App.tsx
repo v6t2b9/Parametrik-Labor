@@ -4,13 +4,15 @@ import { ControlBar } from './components/ControlBar';
 import { MatrixControlCenter } from './components/MatrixControlCenter';
 import { AudioSimulationBridge } from './components/AudioSimulationBridge';
 import { useSimulationStore } from './store/useSimulationStore';
+import { useAudioStore } from './store/useAudioStore';
 
 function App() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [canvasHeight, setCanvasHeight] = useState(800); // Track canvas height for sticky offset
   const fullscreenContainerRef = useRef<HTMLDivElement>(null);
-  const { ui, toggleControlPanel } = useSimulationStore();
+  const { ui, toggleControlPanel, toggleRunning } = useSimulationStore();
+  const { musicEnabled, inputMode, togglePlay } = useAudioStore();
 
   // Fullscreen handlers
   const enterFullscreen = async () => {
@@ -87,17 +89,29 @@ function App() {
     };
   }, []);
 
-  // ESC key handler for fallback fullscreen mode
+  // Keyboard handlers for fullscreen mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // ESC: Exit fullscreen
       if (e.key === 'Escape' && isFullscreen) {
         exitFullscreen();
+      }
+
+      // SPACEBAR: Toggle play/pause in fullscreen mode
+      if (e.key === ' ' && isFullscreen) {
+        e.preventDefault(); // Prevent page scroll
+        toggleRunning();
+
+        // Also toggle audio if music is enabled and using file input
+        if (musicEnabled && inputMode === 'file') {
+          togglePlay();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen]);
+  }, [isFullscreen, musicEnabled, inputMode, toggleRunning, togglePlay]);
 
   // Mobile detection and canvas height tracking
   useEffect(() => {
