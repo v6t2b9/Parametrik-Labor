@@ -30,6 +30,9 @@ interface AudioStore {
   // Music reactivity
   musicEnabled: boolean;
 
+  // Adaptive normalization (Auto-Harmonizer)
+  adaptiveNormalizationEnabled: boolean;
+
   // Video export
   isExporting: boolean;
   exportProgress: number;
@@ -47,6 +50,10 @@ interface AudioStore {
   // Actions - Music Reactivity
   toggleMusic: () => void;
   setMusicEnabled: (enabled: boolean) => void;
+
+  // Actions - Adaptive Normalization
+  toggleAdaptiveNormalization: () => void;
+  setAdaptiveNormalization: (enabled: boolean) => void;
 
   // Actions - Mappings
   updateMappings: (mappings: Partial<MusicMappingParameters>) => void;
@@ -78,6 +85,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   currentPresetKey: 'default',
 
   musicEnabled: false,
+
+  adaptiveNormalizationEnabled: false,
 
   isExporting: false,
   exportProgress: 0,
@@ -203,6 +212,29 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   // Set music enabled
   setMusicEnabled: (enabled: boolean) => {
     set({ musicEnabled: enabled });
+  },
+
+  // Toggle adaptive normalization
+  toggleAdaptiveNormalization: () => {
+    const newValue = !get().adaptiveNormalizationEnabled;
+    const { analyzer } = get();
+
+    if (analyzer) {
+      analyzer.setAdaptiveNormalization(newValue);
+    }
+
+    set({ adaptiveNormalizationEnabled: newValue });
+  },
+
+  // Set adaptive normalization
+  setAdaptiveNormalization: (enabled: boolean) => {
+    const { analyzer } = get();
+
+    if (analyzer) {
+      analyzer.setAdaptiveNormalization(enabled);
+    }
+
+    set({ adaptiveNormalizationEnabled: enabled });
   },
 
   // Update mappings

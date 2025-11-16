@@ -21,12 +21,14 @@ export function AudioOikosPanel() {
     audioFileName,
     currentAnalysis,
     musicEnabled,
+    adaptiveNormalizationEnabled,
     loadAudioFile,
     startMicrophone,
     togglePlay,
     stop,
     setLoop,
     toggleMusic,
+    toggleAdaptiveNormalization,
   } = useAudioStore();
 
   // Audio mappings from SimulationStore (species-aware)
@@ -247,6 +249,39 @@ export function AudioOikosPanel() {
       </div>
 
       <div style={styles.divider} />
+
+      {/* Auto-Harmonizer (Adaptive Normalization) */}
+      {musicEnabled && (
+        <>
+          <div style={styles.section}>
+            <div style={styles.toggleRow}>
+              <h4 style={styles.sectionTitle}>🎛️ Auto-Harmonizer</h4>
+              <button
+                onClick={toggleAdaptiveNormalization}
+                style={{
+                  ...styles.toggleButton,
+                  ...(adaptiveNormalizationEnabled ? styles.toggleButtonActive : {}),
+                }}
+              >
+                {adaptiveNormalizationEnabled ? 'ON' : 'OFF'}
+              </button>
+            </div>
+
+            <p style={styles.toggleDescription}>
+              {adaptiveNormalizationEnabled
+                ? 'Learning musical range to maximize contrast (0-1 normalization)'
+                : 'Enable adaptive normalization for stronger visual response'}
+            </p>
+
+            <p style={styles.autoHarmonizerHint}>
+              💡 Auto-Harmonizer learns your music's actual range (e.g., 1500-3000 Hz instead of 0-8000 Hz)
+              and normalizes features to maximize visual contrast. Especially effective for quiet or narrow-range music!
+            </p>
+          </div>
+
+          <div style={styles.divider} />
+        </>
+      )}
 
       {/* Live Analysis */}
       {musicEnabled && (
@@ -578,6 +613,17 @@ const styles = {
     fontSize: '10px',
     color: '#a0a0b0',
     lineHeight: 1.4,
+  } as React.CSSProperties,
+
+  autoHarmonizerHint: {
+    fontSize: '9px',
+    color: '#7a7a8a',
+    lineHeight: 1.5,
+    marginTop: '8px',
+    padding: '8px',
+    backgroundColor: '#0a0a15',
+    borderRadius: '4px',
+    borderLeft: '2px solid #7d5dbd',
   } as React.CSSProperties,
 
   // Live Analysis
