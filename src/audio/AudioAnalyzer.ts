@@ -23,6 +23,7 @@ import {
   calculateStability,
   estimateBPM,
 } from './MusicPsychology';
+import { AdaptiveNormalizer } from './AdaptiveNormalizer';
 
 export class AudioAnalyzer {
   private audioContext: AudioContext | null = null;
@@ -52,6 +53,10 @@ export class AudioAnalyzer {
   // Mapping parameters for adaptive analysis
   private mappingParams: MusicMappingParameters | null = null;
 
+  // Adaptive normalization (Auto-Harmonizer)
+  private adaptiveNormalizer: AdaptiveNormalizer;
+  private useAdaptiveNormalization: boolean = false;
+
   constructor(fftSize: number = 2048) {
     this.fftSize = fftSize;
     this.frequencyData = new Uint8Array(fftSize / 2);
@@ -59,6 +64,13 @@ export class AudioAnalyzer {
 
     this.beatDetector = new BeatDetector();
     this.loudnessEMA = new ExponentialMovingAverage(0.1);
+
+    // Initialize adaptive normalizer (10 seconds window, 2% smoothing)
+    this.adaptiveNormalizer = new AdaptiveNormalizer({
+      windowSize: 600, // 10 seconds at 60fps
+      smoothingFactor: 0.02,
+      percentileRange: [5, 95], // Ignore extreme outliers
+    });
   }
 
   /**
@@ -307,15 +319,38 @@ export class AudioAnalyzer {
     const crescendo = loudness > this.lastLoudness * 1.1 && loudness > 0.2;
     this.lastLoudness = loudness;
 
+    // Apply adaptive normalization if enabled
+    let normalizedBassEnergy = bassEnergy;
+    let normalizedMidEnergy = midEnergy;
+    let normalizedHighEnergy = highEnergy;
+    let normalizedCentroid = centroid;
+    let normalizedRolloff = rolloff;
+    let normalizedFlatness = flatness;
+    let normalizedZcr = zcr;
+    let normalizedBeatStrength = beatData.beatStrength;
+    let normalizedLoudness = loudness;
+
+    if (this.useAdaptiveNormalization) {
+      normalizedBassEnergy = this.adaptiveNormalizer.normalize('bassEnergy', bassEnergy);
+      normalizedMidEnergy = this.adaptiveNormalizer.normalize('midEnergy', midEnergy);
+      normalizedHighEnergy = this.adaptiveNormalizer.normalize('highEnergy', highEnergy);
+      normalizedCentroid = this.adaptiveNormalizer.normalize('spectralCentroid', centroid);
+      normalizedRolloff = this.adaptiveNormalizer.normalize('spectralRolloff', rolloff);
+      normalizedFlatness = this.adaptiveNormalizer.normalize('spectralFlatness', flatness);
+      normalizedZcr = this.adaptiveNormalizer.normalize('zcr', zcr);
+      normalizedBeatStrength = this.adaptiveNormalizer.normalize('beatStrength', beatData.beatStrength);
+      normalizedLoudness = this.adaptiveNormalizer.normalize('loudness', loudness);
+    }
+
     return {
       spectral: {
-        bassEnergy,
-        midEnergy,
-        highEnergy,
-        centroid,
-        rolloff,
-        flatness,
-        zcr,
+        bassEnergy: normalizedBassEnergy,
+        midEnergy: normalizedMidEnergy,
+        highEnergy: normalizedHighEnergy,
+        centroid: normalizedCentroid,
+        rolloff: normalizedRolloff,
+        flatness: normalizedFlatness,
+        zcr: normalizedZcr,
       },
       tempo: {
         bpm,
@@ -331,11 +366,11 @@ export class AudioAnalyzer {
       },
       rhythm: {
         beat: beatData.beat,
-        beatStrength: beatData.beatStrength,
+        beatStrength: normalizedBeatStrength,
         lastBeatTime: beatData.lastBeatTime,
       },
       dynamics: {
-        loudness,
+        loudness: normalizedLoudness,
         crescendo,
       },
       timestamp,
@@ -450,5 +485,50 @@ export class AudioAnalyzer {
       return this.audioElement.duration || 0;
     }
     return 0;
+  }
+
+  // Adaptive Normalization (Auto-Harmonizer) Controls
+
+  /**
+   * Enable/disable adaptive normalization
+   */
+  setAdaptiveNormalization(enabled: boolean): void {
+    this.useAdaptiveNormalization = enabled;
+    if (enabled) {
+      // Reset normalizer when enabling to start fresh
+      this.adaptiveNormalizer.reset();
+    }
+  }
+
+  /**
+   * Get adaptive normalization status
+   */
+  getAdaptiveNormalization(): boolean {
+    return this.useAdaptiveNormalization;
+  }
+
+  /**
+   * Get the adaptive normalizer instance for UI/debugging
+   */
+  getAdaptiveNormalizer(): AdaptiveNormalizer {
+    return this.adaptiveNormalizer;
+  }
+
+  /**
+   * Reset adaptive normalizer (e.g., when new song starts)
+   */
+  resetAdaptiveNormalizer(): void {
+    this.adaptiveNormalizer.reset();
+  }
+
+  /**
+   * Configure adaptive normalizer
+   */
+  configureAdaptiveNormalizer(config: {
+    windowSize?: number;
+    smoothingFactor?: number;
+    percentileRange?: [number, number];
+  }): void {
+    this.adaptiveNormalizer.setConfig(config);
   }
 }
