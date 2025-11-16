@@ -317,6 +317,22 @@ export function AudioOikosPanel() {
               }
               description="How strongly BPM affects agent speed"
             />
+
+            <div style={styles.curveSelector}>
+              <label style={styles.curveLabel}>Curve Type:</label>
+              <select
+                value={mappings.tempo.tempoToSpeedCurve}
+                onChange={(e) =>
+                  updateAudioParams({ tempo: { ...mappings.tempo, tempoToSpeedCurve: e.target.value as any } })
+                }
+                style={styles.curveDropdown}
+              >
+                <option value="linear">Linear</option>
+                <option value="exponential">Exponential</option>
+                <option value="logarithmic">Logarithmic</option>
+                <option value="sigmoid">Sigmoid</option>
+              </select>
+            </div>
           </div>
 
           {/* Spectral - Bass */}
@@ -345,6 +361,38 @@ export function AudioOikosPanel() {
               }
               description="Bass increases trail deposition"
             />
+          </div>
+
+          {/* Harmony */}
+          <div style={styles.mappingGroup}>
+            <h5 style={styles.groupTitle}>Harmony → Behavior</h5>
+            <ParameterSlider
+              label="Tension → Randomness"
+              value={mappings.harmony.tensionToRandomnessSensitivity}
+              min={0}
+              max={2}
+              step={0.1}
+              onChange={(value) =>
+                updateAudioParams({ harmony: { ...mappings.harmony, tensionToRandomnessSensitivity: value } })
+              }
+              description="Dissonance increases erratic movement"
+            />
+
+            <div style={styles.curveSelector}>
+              <label style={styles.curveLabel}>Curve Type:</label>
+              <select
+                value={mappings.harmony.tensionToRandomnessCurve}
+                onChange={(e) =>
+                  updateAudioParams({ harmony: { ...mappings.harmony, tensionToRandomnessCurve: e.target.value as any } })
+                }
+                style={styles.curveDropdown}
+              >
+                <option value="linear">Linear</option>
+                <option value="exponential">Exponential</option>
+                <option value="logarithmic">Logarithmic</option>
+                <option value="sigmoid">Sigmoid</option>
+              </select>
+            </div>
           </div>
 
           {/* Rhythm */}
@@ -665,5 +713,31 @@ const styles = {
     color: '#e0e0e0',
     marginBottom: '8px',
     cursor: 'pointer',
+  } as React.CSSProperties,
+
+  // Curve Selector
+  curveSelector: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginTop: '8px',
+  } as React.CSSProperties,
+
+  curveLabel: {
+    fontSize: '10px',
+    color: '#a0a0b0',
+    minWidth: '80px',
+  } as React.CSSProperties,
+
+  curveDropdown: {
+    flex: 1,
+    padding: '6px 8px',
+    backgroundColor: '#0a0a15',
+    border: '1px solid #2a2b3a',
+    borderRadius: '4px',
+    color: '#e0e0e0',
+    fontSize: '11px',
+    cursor: 'pointer',
+    outline: 'none',
   } as React.CSSProperties,
 };

@@ -8,6 +8,11 @@ import {
   calculateRMS,
   calculateRoughness,
   getFrequencyRangeEnergy,
+  calculateSpectralCentroid,
+  calculateSpectralRolloff,
+  calculateSpectralFlatness,
+  calculateZeroCrossingRate,
+  calculateChroma,
   ExponentialMovingAverage,
 } from './utils';
 import { BeatDetector } from './BeatDetector';
@@ -249,6 +254,12 @@ export class AudioAnalyzer {
       this.fftSize
     );
 
+    // Advanced spectral features
+    const centroid = calculateSpectralCentroid(this.frequencyData, sampleRate);
+    const rolloff = calculateSpectralRolloff(this.frequencyData, sampleRate);
+    const flatness = calculateSpectralFlatness(this.frequencyData);
+    const zcr = calculateZeroCrossingRate(this.timeData);
+
     // 2. Beat Detection
     const beatData = this.beatDetector.detect(bassEnergy, timestamp * 1000);
 
@@ -276,6 +287,9 @@ export class AudioAnalyzer {
     const dissonance = roughness;
     const consonance = 1 - roughness;
 
+    // Chroma features (pitch class distribution)
+    const chroma = calculateChroma(this.frequencyData, sampleRate);
+
     // 5. Music Psychology Dimensions
     const optimalBPM = this.mappingParams?.tempo.optimalBPM ?? 106;
     const valenceRange = this.mappingParams?.tempo.valenceRange ?? 0.5;
@@ -298,6 +312,10 @@ export class AudioAnalyzer {
         bassEnergy,
         midEnergy,
         highEnergy,
+        centroid,
+        rolloff,
+        flatness,
+        zcr,
       },
       tempo: {
         bpm,
@@ -309,6 +327,7 @@ export class AudioAnalyzer {
         dissonance,
         tension,
         stability,
+        chroma,
       },
       rhythm: {
         beat: beatData.beat,
@@ -332,6 +351,10 @@ export class AudioAnalyzer {
         bassEnergy: 0,
         midEnergy: 0,
         highEnergy: 0,
+        centroid: 0,
+        rolloff: 0,
+        flatness: 0,
+        zcr: 0,
       },
       tempo: {
         bpm: 106,
@@ -343,6 +366,7 @@ export class AudioAnalyzer {
         dissonance: 0,
         tension: 0,
         stability: 1,
+        chroma: new Array(12).fill(0),
       },
       rhythm: {
         beat: false,
