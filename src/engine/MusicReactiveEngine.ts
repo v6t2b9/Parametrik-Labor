@@ -427,8 +427,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
   /**
    * Apply modulation to individual agent
-   * This modulates the agent's behavior for the next frame by directly affecting
-   * movement speed, turning, and trail deposition
+   * Music creates SHORT-LIVED IMPULSES that decay, not permanent position changes
    */
   private applyModulationToAgent(
     agent: Agent,
@@ -436,64 +435,54 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     music: MusicAnalysis,
     mappings: MusicMappingParameters
   ): void {
-    // Apply speed modulation by adjusting velocity (more aggressive)
-    if (modulation.moveSpeedMultiplier !== 1.0) {
-      const speedFactor = modulation.moveSpeedMultiplier;
-      // Increase movement based on music (scaled up for visibility)
-      const movementAmount = (speedFactor - 1.0) * 2.0; // Doubled for visibility
-      const dx = Math.cos(agent.angle) * movementAmount;
-      const dy = Math.sin(agent.angle) * movementAmount;
-
-      agent.x += dx;
-      agent.y += dy;
-
-      // Wrap around edges
-      const gridSize = this.getGridSize();
-      if (agent.x < 0) agent.x += gridSize;
-      if (agent.x >= gridSize) agent.x -= gridSize;
-      if (agent.y < 0) agent.y += gridSize;
-      if (agent.y >= gridSize) agent.y -= gridSize;
+    // Initialize music-reactive state if needed
+    if ((agent as any).__musicVelocityBoost === undefined) {
+      (agent as any).__musicVelocityBoost = 0;
+      (agent as any).__musicAttractionPulse = 0;
+      (agent as any).__musicRepulsionPulse = 0;
     }
 
-    // Apply turn randomness by adding random angle adjustments (more visible)
-    if (modulation.turnRandomnessMultiplier !== 1.0) {
-      const randomness = (modulation.turnRandomnessMultiplier - 1.0) * 0.5; // Increased from 0.2
-      agent.angle += (Math.random() - 0.5) * randomness;
-    }
+    // DECAY existing impulses (exponential decay)
+    const decayRate = 0.85; // Faster decay for snappy response
+    (agent as any).__musicVelocityBoost *= decayRate;
+    (agent as any).__musicAttractionPulse *= decayRate;
+    (agent as any).__musicRepulsionPulse *= decayRate;
 
-    // Apply bass energy directly to movement (very visible)
-    if (music.spectral.bassEnergy > 0.3) {
-      const bassPulse = music.spectral.bassEnergy * 1.5;
-      const dx = Math.cos(agent.angle) * bassPulse;
-      const dy = Math.sin(agent.angle) * bassPulse;
-
-      agent.x += dx;
-      agent.y += dy;
-
-      // Wrap around edges
-      const gridSize = this.getGridSize();
-      if (agent.x < 0) agent.x += gridSize;
-      if (agent.x >= gridSize) agent.x -= gridSize;
-      if (agent.y < 0) agent.y += gridSize;
-      if (agent.y >= gridSize) agent.y -= gridSize;
-    }
-
-    // Store modulation values on agent for parent class to potentially use
-    (agent as any).__musicSpeedMult = modulation.moveSpeedMultiplier;
-    (agent as any).__musicDepositMult = modulation.depositRateMultiplier;
-    (agent as any).__musicTurnMult = modulation.turnSpeedMultiplier;
-
-    // BEAT IMPULSE: Very strong visible boost on beat
+    // BEAT IMPULSE: Create short velocity burst on beat
     if (
       mappings.rhythm.beatEnabled &&
       music.rhythm.beat &&
       mappings.rhythm.beatImpulseStrength > 0
     ) {
-      const impulse = mappings.rhythm.beatImpulseStrength * music.rhythm.beatStrength;
-      const speedBoost = impulse * 5.0; // Increased from 2.0 for maximum visibility
+      const impulseStrength = mappings.rhythm.beatImpulseStrength * music.rhythm.beatStrength;
 
-      const dx = Math.cos(agent.angle) * speedBoost;
-      const dy = Math.sin(agent.angle) * speedBoost;
+      // Add to velocity boost (doesn't move position, just increases next movement)
+      (agent as any).__musicVelocityBoost += impulseStrength * 3.0;
+
+      // BEAT → ATTRACTION/REPULSION PULSE (makes trails pulse like veins!)
+      // High energy beats = stronger attraction pulse
+      const energyLevel = (music.spectral.bassEnergy + music.dynamics.loudness) / 2;
+
+      if (energyLevel > 0.5) {
+        // High energy = attraction pulse (agents drawn together, trails thicken)
+        (agent as any).__musicAttractionPulse += energyLevel * 2.0;
+      } else {
+        // Low energy = subtle repulsion (trails spread slightly)
+        (agent as any).__musicRepulsionPulse += (1.0 - energyLevel) * 0.5;
+      }
+    }
+
+    // BASS ENERGY: Direct velocity push (continuous while bass is present)
+    if (music.spectral.bassEnergy > 0.4) {
+      const bassPush = (music.spectral.bassEnergy - 0.4) * 2.0; // Threshold at 0.4
+      (agent as any).__musicVelocityBoost += bassPush;
+    }
+
+    // APPLY VELOCITY BOOST (temporary speed increase)
+    const currentBoost = (agent as any).__musicVelocityBoost;
+    if (currentBoost > 0.01) {
+      const dx = Math.cos(agent.angle) * currentBoost;
+      const dy = Math.sin(agent.angle) * currentBoost;
 
       agent.x += dx;
       agent.y += dy;
@@ -505,6 +494,39 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       if (agent.y < 0) agent.y += gridSize;
       if (agent.y >= gridSize) agent.y -= gridSize;
     }
+
+    // CONTINUOUS MODULATION (affects base behavior)
+
+    // Apply turn randomness (jitter from high frequencies)
+    if (modulation.turnRandomnessMultiplier !== 1.0) {
+      const randomness = (modulation.turnRandomnessMultiplier - 1.0) * 0.3;
+      agent.angle += (Math.random() - 0.5) * randomness;
+    }
+
+    // Apply speed modulation from tempo/arousal (subtle continuous adjustment)
+    if (modulation.moveSpeedMultiplier !== 1.0) {
+      const speedAdjust = (modulation.moveSpeedMultiplier - 1.0) * 0.5;
+      const dx = Math.cos(agent.angle) * speedAdjust;
+      const dy = Math.sin(agent.angle) * speedAdjust;
+
+      agent.x += dx;
+      agent.y += dy;
+
+      const gridSize = this.getGridSize();
+      if (agent.x < 0) agent.x += gridSize;
+      if (agent.x >= gridSize) agent.x -= gridSize;
+      if (agent.y < 0) agent.y += gridSize;
+      if (agent.y >= gridSize) agent.y -= gridSize;
+    }
+
+    // Store ALL modulation values for parent class (including pulses!)
+    (agent as any).__musicSpeedMult = modulation.moveSpeedMultiplier + currentBoost;
+    (agent as any).__musicDepositMult = modulation.depositRateMultiplier;
+    (agent as any).__musicTurnMult = modulation.turnSpeedMultiplier;
+
+    // Store attraction/repulsion pulses for parent to use in trail-following
+    (agent as any).__musicAttractionMult = 1.0 + (agent as any).__musicAttractionPulse;
+    (agent as any).__musicRepulsionMult = 1.0 + (agent as any).__musicRepulsionPulse;
   }
 
   /**
