@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/v6t2b9/Parametrik-Labor/blob/main/README.md
+    about: Read the full documentation
+  - name: Contributing Guidelines
+    url: https://github.com/v6t2b9/Parametrik-Labor/blob/main/CONTRIBUTING.md
+    about: Learn how to contribute to the project
+  - name: Live Demo
+    url: https://parametrik-labor.vercel.app
+    about: Try the live demo of the application

@@ -49,6 +49,13 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ✅ **Screenshot Capture** - One-click PNG export of current canvas state
 ✅ **Smart Recording Workflow** - Automatic capture with real-time progress indicators
 
+#### Progressive Web App (PWA)
+✅ **Installable App** - Install on desktop and mobile devices
+✅ **Offline Support** - Works without internet after first load
+✅ **Auto-Updates** - Service worker keeps app up-to-date
+✅ **Native-Like Experience** - Standalone window, app icons, splash screen
+✅ **Self-Hosting Ready** - Configurable base path for flexible deployment
+
 #### UX & Interface
 ✅ **Sticky Peek Canvas (Desktop)** - Canvas partially visible at top while scrolling through parameters
 ✅ **Vertical Layout** - Natural top-to-bottom flow with sticky visual feedback
@@ -141,14 +148,50 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 
 ## 📚 Documentation
 
+### User Documentation
 - **[Full Documentation](./docs/README.md)** - Complete guide (600+ lines)
 - **[Theoretical Framework](./docs/parametrics_paper_draft.md)** - Parametrics theory
 - **[Parameter Matrix](./docs/Parameter_Oikos_Matrix.md)** - Oikos organization
 - **[Experiments](./docs/Experimentelle_Sektion_Index.md)** - Validation experiments
 
+### Developer Documentation
+- **[Development Guide](./docs/DEVELOPMENT.md)** - Setup, architecture, and development workflow
+- **[Deployment Guide](./docs/DEPLOYMENT.md)** - Build, deploy, and PWA configuration
+- **[Self-Hosting Guide](./SELF_HOSTING.md)** - Self-hosting with PWA support
+- **[Contributing Guidelines](./CONTRIBUTING.md)** - How to contribute to the project
+- **[Architecture Overview](./docs/ARCHITECTURE.md)** - System architecture and design patterns
+
 ---
 
 ## 🎯 Usage
+
+### Installing as PWA
+
+The app can be installed as a Progressive Web App for a native-like experience:
+
+**Desktop (Chrome/Edge/Brave):**
+1. Visit the live demo or your deployed instance
+2. Look for the install icon (⊕) in the address bar
+3. Click "Install" to add to your desktop
+4. Launch from your app menu or desktop
+
+**Mobile (iOS Safari):**
+1. Open the app in Safari
+2. Tap the Share button
+3. Select "Add to Home Screen"
+4. Tap "Add"
+
+**Mobile (Android Chrome):**
+1. Open the app in Chrome
+2. Tap the three dots menu
+3. Select "Install app" or "Add to Home Screen"
+
+**Benefits:**
+- Standalone window without browser UI
+- Offline access after first load
+- Faster loading with cached resources
+- App icon in your launcher/dock
+- Automatic updates in background
 
 ### Basic Workflow
 

@@ -1,0 +1,156 @@
+name: Bug Report
+description: Report a bug or issue with Parametrik-Labor
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this bug! Please fill out the information below to help us investigate.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what the bug is.
+      placeholder: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe the expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what actually happened
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots or GIFs to help explain the problem.
+      placeholder: Paste or drag images here
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: Which browser are you using?
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Other (please specify in Additional Context)
+    validations:
+      required: true
+
+  - type: input
+    id: browser-version
+    attributes:
+      label: Browser Version
+      description: What version of the browser are you using?
+      placeholder: e.g., 120.0.0.0
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: Which OS are you using?
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - iOS
+        - Android
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device Type
+      description: What type of device are you using?
+      options:
+        - Desktop
+        - Laptop
+        - Tablet
+        - Mobile Phone
+    validations:
+      required: true
+
+  - type: input
+    id: screen-resolution
+    attributes:
+      label: Screen Resolution
+      description: What is your screen resolution?
+      placeholder: e.g., 1920x1080
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: Console Errors
+      description: Any errors in the browser console? (Right-click → Inspect → Console tab)
+      placeholder: Paste console errors here
+      render: shell
+
+  - type: dropdown
+    id: model
+    attributes:
+      label: Which Model?
+      description: Which simulation model were you using when the bug occurred?
+      options:
+        - M1 (Classical)
+        - M2 (Context-Switching)
+        - M3 (Quantum-Inspired)
+        - Not applicable
+
+  - type: textarea
+    id: preset
+    attributes:
+      label: Preset or Parameters
+      description: Were you using a preset or custom parameters?
+      placeholder: e.g., "Plasma Dream preset" or "Custom with 10000 agents"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context about the problem here.
+      placeholder: Any additional information that might be helpful
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have tested this in the latest version
+          required: true
+        - label: I have checked the browser console for errors
+          required: true
