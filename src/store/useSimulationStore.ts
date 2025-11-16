@@ -17,6 +17,7 @@ import type {
   ModelParams,
   AspectRatio,
 } from '../types/index.js';
+import type { MusicMappingParameters } from '../types/musicMappings';
 import { defaultParameters } from '../presets';
 import { MusicReactiveEngine } from '../engine/MusicReactiveEngine';
 import { exportPresetAsJSON, importPresetFromJSON } from '../utils/presetIO';
@@ -44,6 +45,10 @@ export function resolveSpeciesParams(
     resonance: {
       ...params.universal.resonance,
       ...(speciesOverride.resonance || {}),
+    },
+    audio: {
+      ...params.universal.audio,
+      ...(speciesOverride.audio || {}),
     },
   };
 }
@@ -123,17 +128,20 @@ interface SimulationStore {
   updateUniversalSemioticParams: (params: Partial<SemioticOikosParams>) => void;
   updateUniversalTemporalParams: (params: Partial<SpeciesTemporalParams>) => void;
   updateUniversalResonanceParams: (params: Partial<ResonanceOikosParams>) => void;
+  updateUniversalAudioParams: (params: Partial<MusicMappingParameters>) => void;
 
   updateSpeciesPhysicalParams: (species: AgentType, params: Partial<PhysicalOikosParams>) => void;
   updateSpeciesSemioticParams: (species: AgentType, params: Partial<SemioticOikosParams>) => void;
   updateSpeciesTemporalParams: (species: AgentType, params: Partial<SpeciesTemporalParams>) => void;
   updateSpeciesResonanceParams: (species: AgentType, params: Partial<ResonanceOikosParams>) => void;
+  updateSpeciesAudioParams: (species: AgentType, params: Partial<MusicMappingParameters>) => void;
 
   // Context-aware updates (based on current activeSpeciesScope)
   updatePhysicalParams: (params: Partial<PhysicalOikosParams>) => void;
   updateSemioticParams: (params: Partial<SemioticOikosParams>) => void;
   updateTemporalParams: (params: Partial<SpeciesTemporalParams>) => void;
   updateResonanceParams: (params: Partial<ResonanceOikosParams>) => void;
+  updateAudioParams: (params: Partial<MusicMappingParameters>) => void;
 
   // Global updates
   updateGlobalTemporalParams: (params: Partial<AllParameters['globalTemporal']>) => void;
@@ -222,6 +230,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
           semiotic: { ...currentParams.universal.semiotic, ...(params.universal?.semiotic || {}) },
           temporal: { ...currentParams.universal.temporal, ...(params.universal?.temporal || {}) },
           resonance: { ...currentParams.universal.resonance, ...(params.universal?.resonance || {}) },
+          audio: { ...currentParams.universal.audio, ...(params.universal?.audio || {}) },
         },
         species: {
           red: {
@@ -229,18 +238,21 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
             semiotic: { ...currentParams.species.red.semiotic, ...(params.species?.red?.semiotic || {}) },
             temporal: { ...currentParams.species.red.temporal, ...(params.species?.red?.temporal || {}) },
             resonance: { ...currentParams.species.red.resonance, ...(params.species?.red?.resonance || {}) },
+            audio: { ...currentParams.species.red.audio, ...(params.species?.red?.audio || {}) },
           },
           green: {
             physical: { ...currentParams.species.green.physical, ...(params.species?.green?.physical || {}) },
             semiotic: { ...currentParams.species.green.semiotic, ...(params.species?.green?.semiotic || {}) },
             temporal: { ...currentParams.species.green.temporal, ...(params.species?.green?.temporal || {}) },
             resonance: { ...currentParams.species.green.resonance, ...(params.species?.green?.resonance || {}) },
+            audio: { ...currentParams.species.green.audio, ...(params.species?.green?.audio || {}) },
           },
           blue: {
             physical: { ...currentParams.species.blue.physical, ...(params.species?.blue?.physical || {}) },
             semiotic: { ...currentParams.species.blue.semiotic, ...(params.species?.blue?.semiotic || {}) },
             temporal: { ...currentParams.species.blue.temporal, ...(params.species?.blue?.temporal || {}) },
             resonance: { ...currentParams.species.blue.resonance, ...(params.species?.blue?.resonance || {}) },
+            audio: { ...currentParams.species.blue.audio, ...(params.species?.blue?.audio || {}) },
           },
         },
         globalTemporal: { ...currentParams.globalTemporal, ...(params.globalTemporal || {}) },
@@ -310,6 +322,16 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       });
     },
 
+    updateUniversalAudioParams: (params) => {
+      const current = get().parameters;
+      get().setParameters({
+        universal: {
+          ...current.universal,
+          audio: { ...current.universal.audio, ...params },
+        },
+      });
+    },
+
     // Species-specific parameter updates
     updateSpeciesPhysicalParams: (species, params) => {
       const current = get().parameters;
@@ -367,6 +389,20 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       });
     },
 
+    updateSpeciesAudioParams: (species, params) => {
+      const current = get().parameters;
+      const speciesParams = current.species[species];
+      get().setParameters({
+        species: {
+          ...current.species,
+          [species]: {
+            ...speciesParams,
+            audio: { ...speciesParams.audio, ...params },
+          },
+        },
+      });
+    },
+
     // Context-aware updates (based on activeSpeciesScope)
     updatePhysicalParams: (params) => {
       const { ui } = get();
@@ -401,6 +437,15 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         get().updateUniversalResonanceParams(params);
       } else {
         get().updateSpeciesResonanceParams(ui.activeSpeciesScope as AgentType, params);
+      }
+    },
+
+    updateAudioParams: (params) => {
+      const { ui } = get();
+      if (ui.activeSpeciesScope === 'universal') {
+        get().updateUniversalAudioParams(params);
+      } else {
+        get().updateSpeciesAudioParams(ui.activeSpeciesScope as AgentType, params);
       }
     },
 

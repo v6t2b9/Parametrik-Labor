@@ -65,7 +65,7 @@ export function MatrixControlCenter() {
   // For species-specific tabs, filter out presets and global tabs
   const availableOikosTabs = ui.activeSpeciesScope === 'universal'
     ? OIKOS_TABS
-    : OIKOS_TABS.filter(t => !['presets', 'model', 'audio', 'visuals', 'performance'].includes(t.id));
+    : OIKOS_TABS.filter(t => !['presets', 'model', 'visuals', 'performance'].includes(t.id));
 
   return (
     <div style={styles.container}>
@@ -84,7 +84,7 @@ export function MatrixControlCenter() {
               onClick={() => {
                 setActiveSpeciesScope(tab.id);
                 // Switch to appropriate tab if current is not available
-                if (tab.id !== 'universal' && ['presets', 'model', 'audio', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
+                if (tab.id !== 'universal' && ['presets', 'model', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
                   setActiveOikosTab('physical');
                 }
               }}

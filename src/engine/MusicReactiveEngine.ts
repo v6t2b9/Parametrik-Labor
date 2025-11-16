@@ -4,7 +4,8 @@
  */
 
 import { QuantumStigmergyEngine } from './QuantumStigmergyEngine';
-import type { Agent } from '../types/index';
+import type { Agent, AgentType, AllParameters } from '../types/index';
+import { resolveSpeciesParams } from '../store/useSimulationStore';
 import type {
   MusicAnalysis,
   MusicMappingParameters,
@@ -13,15 +14,25 @@ import type {
 import { applyCurve, clamp } from '../audio/utils';
 
 export class MusicReactiveEngine extends QuantumStigmergyEngine {
-  private musicMappings: MusicMappingParameters | null = null;
+  // Species-specific music mappings (resolved from AllParameters)
+  private musicMappingsRed: MusicMappingParameters | null = null;
+  private musicMappingsGreen: MusicMappingParameters | null = null;
+  private musicMappingsBlue: MusicMappingParameters | null = null;
+
   private currentMusicAnalysis: MusicAnalysis | null = null;
   private musicEnabled: boolean = false;
 
   /**
-   * Set music mapping parameters
+   * Override setParameters to extract species-specific audio mappings
    */
-  setMusicMappings(mappings: MusicMappingParameters): void {
-    this.musicMappings = mappings;
+  public setParameters(params: AllParameters): void {
+    // Call parent
+    super.setParameters(params);
+
+    // Extract species-specific audio mappings
+    this.musicMappingsRed = resolveSpeciesParams(params, 'red').audio;
+    this.musicMappingsGreen = resolveSpeciesParams(params, 'green').audio;
+    this.musicMappingsBlue = resolveSpeciesParams(params, 'blue').audio;
   }
 
   /**
@@ -45,29 +56,46 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     // Call parent update
     super.update();
 
-    // Apply music modulation if enabled
-    if (this.musicEnabled && this.musicMappings && this.currentMusicAnalysis) {
+    // Apply music modulation if enabled (species-specific)
+    if (this.musicEnabled && this.currentMusicAnalysis) {
       this.applyMusicModulation();
     }
   }
 
   /**
-   * Apply music modulation to all agents
+   * Apply music modulation to all agents (species-specific)
    */
   private applyMusicModulation(): void {
-    if (!this.currentMusicAnalysis || !this.musicMappings) return;
+    if (!this.currentMusicAnalysis) return;
+    if (!this.musicMappingsRed || !this.musicMappingsGreen || !this.musicMappingsBlue) return;
 
     const agents = this.getAgents();
     const music = this.currentMusicAnalysis;
-    const mappings = this.musicMappings;
 
-    // Calculate behavior modulation from music
-    const modulation = this.calculateBehaviorModulation(music, mappings);
-
-    // Apply modulation to each agent
+    // Apply modulation to each agent with species-specific mappings
     // Note: We modulate by adjusting velocities and trail deposition
     // The core steering logic remains in the parent class
     for (const agent of agents) {
+      // Get species-specific mappings
+      let mappings: MusicMappingParameters;
+      switch (agent.type) {
+        case 'red':
+          mappings = this.musicMappingsRed;
+          break;
+        case 'green':
+          mappings = this.musicMappingsGreen;
+          break;
+        case 'blue':
+          mappings = this.musicMappingsBlue;
+          break;
+        default:
+          continue; // Skip unknown types
+      }
+
+      // Calculate behavior modulation from music for this species
+      const modulation = this.calculateBehaviorModulation(music, mappings);
+
+      // Apply modulation to agent
       this.applyModulationToAgent(agent, modulation, music, mappings);
     }
   }
