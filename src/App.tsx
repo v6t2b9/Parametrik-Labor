@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { CanvasPanel } from './components/CanvasPanel';
 import { ControlBar } from './components/ControlBar';
 import { MatrixControlCenter } from './components/MatrixControlCenter';
+import { AudioSimulationBridge } from './components/AudioSimulationBridge';
 import { useSimulationStore } from './store/useSimulationStore';
 
 function App() {
@@ -130,6 +131,9 @@ function App() {
 
   return (
     <>
+      {/* Audio-Simulation Bridge (invisible component) */}
+      <AudioSimulationBridge />
+
       {/* Fullscreen Container */}
       <div
         ref={fullscreenContainerRef}
