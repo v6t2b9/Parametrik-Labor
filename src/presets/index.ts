@@ -1,4 +1,5 @@
 import type { Preset, AllParameters } from '../types/index.js';
+import { DEFAULT_PRESET } from '../audio/presets';
 
 // Default Performance Parameters
 export const defaultPerformanceParams = {
@@ -34,13 +35,14 @@ export const defaultParameters: AllParameters = {
       repulsionStrength: -0.3,
       crossSpeciesInteraction: true,
     },
+    audio: DEFAULT_PRESET,
   },
 
   // Species-specific overrides (empty by default - all use universal)
   species: {
-    red: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
-    green: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
-    blue: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
+    red: { physical: {}, semiotic: {}, temporal: {}, resonance: {}, audio: {} },
+    green: { physical: {}, semiotic: {}, temporal: {}, resonance: {}, audio: {} },
+    blue: { physical: {}, semiotic: {}, temporal: {}, resonance: {}, audio: {} },
   },
 
   // Global temporal params
@@ -110,11 +112,12 @@ export function convertLegacyPreset(legacy: any): AllParameters {
         chaosStrength: legacy.temporal.chaosStrength,
       },
       resonance: legacy.resonance,
+      audio: DEFAULT_PRESET,
     },
     species: {
-      red: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
-      green: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
-      blue: { physical: {}, semiotic: {}, temporal: {}, resonance: {} },
+      red: { physical: {}, semiotic: {}, temporal: {}, resonance: {}, audio: {} },
+      green: { physical: {}, semiotic: {}, temporal: {}, resonance: {}, audio: {} },
+      blue: { physical: {}, semiotic: {}, temporal: {}, resonance: {}, audio: {} },
     },
     globalTemporal: {
       agentCount: legacy.temporal.agentCount,

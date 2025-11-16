@@ -120,6 +120,7 @@ export interface SpeciesParameterSet {
   semiotic?: Partial<SemioticOikosParams>;
   temporal?: Partial<SpeciesTemporalParams>;
   resonance?: Partial<ResonanceOikosParams>;
+  audio?: Partial<import('./musicMappings').MusicMappingParameters>;
 }
 
 // Universal parameter set (complete, serves as fallback)
@@ -128,6 +129,7 @@ export interface UniversalParameterSet {
   semiotic: SemioticOikosParams;
   temporal: SpeciesTemporalParams;
   resonance: ResonanceOikosParams;
+  audio: import('./musicMappings').MusicMappingParameters;
 }
 
 export type BlendMode = 'additive' | 'average' | 'multiply' | 'screen';
@@ -229,6 +231,7 @@ export interface ResolvedSpeciesParams {
   semiotic: SemioticOikosParams;
   temporal: SpeciesTemporalParams;
   resonance: ResonanceOikosParams;
+  audio: import('./musicMappings').MusicMappingParameters;
 }
 
 // Preset Definition

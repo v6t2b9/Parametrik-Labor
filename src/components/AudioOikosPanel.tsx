@@ -1,16 +1,19 @@
 /**
  * AudioOikosPanel - Music-reactive visualization controls
  * Phase 1: Audio source, live analysis, presets, and key mappings
+ * Now supports species-specific audio mappings!
  */
 
 import { useRef, type ChangeEvent } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
+import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { AUDIO_MAPPING_PRESETS } from '../audio/presets';
 
 export function AudioOikosPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Audio playback controls from AudioStore
   const {
     inputMode,
     isPlaying,
@@ -18,17 +21,21 @@ export function AudioOikosPanel() {
     audioFileName,
     currentAnalysis,
     musicEnabled,
-    currentPresetKey,
-    mappings,
     loadAudioFile,
     startMicrophone,
     togglePlay,
     stop,
     setLoop,
     toggleMusic,
-    loadPreset,
-    updateMappings,
   } = useAudioStore();
+
+  // Audio mappings from SimulationStore (species-aware)
+  const { ui, parameters, updateAudioParams } = useSimulationStore();
+
+  // Get current mappings based on active species scope
+  const mappings = ui.activeSpeciesScope === 'universal'
+    ? parameters.universal.audio
+    : resolveSpeciesParams(parameters, ui.activeSpeciesScope as 'red' | 'green' | 'blue').audio;
 
   // Handle file selection
   const handleFileSelect = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +56,12 @@ export function AudioOikosPanel() {
     } catch (error) {
       alert('Microphone access denied or not available.');
     }
+  };
+
+  // Load audio preset into current species scope
+  const loadPreset = (presetKey: keyof typeof AUDIO_MAPPING_PRESETS) => {
+    const preset = AUDIO_MAPPING_PRESETS[presetKey];
+    updateAudioParams(preset.params);
   };
 
   // Render analysis display
@@ -259,10 +272,7 @@ export function AudioOikosPanel() {
             <button
               key={key}
               onClick={() => loadPreset(key as any)}
-              style={{
-                ...styles.presetButton,
-                ...(currentPresetKey === key ? styles.presetButtonActive : {}),
-              }}
+              style={styles.presetButton}
               title={preset.description}
             >
               <span style={styles.presetIcon}>{preset.icon}</span>
@@ -288,7 +298,7 @@ export function AudioOikosPanel() {
               min={0}
               max={2}
               step={0.1}
-              onChange={(value) => updateMappings({ globalMusicInfluence: value })}
+              onChange={(value) => updateAudioParams({ globalMusicInfluence: value })}
               description="Global multiplier for all audio effects"
             />
           </div>
@@ -303,7 +313,7 @@ export function AudioOikosPanel() {
               max={2}
               step={0.1}
               onChange={(value) =>
-                updateMappings({ tempo: { ...mappings.tempo, tempoToSpeedSensitivity: value } })
+                updateAudioParams({ tempo: { ...mappings.tempo, tempoToSpeedSensitivity: value } })
               }
               description="How strongly BPM affects agent speed"
             />
@@ -319,7 +329,7 @@ export function AudioOikosPanel() {
               max={2}
               step={0.1}
               onChange={(value) =>
-                updateMappings({ spectral: { ...mappings.spectral, bassToSpeedSensitivity: value } })
+                updateAudioParams({ spectral: { ...mappings.spectral, bassToSpeedSensitivity: value } })
               }
               description="Deep frequencies increase movement speed"
             />
@@ -331,7 +341,7 @@ export function AudioOikosPanel() {
               max={2}
               step={0.1}
               onChange={(value) =>
-                updateMappings({ spectral: { ...mappings.spectral, bassToDepositSensitivity: value } })
+                updateAudioParams({ spectral: { ...mappings.spectral, bassToDepositSensitivity: value } })
               }
               description="Bass increases trail deposition"
             />
@@ -346,7 +356,7 @@ export function AudioOikosPanel() {
                 type="checkbox"
                 checked={mappings.rhythm.beatEnabled}
                 onChange={(e) =>
-                  updateMappings({ rhythm: { ...mappings.rhythm, beatEnabled: e.target.checked } })
+                  updateAudioParams({ rhythm: { ...mappings.rhythm, beatEnabled: e.target.checked } })
                 }
               />
               <span>Enable Beat Detection</span>
@@ -360,7 +370,7 @@ export function AudioOikosPanel() {
                 max={3}
                 step={0.1}
                 onChange={(value) =>
-                  updateMappings({ rhythm: { ...mappings.rhythm, beatImpulseStrength: value } })
+                  updateAudioParams({ rhythm: { ...mappings.rhythm, beatImpulseStrength: value } })
                 }
                 description="Speed boost on detected beats"
               />

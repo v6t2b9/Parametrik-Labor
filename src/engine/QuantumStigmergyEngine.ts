@@ -50,6 +50,10 @@ function resolveSpeciesParams(
       ...params.universal.resonance,
       ...(speciesOverride.resonance || {}),
     },
+    audio: {
+      ...params.universal.audio,
+      ...(speciesOverride.audio || {}),
+    },
   };
 }
 
