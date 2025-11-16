@@ -41,7 +41,7 @@ export class BeatPulseModulator {
    * Update impulse with exponential decay
    * Call every frame
    */
-  update(currentTime: number, deltaTime: number): void {
+  update(_currentTime: number, deltaTime: number): void {
     // Exponential decay between beats
     // deltaTime * 60 normalizes to 60fps (decay faster at lower fps)
     const decayExponent = deltaTime * 60;
