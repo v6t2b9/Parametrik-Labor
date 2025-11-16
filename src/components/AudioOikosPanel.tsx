@@ -195,15 +195,16 @@ export function AudioOikosPanel() {
               ⏹
             </button>
 
-            <label style={styles.loopLabel}>
-              <input
-                type="checkbox"
-                checked={loop}
-                onChange={(e) => setLoop(e.target.checked)}
-                disabled={!audioFileName}
-              />
-              <span style={styles.loopText}>Loop</span>
-            </label>
+            <button
+              onClick={() => setLoop(!loop)}
+              style={{
+                ...styles.loopButton,
+                ...(loop ? styles.loopButtonActive : {}),
+              }}
+              disabled={!audioFileName}
+            >
+              🔁 {loop ? 'Loop: ON' : 'Loop: OFF'}
+            </button>
           </div>
         )}
       </div>
@@ -469,17 +470,23 @@ const styles = {
     transition: 'all 0.2s',
   } as React.CSSProperties,
 
-  loopLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    fontSize: '11px',
+  loopButton: {
+    padding: '8px 16px',
+    backgroundColor: '#0a0a15',
+    border: '1px solid #2a2b3a',
+    borderRadius: '4px',
     color: '#a0a0b0',
+    fontSize: '12px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
     marginLeft: 'auto',
   } as React.CSSProperties,
 
-  loopText: {
-    userSelect: 'none' as const,
+  loopButtonActive: {
+    backgroundColor: '#7d5dbd22',
+    borderColor: '#7d5dbd',
+    color: '#7d5dbd',
   } as React.CSSProperties,
 
   // Music Reactivity Toggle
