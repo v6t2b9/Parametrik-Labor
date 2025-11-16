@@ -662,6 +662,13 @@ export class OscillatorBank {
       }
     }
   }
+
+  /**
+   * Get current base BPM
+   */
+  getBaseBPM(): number {
+    return this.baseBPM;
+  }
 }
 
 // ============================================================================
