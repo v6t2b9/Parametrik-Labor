@@ -4,7 +4,7 @@
  */
 
 import { QuantumStigmergyEngine } from './QuantumStigmergyEngine';
-import type { Agent, AgentType, AllParameters } from '../types/index';
+import type { Agent, AllParameters } from '../types/index';
 import { resolveSpeciesParams } from '../store/useSimulationStore';
 import type {
   MusicAnalysis,
@@ -340,10 +340,10 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   }
 
   /**
-   * Get current music mappings
+   * Get current music mappings (returns red species mappings as default)
    */
   getMusicMappings(): MusicMappingParameters | null {
-    return this.musicMappings;
+    return this.musicMappingsRed;
   }
 
   /**

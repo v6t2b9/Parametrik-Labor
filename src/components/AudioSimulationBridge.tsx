@@ -13,17 +13,12 @@ export function AudioSimulationBridge() {
 
   const {
     musicEnabled,
-    mappings,
     updateAnalysis,
     currentAnalysis,
   } = useAudioStore();
 
-  // Sync mappings to engine when they change
-  useEffect(() => {
-    if (engine) {
-      engine.setMusicMappings(mappings);
-    }
-  }, [engine, mappings]);
+  // Note: Audio mappings are now synced via SimulationStore.setParameters
+  // Each species gets its own mappings from parameters.species[type].audio
 
   // Sync music enabled state to engine
   useEffect(() => {
