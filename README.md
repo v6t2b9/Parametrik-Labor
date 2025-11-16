@@ -43,6 +43,14 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ✅ **11+ Post-Processing Effects** - Motion blur, bloom, chromatic aberration, vignette, scanlines, pixelation
 ✅ **High-DPI Support** - Sharp rendering on retina displays (up to 2x devicePixelRatio)
 
+#### Audio Reactivity 🎵
+✅ **Audio Oikos Modulation System** - Real-time music analysis with 7+ spectral features
+✅ **Adaptive Normalization** - Auto-Harmonizer learns each song's unique range for maximum visual contrast
+✅ **Interference Patterns** - Consonance → synchronized waves, Dissonance → chaotic turbulence
+✅ **Beat Pulse Modulation** - Explosive impulse responses on beats (6x deposit flash)
+✅ **Multi-Scale Temporal Structure** - Micro (100ms), Meso (500ms), Macro (4s) time windows
+✅ **3 Audio Presets** - Resonant Harmony, Beat Machine, Spectral Dance
+
 #### Export & Sharing
 ✅ **GIF Loop Export** - 2-second looping GIFs with automatic fade-in/fade-out transitions
 ✅ **Video Export** - WebM (high quality) or GIF format with configurable duration (3s/8s/12s)
@@ -99,7 +107,15 @@ Parametrik-Labor/
 │   ├── engine/                   # Simulation engines
 │   │   ├── SimulationEngine.ts          # Legacy classical engine
 │   │   ├── QuantumStigmergyEngine.ts    # M1/M2/M3 models
+│   │   ├── MusicReactiveEngine.ts       # Audio-reactive simulation
 │   │   └── ComplexMath.ts               # Quantum math utilities
+│   ├── audio/                    # Audio analysis & modulation
+│   │   ├── AudioOikosModulator.ts       # Master modulation system
+│   │   ├── AudioAnalyzer.ts             # Music feature extraction
+│   │   ├── BeatPulseModulator.ts        # Beat impulse modulation
+│   │   ├── InterferenceModulator.ts     # Consonance/dissonance detection
+│   │   ├── MultiScaleModulator.ts       # Multi-timescale tracking
+│   │   └── AdaptiveNormalizer.ts        # Adaptive contrast maximization
 │   ├── store/                    # Zustand state management
 │   ├── presets/                  # Curated parameter configurations
 │   └── types/                    # TypeScript definitions
@@ -141,6 +157,7 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 - **State Management:** Zustand
 - **Build Tool:** Vite
 - **Rendering:** Canvas 2D API + WebGL (hybrid approach)
+- **Audio:** Web Audio API (AnalyserNode, FFT), AudioContext
 - **Export:** gif.js (GIF encoding), MediaRecorder API (WebM)
 - **Performance:** Object pooling, WebGL shaders, requestAnimationFrame
 - **Deployment:** Vercel
