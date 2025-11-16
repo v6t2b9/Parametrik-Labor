@@ -105,10 +105,12 @@ Parametrik-Labor/
 │   └── types/                    # TypeScript definitions
 ├── public/                       # Static assets
 ├── docs/                         # Documentation & research papers
-│   ├── README.md                        # Full app documentation
-│   ├── parametrics_paper_draft.md       # Theoretical framework
-│   ├── Parameter_Oikos_Matrix.md        # Parameter organization
-│   └── ...                              # Additional research docs
+│   ├── README.md                        # Documentation index
+│   ├── guides/                          # User guides
+│   ├── development/                     # Developer documentation
+│   ├── research/                        # Scientific papers
+│   ├── experiments/                     # Experimental protocols
+│   └── archive/                         # Outdated documentation
 ├── package.json                  # Dependencies & scripts
 ├── vite.config.ts                # Vite build configuration
 ├── tsconfig.json                 # TypeScript configuration
@@ -148,18 +150,20 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 
 ## 📚 Documentation
 
+**[📖 Documentation Index](./docs/README.md)** - Complete documentation navigation
+
 ### User Documentation
-- **[Full Documentation](./docs/README.md)** - Complete guide (600+ lines)
-- **[Theoretical Framework](./docs/parametrics_paper_draft.md)** - Parametrics theory
-- **[Parameter Matrix](./docs/Parameter_Oikos_Matrix.md)** - Oikos organization
-- **[Experiments](./docs/Experimentelle_Sektion_Index.md)** - Validation experiments
+- **[User Guide](./docs/guides/user-guide.md)** - Complete guide to using the app
+- **[Theoretical Framework](./docs/research/parametrics_paper_draft.md)** - Parametrics theory
+- **[Parameter Matrix](./docs/research/Parameter_Oikos_Matrix.md)** - Oikos organization
+- **[Experiments](./docs/experiments/Experimentelle_Sektion_Index.md)** - Validation experiments
 
 ### Developer Documentation
-- **[Development Guide](./docs/DEVELOPMENT.md)** - Setup, architecture, and development workflow
-- **[Deployment Guide](./docs/DEPLOYMENT.md)** - Build, deploy, and PWA configuration
+- **[Development Guide](./docs/development/DEVELOPMENT.md)** - Setup, architecture, and development workflow
+- **[Deployment Guide](./docs/development/DEPLOYMENT.md)** - Build, deploy, and PWA configuration
+- **[Architecture Overview](./docs/development/ARCHITECTURE.md)** - System architecture and design patterns
 - **[Self-Hosting Guide](./SELF_HOSTING.md)** - Self-hosting with PWA support
 - **[Contributing Guidelines](./CONTRIBUTING.md)** - How to contribute to the project
-- **[Architecture Overview](./docs/ARCHITECTURE.md)** - System architecture and design patterns
 
 ---
 
