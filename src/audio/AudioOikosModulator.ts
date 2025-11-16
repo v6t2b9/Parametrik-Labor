@@ -168,7 +168,6 @@ export class InterferenceModulator {
 // ============================================================================
 
 export class BeatPulseModulator {
-  private _lastBeatTime: number = 0;
   private currentImpulse: number = 0;
   private beatDecay: number;
   private amplification: number;
@@ -181,9 +180,8 @@ export class BeatPulseModulator {
   /**
    * Trigger impulse on beat detection
    */
-  onBeatDetected(strength: number, timestamp: number): void {
+  onBeatDetected(strength: number, _timestamp: number): void {
     this.currentImpulse = strength;
-    this._lastBeatTime = timestamp;
   }
 
   /**
