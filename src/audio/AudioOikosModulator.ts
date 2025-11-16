@@ -950,14 +950,16 @@ export interface AffectiveState {
 /**
  * Discrete affective regimes - collective emotional states
  */
-export enum MoodState {
-  ETHEREAL = 'ethereal',      // Low arousal, positive valence, low tension
-  HARMONIC = 'harmonic',      // Medium arousal, positive valence, low tension
-  HECTIC = 'hectic',          // High arousal, neutral valence, high tension
-  DISSONANT = 'dissonant',    // High arousal, negative valence, high tension
-  MELANCHOLIC = 'melancholic', // Low arousal, negative valence, low tension
-  INTENSE = 'intense',        // High arousal, positive valence, medium tension
-}
+export const MoodState = {
+  ETHEREAL: 'ethereal',      // Low arousal, positive valence, low tension
+  HARMONIC: 'harmonic',      // Medium arousal, positive valence, low tension
+  HECTIC: 'hectic',          // High arousal, neutral valence, high tension
+  DISSONANT: 'dissonant',    // High arousal, negative valence, high tension
+  MELANCHOLIC: 'melancholic', // Low arousal, negative valence, low tension
+  INTENSE: 'intense',        // High arousal, positive valence, medium tension
+} as const;
+
+export type MoodState = typeof MoodState[keyof typeof MoodState];
 
 /**
  * Mood State Definitions with boundaries
@@ -1196,11 +1198,13 @@ export class AffectivePhaseSystem {
 // XIII. FREQUENCY NICHE SYSTEM
 // ============================================================================
 
-export enum FrequencyBand {
-  LOW = 'low',      // 20-200 Hz (Bass, Kick, Sub-bass)
-  MID = 'mid',      // 200-2000 Hz (Vocals, Melody, Snare)
-  HIGH = 'high',    // 2000-20000 Hz (Hi-hats, Cymbals, Brightness)
-}
+export const FrequencyBand = {
+  LOW: 'low',      // 20-200 Hz (Bass, Kick, Sub-bass)
+  MID: 'mid',      // 200-2000 Hz (Vocals, Melody, Snare)
+  HIGH: 'high',    // 2000-20000 Hz (Hi-hats, Cymbals, Brightness)
+} as const;
+
+export type FrequencyBand = typeof FrequencyBand[keyof typeof FrequencyBand];
 
 export interface FrequencyNiche {
   band: FrequencyBand;
