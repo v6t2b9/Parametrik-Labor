@@ -32,9 +32,9 @@ export class BeatPulseModulator {
   /**
    * Call when beat is detected
    */
-  onBeatDetected(strength: number, timestamp: number): void {
+  onBeatDetected(strength: number, _timestamp: number): void {
     this.currentImpulse = strength;
-    this.lastBeatTime = timestamp;
+    this.lastBeatTime = _timestamp;
   }
 
   /**

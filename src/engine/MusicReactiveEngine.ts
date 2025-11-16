@@ -35,8 +35,8 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   private useInterference: boolean = false;
   private useMultiScale: boolean = false;
 
-  constructor(width: number, height: number) {
-    super(width, height);
+  constructor(gridSize?: number) {
+    super(gridSize);
 
     // Initialize modulators (disabled by default)
     this.beatPulseModulator = new BeatPulseModulator({
