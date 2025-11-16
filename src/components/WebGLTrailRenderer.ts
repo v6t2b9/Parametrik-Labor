@@ -284,7 +284,8 @@ const vertexShaderSource = `
 
   void main() {
     gl_Position = vec4(a_position, 0.0, 1.0);
-    v_texCoord = a_position * 0.5 + 0.5;
+    // Flip Y-axis to match Canvas 2D coordinate system (Y down instead of Y up)
+    v_texCoord = vec2(a_position.x * 0.5 + 0.5, 0.5 - a_position.y * 0.5);
   }
 `;
 
