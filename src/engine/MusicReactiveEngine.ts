@@ -76,12 +76,28 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   updateMusicAnalysis(analysis: MusicAnalysis): void {
     this.currentMusicAnalysis = analysis;
 
+    // Debug logging (first 100 frames only)
+    if (this.musicEnabled && Math.random() < 0.01) {
+      console.log('[Music Reactive] Analysis:', {
+        beat: analysis.rhythm.beat,
+        beatStrength: analysis.rhythm.beatStrength,
+        bassEnergy: analysis.spectral.bassEnergy,
+        loudness: analysis.dynamics.loudness,
+        modulatorsEnabled: {
+          beatPulse: this.useBeatPulse,
+          interference: this.useInterference,
+          multiScale: this.useMultiScale,
+        },
+      });
+    }
+
     // Update enhanced modulators if enabled
     if (this.useBeatPulse && analysis.rhythm.beat) {
       this.beatPulseModulator.onBeatDetected(
         analysis.rhythm.beatStrength,
         analysis.timestamp * 1000 // Convert to ms
       );
+      console.log('[Music Reactive] BEAT DETECTED! Strength:', analysis.rhythm.beatStrength);
     }
 
     if (this.useBeatPulse) {
@@ -130,6 +146,9 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     const agents = this.getAgents();
     const music = this.currentMusicAnalysis;
 
+    // Debug logging for first agent (occasional)
+    let debugLogged = false;
+
     // Apply modulation to each agent with species-specific mappings
     // Note: We modulate by adjusting velocities and trail deposition
     // The core steering logic remains in the parent class
@@ -152,6 +171,17 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
       // Calculate behavior modulation from music for this species
       const modulation = this.calculateBehaviorModulation(music, mappings);
+
+      // Debug log modulation values occasionally
+      if (!debugLogged && Math.random() < 0.001) {
+        console.log('[Music Reactive] Modulation:', {
+          speedMult: modulation.moveSpeedMultiplier,
+          depositMult: modulation.depositRateMultiplier,
+          turnRandomness: modulation.turnRandomnessMultiplier,
+          globalInfluence: mappings.globalMusicInfluence,
+        });
+        debugLogged = true;
+      }
 
       // Apply modulation to agent
       this.applyModulationToAgent(agent, modulation, music, mappings);
@@ -397,32 +427,71 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
   /**
    * Apply modulation to individual agent
-   * This modulates the agent's behavior for the next frame
+   * This modulates the agent's behavior for the next frame by directly affecting
+   * movement speed, turning, and trail deposition
    */
   private applyModulationToAgent(
     agent: Agent,
-    _modulation: BehaviorModulation,
+    modulation: BehaviorModulation,
     music: MusicAnalysis,
     mappings: MusicMappingParameters
   ): void {
-    // Store original values if not already stored
-    if (!(agent as any).__musicOriginalSpeed) {
-      // We'll modulate by temporarily adjusting movement
-      // The actual parameter changes happen in the update loop
-      // For MVP, we primarily modulate via speed and deposit bursts
+    // Apply speed modulation by adjusting velocity (more aggressive)
+    if (modulation.moveSpeedMultiplier !== 1.0) {
+      const speedFactor = modulation.moveSpeedMultiplier;
+      // Increase movement based on music (scaled up for visibility)
+      const movementAmount = (speedFactor - 1.0) * 2.0; // Doubled for visibility
+      const dx = Math.cos(agent.angle) * movementAmount;
+      const dy = Math.sin(agent.angle) * movementAmount;
+
+      agent.x += dx;
+      agent.y += dy;
+
+      // Wrap around edges
+      const gridSize = this.getGridSize();
+      if (agent.x < 0) agent.x += gridSize;
+      if (agent.x >= gridSize) agent.x -= gridSize;
+      if (agent.y < 0) agent.y += gridSize;
+      if (agent.y >= gridSize) agent.y -= gridSize;
     }
 
-    // BEAT IMPULSE: Sudden speed boost on beat
+    // Apply turn randomness by adding random angle adjustments (more visible)
+    if (modulation.turnRandomnessMultiplier !== 1.0) {
+      const randomness = (modulation.turnRandomnessMultiplier - 1.0) * 0.5; // Increased from 0.2
+      agent.angle += (Math.random() - 0.5) * randomness;
+    }
+
+    // Apply bass energy directly to movement (very visible)
+    if (music.spectral.bassEnergy > 0.3) {
+      const bassPulse = music.spectral.bassEnergy * 1.5;
+      const dx = Math.cos(agent.angle) * bassPulse;
+      const dy = Math.sin(agent.angle) * bassPulse;
+
+      agent.x += dx;
+      agent.y += dy;
+
+      // Wrap around edges
+      const gridSize = this.getGridSize();
+      if (agent.x < 0) agent.x += gridSize;
+      if (agent.x >= gridSize) agent.x -= gridSize;
+      if (agent.y < 0) agent.y += gridSize;
+      if (agent.y >= gridSize) agent.y -= gridSize;
+    }
+
+    // Store modulation values on agent for parent class to potentially use
+    (agent as any).__musicSpeedMult = modulation.moveSpeedMultiplier;
+    (agent as any).__musicDepositMult = modulation.depositRateMultiplier;
+    (agent as any).__musicTurnMult = modulation.turnSpeedMultiplier;
+
+    // BEAT IMPULSE: Very strong visible boost on beat
     if (
       mappings.rhythm.beatEnabled &&
       music.rhythm.beat &&
       mappings.rhythm.beatImpulseStrength > 0
     ) {
-      // Apply temporary velocity boost
       const impulse = mappings.rhythm.beatImpulseStrength * music.rhythm.beatStrength;
-      const speedBoost = 1.0 + impulse;
+      const speedBoost = impulse * 5.0; // Increased from 2.0 for maximum visibility
 
-      // Boost movement for this frame
       const dx = Math.cos(agent.angle) * speedBoost;
       const dy = Math.sin(agent.angle) * speedBoost;
 
@@ -436,21 +505,6 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       if (agent.y < 0) agent.y += gridSize;
       if (agent.y >= gridSize) agent.y -= gridSize;
     }
-
-    // BEAT DEPOSIT BURST: Extra trail on beat
-    if (
-      mappings.rhythm.beatEnabled &&
-      mappings.rhythm.beatDepositBurst &&
-      music.rhythm.beat
-    ) {
-      // Deposit handled by parent class, we'd need to expose depositTrail method
-      // For MVP, this is a placeholder - can be enhanced later
-      // Future: const burstAmount = mappings.rhythm.beatBurstIntensity * 10;
-    }
-
-    // Note: Most modulation is indirect - we're modulating the emergent behavior
-    // by changing how agents respond to their environment in real-time
-    // The actual steering/movement happens in parent class update methods
   }
 
   /**
