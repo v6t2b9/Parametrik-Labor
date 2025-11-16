@@ -44,7 +44,7 @@ export function applyCurve(value: number, curve: CurveType): number {
 /**
  * Calculate RMS (Root Mean Square) loudness from audio buffer
  */
-export function calculateRMS(dataArray: Uint8Array<ArrayBufferLike>): number {
+export function calculateRMS(dataArray: Uint8Array): number {
   let sum = 0;
   for (let i = 0; i < dataArray.length; i++) {
     const normalized = dataArray[i] / 255;
@@ -57,7 +57,7 @@ export function calculateRMS(dataArray: Uint8Array<ArrayBufferLike>): number {
  * Calculate spectral roughness (proxy for dissonance)
  * Higher roughness = more dissonant/tense
  */
-export function calculateRoughness(frequencyData: Uint8Array<ArrayBufferLike>): number {
+export function calculateRoughness(frequencyData: Uint8Array): number {
   // Simplified roughness calculation:
   // Sum of differences between adjacent frequency bins
   let roughness = 0;
@@ -82,7 +82,7 @@ export function calculateRoughness(frequencyData: Uint8Array<ArrayBufferLike>): 
  * @param fftSize - FFT size used for analysis
  */
 export function getFrequencyRangeEnergy(
-  frequencyData: Uint8Array<ArrayBufferLike>,
+  frequencyData: Uint8Array,
   minFreq: number,
   maxFreq: number,
   sampleRate: number,
