@@ -932,3 +932,585 @@ export const RHYTHMIC_PRESETS = {
     },
   },
 };
+
+// ============================================================================
+// XI. AFFECTIVE PHASE TRANSITION SYSTEM
+// ============================================================================
+
+/**
+ * AFFECTIVE DIMENSIONS (Circumplex Model of Affect)
+ * Extended with Tension dimension from musicology
+ */
+export interface AffectiveState {
+  arousal: number;   // 0-1: Low (calm) to High (excited)
+  valence: number;   // -1 to +1: Negative (unpleasant) to Positive (pleasant)
+  tension: number;   // 0-1: Low (relaxed) to High (tense)
+}
+
+/**
+ * Discrete affective regimes - collective emotional states
+ */
+export enum MoodState {
+  ETHEREAL = 'ethereal',      // Low arousal, positive valence, low tension
+  HARMONIC = 'harmonic',      // Medium arousal, positive valence, low tension
+  HECTIC = 'hectic',          // High arousal, neutral valence, high tension
+  DISSONANT = 'dissonant',    // High arousal, negative valence, high tension
+  MELANCHOLIC = 'melancholic', // Low arousal, negative valence, low tension
+  INTENSE = 'intense',        // High arousal, positive valence, medium tension
+}
+
+/**
+ * Mood State Definitions with boundaries
+ */
+export const MOOD_DEFINITIONS = {
+  [MoodState.ETHEREAL]: {
+    name: 'Ätherisch-Leicht',
+    arousal: { min: 0.0, max: 0.4 },
+    valence: { min: 0.2, max: 1.0 },
+    tension: { min: 0.0, max: 0.3 },
+    color: '#a8d8ea',  // Light blue
+    description: 'Schwebend, traumhaft, ambient',
+  },
+
+  [MoodState.HARMONIC]: {
+    name: 'Harmonisch-Flow',
+    arousal: { min: 0.3, max: 0.7 },
+    valence: { min: 0.3, max: 1.0 },
+    tension: { min: 0.0, max: 0.4 },
+    color: '#90ee90',  // Light green
+    description: 'Fließend, balanciert, im Groove',
+  },
+
+  [MoodState.HECTIC]: {
+    name: 'Hektisch-Chaotisch',
+    arousal: { min: 0.6, max: 1.0 },
+    valence: { min: -0.3, max: 0.3 },
+    tension: { min: 0.6, max: 1.0 },
+    color: '#ff6b6b',  // Red
+    description: 'Gehetzt, überladen, nervös',
+  },
+
+  [MoodState.DISSONANT]: {
+    name: 'Dissonant-Düster',
+    arousal: { min: 0.5, max: 1.0 },
+    valence: { min: -1.0, max: 0.0 },
+    tension: { min: 0.5, max: 1.0 },
+    color: '#8b0000',  // Dark red
+    description: 'Beunruhigend, disharmonisch, aggressiv',
+  },
+
+  [MoodState.MELANCHOLIC]: {
+    name: 'Melancholisch-Ruhig',
+    arousal: { min: 0.0, max: 0.4 },
+    valence: { min: -1.0, max: 0.0 },
+    tension: { min: 0.0, max: 0.4 },
+    color: '#4a5568',  // Dark gray
+    description: 'Traurig, introspektiv, gedämpft',
+  },
+
+  [MoodState.INTENSE]: {
+    name: 'Intensiv-Ekstatisch',
+    arousal: { min: 0.7, max: 1.0 },
+    valence: { min: 0.4, max: 1.0 },
+    tension: { min: 0.3, max: 0.7 },
+    color: '#ff1493',  // Deep pink
+    description: 'Euphorisch, kraftvoll, peak experience',
+  },
+};
+
+/**
+ * Calculate affective state from audio features
+ */
+export function calculateAffectiveState(features: AudioFeatures): AffectiveState {
+  // AROUSAL - Physiological activation
+  const arousal = (
+    features.rmsEnergy * 0.5 +
+    Math.min(features.tempo / 200, 1.0) * 0.3 +
+    features.zeroCrossingRate / 5000 * 0.2
+  );
+
+  // VALENCE - Pleasantness
+  const harmonicity = 1 - features.spectralFlatness;
+  const brightness = features.spectralCentroid / 22050;
+  const valence = (
+    harmonicity * 0.5 +
+    (brightness * 0.5 - 0.25)
+  ) * 2 - 1;
+
+  // TENSION - Musical expectation violation
+  const dissonance = features.spectralFlatness;
+  const dynamicContrast = Math.abs(features.rmsEnergy - 0.5) * 2;
+  const tension = (
+    dissonance * 0.5 +
+    dynamicContrast * 0.3 +
+    (1 - harmonicity) * 0.2
+  );
+
+  return {
+    arousal: Math.max(0, Math.min(1, arousal)),
+    valence: Math.max(-1, Math.min(1, valence)),
+    tension: Math.max(0, Math.min(1, tension)),
+  };
+}
+
+/**
+ * Classify mood state from affective dimensions
+ */
+export function classifyMood(affect: AffectiveState): MoodState {
+  for (const [mood, def] of Object.entries(MOOD_DEFINITIONS)) {
+    const arousalMatch = affect.arousal >= def.arousal.min && affect.arousal <= def.arousal.max;
+    const valenceMatch = affect.valence >= def.valence.min && affect.valence <= def.valence.max;
+    const tensionMatch = affect.tension >= def.tension.min && affect.tension <= def.tension.max;
+
+    if (arousalMatch && valenceMatch && tensionMatch) {
+      return mood as MoodState;
+    }
+  }
+
+  return MoodState.HARMONIC;
+}
+
+// ============================================================================
+// XII. PHASE TRANSITION SYSTEM
+// ============================================================================
+
+export interface PhaseTransitionConfig {
+  hysteresis: number;        // 0-1: How much overlap before switching
+  transitionTime: number;    // Seconds: Smooth transition duration
+  minDwellTime: number;      // Seconds: Minimum time in state before switching
+}
+
+export class AffectivePhaseSystem {
+  private currentMood: MoodState = MoodState.HARMONIC;
+  private previousMood: MoodState = MoodState.HARMONIC;
+  private timeInCurrentMood: number = 0;
+  private transitionProgress: number = 1.0; // 0-1: 1 = fully in current mood
+
+  private config: PhaseTransitionConfig;
+
+  // History for hysteresis
+  private affectHistory: AffectiveState[] = [];
+  private historySize: number = 30; // ~0.5 seconds at 60fps
+
+  constructor(config: PhaseTransitionConfig = {
+    hysteresis: 0.2,
+    transitionTime: 1.0,
+    minDwellTime: 2.0,
+  }) {
+    this.config = config;
+  }
+
+  /**
+   * Update mood based on current affective state
+   */
+  update(
+    affect: AffectiveState,
+    deltaTime: number
+  ): {
+    currentMood: MoodState;
+    previousMood: MoodState;
+    transitionProgress: number;
+    isTransitioning: boolean;
+  } {
+    // Add to history
+    this.affectHistory.push(affect);
+    if (this.affectHistory.length > this.historySize) {
+      this.affectHistory.shift();
+    }
+
+    // Classify target mood
+    const targetMood = this.classifyMoodWithHysteresis(affect);
+
+    // Update time in current mood
+    this.timeInCurrentMood += deltaTime;
+
+    // Check if we should transition
+    const shouldTransition =
+      targetMood !== this.currentMood &&
+      this.timeInCurrentMood >= this.config.minDwellTime;
+
+    if (shouldTransition) {
+      // Start transition
+      this.previousMood = this.currentMood;
+      this.currentMood = targetMood;
+      this.transitionProgress = 0;
+      this.timeInCurrentMood = 0;
+    }
+
+    // Update transition progress
+    if (this.transitionProgress < 1.0) {
+      this.transitionProgress += deltaTime / this.config.transitionTime;
+      this.transitionProgress = Math.min(1.0, this.transitionProgress);
+    }
+
+    return {
+      currentMood: this.currentMood,
+      previousMood: this.previousMood,
+      transitionProgress: this.transitionProgress,
+      isTransitioning: this.transitionProgress < 1.0,
+    };
+  }
+
+  /**
+   * Classify mood with hysteresis to prevent rapid switching
+   */
+  private classifyMoodWithHysteresis(affect: AffectiveState): MoodState {
+    if (this.affectHistory.length < this.historySize / 2) {
+      return classifyMood(affect);
+    }
+
+    // Average recent affect
+    const avgAffect: AffectiveState = {
+      arousal: this.affectHistory.reduce((sum, a) => sum + a.arousal, 0) / this.affectHistory.length,
+      valence: this.affectHistory.reduce((sum, a) => sum + a.valence, 0) / this.affectHistory.length,
+      tension: this.affectHistory.reduce((sum, a) => sum + a.tension, 0) / this.affectHistory.length,
+    };
+
+    const newMood = classifyMood(avgAffect);
+
+    // If different from current, check if we've crossed hysteresis threshold
+    if (newMood !== this.currentMood) {
+      // How many recent frames agree with new mood?
+      const recentFrames = this.affectHistory.slice(-10);
+      const agreementRatio = recentFrames.filter(a => classifyMood(a) === newMood).length / recentFrames.length;
+
+      // Require significant agreement to switch
+      if (agreementRatio >= (1 - this.config.hysteresis)) {
+        return newMood;
+      }
+    }
+
+    return this.currentMood;
+  }
+
+  getCurrentMood(): MoodState {
+    return this.currentMood;
+  }
+
+  getTransitionProgress(): number {
+    return this.transitionProgress;
+  }
+}
+
+// ============================================================================
+// XIII. FREQUENCY NICHE SYSTEM
+// ============================================================================
+
+export enum FrequencyBand {
+  LOW = 'low',      // 20-200 Hz (Bass, Kick, Sub-bass)
+  MID = 'mid',      // 200-2000 Hz (Vocals, Melody, Snare)
+  HIGH = 'high',    // 2000-20000 Hz (Hi-hats, Cymbals, Brightness)
+}
+
+export interface FrequencyNiche {
+  band: FrequencyBand;
+  minFreq: number;  // Hz
+  maxFreq: number;  // Hz
+  energy: number;   // 0-1: Current energy in this band
+}
+
+export const FREQUENCY_NICHES: Record<FrequencyBand, Omit<FrequencyNiche, 'energy'>> = {
+  [FrequencyBand.LOW]: {
+    band: FrequencyBand.LOW,
+    minFreq: 20,
+    maxFreq: 200,
+  },
+  [FrequencyBand.MID]: {
+    band: FrequencyBand.MID,
+    minFreq: 200,
+    maxFreq: 2000,
+  },
+  [FrequencyBand.HIGH]: {
+    band: FrequencyBand.HIGH,
+    minFreq: 2000,
+    maxFreq: 20000,
+  },
+};
+
+/**
+ * Extract energy in each frequency band from FFT data
+ * NOTE: Requires raw FFT data access (Float32Array) and sample rate
+ */
+export function extractBandEnergies(fftData: Float32Array, sampleRate: number): Record<FrequencyBand, number> {
+  const binCount = fftData.length;
+  const binFreqRange = sampleRate / 2 / binCount;
+
+  const energies: Record<FrequencyBand, number> = {
+    [FrequencyBand.LOW]: 0,
+    [FrequencyBand.MID]: 0,
+    [FrequencyBand.HIGH]: 0,
+  };
+
+  // Calculate energy in each band
+  for (const [band, niche] of Object.entries(FREQUENCY_NICHES)) {
+    const startBin = Math.floor(niche.minFreq / binFreqRange);
+    const endBin = Math.floor(niche.maxFreq / binFreqRange);
+
+    let bandEnergy = 0;
+    let binCountInBand = 0;
+
+    for (let i = startBin; i < endBin && i < fftData.length; i++) {
+      bandEnergy += fftData[i] * fftData[i]; // Power = amplitude²
+      binCountInBand++;
+    }
+
+    // RMS energy in band
+    energies[band as FrequencyBand] = binCountInBand > 0 ? Math.sqrt(bandEnergy / binCountInBand) : 0;
+  }
+
+  // Normalize to 0-1
+  const maxEnergy = Math.max(...Object.values(energies));
+  if (maxEnergy > 0) {
+    for (const band of Object.keys(energies)) {
+      energies[band as FrequencyBand] /= maxEnergy;
+    }
+  }
+
+  return energies;
+}
+
+// ============================================================================
+// XIV. SPECIES-SPECIFIC NICHE OCCUPANCY
+// ============================================================================
+
+export interface SpeciesNicheConfig {
+  speciesId: string;
+  primaryBand: FrequencyBand;     // Main frequency band this species responds to
+  sensitivity: number;             // 0-1: How strongly it responds to its band
+  crossBandInfluence: number;     // 0-1: How much other bands affect it
+}
+
+export class SpeciesNicheSystem {
+  private speciesConfigs: Map<string, SpeciesNicheConfig> = new Map();
+
+  /**
+   * Register species with frequency niche
+   */
+  registerSpecies(config: SpeciesNicheConfig): void {
+    this.speciesConfigs.set(config.speciesId, config);
+  }
+
+  /**
+   * Get modulation factor for species based on band energies
+   */
+  getSpeciesModulation(
+    speciesId: string,
+    bandEnergies: Record<FrequencyBand, number>
+  ): number {
+    const config = this.speciesConfigs.get(speciesId);
+    if (!config) return 1.0;
+
+    // Primary band energy
+    const primaryEnergy = bandEnergies[config.primaryBand];
+
+    // Other bands energy (averaged)
+    const otherBands = Object.entries(bandEnergies)
+      .filter(([band]) => band !== config.primaryBand)
+      .map(([_, energy]) => energy);
+    const otherEnergy = otherBands.reduce((sum, e) => sum + e, 0) / otherBands.length;
+
+    // Weighted combination
+    const modulation =
+      primaryEnergy * config.sensitivity +
+      otherEnergy * (1 - config.sensitivity) * config.crossBandInfluence;
+
+    return modulation;
+  }
+}
+
+// ============================================================================
+// XV. MOOD-BASED PARAMETER MODULATION
+// ============================================================================
+
+export interface MoodParameterProfile {
+  crossSpeciesCoupling: number;      // Attraction between different species
+  intraSpeciesInteraction: number;   // Attraction/Repulsion within species
+  pheromoneDiffusionRate: number;
+  pheromoneDecayRate: number;
+  agentSpeed: number;
+  turnSpeed: number;
+  depositRate: number;
+  sensorNoise: number;
+}
+
+/**
+ * Mood-specific parameter profiles
+ * Each mood has characteristic behavioral patterns
+ */
+export const MOOD_PARAMETER_PROFILES: Record<MoodState, MoodParameterProfile> = {
+  [MoodState.ETHEREAL]: {
+    crossSpeciesCoupling: 0.5,       // Weak coupling (floaty)
+    intraSpeciesInteraction: 0.3,    // Weak within-species (dispersed)
+    pheromoneDiffusionRate: 0.8,     // High diffusion (blurred trails)
+    pheromoneDecayRate: 0.98,        // Slow decay (long memory)
+    agentSpeed: 0.5,                 // Slow movement
+    turnSpeed: 0.7,                  // Gentle turns
+    depositRate: 0.6,                // Moderate deposition
+    sensorNoise: 0.1,                // Low noise (smooth)
+  },
+
+  [MoodState.HARMONIC]: {
+    crossSpeciesCoupling: 1.5,       // Strong coupling (synchronized)
+    intraSpeciesInteraction: 1.0,    // Neutral within-species
+    pheromoneDiffusionRate: 0.3,     // Low diffusion (clear trails)
+    pheromoneDecayRate: 0.95,        // Medium decay
+    agentSpeed: 1.0,                 // Normal speed
+    turnSpeed: 1.0,                  // Normal turns
+    depositRate: 1.0,                // Normal deposition
+    sensorNoise: 0.05,               // Very low noise (coordinated)
+  },
+
+  [MoodState.HECTIC]: {
+    crossSpeciesCoupling: 0.8,       // Moderate coupling
+    intraSpeciesInteraction: -0.5,   // REPULSION within species! (scattered)
+    pheromoneDiffusionRate: 0.5,     // Medium diffusion
+    pheromoneDecayRate: 0.90,        // Fast decay (short memory)
+    agentSpeed: 1.8,                 // Fast movement
+    turnSpeed: 2.0,                  // Rapid turns
+    depositRate: 1.5,                // High deposition
+    sensorNoise: 0.3,                // High noise (chaotic)
+  },
+
+  [MoodState.DISSONANT]: {
+    crossSpeciesCoupling: -0.3,      // REPULSION between species!
+    intraSpeciesInteraction: -0.8,   // Strong repulsion within (total scatter)
+    pheromoneDiffusionRate: 1.2,     // Very high diffusion (turbulent)
+    pheromoneDecayRate: 0.85,        // Very fast decay
+    agentSpeed: 1.5,                 // Fast but not as hectic
+    turnSpeed: 2.5,                  // Very rapid, erratic turns
+    depositRate: 0.8,                // Lower deposition (chaotic trails)
+    sensorNoise: 0.5,                // Very high noise (unstable)
+  },
+
+  [MoodState.MELANCHOLIC]: {
+    crossSpeciesCoupling: 0.6,       // Weak coupling
+    intraSpeciesInteraction: 0.5,    // Slight attraction (clustered but separate)
+    pheromoneDiffusionRate: 0.4,     // Low diffusion
+    pheromoneDecayRate: 0.97,        // Very slow decay (persistent)
+    agentSpeed: 0.4,                 // Very slow
+    turnSpeed: 0.5,                  // Slow turns
+    depositRate: 0.7,                // Moderate deposition
+    sensorNoise: 0.08,               // Low noise (deliberate)
+  },
+
+  [MoodState.INTENSE]: {
+    crossSpeciesCoupling: 2.0,       // Very strong coupling (hyper-sync)
+    intraSpeciesInteraction: 1.5,    // Strong attraction (tight packs)
+    pheromoneDiffusionRate: 0.2,     // Very low diffusion (sharp trails)
+    pheromoneDecayRate: 0.93,        // Medium-fast decay
+    agentSpeed: 2.0,                 // Very fast
+    turnSpeed: 1.5,                  // Fast but controlled
+    depositRate: 2.0,                // Very high deposition (bright trails)
+    sensorNoise: 0.02,               // Very low noise (precise coordination)
+  },
+};
+
+/**
+ * Interpolate between two mood parameter profiles
+ */
+export function interpolateMoodParameters(
+  from: MoodParameterProfile,
+  to: MoodParameterProfile,
+  t: number  // 0-1: transition progress
+): MoodParameterProfile {
+  const lerp = (a: number, b: number) => a + (b - a) * t;
+
+  return {
+    crossSpeciesCoupling: lerp(from.crossSpeciesCoupling, to.crossSpeciesCoupling),
+    intraSpeciesInteraction: lerp(from.intraSpeciesInteraction, to.intraSpeciesInteraction),
+    pheromoneDiffusionRate: lerp(from.pheromoneDiffusionRate, to.pheromoneDiffusionRate),
+    pheromoneDecayRate: lerp(from.pheromoneDecayRate, to.pheromoneDecayRate),
+    agentSpeed: lerp(from.agentSpeed, to.agentSpeed),
+    turnSpeed: lerp(from.turnSpeed, to.turnSpeed),
+    depositRate: lerp(from.depositRate, to.depositRate),
+    sensorNoise: lerp(from.sensorNoise, to.sensorNoise),
+  };
+}
+
+// ============================================================================
+// XVI. MASTER AFFECTIVE MODULATION SYSTEM
+// ============================================================================
+
+export class AffectiveMusicModulator {
+  private phaseSystem: AffectivePhaseSystem;
+  private nicheSystem: SpeciesNicheSystem;
+
+  private currentAffect: AffectiveState = { arousal: 0.5, valence: 0, tension: 0.3 };
+  private bandEnergies: Record<FrequencyBand, number> = {
+    [FrequencyBand.LOW]: 0,
+    [FrequencyBand.MID]: 0,
+    [FrequencyBand.HIGH]: 0,
+  };
+
+  constructor() {
+    this.phaseSystem = new AffectivePhaseSystem();
+    this.nicheSystem = new SpeciesNicheSystem();
+  }
+
+  /**
+   * Register species with their frequency niches
+   */
+  registerSpecies(configs: SpeciesNicheConfig[]): void {
+    configs.forEach(config => this.nicheSystem.registerSpecies(config));
+  }
+
+  /**
+   * Update and get mood-modulated parameters
+   * NOTE: Requires FFT data access - if not available, uses simplified mood calculation
+   */
+  modulate(
+    features: AudioFeatures,
+    fftData: Float32Array | null,
+    sampleRate: number,
+    deltaTime: number
+  ): {
+    moodParams: MoodParameterProfile;
+    currentMood: MoodState;
+    affect: AffectiveState;
+    bandEnergies: Record<FrequencyBand, number>;
+    transitionProgress: number;
+  } {
+    // 1. Calculate affective state
+    this.currentAffect = calculateAffectiveState(features);
+
+    // 2. Extract band energies (if FFT data available)
+    if (fftData) {
+      this.bandEnergies = extractBandEnergies(fftData, sampleRate);
+    }
+
+    // 3. Update phase system (mood classification)
+    const phaseState = this.phaseSystem.update(this.currentAffect, deltaTime);
+
+    // 4. Get mood parameter profiles
+    const currentProfile = MOOD_PARAMETER_PROFILES[phaseState.currentMood];
+    const previousProfile = MOOD_PARAMETER_PROFILES[phaseState.previousMood];
+
+    // 5. Interpolate if transitioning
+    const moodParams = phaseState.isTransitioning
+      ? interpolateMoodParameters(previousProfile, currentProfile, phaseState.transitionProgress)
+      : currentProfile;
+
+    return {
+      moodParams,
+      currentMood: phaseState.currentMood,
+      affect: this.currentAffect,
+      bandEnergies: this.bandEnergies,
+      transitionProgress: phaseState.transitionProgress,
+    };
+  }
+
+  /**
+   * Get species-specific modulation based on frequency niche
+   */
+  getSpeciesModulation(speciesId: string): number {
+    return this.nicheSystem.getSpeciesModulation(speciesId, this.bandEnergies);
+  }
+
+  getCurrentMood(): MoodState {
+    return this.phaseSystem.getCurrentMood();
+  }
+
+  getCurrentAffect(): AffectiveState {
+    return this.currentAffect;
+  }
+}
