@@ -1,4 +1,4 @@
-import type { RGBColor, HueCyclingParams, VisualizationParams } from '../types';
+import type { RGBColor, VisualizationParams } from '../types';
 
 /**
  * Convert RGB to HSL
