@@ -1,0 +1,137 @@
+name: Scientific Contribution
+description: Suggest improvements to models, validation, or research methodology
+title: "[Science]: "
+labels: ["scientific", "research", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing to the scientific aspects of this project! This template is for research-related contributions.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Contribution Type
+      description: What type of scientific contribution is this?
+      options:
+        - Model improvement (M1/M2/M3)
+        - New validation experiment
+        - Empirical benchmark
+        - Theoretical framework
+        - Parameter optimization
+        - Literature reference
+        - Falsification test
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Scientific Background
+      description: Provide the theoretical or empirical background for this contribution
+      placeholder: What is the scientific basis for this suggestion?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Detailed Proposal
+      description: Describe your scientific contribution in detail
+      placeholder: What exactly are you proposing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis or Prediction
+      description: What predictions does this make? How can it be tested?
+      placeholder: If applicable, state testable hypotheses
+
+  - type: textarea
+    id: methodology
+    attributes:
+      label: Methodology
+      description: How would this be implemented or tested?
+      placeholder: Describe the experimental or computational approach
+
+  - type: textarea
+    id: expected-results
+    attributes:
+      label: Expected Results
+      description: What results do you expect?
+      placeholder: Describe expected outcomes
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Cite relevant literature
+      placeholder: |
+        - Author et al. (Year). Title. Journal.
+        - https://doi.org/...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: model
+    attributes:
+      label: Relevant Model(s)
+      description: Which model(s) does this affect?
+      multiple: true
+      options:
+        - M1 (Classical)
+        - M2 (Context-Switching)
+        - M3 (Quantum-Inspired)
+        - All models
+        - New model proposal
+
+  - type: textarea
+    id: falsification
+    attributes:
+      label: Falsification Criteria
+      description: How could this hypothesis be falsified?
+      placeholder: What evidence would disprove this?
+
+  - type: textarea
+    id: empirical-support
+    attributes:
+      label: Empirical Support
+      description: Is there empirical data supporting this?
+      placeholder: Cite empirical studies or datasets
+
+  - type: dropdown
+    id: alignment
+    attributes:
+      label: Alignment with Pre-registered Protocol
+      description: Does this align with the pre-registered protocol?
+      options:
+        - Yes - Directly supports protocol
+        - Partially - Related but extends protocol
+        - No - New direction
+        - Unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: statistical-approach
+    attributes:
+      label: Statistical Approach
+      description: What statistical methods would be used?
+      placeholder: e.g., AIC/BIC comparison, cross-validation, etc.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Scientific Rigor Checklist
+      options:
+        - label: I have reviewed relevant literature
+          required: true
+        - label: This contribution is theoretically motivated
+          required: true
+        - label: I have considered falsification criteria
+          required: false
+        - label: I can provide references or empirical support
+          required: false

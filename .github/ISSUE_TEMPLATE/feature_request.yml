@@ -1,0 +1,112 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like
+      placeholder: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered
+      placeholder: Have you thought of other ways to solve this?
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What area does this feature relate to?
+      options:
+        - Simulation Engine
+        - User Interface
+        - Visualization/Rendering
+        - Export/Recording
+        - Performance
+        - PWA/Offline
+        - Presets
+        - Documentation
+        - Accessibility
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scientific
+    attributes:
+      label: Scientific Relevance
+      description: Is this feature scientifically motivated?
+      options:
+        - Yes - Improves model accuracy
+        - Yes - Adds validation capability
+        - Yes - Enables new experiments
+        - No - UI/UX improvement
+        - No - Technical improvement
+        - Unsure
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups or Examples
+      description: If applicable, add mockups, sketches, or examples
+      placeholder: Paste or drag images here
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: How would you use this feature?
+      placeholder: Describe a specific scenario where this would be useful
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority (Your Opinion)
+      description: How important is this feature to you?
+      options:
+        - Critical - Cannot work without it
+        - High - Would significantly improve workflow
+        - Medium - Nice to have
+        - Low - Minor improvement
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, references, or links about the feature request
+      placeholder: Any additional information
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues and this is not a duplicate
+          required: true
+        - label: I have read the documentation and this feature doesn't already exist
+          required: true
+        - label: This feature aligns with the project's goals (biosemiotics research)
+          required: false
