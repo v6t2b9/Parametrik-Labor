@@ -40,7 +40,6 @@ export class AudioAnalyzer {
 
   private startTime: number = 0;
   private pausedAt: number = 0;
-  private pauseDuration: number = 0;
 
   private isPlaying: boolean = false;
   private currentMode: 'none' | 'file' | 'microphone' = 'none';
