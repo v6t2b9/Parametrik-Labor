@@ -70,7 +70,7 @@ Transform your simulations into stunning visual experiences:
 
 ### Parameter Control System
 
-Parameters are organized into **8 "Oikos"** (ecological) dimensions:
+Parameters are organized into **9 "Oikos"** (ecological) dimensions:
 
 #### 🧬 Model Oikos
 **NEW!** Quantum-Inspired Stigmergy Computational Models:
@@ -140,6 +140,54 @@ Post-processing effects for Lavalampen-Magie (see Post-Processing Effects sectio
 
 #### ⚡ Performance Oikos
 Performance optimization and quality settings (see Performance Optimization section above).
+
+#### 🎵 Audio Oikos
+**NEW!** Complete music reactivity system for maximum visual responsiveness to audio:
+
+**Audio Features:**
+- **Enable Music Reactivity** - Toggle audio analysis on/off
+- **Audio Input Source** - Microphone or file upload
+- **Auto-Harmonizer** - Adaptive normalization that learns each song's frequency range
+
+**Core Modulation Strategies:**
+- **Adaptive Normalization**: Relative normalization using sliding window (1s history)
+  - Learns actual musical range (e.g., 1500-3000 Hz instead of 0-8000 Hz)
+  - Power curve exaggeration (exponent 2.0-3.0) for dramatic visual impact
+  - Result: Maximum contrast within each song, visible verse/chorus differences
+
+- **Interference Modulation**: Musical mode detection and substrate modulation
+  - **Constructive (Consonance)**: High energy + low complexity + strong rhythm
+    - Effect: Synchronized wave patterns, stronger agent coupling, stable trails
+  - **Destructive (Dissonance)**: High complexity + variable energy + weak rhythm
+    - Effect: Chaotic turbulence, faster diffusion, sensor noise, jittery movements
+
+- **Beat Pulse Modulation**: Impulse-based beat response with exponential decay
+  - On beat: 6x deposit rate → Bright flash
+  - Between beats: Exponential decay → Trails fade
+  - Result: Patterns "dance" to rhythm with explosive pulses
+
+- **Multi-Scale Modulation**: Different time windows capture musical structure
+  - **Micro (100ms)**: High-frequency texture → Agent jitter, turn randomness
+  - **Meso (500ms)**: Rhythmic structure → Beat pulsation, deposit rate
+  - **Macro (4.0s)**: Musical form → Diffusion changes, structural shifts
+
+**3 Audio Presets:**
+- **Resonant Harmony** 🎶: Maximum synchronization on harmonic music (constructive 5.0x, destructive 2.0x, beat 3.0x)
+- **Beat Machine** 💥: Explosive beat response for rhythm-heavy music (balanced interference, beat 8.0x, fast decay)
+- **Spectral Dance** 🌈: Responds to spectral texture and brightness (constructive 3.0x, destructive 4.0x, beat 4.0x)
+
+**Technical Details:**
+- **7+ Audio Features**: Spectral Centroid (brightness), Rolloff, Flatness (complexity), Zero Crossing Rate (texture), RMS Energy, Beat Strength, Tempo
+- **Web Audio API**: Real-time FFT analysis via AnalyserNode (2048 FFT size)
+- **Integration**: Modulates substrate parameters (coupling, decay, diffusion, deposit, turn speed, sensor noise) in real-time
+
+**Usage:**
+1. Enable music reactivity in Audio Oikos panel
+2. Select input source (microphone or upload audio file)
+3. Toggle Auto-Harmonizer for adaptive normalization
+4. Choose audio preset or manually adjust modulation parameters
+5. Observe how patterns synchronize to harmonic passages and become chaotic during dissonant sections
+6. Watch explosive flashes on beats and smooth modulation between beats
 
 ---
 
@@ -499,14 +547,16 @@ parametric-explorer/
 - **Critical fix**: Diffusion frequency is inverted (lower value = more frequent = more diffusion)
 
 #### Parameter-Oikos Organization
-Parameters are organized into **7 "Oikos"** (ecological) dimensions based on their role in structuring emergent patterns:
-1. **Physical**: Environmental constraints (trace persistence, diffusion, saturation)
-2. **Semiotic**: Sign production and perception (species behavior)
-3. **Temporal**: Time-based dynamics (speed, population, chaos)
-4. **Resonance**: Inter-system coupling (attraction/repulsion)
-5. **Visualization**: Visual appearance (colors, brightness, blend modes) - does not affect simulation
-6. **Effects**: Post-processing effects (blur, bloom, distortion, etc.) - does not affect simulation
-7. **Performance**: Quality settings and auto-optimization - affects rendering performance
+Parameters are organized into **9 "Oikos"** (ecological) dimensions based on their role in structuring emergent patterns:
+1. **Model**: Computational model selection (M1/M2/M3) and model-specific parameters
+2. **Physical**: Environmental constraints (trace persistence, diffusion, saturation)
+3. **Semiotic**: Sign production and perception (species behavior)
+4. **Temporal**: Time-based dynamics (speed, population, chaos)
+5. **Resonance**: Inter-system coupling (attraction/repulsion)
+6. **Visualization**: Visual appearance (colors, brightness, blend modes) - does not affect simulation
+7. **Effects**: Post-processing effects (blur, bloom, distortion, etc.) - does not affect simulation
+8. **Performance**: Quality settings and auto-optimization - affects rendering performance
+9. **Audio**: Music reactivity and modulation (adaptive normalization, interference, beat pulse, multi-scale)
 
 #### Preset System
 - **Global Presets**: 8 full-parameter configurations for extreme/canonical states
@@ -640,11 +690,18 @@ For detailed theoretical background, see `parametrics_paper_draft.md` and `Param
 
 ## Roadmap
 
-### Phase 1: Core MVP + Quantum Extension ✅ **COMPLETE**
+### Phase 1: Core MVP + Quantum Extension + Audio Oikos ✅ **COMPLETE**
 - ✅ 8-connected diffusion simulation engine
 - ✅ Canvas visualization with fullscreen mode
-- ✅ **8-dimensional parameter controls** (Model, Physical, Semiotic, Temporal, Resonance, Visualization, Effects, Performance)
+- ✅ **9-dimensional parameter controls** (Model, Physical, Semiotic, Temporal, Resonance, Visualization, Effects, Performance, Audio)
 - ✅ **Quantum-Inspired Stigmergy Models** (M1, M2, M3)
+- ✅ **Audio Oikos - Complete Music Reactivity System**
+  - ✅ AudioOikosModulator with 5 integrated classes
+  - ✅ Adaptive normalization (Auto-Harmonizer)
+  - ✅ Interference modulation (consonance/dissonance detection)
+  - ✅ Beat pulse modulation (impulse-based beat response)
+  - ✅ Multi-scale modulation (micro/meso/macro time windows)
+  - ✅ 3 audio presets (Resonant Harmony, Beat Machine, Spectral Dance)
 - ✅ 8 global presets + 43 tab-specific presets (51 total!)
 - ✅ Screenshot export
 - ✅ Real-time parameter manipulation
@@ -775,11 +832,19 @@ Inspired by:
 
 ---
 
-**Version**: 2.0.0 (Phase 1 Complete - Ultimate Visual Edition)
-**Status**: Production-ready with 51 presets, 7 parameter dimensions, 4 blend modes, 11 effects, and adaptive performance optimization
-**Last Updated**: 2025-11-09
+**Version**: 2.1.0 (Phase 1 Complete - Ultimate Visual & Audio Edition)
+**Status**: Production-ready with 51 presets, 9 parameter dimensions (including Audio Oikos), 4 blend modes, 11 effects, and adaptive performance optimization
+**Last Updated**: 2025-11-16
 
-### Recent Updates (2025-11-09)
+### Recent Updates (2025-11-16)
+- ✅ **Audio Oikos - Complete Music Reactivity System** 🎵
+  - AudioOikosModulator with 5 integrated modulation classes
+  - Adaptive normalization (Auto-Harmonizer) for maximum visual contrast
+  - Interference modulation (consonance/dissonance detection)
+  - Beat pulse modulation (explosive impulse responses)
+  - Multi-scale modulation (micro/meso/macro time windows)
+  - 3 audio presets (Resonant Harmony, Beat Machine, Spectral Dance)
+  - Real-time audio analysis via Web Audio API (7+ spectral features)
 - ✅ Complete overhaul with 51 total presets (8 global + 43 tab-specific)
 - ✅ Added Effects Oikos with 11 post-processing parameters and 9 presets
 - ✅ Added Performance Oikos with auto-optimizer and 4 quality presets
@@ -794,4 +859,4 @@ Inspired by:
 
 ---
 
-**Ready to explore emergent coordination? Load a preset and press Play!** 🚀
+**Ready to explore emergent coordination? Load a preset, enable music reactivity, and press Play!** 🚀🎵

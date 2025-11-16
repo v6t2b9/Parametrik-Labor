@@ -8,6 +8,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Audio Oikos - Complete Music Reactivity System** 🎵
+  - **AudioOikosModulator** - Master modulation system integrating 5 specialized classes
+  - **AdaptiveNormalizer** - Auto-Harmonizer that learns each song's unique frequency range for maximum visual contrast
+    - Sliding window normalization (1-second history)
+    - Power curve exaggeration (exponents 2.0-3.0) for dramatic visual responses
+  - **InterferenceModulator** - Multi-dimensional consonance/dissonance detection
+    - Constructive interference (consonance) → synchronized agent movements, stronger coupling, stable trails
+    - Destructive interference (dissonance) → chaotic turbulence, faster diffusion, sensor noise
+  - **BeatPulseModulator** - Impulse-based beat response with exponential decay
+    - Explosive deposit rate spikes (6x amplification) on beat detection
+    - Configurable decay factors (0.8-0.99) and amplification (1-10x)
+  - **MultiScaleModulator** - Multi-timescale feature tracking
+    - Micro scale (100ms): High-frequency texture details → agent jitter, turn randomness
+    - Meso scale (500ms): Rhythmic structure → beat pulsation, deposit rate
+    - Macro scale (4.0s): Musical form → diffusion changes, overall energy
+  - **3 Audio Presets** - Curated configurations for different musical styles
+    - Resonant Harmony: Maximum synchronization on harmonic music
+    - Beat Machine: Explosive response to beats and rhythm
+    - Spectral Dance: Responds to spectral characteristics and texture
+  - **Real-time Audio Analysis** - 7+ spectral features extracted via Web Audio API
+    - Spectral Centroid (brightness), Rolloff, Flatness (complexity)
+    - Zero Crossing Rate (texture), RMS Energy
+    - Beat detection and tempo tracking
+  - **MusicReactiveEngine** - Integration layer between audio analysis and simulation
+    - Modulates substrate parameters in real-time based on music
+    - Supports all three stigmergy models (M1/M2/M3)
+
 - Progressive Web App (PWA) support
   - Installable on desktop and mobile devices
   - Offline support with service worker
@@ -23,13 +50,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - CONTRIBUTING.md with contribution guidelines
   - CODE_OF_CONDUCT.md for community standards
   - SELF_HOSTING.md with deployment instructions
-  - Enhanced README.md with PWA installation guide
+  - Enhanced README.md with PWA installation guide and Audio Oikos features
 - Development tooling
   - vite-plugin-pwa for PWA generation
   - PWA enabled in development mode for testing
 
 ### Changed
-- Updated README.md with PWA features and installation instructions
+- Updated README.md with PWA features, Audio Oikos system, and installation instructions
+- Updated project structure documentation to include audio/ directory
+- Enhanced Technology Stack section with Web Audio API mention
 - Improved documentation structure with dedicated developer docs section
 - Enhanced build process to support PWA generation
 
