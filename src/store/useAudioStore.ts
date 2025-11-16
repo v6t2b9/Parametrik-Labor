@@ -266,7 +266,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   },
 
   // Export video (placeholder for now)
-  exportVideo: async (options: any) => {
+  exportVideo: async (_options: any) => {
     console.log('[Audio Oikos] Video export not yet implemented');
     set({ isExporting: true, exportProgress: 0 });
 

@@ -86,7 +86,7 @@ export function getFrequencyRangeEnergy(
   minFreq: number,
   maxFreq: number,
   sampleRate: number,
-  fftSize: number
+  _fftSize: number
 ): number {
   // Calculate bin indices for frequency range
   const nyquist = sampleRate / 2;

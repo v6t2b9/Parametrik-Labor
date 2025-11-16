@@ -88,7 +88,7 @@ export function calculateStability(tension: number): number {
  * @returns Estimated BPM (60-180)
  */
 export function estimateBPM(
-  bassEnergy: number,
+  _bassEnergy: number,
   beatInterval: number
 ): number {
   if (beatInterval <= 0 || !isFinite(beatInterval)) {

@@ -4,12 +4,11 @@
  */
 
 import { QuantumStigmergyEngine } from './QuantumStigmergyEngine';
-import type { Agent, AgentType, ResolvedSpeciesParams } from '../types/index';
+import type { Agent } from '../types/index';
 import type {
   MusicAnalysis,
   MusicMappingParameters,
   BehaviorModulation,
-  CurveType,
 } from '../types/musicMappings';
 import { applyCurve, clamp } from '../audio/utils';
 
@@ -253,7 +252,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
    */
   private applyModulationToAgent(
     agent: Agent,
-    modulation: BehaviorModulation,
+    _modulation: BehaviorModulation,
     music: MusicAnalysis,
     mappings: MusicMappingParameters
   ): void {
@@ -295,9 +294,9 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       mappings.rhythm.beatDepositBurst &&
       music.rhythm.beat
     ) {
-      const burstAmount = mappings.rhythm.beatBurstIntensity * 10;
       // Deposit handled by parent class, we'd need to expose depositTrail method
       // For MVP, this is a placeholder - can be enhanced later
+      // Future: const burstAmount = mappings.rhythm.beatBurstIntensity * 10;
     }
 
     // Note: Most modulation is indirect - we're modulating the emergent behavior
