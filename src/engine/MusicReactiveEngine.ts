@@ -12,9 +12,13 @@ import type {
   BehaviorModulation,
 } from '../types/musicMappings';
 import { applyCurve, clamp } from '../audio/utils';
-import { BeatPulseModulator } from '../audio/BeatPulseModulator';
-import { InterferenceModulator } from '../audio/InterferenceModulator';
-import { MultiScaleModulator } from '../audio/MultiScaleModulator';
+
+// Import from unified AudioOikosModulator
+import {
+  BeatPulseModulator,
+  InterferenceModulator,
+  MultiScaleModulator,
+} from '../audio/AudioOikosModulator';
 
 export class MusicReactiveEngine extends QuantumStigmergyEngine {
   // Species-specific music mappings (resolved from AllParameters)
@@ -39,22 +43,18 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     super(gridSize);
 
     // Initialize modulators (disabled by default)
-    this.beatPulseModulator = new BeatPulseModulator({
-      decayFactor: 0.95,
-      amplification: 5.0,
-    });
+    // New AudioOikosModulator interface: separate parameters
+    this.beatPulseModulator = new BeatPulseModulator(
+      0.95,  // beatDecay
+      5.0    // amplification
+    );
 
-    this.interferenceModulator = new InterferenceModulator({
-      consonanceWeight: 1.0,
-      dissonanceWeight: 1.0,
-    });
+    this.interferenceModulator = new InterferenceModulator(
+      1.0,  // consonanceWeight
+      1.0   // dissonanceWeight
+    );
 
-    this.multiScaleModulator = new MultiScaleModulator({
-      microWindow: 0.1,
-      mesoWindow: 0.5,
-      macroWindow: 4.0,
-      fps: 60,
-    });
+    this.multiScaleModulator = new MultiScaleModulator(60); // fps
   }
 
   /**
@@ -86,11 +86,17 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
     if (this.useBeatPulse) {
       // Update beat pulse decay (assuming 60fps, ~16.67ms per frame)
-      this.beatPulseModulator.update(analysis.timestamp * 1000, 1 / 60);
+      // New interface: only deltaTime parameter
+      this.beatPulseModulator.update(1 / 60);
     }
 
     if (this.useMultiScale) {
-      this.multiScaleModulator.update(analysis);
+      // MultiScaleModulator.update expects micro/meso/macro features
+      this.multiScaleModulator.update(
+        analysis.spectral.zcr,                // micro (zero crossing rate)
+        analysis.rhythm.beatStrength,         // meso
+        analysis.spectral.centroid            // macro
+      );
     }
   }
 
@@ -306,17 +312,24 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     if (this.useBeatPulse) {
       const beatImpulse = this.beatPulseModulator.getImpulse();
       if (beatImpulse > 0) {
-        // Deposit rate spike on beat (1x → 6x)
-        depositRateMult *= this.beatPulseModulator.modulateDeposition(1.0);
+        // Deposit rate spike on beat (1x → 6x with amplification=5.0)
+        depositRateMult *= this.beatPulseModulator.modulate(1.0);
 
-        // Speed boost on beat (1x → 2x)
-        moveSpeedMult *= this.beatPulseModulator.modulateSpeed(1.0);
+        // Speed boost on beat (reduced amplification for speed)
+        moveSpeedMult *= (1.0 + beatImpulse * 1.0); // 1x → 2x boost
       }
     }
 
     // Interference: Consonance/Dissonance modulation
     if (this.useInterference) {
-      const interference = this.interferenceModulator.calculateFromAnalysis(music);
+      // Construct MusicalMode from MusicAnalysis
+      const mode = {
+        energy: music.dynamics.loudness,
+        brightness: music.spectral.centroid,
+        complexity: music.spectral.flatness,
+        rhythm: music.rhythm.beatStrength,
+      };
+      const interference = this.interferenceModulator.calculateResonance(mode);
 
       // High consonance → strong synchronization (long trails, low noise)
       if (interference.constructive > 0.5) {
@@ -336,8 +349,13 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     }
 
     // Multi-Scale: Micro/Meso/Macro temporal modulation
-    if (this.useMultiScale && this.multiScaleModulator.isReady()) {
-      const scales = this.multiScaleModulator.update(music);
+    if (this.useMultiScale) {
+      // Update was already called in updateMusicAnalysis, call again to get current values
+      const scales = this.multiScaleModulator.update(
+        music.spectral.zcr,
+        music.rhythm.beatStrength,
+        music.spectral.centroid
+      );
 
       // Micro: Subtle turn jitter from high-frequency texture
       turnRandomnessMult *= (1.0 + scales.micro * 0.3);
@@ -463,9 +481,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
    */
   setBeatPulseEnabled(enabled: boolean): void {
     this.useBeatPulse = enabled;
-    if (!enabled) {
-      this.beatPulseModulator.reset();
-    }
+    // Note: BeatPulseModulator impulse will naturally decay to 0
   }
 
   /**
