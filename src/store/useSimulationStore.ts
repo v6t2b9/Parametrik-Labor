@@ -18,7 +18,7 @@ import type {
   AspectRatio,
 } from '../types/index.js';
 import { defaultParameters } from '../presets';
-import { QuantumStigmergyEngine } from '../engine/QuantumStigmergyEngine';
+import { MusicReactiveEngine } from '../engine/MusicReactiveEngine';
 import { exportPresetAsJSON, importPresetFromJSON } from '../utils/presetIO';
 
 // Helper: Merge universal + species overrides
@@ -100,7 +100,7 @@ interface SimulationStore {
   frameCount: number;
   agents: Agent[];
   trails: Trails;
-  engine: QuantumStigmergyEngine;
+  engine: MusicReactiveEngine;
 
   // Parameters
   parameters: AllParameters;
@@ -165,8 +165,8 @@ interface SimulationStore {
 const GRID_SIZE = 400;
 
 export const useSimulationStore = create<SimulationStore>((set, get) => {
-  // Create engine instance
-  const engine = new QuantumStigmergyEngine(GRID_SIZE);
+  // Create engine instance (using MusicReactiveEngine which extends QuantumStigmergyEngine)
+  const engine = new MusicReactiveEngine(GRID_SIZE);
   engine.setParameters(defaultParameters);
   engine.initializeAgents(defaultParameters.globalTemporal.agentCount);
 
