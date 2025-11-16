@@ -355,7 +355,7 @@ When creating a PR, include:
 
 When adding validation experiments:
 
-1. Follow the template in `docs/Template_Parameter_Experiment.md`
+1. Follow the template in `docs/experiments/Template_Parameter_Experiment.md`
 2. Include clear hypotheses and predictions
 3. Document methodology
 4. Provide reproducible results
