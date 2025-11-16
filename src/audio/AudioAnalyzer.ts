@@ -218,8 +218,8 @@ export class AudioAnalyzer {
     }
 
     // Get frequency and time domain data
-    this.analyser.getByteFrequencyData(this.frequencyData);
-    this.analyser.getByteTimeDomainData(this.timeData);
+    this.analyser.getByteFrequencyData(this.frequencyData as Uint8Array<ArrayBuffer>);
+    this.analyser.getByteTimeDomainData(this.timeData as Uint8Array<ArrayBuffer>);
 
     const sampleRate = this.audioContext.sampleRate;
     const timestamp = this.audioContext.currentTime;
