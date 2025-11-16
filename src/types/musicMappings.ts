@@ -4,7 +4,7 @@
  */
 
 // Curve types for mapping audio values to behavior
-export type CurveType = 'linear' | 'exponential' | 'logarithmic';
+export type CurveType = 'linear' | 'exponential' | 'logarithmic' | 'sigmoid';
 
 /**
  * Real-time audio analysis data
@@ -16,6 +16,10 @@ export interface MusicAnalysis {
     bassEnergy: number;      // 20-250 Hz
     midEnergy: number;       // 250-2000 Hz
     highEnergy: number;      // 2000-20000 Hz
+    centroid: number;        // 0-1, spectral brightness (weighted average frequency)
+    rolloff: number;         // 0-1, frequency below which 85% of energy is contained
+    flatness: number;        // 0-1, noisiness vs tonality (0=tonal, 1=noisy)
+    zcr: number;             // 0-1, zero crossing rate (texture/percussiveness)
   };
 
   // Tempo and arousal (calculated from BPM)
@@ -31,6 +35,7 @@ export interface MusicAnalysis {
     dissonance: number;      // 0-1 (tense, high roughness)
     tension: number;         // 0-1 (= dissonance)
     stability: number;       // 0-1 (= 1 - tension)
+    chroma: number[];        // 12-element array, pitch class distribution (C, C#, D, ..., B)
   };
 
   // Rhythm detection
