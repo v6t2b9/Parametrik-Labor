@@ -18,8 +18,6 @@ export function AudioSimulationBridge() {
     currentAnalysis,
     isPlaying,
     inputMode,
-    play,
-    pause,
   } = useAudioStore();
 
   // Note: Audio mappings are now synced via SimulationStore.setParameters
