@@ -16,6 +16,7 @@ export interface AdaptiveNormalizerConfig {
   windowSize?: number;        // Number of samples to keep (default: 600 = 10s at 60fps)
   smoothingFactor?: number;   // How quickly to adapt (0.001-0.1, default: 0.02)
   percentileRange?: [number, number]; // Ignore outliers (default: [5, 95])
+  exaggeration?: number;      // Power curve exponent for dramatic effect (default: 1.0)
 }
 
 export interface AdaptiveRange {
@@ -42,6 +43,7 @@ export class AdaptiveNormalizer {
   private windowSize: number;
   private smoothingFactor: number;
   private percentileRange: [number, number];
+  private exaggeration: number;
 
   // History buffers for each feature
   private history: Map<string, number[]> = new Map();
@@ -56,6 +58,7 @@ export class AdaptiveNormalizer {
     this.windowSize = config.windowSize || 600; // 10 seconds at 60fps
     this.smoothingFactor = config.smoothingFactor || 0.02; // 2% update rate
     this.percentileRange = config.percentileRange || [5, 95]; // Ignore outliers
+    this.exaggeration = config.exaggeration || 1.0; // No exaggeration by default
   }
 
   /**
@@ -147,10 +150,43 @@ export class AdaptiveNormalizer {
     const range = this.adaptiveRanges.get(featureName)!;
 
     // Adaptive normalization
-    const normalized = (rawValue - range.min) / (range.max - range.min);
+    let normalized = (rawValue - range.min) / (range.max - range.min);
 
     // Clamp to [0, 1]
-    return Math.max(0, Math.min(1, normalized));
+    normalized = Math.max(0, Math.min(1, normalized));
+
+    // Apply exaggeration (power curve for dramatic effect)
+    // exponent > 1: Amplifies extremes (0→0, 1→1, middle compressed)
+    // exponent < 1: Compresses extremes (S-curve effect)
+    if (this.exaggeration !== 1.0) {
+      normalized = Math.pow(normalized, this.exaggeration);
+    }
+
+    return normalized;
+  }
+
+  /**
+   * Normalize with custom exaggeration
+   * Useful for different dramatic effects per feature
+   *
+   * @param exponent - Power curve exponent (1.0 = linear, >1 = dramatic, <1 = subtle)
+   */
+  public normalizeExaggerated(featureName: string, rawValue: number, exponent: number): number {
+    // Update history and ranges
+    this.update(featureName, rawValue);
+
+    const range = this.adaptiveRanges.get(featureName)!;
+
+    // Adaptive normalization
+    let normalized = (rawValue - range.min) / (range.max - range.min);
+
+    // Clamp to [0, 1]
+    normalized = Math.max(0, Math.min(1, normalized));
+
+    // Apply custom exaggeration
+    normalized = Math.pow(normalized, exponent);
+
+    return normalized;
   }
 
   /**
@@ -209,6 +245,7 @@ export class AdaptiveNormalizer {
     if (config.windowSize !== undefined) this.windowSize = config.windowSize;
     if (config.smoothingFactor !== undefined) this.smoothingFactor = config.smoothingFactor;
     if (config.percentileRange !== undefined) this.percentileRange = config.percentileRange;
+    if (config.exaggeration !== undefined) this.exaggeration = config.exaggeration;
   }
 
   /**

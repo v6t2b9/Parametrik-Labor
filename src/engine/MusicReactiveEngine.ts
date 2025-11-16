@@ -12,6 +12,9 @@ import type {
   BehaviorModulation,
 } from '../types/musicMappings';
 import { applyCurve, clamp } from '../audio/utils';
+import { BeatPulseModulator } from '../audio/BeatPulseModulator';
+import { InterferenceModulator } from '../audio/InterferenceModulator';
+import { MultiScaleModulator } from '../audio/MultiScaleModulator';
 
 export class MusicReactiveEngine extends QuantumStigmergyEngine {
   // Species-specific music mappings (resolved from AllParameters)
@@ -21,6 +24,38 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
   private currentMusicAnalysis: MusicAnalysis | null = null;
   private musicEnabled: boolean = false;
+
+  // Enhanced modulators (optional, can be enabled/disabled)
+  private beatPulseModulator: BeatPulseModulator;
+  private interferenceModulator: InterferenceModulator;
+  private multiScaleModulator: MultiScaleModulator;
+
+  // Modulator enable flags
+  private useBeatPulse: boolean = false;
+  private useInterference: boolean = false;
+  private useMultiScale: boolean = false;
+
+  constructor(gridSize?: number) {
+    super(gridSize);
+
+    // Initialize modulators (disabled by default)
+    this.beatPulseModulator = new BeatPulseModulator({
+      decayFactor: 0.95,
+      amplification: 5.0,
+    });
+
+    this.interferenceModulator = new InterferenceModulator({
+      consonanceWeight: 1.0,
+      dissonanceWeight: 1.0,
+    });
+
+    this.multiScaleModulator = new MultiScaleModulator({
+      microWindow: 0.1,
+      mesoWindow: 0.5,
+      macroWindow: 4.0,
+      fps: 60,
+    });
+  }
 
   /**
    * Override setParameters to extract species-specific audio mappings
@@ -40,6 +75,23 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
    */
   updateMusicAnalysis(analysis: MusicAnalysis): void {
     this.currentMusicAnalysis = analysis;
+
+    // Update enhanced modulators if enabled
+    if (this.useBeatPulse && analysis.rhythm.beat) {
+      this.beatPulseModulator.onBeatDetected(
+        analysis.rhythm.beatStrength,
+        analysis.timestamp * 1000 // Convert to ms
+      );
+    }
+
+    if (this.useBeatPulse) {
+      // Update beat pulse decay (assuming 60fps, ~16.67ms per frame)
+      this.beatPulseModulator.update(analysis.timestamp * 1000, 1 / 60);
+    }
+
+    if (this.useMultiScale) {
+      this.multiScaleModulator.update(analysis);
+    }
   }
 
   /**
@@ -248,6 +300,57 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       explorationBiasMult *= 1.0 + stressEffect;
     }
 
+    // 12. ENHANCED MODULATORS (optional, dramatic effects)
+
+    // Beat Pulse: Explosive modulation on beats with decay
+    if (this.useBeatPulse) {
+      const beatImpulse = this.beatPulseModulator.getImpulse();
+      if (beatImpulse > 0) {
+        // Deposit rate spike on beat (1x → 6x)
+        depositRateMult *= this.beatPulseModulator.modulateDeposition(1.0);
+
+        // Speed boost on beat (1x → 2x)
+        moveSpeedMult *= this.beatPulseModulator.modulateSpeed(1.0);
+      }
+    }
+
+    // Interference: Consonance/Dissonance modulation
+    if (this.useInterference) {
+      const interference = this.interferenceModulator.calculateFromAnalysis(music);
+
+      // High consonance → strong synchronization (long trails, low noise)
+      if (interference.constructive > 0.5) {
+        // Slower decay for stable patterns (not directly modulated here, but documented)
+        // Lower turn randomness for smoother movements
+        turnRandomnessMult *= 0.7;
+      }
+
+      // High dissonance → chaos and turbulence
+      if (interference.destructive > 0.5) {
+        // Increase turn randomness (jittery movements)
+        turnRandomnessMult *= (1.0 + interference.destructive * 0.5);
+
+        // Increase turn speed (nervous behavior)
+        turnSpeedMult *= (1.0 + interference.destructive * 0.3);
+      }
+    }
+
+    // Multi-Scale: Micro/Meso/Macro temporal modulation
+    if (this.useMultiScale && this.multiScaleModulator.isReady()) {
+      const scales = this.multiScaleModulator.update(music);
+
+      // Micro: Subtle turn jitter from high-frequency texture
+      turnRandomnessMult *= (1.0 + scales.micro * 0.3);
+
+      // Meso: Rhythmic deposit pulse (already handled by beat pulse, skip if overlap)
+      if (!this.useBeatPulse) {
+        depositRateMult *= (1.0 + scales.meso * 2.0);
+      }
+
+      // Macro: Structural speed shifts (overall energy)
+      moveSpeedMult *= (0.8 + scales.macro * 0.4);
+    }
+
     // Apply global influence multiplier
     const neutral = 1.0;
     moveSpeedMult = neutral + (moveSpeedMult - neutral) * globalInfluence;
@@ -351,5 +454,70 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
    */
   isMusicEnabled(): boolean {
     return this.musicEnabled;
+  }
+
+  // Enhanced Modulator Controls
+
+  /**
+   * Enable/disable beat pulse modulation
+   */
+  setBeatPulseEnabled(enabled: boolean): void {
+    this.useBeatPulse = enabled;
+    if (!enabled) {
+      this.beatPulseModulator.reset();
+    }
+  }
+
+  /**
+   * Enable/disable interference modulation
+   */
+  setInterferenceEnabled(enabled: boolean): void {
+    this.useInterference = enabled;
+  }
+
+  /**
+   * Enable/disable multi-scale modulation
+   */
+  setMultiScaleEnabled(enabled: boolean): void {
+    this.useMultiScale = enabled;
+    if (!enabled) {
+      this.multiScaleModulator.reset();
+    }
+  }
+
+  /**
+   * Get beat pulse modulator (for UI/debugging)
+   */
+  getBeatPulseModulator(): BeatPulseModulator {
+    return this.beatPulseModulator;
+  }
+
+  /**
+   * Get interference modulator (for UI/debugging)
+   */
+  getInterferenceModulator(): InterferenceModulator {
+    return this.interferenceModulator;
+  }
+
+  /**
+   * Get multi-scale modulator (for UI/debugging)
+   */
+  getMultiScaleModulator(): MultiScaleModulator {
+    return this.multiScaleModulator;
+  }
+
+  /**
+   * Check enhanced modulator states
+   */
+  getModulatorStates(): {
+    beatPulse: boolean;
+    interference: boolean;
+    multiScale: boolean;
+  } {
+    return {
+      beatPulse: this.useBeatPulse,
+      interference: this.useInterference,
+      multiScale: this.useMultiScale,
+    };
   }
 }
