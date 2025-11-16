@@ -456,8 +456,8 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     ) {
       const impulseStrength = mappings.rhythm.beatImpulseStrength * music.rhythm.beatStrength;
 
-      // Add to velocity boost (doesn't move position, just increases next movement)
-      (agent as any).__musicVelocityBoost += impulseStrength * 3.0;
+      // Add to velocity boost - MASSIVELY INCREASED for visibility
+      (agent as any).__musicVelocityBoost += impulseStrength * 10.0; // Increased from 3.0
 
       // BEAT → ATTRACTION/REPULSION PULSE (makes trails pulse like veins!)
       // High energy beats = stronger attraction pulse
@@ -465,16 +465,19 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
       if (energyLevel > 0.5) {
         // High energy = attraction pulse (agents drawn together, trails thicken)
-        (agent as any).__musicAttractionPulse += energyLevel * 2.0;
+        (agent as any).__musicAttractionPulse += energyLevel * 5.0; // Increased from 2.0
       } else {
         // Low energy = subtle repulsion (trails spread slightly)
-        (agent as any).__musicRepulsionPulse += (1.0 - energyLevel) * 0.5;
+        (agent as any).__musicRepulsionPulse += (1.0 - energyLevel) * 2.0; // Increased from 0.5
       }
+
+      // Log beat events for debugging
+      console.log('[Music Reactive] BEAT! Impulse:', impulseStrength, 'Energy:', energyLevel);
     }
 
     // BASS ENERGY: Direct velocity push (continuous while bass is present)
-    if (music.spectral.bassEnergy > 0.4) {
-      const bassPush = (music.spectral.bassEnergy - 0.4) * 2.0; // Threshold at 0.4
+    if (music.spectral.bassEnergy > 0.3) { // Lowered threshold from 0.4
+      const bassPush = (music.spectral.bassEnergy - 0.3) * 5.0; // Increased from 2.0
       (agent as any).__musicVelocityBoost += bassPush;
     }
 
@@ -497,17 +500,33 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
     // CONTINUOUS MODULATION (affects base behavior)
 
-    // Apply turn randomness (jitter from high frequencies)
+    // Apply turn randomness (jitter from high frequencies) - INCREASED
     if (modulation.turnRandomnessMultiplier !== 1.0) {
-      const randomness = (modulation.turnRandomnessMultiplier - 1.0) * 0.3;
+      const randomness = (modulation.turnRandomnessMultiplier - 1.0) * 0.8; // Increased from 0.3
       agent.angle += (Math.random() - 0.5) * randomness;
     }
 
-    // Apply speed modulation from tempo/arousal (subtle continuous adjustment)
+    // Apply speed modulation from tempo/arousal - INCREASED
     if (modulation.moveSpeedMultiplier !== 1.0) {
-      const speedAdjust = (modulation.moveSpeedMultiplier - 1.0) * 0.5;
+      const speedAdjust = (modulation.moveSpeedMultiplier - 1.0) * 2.0; // Increased from 0.5
       const dx = Math.cos(agent.angle) * speedAdjust;
       const dy = Math.sin(agent.angle) * speedAdjust;
+
+      agent.x += dx;
+      agent.y += dy;
+
+      const gridSize = this.getGridSize();
+      if (agent.x < 0) agent.x += gridSize;
+      if (agent.x >= gridSize) agent.x -= gridSize;
+      if (agent.y < 0) agent.y += gridSize;
+      if (agent.y >= gridSize) agent.y -= gridSize;
+    }
+
+    // DIRECT LOUDNESS → MOVEMENT (very visible!)
+    if (music.dynamics.loudness > 0.5) {
+      const loudnessPush = (music.dynamics.loudness - 0.5) * 3.0;
+      const dx = Math.cos(agent.angle) * loudnessPush;
+      const dy = Math.sin(agent.angle) * loudnessPush;
 
       agent.x += dx;
       agent.y += dy;

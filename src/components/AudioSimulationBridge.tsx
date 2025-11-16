@@ -56,16 +56,36 @@ export function AudioSimulationBridge() {
     }
 
     let animationFrameId: number;
+    let frameCount = 0;
 
     const update = () => {
       // Update audio analysis from analyzer
       updateAnalysis();
 
+      // Debug: Log every 60 frames (once per second at 60fps)
+      if (frameCount % 60 === 0) {
+        console.log('[AudioSimulationBridge] Running - musicEnabled:', musicEnabled, 'currentAnalysis:', !!currentAnalysis);
+      }
+
       // Sync current analysis to engine
       if (currentAnalysis && engine) {
         engine.updateMusicAnalysis(currentAnalysis);
+
+        // Debug first few frames
+        if (frameCount < 5) {
+          console.log('[AudioSimulationBridge] Frame', frameCount, '- Sending analysis to engine:', {
+            beat: currentAnalysis.rhythm.beat,
+            bassEnergy: currentAnalysis.spectral.bassEnergy,
+            loudness: currentAnalysis.dynamics.loudness,
+          });
+        }
+      } else {
+        if (frameCount < 5) {
+          console.warn('[AudioSimulationBridge] No analysis or engine!', { engine: !!engine, analysis: !!currentAnalysis });
+        }
       }
 
+      frameCount++;
       animationFrameId = requestAnimationFrame(update);
     };
 
