@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
+import { useAudioStore } from '../store/useAudioStore';
 import GIF from 'gif.js.optimized';
 
 interface ControlBarProps {
@@ -8,6 +9,17 @@ interface ControlBarProps {
 
 export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics, ui, setAspectRatio } = useSimulationStore();
+  const { musicEnabled, inputMode, togglePlay } = useAudioStore();
+
+  // Combined toggle that syncs audio and simulation when music is enabled
+  const handlePlayPause = () => {
+    toggleRunning();
+
+    // Also toggle audio playback if music is enabled and using file input
+    if (musicEnabled && inputMode === 'file') {
+      togglePlay();
+    }
+  };
 
   // Video recording state (for future Tools tab)
   const [isRecording, setIsRecording] = useState(false);
@@ -344,7 +356,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       {/* Top Row: Simulation Controls and Stats */}
       <div style={styles.topRow}>
         <div style={styles.left}>
-          <button onClick={toggleRunning} style={styles.playButton}>
+          <button onClick={handlePlayPause} style={styles.playButton}>
             {running ? '⏸️ Pause' : '▶️ Play'}
           </button>
           <button onClick={reset} style={styles.button}>

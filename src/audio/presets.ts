@@ -10,7 +10,7 @@ import type { MusicMappingParameters } from '../types/musicMappings';
  * Suitable for most music genres
  */
 export const DEFAULT_PRESET: MusicMappingParameters = {
-  globalMusicInfluence: 1.0,
+  globalMusicInfluence: 1.5,
 
   tempo: {
     tempoToSpeedSensitivity: 0.8,
@@ -65,7 +65,7 @@ export const DEFAULT_PRESET: MusicMappingParameters = {
  * Great for electronic, hip-hop, dubstep
  */
 export const BASS_HEAVY_PRESET: MusicMappingParameters = {
-  globalMusicInfluence: 1.2,
+  globalMusicInfluence: 1.8,
 
   tempo: {
     tempoToSpeedSensitivity: 0.5,
@@ -120,7 +120,7 @@ export const BASS_HEAVY_PRESET: MusicMappingParameters = {
  * Perfect for ambient, classical, meditation music
  */
 export const AMBIENT_PRESET: MusicMappingParameters = {
-  globalMusicInfluence: 0.6,
+  globalMusicInfluence: 1.2,
 
   tempo: {
     tempoToSpeedSensitivity: 0.3,
@@ -150,17 +150,17 @@ export const AMBIENT_PRESET: MusicMappingParameters = {
   },
 
   rhythm: {
-    beatEnabled: false,
-    beatImpulseStrength: 0.0,
-    beatDepositBurst: false,
-    beatBurstIntensity: 0.0,
-    beatCooldown: 0,
+    beatEnabled: true,
+    beatImpulseStrength: 0.8,
+    beatDepositBurst: true,
+    beatBurstIntensity: 0.5,
+    beatCooldown: 500,
   },
 
   dynamics: {
-    loudnessToIntensitySensitivity: 0.5,
-    crescendoDetection: false,
-    crescendoBoostFactor: 1.0,
+    loudnessToIntensitySensitivity: 0.8,
+    crescendoDetection: true,
+    crescendoBoostFactor: 1.3,
   },
 
   compound: {
@@ -230,7 +230,7 @@ export const CHAOTIC_PRESET: MusicMappingParameters = {
  * Subtle response, user can build up from here
  */
 export const MINIMAL_PRESET: MusicMappingParameters = {
-  globalMusicInfluence: 0.5,
+  globalMusicInfluence: 1.0,
 
   tempo: {
     tempoToSpeedSensitivity: 0.5,
@@ -260,17 +260,17 @@ export const MINIMAL_PRESET: MusicMappingParameters = {
   },
 
   rhythm: {
-    beatEnabled: false,
-    beatImpulseStrength: 0.0,
-    beatDepositBurst: false,
-    beatBurstIntensity: 0.0,
-    beatCooldown: 0,
+    beatEnabled: true,
+    beatImpulseStrength: 1.0,
+    beatDepositBurst: true,
+    beatBurstIntensity: 0.8,
+    beatCooldown: 300,
   },
 
   dynamics: {
-    loudnessToIntensitySensitivity: 0.3,
-    crescendoDetection: false,
-    crescendoBoostFactor: 1.0,
+    loudnessToIntensitySensitivity: 0.6,
+    crescendoDetection: true,
+    crescendoBoostFactor: 1.2,
   },
 
   compound: {
