@@ -1,5 +1,8 @@
 // Core Type Definitions for Parametric Space Explorer
 
+// Export ecosystem types
+export * from './ecosystem.js';
+
 export type AgentType = 'red' | 'green' | 'blue';
 
 // Complex number type for quantum amplitudes
