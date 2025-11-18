@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { PhysicalOikosPanel } from './PhysicalOikosPanel';
 import { SemioticOikosPanel } from './SemioticOikosPanel';
-import { TemporalOikosPanel } from './TemporalOikosPanel';
 import { ResonanceOikosPanel } from './ResonanceOikosPanel';
 import { VisualizationOikosPanel } from './VisualizationOikosPanel';
 import { EffectsOikosPanel } from './EffectsOikosPanel';
@@ -12,7 +11,7 @@ import { ModelOikosPanel } from './ModelOikosPanel';
 import { AudioOikosPanel } from './AudioOikosPanel';
 import { EcosystemOikosPanel } from './EcosystemOikosPanel';
 
-type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'ecosystem' | 'audio' | 'visualization' | 'effects' | 'performance';
+type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'resonance' | 'ecosystem' | 'audio' | 'visualization' | 'effects' | 'performance';
 
 export function ParameterControlCenter() {
   const [activeTab, setActiveTab] = useState<TabType>('presets');
@@ -47,11 +46,6 @@ export function ParameterControlCenter() {
           active={activeTab === 'semiotic'}
           onClick={() => setActiveTab('semiotic')}
           label="👁️ Semiotisch"
-        />
-        <Tab
-          active={activeTab === 'temporal'}
-          onClick={() => setActiveTab('temporal')}
-          label="⏱️ Temporal"
         />
         <Tab
           active={activeTab === 'resonance'}
@@ -90,7 +84,6 @@ export function ParameterControlCenter() {
         {activeTab === 'model' && <ModelOikosPanel />}
         {activeTab === 'physical' && <PhysicalOikosPanel />}
         {activeTab === 'semiotic' && <SemioticOikosPanel />}
-        {activeTab === 'temporal' && <TemporalOikosPanel />}
         {activeTab === 'resonance' && <ResonanceOikosPanel />}
         {activeTab === 'ecosystem' && <EcosystemOikosPanel />}
         {activeTab === 'audio' && <AudioOikosPanel />}
