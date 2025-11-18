@@ -12,9 +12,9 @@ export function EffectsOikosPanel() {
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.title}>🎨 Effects Oikos</h3>
+      <h3 style={styles.title}>✨ Effects Oikos</h3>
       <p style={styles.description}>
-        Post-processing effects for Lavalampen-Magie
+        Post-processing layer stack - effects are rendered in order from base to top
       </p>
 
       {/* Presets */}
@@ -35,133 +35,151 @@ export function EffectsOikosPanel() {
         </div>
       </div>
 
-      {/* Blur & Glow */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Blur & Glow</h4>
-        <ParameterSlider
-          label="Blur"
-          value={effects.blur}
-          min={0}
-          max={20}
-          step={0.5}
-          onChange={(value) => updateEffectsParams({ blur: value })}
-          description="Gaussian blur radius (px). Higher = softer, dreamier"
-        />
-        <ParameterSlider
-          label="Bloom"
-          value={effects.bloom}
-          min={0}
-          max={1}
-          step={0.05}
-          onChange={(value) => updateEffectsParams({ bloom: value })}
-          description="Additive glow strength. Higher = more ethereal glow"
-        />
+      {/* Layer 1: Base Effects */}
+      <div style={styles.layerSection}>
+        <h4 style={styles.layerTitle}>🎨 Layer 1: Color Grading (Base)</h4>
+        <p style={styles.layerDescription}>
+          Foundation color adjustments applied to the base image
+        </p>
+        <div style={styles.section}>
+          <ParameterSlider
+            label="Saturation"
+            value={effects.saturation}
+            min={0}
+            max={3}
+            step={0.1}
+            onChange={(value) => updateEffectsParams({ saturation: value })}
+            description="Color saturation (1 = normal, <1 = desaturated, >1 = vivid)"
+          />
+          <ParameterSlider
+            label="Contrast"
+            value={effects.contrast}
+            min={0}
+            max={3}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ contrast: value })}
+            description="Contrast (1 = normal, <1 = flat, >1 = punchy)"
+          />
+          <ParameterSlider
+            label="Hue Shift"
+            value={effects.hueShift}
+            min={0}
+            max={360}
+            step={5}
+            onChange={(value) => updateEffectsParams({ hueShift: value })}
+            description="Hue rotation in degrees (0-360). Cycle through color spectrum"
+          />
+        </div>
       </div>
 
-      {/* Color Grading */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Color Grading</h4>
-        <ParameterSlider
-          label="Saturation"
-          value={effects.saturation}
-          min={0}
-          max={3}
-          step={0.1}
-          onChange={(value) => updateEffectsParams({ saturation: value })}
-          description="Color saturation (1 = normal, <1 = desaturated, >1 = vivid)"
-        />
-        <ParameterSlider
-          label="Contrast"
-          value={effects.contrast}
-          min={0}
-          max={3}
-          step={0.05}
-          onChange={(value) => updateEffectsParams({ contrast: value })}
-          description="Contrast (1 = normal, <1 = flat, >1 = punchy)"
-        />
-        <ParameterSlider
-          label="Hue Shift"
-          value={effects.hueShift}
-          min={0}
-          max={360}
-          step={5}
-          onChange={(value) => updateEffectsParams({ hueShift: value })}
-          description="Hue rotation in degrees (0-360). Cycle through color spectrum"
-        />
+      {/* Layer 2: Spatial Effects */}
+      <div style={styles.layerSection}>
+        <h4 style={styles.layerTitle}>🌫️ Layer 2: Spatial Effects</h4>
+        <p style={styles.layerDescription}>
+          Blur, glow, and motion effects applied after color grading
+        </p>
+        <div style={styles.section}>
+          <ParameterSlider
+            label="Blur"
+            value={effects.blur}
+            min={0}
+            max={20}
+            step={0.5}
+            onChange={(value) => updateEffectsParams({ blur: value })}
+            description="Gaussian blur radius (px). Higher = softer, dreamier"
+          />
+          <ParameterSlider
+            label="Bloom"
+            value={effects.bloom}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ bloom: value })}
+            description="Additive glow strength. Higher = more ethereal glow"
+          />
+          <ParameterSlider
+            label="Motion Blur"
+            value={effects.motionBlur}
+            min={0}
+            max={0.95}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ motionBlur: value })}
+            description="Frame persistence / ghosting. Higher = longer trails, fluid motion"
+          />
+        </div>
       </div>
 
-      {/* Motion & Trails */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Motion & Trails</h4>
-        <ParameterSlider
-          label="Motion Blur"
-          value={effects.motionBlur}
-          min={0}
-          max={0.95}
-          step={0.05}
-          onChange={(value) => updateEffectsParams({ motionBlur: value })}
-          description="Frame persistence / ghosting. Higher = longer trails, fluid motion"
-        />
+      {/* Layer 3: Distortion Effects */}
+      <div style={styles.layerSection}>
+        <h4 style={styles.layerTitle}>🌀 Layer 3: Distortion & Lo-Fi</h4>
+        <p style={styles.layerDescription}>
+          Spatial distortions and pixelation effects
+        </p>
+        <div style={styles.section}>
+          <ParameterSlider
+            label="Chromatic Aberration"
+            value={effects.chromaticAberration}
+            min={0}
+            max={15}
+            step={0.5}
+            onChange={(value) => updateEffectsParams({ chromaticAberration: value })}
+            description="RGB channel offset (px). Creates retro glitch / CRT effect"
+          />
+          <ParameterSlider
+            label="Pixelation"
+            value={effects.pixelation}
+            min={1}
+            max={16}
+            step={1}
+            onChange={(value) => updateEffectsParams({ pixelation: value })}
+            description="Pixel/block size. 1 = none, higher = more retro pixelated"
+          />
+          <ParameterSlider
+            label="Wave Distortion"
+            value={effects.waveDistortion}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ waveDistortion: value })}
+            description="Sine wave amplitude (disabled for performance, kept for compatibility)"
+          />
+        </div>
       </div>
 
-      {/* Atmospheric */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Atmospheric</h4>
-        <ParameterSlider
-          label="Vignette"
-          value={effects.vignette}
-          min={0}
-          max={1}
-          step={0.05}
-          onChange={(value) => updateEffectsParams({ vignette: value })}
-          description="Edge darkening. Higher = stronger focus on center"
-        />
+      {/* Layer 4: Screen Overlays */}
+      <div style={styles.layerSection}>
+        <h4 style={styles.layerTitle}>📺 Layer 4: Screen Overlays (Top)</h4>
+        <p style={styles.layerDescription}>
+          Final overlay effects rendered on top of everything - vignette, then scanlines last
+        </p>
+        <div style={styles.section}>
+          <ParameterSlider
+            label="Vignette"
+            value={effects.vignette}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ vignette: value })}
+            description="Edge darkening overlay. Higher = stronger focus on center"
+          />
+          <ParameterSlider
+            label="Scanlines"
+            value={effects.scanlines}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ scanlines: value })}
+            description="CRT scanline overlay (top layer). Perfect for Matrix/Retro look"
+          />
+        </div>
       </div>
 
-      {/* Psychedelic / Distortion */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Psychedelic / Distortion</h4>
-        <ParameterSlider
-          label="Chromatic Aberration"
-          value={effects.chromaticAberration}
-          min={0}
-          max={15}
-          step={0.5}
-          onChange={(value) => updateEffectsParams({ chromaticAberration: value })}
-          description="RGB channel offset (px). Creates retro glitch / CRT effect"
-        />
-        <ParameterSlider
-          label="Wave Distortion"
-          value={effects.waveDistortion}
-          min={0}
-          max={1}
-          step={0.05}
-          onChange={(value) => updateEffectsParams({ waveDistortion: value })}
-          description="Sine wave amplitude. Higher = more liquid/psychedelic warping"
-        />
-      </div>
-
-      {/* Retro / Lo-Fi */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Retro / Lo-Fi</h4>
-        <ParameterSlider
-          label="Scanlines"
-          value={effects.scanlines}
-          min={0}
-          max={1}
-          step={0.05}
-          onChange={(value) => updateEffectsParams({ scanlines: value })}
-          description="CRT scanline effect strength. Perfect for Matrix/Retro look"
-        />
-        <ParameterSlider
-          label="Pixelation"
-          value={effects.pixelation}
-          min={1}
-          max={16}
-          step={1}
-          onChange={(value) => updateEffectsParams({ pixelation: value })}
-          description="Pixel/block size. 1 = none, higher = more retro pixelated"
-        />
+      <div style={styles.infoBox}>
+        <p style={styles.infoText}>
+          💡 <strong>Rendering Order:</strong> Effects are applied from Layer 1 → Layer 4.
+          <br/>
+          Screen Overlays (Layer 4) are always rendered last, with Scanlines as the final top layer.
+        </p>
       </div>
     </div>
   );
@@ -225,5 +243,39 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
+  } as React.CSSProperties,
+  layerSection: {
+    marginBottom: '24px',
+    padding: '16px',
+    backgroundColor: '#0a0a15',
+    borderRadius: '8px',
+    border: '1px solid #2a2b3a',
+  } as React.CSSProperties,
+  layerTitle: {
+    margin: '0 0 6px 0',
+    fontSize: '15px',
+    color: '#9d7dd4',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+  } as React.CSSProperties,
+  layerDescription: {
+    margin: '0 0 16px 0',
+    fontSize: '11px',
+    color: '#7d7d8d',
+    lineHeight: '1.4',
+  } as React.CSSProperties,
+  infoBox: {
+    padding: '12px',
+    backgroundColor: '#0a0a15',
+    borderRadius: '6px',
+    border: '1px solid #3d2d5d',
+    marginTop: '8px',
+  } as React.CSSProperties,
+  infoText: {
+    fontSize: '11px',
+    color: '#a0a0b0',
+    lineHeight: '1.6',
+    margin: 0,
   } as React.CSSProperties,
 };

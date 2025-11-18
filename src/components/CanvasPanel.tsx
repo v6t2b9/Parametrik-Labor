@@ -448,33 +448,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // If needed, consider implementing with CSS transform or WebGL shader
     // Keeping the parameter for backward compatibility but not applying the effect
 
-    // === 8. Vignette ===
-    if (effects.vignette > 0) {
-      const centerX = canvasWidth / 2;
-      const centerY = canvasHeight / 2;
-      const maxRadius = Math.max(canvasWidth, canvasHeight) * 0.7;
-      const gradient = ctx.createRadialGradient(
-        centerX, centerY, Math.min(canvasWidth, canvasHeight) * 0.3,
-        centerX, centerY, maxRadius
-      );
-      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      gradient.addColorStop(1, `rgba(0, 0, 0, ${effects.vignette})`);
-
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    }
-
-    // === 9. Scanlines (CRT Effect) - OPTIMIZED with cached pattern ===
-    if (effects.scanlines > 0 && scanlinePatternRef.current) {
-      ctx.globalCompositeOperation = 'multiply';
-      ctx.globalAlpha = effects.scanlines;
-      ctx.fillStyle = scanlinePatternRef.current;
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-      ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = 'source-over';
-    }
-
-    // === 10. Render agents (optional - Lab Mode) ===
+    // === 8. Render agents (optional - Lab Mode) ===
+    // Rendered BEFORE screen overlays (vignette, scanlines) for correct layering
     // Controlled via currentVisualization.showAgents and currentVisualization.useTriangles
     if (currentVisualization.showAgents && currentVisualization.brightness > 0.5) {
       // Check if we're in ecosystem mode and should render ecosystem-specific agents
@@ -551,6 +526,34 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
           }
         });
       }
+    }
+
+    // === 9. Vignette (Screen Overlay) ===
+    // Applied AFTER agents for correct layering - darkens edges
+    if (effects.vignette > 0) {
+      const centerX = canvasWidth / 2;
+      const centerY = canvasHeight / 2;
+      const maxRadius = Math.max(canvasWidth, canvasHeight) * 0.7;
+      const gradient = ctx.createRadialGradient(
+        centerX, centerY, Math.min(canvasWidth, canvasHeight) * 0.3,
+        centerX, centerY, maxRadius
+      );
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      gradient.addColorStop(1, `rgba(0, 0, 0, ${effects.vignette})`);
+
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    }
+
+    // === 10. Scanlines (Top Screen Overlay - CRT Effect) ===
+    // MUST be rendered LAST as top layer - OPTIMIZED with cached pattern
+    if (effects.scanlines > 0 && scanlinePatternRef.current) {
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.globalAlpha = effects.scanlines;
+      ctx.fillStyle = scanlinePatternRef.current;
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
     }
 
     // === 11. Render ecosystem crystals (if in ecosystem mode) ===
