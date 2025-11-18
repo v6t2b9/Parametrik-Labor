@@ -598,6 +598,18 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
     return this.crystals.reduce((sum, c) => sum + c.energy, 0);
   }
 
+  /**
+   * Override setParameters to update ecology configuration
+   */
+  public setParameters(params: AllParameters): void {
+    super.setParameters(params);
+
+    // Update ecology config if present in parameters
+    if (params.ecosystem) {
+      this.ecologyConfig = params.ecosystem;
+    }
+  }
+
   public resetEcosystem(params: AllParameters): void {
     this.crystals = [];
     this.crystalGrid.clear();

@@ -20,6 +20,7 @@ import type {
 import type { MusicMappingParameters } from '../types/musicMappings';
 import { defaultParameters } from '../presets';
 import { MusicReactiveEngine } from '../engine/MusicReactiveEngine';
+import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
 import { exportPresetAsJSON, importPresetFromJSON } from '../utils/presetIO';
 
 // Helper: Merge universal + species overrides
@@ -105,7 +106,7 @@ interface SimulationStore {
   frameCount: number;
   agents: Agent[];
   trails: Trails;
-  engine: MusicReactiveEngine;
+  engine: MusicReactiveEngine | MusicReactiveEcosystemEngine;
 
   // Parameters
   parameters: AllParameters;
@@ -172,11 +173,26 @@ interface SimulationStore {
 
 const GRID_SIZE = 400;
 
+// Helper: Create the appropriate engine based on ecosystem mode
+function createEngine(params: AllParameters, gridSize: number = GRID_SIZE): MusicReactiveEngine | MusicReactiveEcosystemEngine {
+  const ecosystemMode = params.ecosystemMode || false;
+
+  if (ecosystemMode) {
+    const ecosystemEngine = new MusicReactiveEcosystemEngine(gridSize);
+    ecosystemEngine.setParameters(params);
+    ecosystemEngine.initializeEcosystem(params);
+    return ecosystemEngine;
+  } else {
+    const engine = new MusicReactiveEngine(gridSize);
+    engine.setParameters(params);
+    engine.initializeAgents(params.globalTemporal.agentCount);
+    return engine;
+  }
+}
+
 export const useSimulationStore = create<SimulationStore>((set, get) => {
-  // Create engine instance (using MusicReactiveEngine which extends QuantumStigmergyEngine)
-  const engine = new MusicReactiveEngine(GRID_SIZE);
-  engine.setParameters(defaultParameters);
-  engine.initializeAgents(defaultParameters.globalTemporal.agentCount);
+  // Create initial engine instance
+  const engine = createEngine(defaultParameters, GRID_SIZE);
 
   return {
     // Initial state
@@ -264,10 +280,28 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         ecosystem: params.ecosystem ? { ...currentParams.ecosystem, ...params.ecosystem } : currentParams.ecosystem,
       };
 
-      const { engine } = get();
-      engine.setParameters(newParams);
+      // Check if ecosystem mode changed - if so, recreate engine
+      const oldEcosystemMode = currentParams.ecosystemMode || false;
+      const newEcosystemMode = newParams.ecosystemMode || false;
 
-      set({ parameters: newParams });
+      if (oldEcosystemMode !== newEcosystemMode) {
+        // Ecosystem mode changed - create new engine
+        const newEngine = createEngine(newParams, GRID_SIZE);
+
+        set({
+          parameters: newParams,
+          engine: newEngine,
+          agents: newEngine.getAgents(),
+          trails: newEngine.getTrails(),
+          frameCount: 0,
+        });
+      } else {
+        // Same mode - just update parameters
+        const { engine } = get();
+        engine.setParameters(newParams);
+
+        set({ parameters: newParams });
+      }
     },
 
     loadPreset: (params: AllParameters) => {
