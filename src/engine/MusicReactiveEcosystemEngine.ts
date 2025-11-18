@@ -99,6 +99,29 @@ export class MusicReactiveEcosystemEngine extends EcosystemEngine {
   }
 
   /**
+   * Compatibility methods for AudioSimulationBridge
+   * These are no-ops for ecosystem engine as it has different modulation system
+   */
+  public setBeatPulseEnabled(_enabled: boolean): void {
+    // No-op: Ecosystem uses audio-ecology mapping instead
+  }
+
+  public setInterferenceEnabled(_enabled: boolean): void {
+    // No-op: Ecosystem uses audio-ecology mapping instead
+  }
+
+  public setMultiScaleEnabled(_enabled: boolean): void {
+    // No-op: Ecosystem uses audio-ecology mapping instead
+  }
+
+  /**
+   * Alias for compatibility with AudioSimulationBridge
+   */
+  public updateMusicAnalysis(analysis: MusicAnalysis): void {
+    this.updateWithMusic(analysis);
+  }
+
+  /**
    * Get current music enabled state
    */
   public isMusicEnabled(): boolean {
@@ -125,9 +148,10 @@ export class MusicReactiveEcosystemEngine extends EcosystemEngine {
   public setParameters(params: AllParameters): void {
     super.setParameters(params);
 
-    // If params include ecosystem config, update audio ecology config
-    // For now, use default config
-    // TODO: Add ecosystem config to AllParameters
+    // Update audio ecology config if present
+    if (params.ecosystem?.audioEcology) {
+      this.audioEcologyMapper.setConfig(params.ecosystem.audioEcology);
+    }
   }
 
   /**
