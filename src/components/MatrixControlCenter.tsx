@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { PhysicalOikosPanel } from './PhysicalOikosPanel';
 import { SemioticOikosPanel } from './SemioticOikosPanel';
-import { TemporalOikosPanel } from './TemporalOikosPanel';
 import { ResonanceOikosPanel } from './ResonanceOikosPanel';
 import { AudioOikosPanel } from './AudioOikosPanel';
 import { VisualsOikosPanel } from './VisualsOikosPanel';
@@ -41,7 +40,6 @@ const OIKOS_TABS: OikosTabDef[] = [
   { id: 'ecosystem', label: 'Ecosystem', icon: '🌿' },
   { id: 'physical', label: 'Physikalisch', icon: '🌊' },
   { id: 'semiotic', label: 'Semiotisch', icon: '👁️' },
-  { id: 'temporal', label: 'Temporal', icon: '⏱️' },
   { id: 'resonance', label: 'Resonanz', icon: '🔗' },
   { id: 'audio', label: 'Audio', icon: '🎵' },
   { id: 'visuals', label: 'Visuals', icon: '🎨' },
@@ -145,7 +143,6 @@ export function MatrixControlCenter() {
         {ui.activeOikosTab === 'ecosystem' && <EcosystemOikosPanel />}
         {ui.activeOikosTab === 'physical' && <PhysicalOikosPanel />}
         {ui.activeOikosTab === 'semiotic' && <SemioticOikosPanel />}
-        {ui.activeOikosTab === 'temporal' && <TemporalOikosPanel />}
         {ui.activeOikosTab === 'resonance' && <ResonanceOikosPanel />}
         {ui.activeOikosTab === 'audio' && <AudioOikosPanel />}
         {ui.activeOikosTab === 'visuals' && <VisualsOikosPanel />}
