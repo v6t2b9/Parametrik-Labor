@@ -21,12 +21,15 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     }
   };
 
-  // Video recording state (for future Tools tab)
+  // Export panel state
+  const [showExportPanel, setShowExportPanel] = useState(false);
+
+  // Video recording state
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [exportMode, _setExportMode] = useState<'gif-loop' | 'video'>('video');
-  const [videoFormat, _setVideoFormat] = useState<'webm' | 'gif'>('webm');
-  const [videoDuration, _setVideoDuration] = useState<3 | 8 | 12>(3);
+  const [exportMode, setExportMode] = useState<'screenshot' | 'gif-loop' | 'video'>('screenshot');
+  const [videoFormat, setVideoFormat] = useState<'webm' | 'gif'>('webm');
+  const [videoDuration, setVideoDuration] = useState<3 | 8 | 12>(3);
   const [recordedFrameCount, setRecordedFrameCount] = useState(0);
   const [processingProgress, setProcessingProgress] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -34,8 +37,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const gifEncoderRef = useRef<any>(null);
   const recordingIntervalRef = useRef<number | null>(null);
 
-  // Placeholder function for future Tools tab
-  function _takeScreenshot() {
+  function takeScreenshot() {
     const canvas = document.querySelector('canvas');
     if (!canvas) return;
     canvas.toBlob((blob) => {
@@ -69,7 +71,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     return tempCanvas;
   };
 
-  function _startRecording() {
+  function startRecording() {
     const canvas = document.querySelector('canvas') as HTMLCanvasElement;
     if (!canvas) return;
 
@@ -320,7 +322,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   };
 
   // Get button label based on current state
-  function _getButtonLabel() {
+  function getRecordButtonLabel() {
     if (isProcessing) {
       return `⏳ Processing GIF... ${processingProgress}%`;
     }
@@ -344,13 +346,6 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     }
   }
 
-  // Suppress TS6133 - these functions will be used in future Tools tab
-  if (false as boolean) {
-    _takeScreenshot();
-    _startRecording();
-    _getButtonLabel();
-  }
-
   return (
     <div style={styles.container}>
       {/* Top Row: Simulation Controls and Stats */}
@@ -367,6 +362,15 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
               ⛶ Fullscreen
             </button>
           )}
+          <button
+            onClick={() => setShowExportPanel(!showExportPanel)}
+            style={{
+              ...styles.button,
+              ...(showExportPanel ? { backgroundColor: '#7d5dbd', color: '#ffffff' } : {})
+            }}
+          >
+            📸 Export
+          </button>
         </div>
 
         <div style={styles.right}>
@@ -380,8 +384,130 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         </div>
       </div>
 
+      {/* Export Panel */}
+      {showExportPanel && (
+        <div style={styles.exportPanel}>
+          <div style={styles.exportHeader}>
+            <h3 style={styles.exportTitle}>Export & Recording</h3>
+          </div>
+
+          {/* Export Mode Selection */}
+          <div style={styles.exportModes}>
+            <button
+              onClick={() => setExportMode('screenshot')}
+              style={{
+                ...styles.modeButton,
+                ...(exportMode === 'screenshot' ? styles.modeButtonActive : {})
+              }}
+            >
+              📸 Screenshot
+            </button>
+            <button
+              onClick={() => setExportMode('gif-loop')}
+              style={{
+                ...styles.modeButton,
+                ...(exportMode === 'gif-loop' ? styles.modeButtonActive : {})
+              }}
+            >
+              🔄 GIF Loop
+            </button>
+            <button
+              onClick={() => setExportMode('video')}
+              style={{
+                ...styles.modeButton,
+                ...(exportMode === 'video' ? styles.modeButtonActive : {})
+              }}
+            >
+              🎥 Video
+            </button>
+          </div>
+
+          {/* Mode-specific controls */}
+          <div style={styles.exportOptions}>
+            {exportMode === 'screenshot' && (
+              <div style={styles.modeInfo}>
+                <p style={styles.infoText}>📸 Capture the current canvas as a PNG image</p>
+                <button
+                  onClick={takeScreenshot}
+                  disabled={isRecording || isProcessing}
+                  style={styles.actionButton}
+                >
+                  Take Screenshot
+                </button>
+              </div>
+            )}
+
+            {exportMode === 'gif-loop' && (
+              <div style={styles.modeInfo}>
+                <p style={styles.infoText}>🔄 2-second looping GIF with smooth fade transitions</p>
+                <button
+                  onClick={startRecording}
+                  disabled={isRecording || isProcessing}
+                  style={isRecording || isProcessing ? styles.actionButtonDisabled : styles.actionButton}
+                >
+                  {getRecordButtonLabel()}
+                </button>
+                {(isRecording || isProcessing) && (
+                  <div style={styles.progressInfo}>
+                    {isRecording && <p>Capturing frames: {recordedFrameCount}/60</p>}
+                    {isProcessing && <p>Processing: {processingProgress}%</p>}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {exportMode === 'video' && (
+              <div style={styles.modeInfo}>
+                <div style={styles.videoControls}>
+                  <div style={styles.controlGroup}>
+                    <label style={styles.controlLabel}>Format:</label>
+                    <select
+                      value={videoFormat}
+                      onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif')}
+                      disabled={isRecording || isProcessing}
+                      style={styles.formatSelect}
+                    >
+                      <option value="webm">WebM (smaller)</option>
+                      <option value="gif">GIF (universal)</option>
+                    </select>
+                  </div>
+                  <div style={styles.controlGroup}>
+                    <label style={styles.controlLabel}>Duration:</label>
+                    <select
+                      value={videoDuration}
+                      onChange={(e) => setVideoDuration(parseInt(e.target.value) as 3 | 8 | 12)}
+                      disabled={isRecording || isProcessing}
+                      style={styles.formatSelect}
+                    >
+                      <option value={3}>3 seconds</option>
+                      <option value={8}>8 seconds</option>
+                      <option value={12}>12 seconds</option>
+                    </select>
+                  </div>
+                </div>
+                <button
+                  onClick={startRecording}
+                  disabled={isRecording || isProcessing}
+                  style={isRecording || isProcessing ? styles.actionButtonDisabled : styles.actionButton}
+                >
+                  {getRecordButtonLabel()}
+                </button>
+                {(isRecording || isProcessing) && (
+                  <div style={styles.progressInfo}>
+                    {isRecording && videoFormat === 'webm' && <p>Recording: {videoDuration}s</p>}
+                    {isRecording && videoFormat === 'gif' && <p>Capturing frames: {recordedFrameCount}/{videoDuration * 30}</p>}
+                    {isProcessing && <p>Processing: {processingProgress}%</p>}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Bottom Row: Global Parameter Sliders */}
-      <div style={styles.slidersRow}>
+      {!showExportPanel && (
+        <div style={styles.slidersRow}>
         {/* Agent Count Slider */}
         <div style={styles.sliderContainer}>
           <div style={styles.sliderHeader}>
@@ -441,7 +567,8 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             <option value="9:21">9:21 (Ultra Portrait)</option>
           </select>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -602,5 +729,99 @@ const styles = {
     cursor: 'pointer',
     outline: 'none',
     transition: 'all 0.2s',
+  } as React.CSSProperties,
+  // Export Panel Styles
+  exportPanel: {
+    paddingTop: '12px',
+    borderTop: '1px solid #2a2b3a',
+  } as React.CSSProperties,
+  exportHeader: {
+    marginBottom: '12px',
+  } as React.CSSProperties,
+  exportTitle: {
+    fontSize: '16px',
+    color: '#e0e0e0',
+    fontWeight: 600,
+    margin: 0,
+  } as React.CSSProperties,
+  exportModes: {
+    display: 'flex',
+    gap: '8px',
+    marginBottom: '16px',
+  } as React.CSSProperties,
+  modeButton: {
+    padding: '10px 16px',
+    backgroundColor: '#2a2b3a',
+    color: '#a0a0b0',
+    border: '1px solid #3a3b4a',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+    flex: 1,
+  } as React.CSSProperties,
+  modeButtonActive: {
+    backgroundColor: '#7d5dbd',
+    color: '#ffffff',
+    borderColor: '#7d5dbd',
+  } as React.CSSProperties,
+  exportOptions: {
+    minHeight: '120px',
+  } as React.CSSProperties,
+  modeInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  } as React.CSSProperties,
+  infoText: {
+    fontSize: '13px',
+    color: '#a0a0b0',
+    margin: 0,
+  } as React.CSSProperties,
+  actionButton: {
+    padding: '12px 24px',
+    backgroundColor: '#7d5dbd',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'background-color 0.2s',
+  } as React.CSSProperties,
+  actionButtonDisabled: {
+    padding: '12px 24px',
+    backgroundColor: '#4a4a5a',
+    color: '#8a8a9a',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'not-allowed',
+    opacity: 0.6,
+  } as React.CSSProperties,
+  videoControls: {
+    display: 'flex',
+    gap: '16px',
+    marginBottom: '12px',
+  } as React.CSSProperties,
+  controlGroup: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    flex: 1,
+  } as React.CSSProperties,
+  controlLabel: {
+    fontSize: '13px',
+    color: '#e0e0e0',
+    fontWeight: 600,
+    minWidth: '60px',
+  } as React.CSSProperties,
+  progressInfo: {
+    fontSize: '13px',
+    color: '#7d5dbd',
+    fontFamily: 'monospace',
+    fontWeight: 600,
   } as React.CSSProperties,
 };

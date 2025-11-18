@@ -11,9 +11,8 @@ import { PresetGallery } from './PresetGallery';
 import { ModelOikosPanel } from './ModelOikosPanel';
 import { AudioOikosPanel } from './AudioOikosPanel';
 import { EcosystemOikosPanel } from './EcosystemOikosPanel';
-import { ToolsOikosPanel } from './ToolsOikosPanel';
 
-type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'ecosystem' | 'audio' | 'visualization' | 'effects' | 'performance' | 'tools';
+type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'ecosystem' | 'audio' | 'visualization' | 'effects' | 'performance';
 
 export function ParameterControlCenter() {
   const [activeTab, setActiveTab] = useState<TabType>('presets');
@@ -84,11 +83,6 @@ export function ParameterControlCenter() {
           onClick={() => setActiveTab('performance')}
           label="⚡ Performance"
         />
-        <Tab
-          active={activeTab === 'tools'}
-          onClick={() => setActiveTab('tools')}
-          label="🛠️ Tools"
-        />
       </div>
 
       <div style={styles.content}>
@@ -103,7 +97,6 @@ export function ParameterControlCenter() {
         {activeTab === 'visualization' && <VisualizationOikosPanel />}
         {activeTab === 'effects' && <EffectsOikosPanel />}
         {activeTab === 'performance' && <PerformanceOikosPanel />}
-        {activeTab === 'tools' && <ToolsOikosPanel />}
       </div>
     </div>
   );
