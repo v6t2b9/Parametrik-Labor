@@ -260,6 +260,8 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         effects: { ...currentParams.effects, ...(params.effects || {}) },
         performance: { ...currentParams.performance, ...(params.performance || {}) },
         modelParams: { ...currentParams.modelParams, ...(params.modelParams || {}) },
+        ecosystemMode: params.ecosystemMode !== undefined ? params.ecosystemMode : currentParams.ecosystemMode,
+        ecosystem: params.ecosystem ? { ...currentParams.ecosystem, ...params.ecosystem } : currentParams.ecosystem,
       };
 
       const { engine } = get();

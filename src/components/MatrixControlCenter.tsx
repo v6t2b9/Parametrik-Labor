@@ -8,6 +8,7 @@ import { AudioOikosPanel } from './AudioOikosPanel';
 import { VisualsOikosPanel } from './VisualsOikosPanel';
 import { PerformanceOikosPanel } from './PerformanceOikosPanel';
 import { ModelOikosPanel } from './ModelOikosPanel';
+import { EcosystemOikosPanel } from './EcosystemOikosPanel';
 import { PresetGallery } from './PresetGallery';
 import type { SpeciesScope, OikosTab } from '../types';
 
@@ -37,6 +38,7 @@ const SPECIES_TABS: SpeciesTabDef[] = [
 const OIKOS_TABS: OikosTabDef[] = [
   { id: 'presets', label: 'Presets', icon: '🎯' },
   { id: 'model', label: 'Model', icon: '🧬' },
+  { id: 'ecosystem', label: 'Ecosystem', icon: '🌿' },
   { id: 'physical', label: 'Physikalisch', icon: '🌊' },
   { id: 'semiotic', label: 'Semiotisch', icon: '👁️' },
   { id: 'temporal', label: 'Temporal', icon: '⏱️' },
@@ -65,7 +67,7 @@ export function MatrixControlCenter() {
   // For species-specific tabs, filter out presets and global tabs
   const availableOikosTabs = ui.activeSpeciesScope === 'universal'
     ? OIKOS_TABS
-    : OIKOS_TABS.filter(t => !['presets', 'model', 'visuals', 'performance'].includes(t.id));
+    : OIKOS_TABS.filter(t => !['presets', 'model', 'ecosystem', 'visuals', 'performance'].includes(t.id));
 
   return (
     <div style={styles.container}>
@@ -84,7 +86,7 @@ export function MatrixControlCenter() {
               onClick={() => {
                 setActiveSpeciesScope(tab.id);
                 // Switch to appropriate tab if current is not available
-                if (tab.id !== 'universal' && ['presets', 'model', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
+                if (tab.id !== 'universal' && ['presets', 'model', 'ecosystem', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
                   setActiveOikosTab('physical');
                 }
               }}
@@ -140,6 +142,7 @@ export function MatrixControlCenter() {
       <div style={styles.content}>
         {ui.activeOikosTab === 'presets' && <PresetGallery />}
         {ui.activeOikosTab === 'model' && <ModelOikosPanel />}
+        {ui.activeOikosTab === 'ecosystem' && <EcosystemOikosPanel />}
         {ui.activeOikosTab === 'physical' && <PhysicalOikosPanel />}
         {ui.activeOikosTab === 'semiotic' && <SemioticOikosPanel />}
         {ui.activeOikosTab === 'temporal' && <TemporalOikosPanel />}
