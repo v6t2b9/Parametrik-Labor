@@ -2,6 +2,9 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { WebGLTrailRenderer } from './WebGLTrailRenderer';
 import { applyHueCycling } from '../utils/colorUtils';
+import { EcosystemRenderer } from '../engine/EcosystemRenderer';
+import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
+import { SPECIES_COLORS } from '../types/ecosystem';
 
 const DEFAULT_CANVAS_SIZE = 800;
 const GRID_SIZE = 400;
@@ -73,12 +76,18 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const trails = useSimulationStore((state) => state.trails);
   const agents = useSimulationStore((state) => state.agents);
   const running = useSimulationStore((state) => state.running);
+  const engine = useSimulationStore((state) => state.engine);
+  const parameters = useSimulationStore((state) => state.parameters);
   const visualization = useSimulationStore((state) => state.parameters.visualization);
   const effects = useSimulationStore((state) => state.parameters.effects);
   const updatePerformanceMetrics = useSimulationStore((state) => state.updatePerformanceMetrics);
   const performAutoOptimization = useSimulationStore((state) => state.performAutoOptimization);
   const playbackSpeed = useSimulationStore((state) => state.ui.playbackSpeed);
   const aspectRatio = useSimulationStore((state) => state.ui.aspectRatio);
+
+  // Check if ecosystem mode is active
+  const ecosystemMode = parameters.ecosystemMode || false;
+  const isEcosystemEngine = engine instanceof MusicReactiveEcosystemEngine;
 
   // Responsive canvas sizing based on fullscreen mode and aspect ratio
   useEffect(() => {
@@ -468,44 +477,119 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // === 10. Render agents (optional - Lab Mode) ===
     // Controlled via currentVisualization.showAgents and currentVisualization.useTriangles
     if (currentVisualization.showAgents && currentVisualization.brightness > 0.5) {
-      agents.forEach((agent) => {
-        const x = agent.x * scaleX;
-        const y = agent.y * scaleY;
+      // Check if we're in ecosystem mode and should render ecosystem-specific agents
+      if (isEcosystemEngine && ecosystemMode) {
+        // Render ecosystem agents with species colors
+        const ecosystemEngine = engine as MusicReactiveEcosystemEngine;
+        const ecosystemAgents = ecosystemEngine.getEcosystemAgents();
 
-        ctx.fillStyle =
-          agent.type === 'red'
-            ? `rgb(${currentVisualization.colorRed.r}, ${currentVisualization.colorRed.g}, ${currentVisualization.colorRed.b})`
-            : agent.type === 'green'
-            ? `rgb(${currentVisualization.colorGreen.r}, ${currentVisualization.colorGreen.g}, ${currentVisualization.colorGreen.b})`
-            : `rgb(${currentVisualization.colorBlue.r}, ${currentVisualization.colorBlue.g}, ${currentVisualization.colorBlue.b})`;
+        ecosystemAgents.forEach((agent) => {
+          const x = agent.x * scaleX;
+          const y = agent.y * scaleY;
 
-        if (currentVisualization.useTriangles) {
-          // Draw directional triangle (points in movement direction)
-          const size = 3;
-          ctx.save();
-          ctx.translate(x, y);
-          ctx.rotate(agent.angle);
+          // Get species color
+          const color = SPECIES_COLORS[agent.species];
+          // Energy-based alpha (dim when low energy)
+          const alpha = Math.max(0.3, agent.energy);
+          ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
 
-          ctx.beginPath();
-          ctx.moveTo(size, 0);           // tip (front)
-          ctx.lineTo(-size, -size/2);    // back-left
-          ctx.lineTo(-size, size/2);     // back-right
-          ctx.closePath();
-          ctx.fill();
+          if (currentVisualization.useTriangles) {
+            // Draw directional triangle
+            const size = 3;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(agent.angle);
 
-          ctx.restore();
-        } else {
-          // Draw simple dot (no direction info)
-          ctx.beginPath();
-          ctx.arc(x, y, 2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
+            ctx.beginPath();
+            ctx.moveTo(size, 0);           // tip (front)
+            ctx.lineTo(-size, -size/2);    // back-left
+            ctx.lineTo(-size, size/2);     // back-right
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+          } else {
+            // Draw simple dot
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      } else {
+        // Standard stigmergy agent rendering
+        agents.forEach((agent) => {
+          const x = agent.x * scaleX;
+          const y = agent.y * scaleY;
+
+          ctx.fillStyle =
+            agent.type === 'red'
+              ? `rgb(${currentVisualization.colorRed.r}, ${currentVisualization.colorRed.g}, ${currentVisualization.colorRed.b})`
+              : agent.type === 'green'
+              ? `rgb(${currentVisualization.colorGreen.r}, ${currentVisualization.colorGreen.g}, ${currentVisualization.colorGreen.b})`
+              : `rgb(${currentVisualization.colorBlue.r}, ${currentVisualization.colorBlue.g}, ${currentVisualization.colorBlue.b})`;
+
+          if (currentVisualization.useTriangles) {
+            // Draw directional triangle (points in movement direction)
+            const size = 3;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(agent.angle);
+
+            ctx.beginPath();
+            ctx.moveTo(size, 0);           // tip (front)
+            ctx.lineTo(-size, -size/2);    // back-left
+            ctx.lineTo(-size, size/2);     // back-right
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+          } else {
+            // Draw simple dot (no direction info)
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      }
+    }
+
+    // === 11. Render ecosystem crystals (if in ecosystem mode) ===
+    if (isEcosystemEngine && ecosystemMode) {
+      const ecosystemEngine = engine as MusicReactiveEcosystemEngine;
+      const crystals = ecosystemEngine.getCrystals();
+
+      // Render crystals using EcosystemRenderer
+      const renderOptions = {
+        scaleX,
+        scaleY,
+        showAgents: currentVisualization.showAgents,
+        useTriangles: currentVisualization.useTriangles,
+        showCrystals: true,
+        showEnergyRings: true,
+        agentSize: 3,
+        crystalGlow: effects.bloom > 0,
+      };
+
+      EcosystemRenderer.renderCrystals(ctx, crystals, renderOptions);
+
+      // === 12. Render population stats HUD (optional) ===
+      if (currentVisualization.showAgents) {
+        const populationStats = ecosystemEngine.getPopulationStats();
+        const totalCrystals = ecosystemEngine.getTotalCrystals();
+        const totalEnergy = ecosystemEngine.getTotalEnergy();
+
+        EcosystemRenderer.renderHUD(
+          ctx,
+          populationStats,
+          totalCrystals,
+          totalEnergy
+        );
+      }
     }
 
     // Release all pooled canvases
     canvasPool.releaseAll();
-  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scaleX, scaleY]);
+  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scaleX, scaleY, engine, ecosystemMode, isEcosystemEngine]);
 
   // Animation loop with playback speed control
   useEffect(() => {
