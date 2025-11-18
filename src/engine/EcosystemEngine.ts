@@ -87,11 +87,21 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
   private createAgent(species: SpeciesType, gridSize: number): EcosystemAgent {
     const config = getSpeciesConfig(species);
 
+    // Map species to pheromone type for trail compatibility
+    const speciesTypeMap: Record<SpeciesType, 'red' | 'green' | 'blue'> = {
+      builder: 'red',
+      harvester: 'green',
+      consumer: 'blue',
+      decomposer: 'red',
+      scout: 'blue',
+    };
+
     return {
       x: Math.random() * gridSize,
       y: Math.random() * gridSize,
       angle: Math.random() * Math.PI * 2,
       rhythmPhase: Math.random() * Math.PI * 2,
+      type: speciesTypeMap[species], // Assign pheromone type
       species,
       energy: 0.5 + Math.random() * 0.3, // Start with 50-80% energy
       behaviorState: config.defaultState,
@@ -616,5 +626,13 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
     this.crystalFormationCounter = 0;
     this.initializeEcosystem(params);
     this.reset();
+  }
+
+  /**
+   * Override getAgents() to return ecosystem agents for pheromone trail generation
+   * EcosystemAgent extends Agent interface, so this is compatible
+   */
+  public override getAgents(): any[] {
+    return this.ecosystemAgents;
   }
 }

@@ -72,6 +72,7 @@ export interface EcosystemAgent {
   y: number;
   angle: number;
   rhythmPhase: number;
+  type: import('./index.js').AgentType; // For pheromone trail compatibility (red/green/blue)
 
   // Quantum properties (optional, for M3)
   quantumAmplitudes?: import('./index.js').QuantumAmplitudes;
