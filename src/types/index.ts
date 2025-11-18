@@ -226,6 +226,10 @@ export interface AllParameters {
 
   // Quantum-inspired stigmergy model selection
   modelParams: ModelParams;
+
+  // Ecosystem configuration (optional, for ecosystem mode)
+  ecosystem?: import('./ecosystem.js').EcologyConfig;
+  ecosystemMode?: boolean; // Toggle between stigmergy and ecosystem mode
 }
 
 // Helper type for resolved parameters (after merging universal + species)
@@ -269,7 +273,7 @@ export interface EmergentProperties {
 
 // UI State - Matrix Navigation
 export type SpeciesScope = 'universal' | 'red' | 'green' | 'blue';
-export type OikosTab = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'audio' | 'visuals' | 'performance';
+export type OikosTab = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'audio' | 'visuals' | 'performance' | 'ecosystem';
 
 // Aspect Ratio options
 export type AspectRatio = '1:1' | '16:9' | '9:16' | '3:2' | '2:3' | '4:3' | '3:4' | '21:9' | '9:21';

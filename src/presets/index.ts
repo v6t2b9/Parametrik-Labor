@@ -1,5 +1,6 @@
 import type { Preset, AllParameters } from '../types/index.js';
 import { DEFAULT_PRESET } from '../audio/presets';
+import { DEFAULT_ECOLOGY_CONFIG } from '../engine/SpeciesConfigs';
 
 // Default Performance Parameters
 export const defaultPerformanceParams = {
@@ -98,6 +99,9 @@ export const defaultParameters: AllParameters = {
       phaseNoise: 0.05,
     },
   },
+  // Ecosystem mode (optional)
+  ecosystemMode: false, // Default: Stigmergy mode
+  ecosystem: DEFAULT_ECOLOGY_CONFIG,
 };
 
 // Legacy format converter for old presets
@@ -143,6 +147,8 @@ export function convertLegacyPreset(legacy: any): AllParameters {
     },
     performance: legacy.performance,
     modelParams: legacy.modelParams || defaultParameters.modelParams,
+    ecosystemMode: legacy.ecosystemMode || false,
+    ecosystem: legacy.ecosystem || DEFAULT_ECOLOGY_CONFIG,
   };
 }
 
