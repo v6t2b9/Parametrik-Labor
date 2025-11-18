@@ -21,13 +21,12 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     }
   };
 
-  // Export panel state
-  const [showExportPanel, setShowExportPanel] = useState(false);
+  // Video panel state
+  const [showVideoPanel, setShowVideoPanel] = useState(false);
 
   // Video recording state
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [exportMode, setExportMode] = useState<'screenshot' | 'gif-loop' | 'video'>('screenshot');
   const [videoFormat, setVideoFormat] = useState<'webm' | 'gif'>('webm');
   const [videoDuration, setVideoDuration] = useState<3 | 8 | 12>(3);
   const [recordedFrameCount, setRecordedFrameCount] = useState(0);
@@ -51,26 +50,6 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     });
   }
 
-  const applyFadeEffect = (canvas: HTMLCanvasElement, fadeAlpha: number): HTMLCanvasElement => {
-    // Create a temporary canvas with the fade effect
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
-    const ctx = tempCanvas.getContext('2d');
-    if (!ctx) return canvas;
-
-    // Draw original canvas
-    ctx.drawImage(canvas, 0, 0);
-
-    // Apply fade overlay
-    ctx.globalCompositeOperation = 'source-atop';
-    ctx.globalAlpha = fadeAlpha;
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-    return tempCanvas;
-  };
-
   function startRecording() {
     const canvas = document.querySelector('canvas') as HTMLCanvasElement;
     if (!canvas) return;
@@ -78,14 +57,69 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     setRecordedFrameCount(0);
     setIsRecording(true);
 
-    if (exportMode === 'gif-loop') {
-      // GIF Loop mode: 2 seconds with fade transitions
-      const fadeFrames = 10; // Frames for fade in/out
-      const totalFrames = 60; // 2 seconds at 30fps
-      const fps = 30;
+    const duration = videoDuration * 1000; // Convert to milliseconds
+    const maxFrames = videoDuration * 30; // 30 FPS
 
-      console.log('Starting GIF Loop recording...');
+    if (videoFormat === 'webm') {
+      // WebM recording with MediaRecorder
+      try {
+        const stream = canvas.captureStream(30); // 30 FPS
+        const options: MediaRecorderOptions = {
+          mimeType: 'video/webm;codecs=vp9',
+          videoBitsPerSecond: 5000000, // 5 Mbps
+        };
 
+        // Fallback to vp8 if vp9 not supported
+        if (!MediaRecorder.isTypeSupported(options.mimeType!)) {
+          options.mimeType = 'video/webm;codecs=vp8';
+        }
+
+        const mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorderRef.current = mediaRecorder;
+        recordedChunksRef.current = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            recordedChunksRef.current.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `parametric-video-${Date.now()}.webm`;
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+
+          // Delay cleanup to ensure download starts
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            recordedChunksRef.current = [];
+            setIsRecording(false);
+            setIsProcessing(false);
+          }, 100);
+        };
+
+        mediaRecorder.start();
+
+        // Auto-stop after selected duration
+        setTimeout(() => {
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            mediaRecorderRef.current.stop();
+          }
+        }, duration);
+      } catch (error) {
+        console.error('WebM recording error:', error);
+        alert('WebM recording not supported. Try GIF format instead.');
+        setIsRecording(false);
+      }
+    } else {
+      // GIF recording with gif.js
+      console.log('Starting GIF video recording...');
       try {
         const gif = new GIF({
           workers: 2,
@@ -93,18 +127,17 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           width: canvas.width,
           height: canvas.height,
           workerScript: '/gif.worker.js',
-          repeat: 0, // 0 = infinite loop
         });
 
         gifEncoderRef.current = gif;
 
         gif.on('progress', (progress: number) => {
           setProcessingProgress(Math.round(progress * 100));
-          console.log('GIF encoding progress:', (progress * 100).toFixed(1) + '%');
+          console.log('GIF video encoding progress:', (progress * 100).toFixed(1) + '%');
         });
 
         gif.on('finished', (blob: Blob) => {
-          console.log('GIF rendering finished, blob size:', blob.size);
+          console.log('GIF video rendering finished, blob size:', blob.size);
           if (!blob || blob.size === 0) {
             alert('GIF rendering failed: Empty file. Please try again.');
             setIsRecording(false);
@@ -117,7 +150,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `parametric-loop-${Date.now()}.gif`;
+          a.download = `parametric-video-${Date.now()}.gif`;
           a.style.display = 'none';
           document.body.appendChild(a);
           a.click();
@@ -133,11 +166,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           }, 100);
         });
 
-        // Capture frames at 30 FPS with fade effects
+        // Capture frames at 30 FPS
         let frameCount = 0;
         recordingIntervalRef.current = window.setInterval(() => {
-          if (frameCount >= totalFrames) {
-            console.log('All frames captured, starting render...');
+          if (frameCount >= maxFrames) {
+            console.log('All video frames captured, starting render...');
             // Auto-stop and start rendering
             if (recordingIntervalRef.current) {
               clearInterval(recordingIntervalRef.current);
@@ -150,200 +183,38 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             return;
           }
 
-          let fadeAlpha = 1.0;
-
-          // Fade in at the beginning
-          if (frameCount < fadeFrames) {
-            fadeAlpha = (frameCount + 1) / fadeFrames;
-          }
-          // Fade out at the end
-          else if (frameCount >= totalFrames - fadeFrames) {
-            fadeAlpha = (totalFrames - frameCount) / fadeFrames;
-          }
-
-          const frameCanvas = fadeAlpha < 1.0 ? applyFadeEffect(canvas, fadeAlpha) : canvas;
-          gif.addFrame(frameCanvas, { copy: true, delay: 1000 / fps });
-
+          gif.addFrame(canvas, { copy: true, delay: 33 }); // 33ms = ~30fps
           frameCount++;
           setRecordedFrameCount(frameCount);
 
-          if (frameCount % 10 === 0) {
-            console.log(`Captured ${frameCount}/${totalFrames} frames`);
+          if (frameCount % 30 === 0) {
+            console.log(`Captured ${frameCount}/${maxFrames} video frames`);
           }
-        }, 1000 / fps);
+        }, 33);
       } catch (error) {
-        console.error('GIF Loop recording error:', error);
-        alert('GIF Loop recording failed. Please try again.');
+        console.error('GIF recording error:', error);
+        alert('GIF recording failed. Please try again.');
         setIsRecording(false);
       }
-    } else {
-      // Video mode: WebM or GIF with selected duration
-      const duration = videoDuration * 1000; // Convert to milliseconds
-      const maxFrames = videoDuration * 30; // 30 FPS
-
-      if (videoFormat === 'webm') {
-        // WebM recording with MediaRecorder
-        try {
-          const stream = canvas.captureStream(30); // 30 FPS
-          const options: MediaRecorderOptions = {
-            mimeType: 'video/webm;codecs=vp9',
-            videoBitsPerSecond: 5000000, // 5 Mbps
-          };
-
-          // Fallback to vp8 if vp9 not supported
-          if (!MediaRecorder.isTypeSupported(options.mimeType!)) {
-            options.mimeType = 'video/webm;codecs=vp8';
-          }
-
-          const mediaRecorder = new MediaRecorder(stream, options);
-          mediaRecorderRef.current = mediaRecorder;
-          recordedChunksRef.current = [];
-
-          mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-              recordedChunksRef.current.push(event.data);
-            }
-          };
-
-          mediaRecorder.onstop = () => {
-            const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `parametric-video-${Date.now()}.webm`;
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-
-            // Delay cleanup to ensure download starts
-            setTimeout(() => {
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-              recordedChunksRef.current = [];
-              setIsRecording(false);
-              setIsProcessing(false);
-            }, 100);
-          };
-
-          mediaRecorder.start();
-
-          // Auto-stop after selected duration
-          setTimeout(() => {
-            if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-              mediaRecorderRef.current.stop();
-            }
-          }, duration);
-        } catch (error) {
-          console.error('WebM recording error:', error);
-          alert('WebM recording not supported. Try GIF format instead.');
-          setIsRecording(false);
-        }
-      } else {
-        // GIF recording with gif.js (no fade effects for video mode)
-        console.log('Starting GIF video recording...');
-        try {
-          const gif = new GIF({
-            workers: 2,
-            quality: 10,
-            width: canvas.width,
-            height: canvas.height,
-            workerScript: '/gif.worker.js',
-          });
-
-          gifEncoderRef.current = gif;
-
-          gif.on('progress', (progress: number) => {
-            setProcessingProgress(Math.round(progress * 100));
-            console.log('GIF video encoding progress:', (progress * 100).toFixed(1) + '%');
-          });
-
-          gif.on('finished', (blob: Blob) => {
-            console.log('GIF video rendering finished, blob size:', blob.size);
-            if (!blob || blob.size === 0) {
-              alert('GIF rendering failed: Empty file. Please try again.');
-              setIsRecording(false);
-              setIsProcessing(false);
-              setRecordedFrameCount(0);
-              setProcessingProgress(0);
-              return;
-            }
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `parametric-video-${Date.now()}.gif`;
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-
-            // Delay cleanup to ensure download starts
-            setTimeout(() => {
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-              setIsRecording(false);
-              setIsProcessing(false);
-              setRecordedFrameCount(0);
-              setProcessingProgress(0);
-            }, 100);
-          });
-
-          // Capture frames at 30 FPS
-          let frameCount = 0;
-          recordingIntervalRef.current = window.setInterval(() => {
-            if (frameCount >= maxFrames) {
-              console.log('All video frames captured, starting render...');
-              // Auto-stop and start rendering
-              if (recordingIntervalRef.current) {
-                clearInterval(recordingIntervalRef.current);
-                recordingIntervalRef.current = null;
-              }
-              setIsRecording(false);
-              setIsProcessing(true);
-              setProcessingProgress(0);
-              gif.render();
-              return;
-            }
-
-            gif.addFrame(canvas, { copy: true, delay: 33 }); // 33ms = ~30fps
-            frameCount++;
-            setRecordedFrameCount(frameCount);
-
-            if (frameCount % 30 === 0) {
-              console.log(`Captured ${frameCount}/${maxFrames} video frames`);
-            }
-          }, 33);
-        } catch (error) {
-          console.error('GIF recording error:', error);
-          alert('GIF recording failed. Please try again.');
-          setIsRecording(false);
-        }
-      }
     }
-  };
+  }
 
   // Get button label based on current state
   function getRecordButtonLabel() {
     if (isProcessing) {
-      return `⏳ Processing GIF... ${processingProgress}%`;
+      return `⏳ Processing... ${processingProgress}%`;
     }
 
     if (isRecording) {
-      if (exportMode === 'gif-loop') {
-        return `🔴 Capturing... ${recordedFrameCount}/60`;
-      } else if (videoFormat === 'webm') {
-        return `🔴 Recording WebM... ${videoDuration}s`;
+      if (videoFormat === 'webm') {
+        return `🔴 Recording... ${videoDuration}s`;
       } else {
         const maxFrames = videoDuration * 30;
         return `🔴 Capturing... ${recordedFrameCount}/${maxFrames}`;
       }
     }
 
-    // Not recording
-    if (exportMode === 'gif-loop') {
-      return '🎥 Record GIF Loop (2s)';
-    } else {
-      return `🎥 Record ${videoFormat.toUpperCase()} (${videoDuration}s)`;
-    }
+    return '🎥 Start Recording';
   }
 
   return (
@@ -363,13 +234,22 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             </button>
           )}
           <button
-            onClick={() => setShowExportPanel(!showExportPanel)}
+            onClick={takeScreenshot}
+            disabled={isRecording || isProcessing}
+            style={styles.button}
+            title="Take screenshot (PNG)"
+          >
+            📸 Screenshot
+          </button>
+          <button
+            onClick={() => setShowVideoPanel(!showVideoPanel)}
             style={{
               ...styles.button,
-              ...(showExportPanel ? { backgroundColor: '#7d5dbd', color: '#ffffff' } : {})
+              ...(showVideoPanel ? { backgroundColor: '#7d5dbd', color: '#ffffff' } : {})
             }}
+            title="Record video"
           >
-            📸 Export
+            🎥 Video
           </button>
         </div>
 
@@ -384,121 +264,47 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         </div>
       </div>
 
-      {/* Export Panel */}
-      {showExportPanel && (
-        <div style={styles.exportPanel}>
-          <div style={styles.exportHeader}>
-            <h3 style={styles.exportTitle}>Export & Recording</h3>
-          </div>
-
-          {/* Export Mode Selection */}
-          <div style={styles.exportModes}>
+      {/* Video Options Panel */}
+      {showVideoPanel && (
+        <div style={styles.videoPanel}>
+          <div style={styles.videoPanelContent}>
+            <div style={styles.videoOption}>
+              <label style={styles.videoLabel}>Format:</label>
+              <select
+                value={videoFormat}
+                onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif')}
+                disabled={isRecording || isProcessing}
+                style={styles.videoSelect}
+              >
+                <option value="webm">WebM</option>
+                <option value="gif">GIF</option>
+              </select>
+            </div>
+            <div style={styles.videoOption}>
+              <label style={styles.videoLabel}>Duration:</label>
+              <select
+                value={videoDuration}
+                onChange={(e) => setVideoDuration(parseInt(e.target.value) as 3 | 8 | 12)}
+                disabled={isRecording || isProcessing}
+                style={styles.videoSelect}
+              >
+                <option value={3}>3s</option>
+                <option value={8}>8s</option>
+                <option value={12}>12s</option>
+              </select>
+            </div>
             <button
-              onClick={() => setExportMode('screenshot')}
-              style={{
-                ...styles.modeButton,
-                ...(exportMode === 'screenshot' ? styles.modeButtonActive : {})
-              }}
+              onClick={startRecording}
+              disabled={isRecording || isProcessing}
+              style={isRecording || isProcessing ? styles.recordButtonDisabled : styles.recordButton}
             >
-              📸 Screenshot
+              {getRecordButtonLabel()}
             </button>
-            <button
-              onClick={() => setExportMode('gif-loop')}
-              style={{
-                ...styles.modeButton,
-                ...(exportMode === 'gif-loop' ? styles.modeButtonActive : {})
-              }}
-            >
-              🔄 GIF Loop
-            </button>
-            <button
-              onClick={() => setExportMode('video')}
-              style={{
-                ...styles.modeButton,
-                ...(exportMode === 'video' ? styles.modeButtonActive : {})
-              }}
-            >
-              🎥 Video
-            </button>
-          </div>
-
-          {/* Mode-specific controls */}
-          <div style={styles.exportOptions}>
-            {exportMode === 'screenshot' && (
-              <div style={styles.modeInfo}>
-                <p style={styles.infoText}>📸 Capture the current canvas as a PNG image</p>
-                <button
-                  onClick={takeScreenshot}
-                  disabled={isRecording || isProcessing}
-                  style={styles.actionButton}
-                >
-                  Take Screenshot
-                </button>
-              </div>
-            )}
-
-            {exportMode === 'gif-loop' && (
-              <div style={styles.modeInfo}>
-                <p style={styles.infoText}>🔄 2-second looping GIF with smooth fade transitions</p>
-                <button
-                  onClick={startRecording}
-                  disabled={isRecording || isProcessing}
-                  style={isRecording || isProcessing ? styles.actionButtonDisabled : styles.actionButton}
-                >
-                  {getRecordButtonLabel()}
-                </button>
-                {(isRecording || isProcessing) && (
-                  <div style={styles.progressInfo}>
-                    {isRecording && <p>Capturing frames: {recordedFrameCount}/60</p>}
-                    {isProcessing && <p>Processing: {processingProgress}%</p>}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {exportMode === 'video' && (
-              <div style={styles.modeInfo}>
-                <div style={styles.videoControls}>
-                  <div style={styles.controlGroup}>
-                    <label style={styles.controlLabel}>Format:</label>
-                    <select
-                      value={videoFormat}
-                      onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif')}
-                      disabled={isRecording || isProcessing}
-                      style={styles.formatSelect}
-                    >
-                      <option value="webm">WebM (smaller)</option>
-                      <option value="gif">GIF (universal)</option>
-                    </select>
-                  </div>
-                  <div style={styles.controlGroup}>
-                    <label style={styles.controlLabel}>Duration:</label>
-                    <select
-                      value={videoDuration}
-                      onChange={(e) => setVideoDuration(parseInt(e.target.value) as 3 | 8 | 12)}
-                      disabled={isRecording || isProcessing}
-                      style={styles.formatSelect}
-                    >
-                      <option value={3}>3 seconds</option>
-                      <option value={8}>8 seconds</option>
-                      <option value={12}>12 seconds</option>
-                    </select>
-                  </div>
-                </div>
-                <button
-                  onClick={startRecording}
-                  disabled={isRecording || isProcessing}
-                  style={isRecording || isProcessing ? styles.actionButtonDisabled : styles.actionButton}
-                >
-                  {getRecordButtonLabel()}
-                </button>
-                {(isRecording || isProcessing) && (
-                  <div style={styles.progressInfo}>
-                    {isRecording && videoFormat === 'webm' && <p>Recording: {videoDuration}s</p>}
-                    {isRecording && videoFormat === 'gif' && <p>Capturing frames: {recordedFrameCount}/{videoDuration * 30}</p>}
-                    {isProcessing && <p>Processing: {processingProgress}%</p>}
-                  </div>
-                )}
+            {(isRecording || isProcessing) && (
+              <div style={styles.videoProgress}>
+                {isRecording && videoFormat === 'webm' && <span>Recording: {videoDuration}s</span>}
+                {isRecording && videoFormat === 'gif' && <span>Frames: {recordedFrameCount}/{videoDuration * 30}</span>}
+                {isProcessing && <span>Processing: {processingProgress}%</span>}
               </div>
             )}
           </div>
@@ -506,8 +312,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       )}
 
       {/* Bottom Row: Global Parameter Sliders */}
-      {!showExportPanel && (
-        <div style={styles.slidersRow}>
+      <div style={styles.slidersRow}>
         {/* Agent Count Slider */}
         <div style={styles.sliderContainer}>
           <div style={styles.sliderHeader}>
@@ -567,8 +372,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             <option value="9:21">9:21 (Ultra Portrait)</option>
           </select>
         </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -730,95 +534,64 @@ const styles = {
     outline: 'none',
     transition: 'all 0.2s',
   } as React.CSSProperties,
-  // Export Panel Styles
-  exportPanel: {
+  // Video Panel Styles
+  videoPanel: {
     paddingTop: '12px',
     borderTop: '1px solid #2a2b3a',
   } as React.CSSProperties,
-  exportHeader: {
-    marginBottom: '12px',
-  } as React.CSSProperties,
-  exportTitle: {
-    fontSize: '16px',
-    color: '#e0e0e0',
-    fontWeight: 600,
-    margin: 0,
-  } as React.CSSProperties,
-  exportModes: {
+  videoPanelContent: {
     display: 'flex',
-    gap: '8px',
-    marginBottom: '16px',
-  } as React.CSSProperties,
-  modeButton: {
-    padding: '10px 16px',
-    backgroundColor: '#2a2b3a',
-    color: '#a0a0b0',
-    border: '1px solid #3a3b4a',
-    borderRadius: '6px',
-    fontSize: '14px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'all 0.2s',
-    flex: 1,
-  } as React.CSSProperties,
-  modeButtonActive: {
-    backgroundColor: '#7d5dbd',
-    color: '#ffffff',
-    borderColor: '#7d5dbd',
-  } as React.CSSProperties,
-  exportOptions: {
-    minHeight: '120px',
-  } as React.CSSProperties,
-  modeInfo: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-  } as React.CSSProperties,
-  infoText: {
-    fontSize: '13px',
-    color: '#a0a0b0',
-    margin: 0,
-  } as React.CSSProperties,
-  actionButton: {
-    padding: '12px 24px',
-    backgroundColor: '#7d5dbd',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-  } as React.CSSProperties,
-  actionButtonDisabled: {
-    padding: '12px 24px',
-    backgroundColor: '#4a4a5a',
-    color: '#8a8a9a',
-    border: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
-    fontWeight: 600,
-    cursor: 'not-allowed',
-    opacity: 0.6,
-  } as React.CSSProperties,
-  videoControls: {
-    display: 'flex',
+    alignItems: 'center',
     gap: '16px',
-    marginBottom: '12px',
+    flexWrap: 'wrap',
   } as React.CSSProperties,
-  controlGroup: {
+  videoOption: {
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
-    flex: 1,
   } as React.CSSProperties,
-  controlLabel: {
+  videoLabel: {
     fontSize: '13px',
     color: '#e0e0e0',
     fontWeight: 600,
     minWidth: '60px',
   } as React.CSSProperties,
-  progressInfo: {
+  videoSelect: {
+    padding: '8px 12px',
+    backgroundColor: '#2a2b3a',
+    color: '#e0e0e0',
+    border: '1px solid #3a3b4a',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    outline: 'none',
+    transition: 'all 0.2s',
+    minWidth: '100px',
+  } as React.CSSProperties,
+  recordButton: {
+    padding: '8px 20px',
+    backgroundColor: '#7d5dbd',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'background-color 0.2s',
+  } as React.CSSProperties,
+  recordButtonDisabled: {
+    padding: '8px 20px',
+    backgroundColor: '#4a4a5a',
+    color: '#8a8a9a',
+    border: 'none',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: 600,
+    cursor: 'not-allowed',
+    opacity: 0.6,
+  } as React.CSSProperties,
+  videoProgress: {
     fontSize: '13px',
     color: '#7d5dbd',
     fontFamily: 'monospace',
