@@ -91,6 +91,32 @@ This document provides a comprehensive overview of the Parametrik-Labor architec
 │  └─────────────────────────────────────────────────────┘   │
 │                                                               │
 │  ┌─────────────────────────────────────────────────────┐   │
+│  │         EcosystemEngine (extends Quantum)            │   │
+│  │  ┌──────────────────────────────────────────────┐  │   │
+│  │  │  Multi-Species System                         │  │   │
+│  │  │  - 5 species (builder, harvester, consumer,   │  │   │
+│  │  │    decomposer, scout)                         │  │   │
+│  │  │  - Energy-based lifecycle                     │  │   │
+│  │  │  - Behavior state machines                    │  │   │
+│  │  │  - Population dynamics                        │  │   │
+│  │  └──────────────────────────────────────────────┘  │   │
+│  │  ┌──────────────────────────────────────────────┐  │   │
+│  │  │  Crystal System                               │  │   │
+│  │  │  - Formation from pheromone concentrations    │  │   │
+│  │  │  - Energy storage & decay                     │  │   │
+│  │  │  - Consumption by agents                      │  │   │
+│  │  │  - Spatial grid optimization                  │  │   │
+│  │  └──────────────────────────────────────────────┘  │   │
+│  │  ┌──────────────────────────────────────────────┐  │   │
+│  │  │  Audio-Ecology Mapping                        │  │   │
+│  │  │  - Bass → builders                            │  │   │
+│  │  │  - Mids → harvesters                          │  │   │
+│  │  │  - Highs → scouts/decomposers                 │  │   │
+│  │  │  - Transients → consumers                     │  │   │
+│  │  └──────────────────────────────────────────────┘  │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                               │
+│  ┌─────────────────────────────────────────────────────┐   │
 │  │              ComplexMath                             │   │
 │  │  - Complex number operations                         │   │
 │  │  - Phase rotation                                    │   │
@@ -182,6 +208,7 @@ App
         ├── SemioticOikosPanel (Semiotic params)
         ├── TemporalOikosPanel (Time-related)
         ├── ResonanceOikosPanel (Quantum params)
+        ├── EcosystemOikosPanel (Multi-species ecosystem)
         ├── VisualsOikosPanel (Visual settings)
         ├── EffectsOikosPanel (Post-processing)
         └── PerformanceOikosPanel (FPS, resolution)
@@ -405,6 +432,243 @@ class QuantumStigmergyEngine {
 - Interference between agents
 - Amplitude coupling effects
 
+### Ecosystem Engine (Multi-Species Extension)
+
+**Location:** `src/engine/EcosystemEngine.ts`, `src/engine/MusicReactiveEcosystemEngine.ts`
+
+The EcosystemEngine extends QuantumStigmergyEngine with multi-species dynamics, energy-based lifecycles, and resource consumption.
+
+#### Architecture
+
+```typescript
+class EcosystemEngine extends QuantumStigmergyEngine {
+  // Core ecosystem state
+  private ecosystemAgents: EcosystemAgent[]
+  private crystals: Crystal[]
+  private crystalGrid: CrystalGrid  // Spatial optimization
+  private ecologyConfig: EcologyConfig
+
+  // Population tracking
+  private populationStats: PopulationStats
+  private speciesBoosts: SpeciesBoosts  // Audio modulation
+
+  // Main update loop
+  updateEcosystem(audioData?: AudioFeatures): void {
+    // 1. Update audio boosts (bass → builders, etc.)
+    // 2. Update agent behaviors (state machines)
+    // 3. Apply energy decay
+    // 4. Check for death (energy <= 0)
+    // 5. Check for reproduction
+    // 6. Update crystals (decay, removal)
+    // 7. Form new crystals from pheromones
+    // 8. Update base stigmergy (super.update())
+    // 9. Update population stats
+  }
+
+  // Override getAgents() for pheromone trail compatibility
+  public override getAgents(): EcosystemAgent[] {
+    return this.ecosystemAgents
+  }
+}
+```
+
+#### Species Types
+
+Five distinct species with unique behaviors and ecology:
+
+| Species | Color | Diet | Production | Role |
+|---------|-------|------|------------|------|
+| **Builder** | Orange | Food | Build | Structure formation |
+| **Harvester** | Green | Build | Food | Resource gathering |
+| **Consumer** | Magenta | Food, Home | Home | Resource consumption |
+| **Decomposer** | Purple | All | Food | Cleanup, recycling |
+| **Scout** | Blue | Food | Home | Exploration |
+
+#### EcosystemAgent Structure
+
+```typescript
+interface EcosystemAgent {
+  // Base agent properties
+  x: number
+  y: number
+  angle: number
+  rhythmPhase: number
+  type: 'red' | 'green' | 'blue'  // For pheromone trail compatibility
+
+  // Ecosystem properties
+  species: SpeciesType
+  energy: number              // 0-1, dies at 0
+  behaviorState: BehaviorState
+  targetCrystal: Crystal | null
+  age: number
+  reproductionCooldown: number
+  lastReproduction: number
+}
+```
+
+#### Behavior State Machine
+
+Agents transition between behavioral states:
+
+```
+IDLE → EXPLORE → SEEK_FOOD → APPROACH_CRYSTAL → CONSUME
+         ↓           ↓              ↓
+    [Species-specific behaviors]
+    BUILD, HARVEST, HUNT, DECOMPOSE, SCOUT
+```
+
+**State Descriptions:**
+
+- **IDLE/EXPLORE:** Random movement, sensory scanning, low energy check
+- **SEEK_FOOD:** Active search for consumable crystals, gradient following
+- **APPROACH_CRYSTAL:** Direct movement toward target crystal
+- **CONSUME:** Extract energy from crystal, convert to agent energy
+- **Species-specific:** Unique behaviors (builders deposit build pheromones, scouts explore rapidly, etc.)
+
+#### Crystal System
+
+Crystals form at high pheromone concentrations and serve as consumable resources.
+
+```typescript
+class Crystal {
+  x: number
+  y: number
+  type: CrystalType        // 'food', 'build', 'home'
+  sourceSpecies: SpeciesType
+  energy: number           // Depletes as consumed
+  age: number
+  decayRate: number
+
+  update(dt: number): boolean {
+    // Age and decay
+    // Return false if depleted
+  }
+
+  consume(amount: number): number {
+    // Extract energy, return actual consumed
+  }
+}
+```
+
+**Crystal Formation:**
+- Samples pheromone grid every 10 frames
+- Forms crystal when pheromone > threshold
+- Maps pheromone type to crystal type:
+  - Red trail → Build crystal
+  - Green trail → Food crystal
+  - Blue trail → Home crystal
+
+**CrystalGrid (Spatial Optimization):**
+```typescript
+class CrystalGrid {
+  getNearby(x: number, y: number, radius: number): Crystal[] {
+    // Fast spatial lookup using grid cells
+    // Avoids O(n²) distance checks
+  }
+}
+```
+
+#### Energy & Lifecycle
+
+**Energy Decay:**
+```typescript
+agent.energy -= speciesConfig.energyDecay * speciesBoosts[species]
+```
+Audio boosts modulate energy consumption (e.g., bass boosts builders).
+
+**Energy Consumption:**
+```typescript
+const consumed = crystal.consume(config.consumptionRate)
+const efficiency = getConversionEfficiency(crystal.type)
+agent.energy += consumed * efficiency
+agent.energy = Math.min(1.0, agent.energy)  // Capped at 100%
+```
+
+**Death:**
+```typescript
+if (agent.energy <= 0) {
+  removeAgent(agent)
+}
+```
+
+**Reproduction:**
+```typescript
+if (
+  agent.energy >= config.reproductionThreshold &&
+  agent.reproductionCooldown <= 0 &&
+  populationStats.total < maxPopulation
+) {
+  const offspring = createAgent(agent.species, gridSize)
+  offspring.x = agent.x + random(-20, 20)  // Near parent
+  offspring.energy = 0.4 + random(0, 0.2)
+
+  agent.energy -= config.reproductionCost
+  agent.reproductionCooldown = 200
+}
+```
+
+#### Audio-Ecology Mapping
+
+Maps audio features to species activity boosts:
+
+**Feature Mapping:**
+- **Bass** → Builders (structure formation responds to low frequencies)
+- **Mids** → Harvesters (resource gathering responds to mid frequencies)
+- **Highs** → Scouts, Decomposers (exploration/cleanup responds to high frequencies)
+- **Transients** → Consumers (consumption responds to percussive events)
+
+**Implementation:**
+```typescript
+class AudioEcologyMapper {
+  update(features: AudioFeatures): void {
+    const { bass, mid, high, transient } = features
+
+    // Calculate boosts
+    speciesBoosts.builder = 1.0 + bass * boostStrength
+    speciesBoosts.harvester = 1.0 + mid * boostStrength
+    speciesBoosts.scout = 1.0 + high * boostStrength
+    speciesBoosts.decomposer = 1.0 + high * boostStrength
+    speciesBoosts.consumer = 1.0 + transient * boostStrength
+  }
+}
+```
+
+#### Integration with Stigmergy
+
+**Pheromone Trail Compatibility:**
+
+EcosystemAgent includes a `type` property ('red', 'green', 'blue') that maps species to pheromone trails:
+
+```typescript
+const speciesTypeMap: Record<SpeciesType, 'red' | 'green' | 'blue'> = {
+  builder: 'red',
+  harvester: 'green',
+  consumer: 'blue',
+  decomposer: 'red',
+  scout: 'blue',
+}
+```
+
+This ensures ecosystem agents participate in the parent QuantumStigmergyEngine's pheromone trail generation.
+
+**Engine Switching:**
+
+The store switches between engines based on `ecosystemMode`:
+
+```typescript
+function createEngine(params: AllParameters): MusicReactiveEngine | MusicReactiveEcosystemEngine {
+  if (params.ecosystemMode) {
+    const ecosystem = new MusicReactiveEcosystemEngine(gridSize)
+    ecosystem.initializeEcosystem(params)
+    return ecosystem
+  } else {
+    const standard = new MusicReactiveEngine(gridSize)
+    standard.initializeAgents(params.globalTemporal.agentCount)
+    return standard
+  }
+}
+```
+
 ---
 
 ## Rendering System
@@ -477,6 +741,7 @@ void main() {
 
 ### Canvas 2D Agent Rendering
 
+**Standard Rendering:**
 ```typescript
 function renderAgents(ctx: CanvasRenderingContext2D, agents: Agent[]) {
   ctx.fillStyle = '#ffffff'
@@ -484,6 +749,133 @@ function renderAgents(ctx: CanvasRenderingContext2D, agents: Agent[]) {
   for (const agent of agents) {
     ctx.fillRect(agent.x, agent.y, 1, 1)
   }
+}
+```
+
+**Ecosystem Rendering:**
+
+When ecosystem mode is active, the canvas renderer switches to species-colored rendering with additional ecosystem elements:
+
+```typescript
+function renderEcosystem(ctx: CanvasRenderingContext2D, engine: MusicReactiveEcosystemEngine) {
+  const ecosystemAgents = engine.getEcosystemAgents()
+  const crystals = engine.getCrystals()
+
+  // 1. Render agents with species colors
+  ecosystemAgents.forEach((agent) => {
+    const color = SPECIES_COLORS[agent.species]
+    const alpha = Math.max(0.3, agent.energy)  // Energy affects opacity
+    ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`
+
+    if (renderOptions.agentStyle === 'triangle') {
+      renderTriangle(ctx, agent.x, agent.y, agent.angle, renderOptions.agentSize)
+    } else {
+      renderDot(ctx, agent.x, agent.y, renderOptions.agentSize)
+    }
+  })
+
+  // 2. Render crystals with energy rings
+  EcosystemRenderer.renderCrystals(ctx, crystals, renderOptions)
+
+  // 3. Render population HUD (optional)
+  if (currentVisualization.showAgents) {
+    const populationStats = engine.getPopulationStats()
+    const totalCrystals = engine.getTotalCrystals()
+    const totalEnergy = engine.getTotalEnergy()
+    EcosystemRenderer.renderHUD(ctx, populationStats, totalCrystals, totalEnergy)
+  }
+}
+```
+
+**Species Colors:**
+```typescript
+const SPECIES_COLORS: Record<SpeciesType, [number, number, number]> = {
+  builder: [255, 150, 50],      // Orange
+  harvester: [100, 255, 100],   // Green
+  consumer: [255, 100, 255],    // Magenta
+  decomposer: [180, 100, 255],  // Purple
+  scout: [100, 150, 255],       // Blue
+}
+```
+
+**Crystal Rendering:**
+```typescript
+class EcosystemRenderer {
+  static renderCrystals(
+    ctx: CanvasRenderingContext2D,
+    crystals: Crystal[],
+    options: RenderOptions
+  ): void {
+    crystals.forEach(crystal => {
+      const alpha = crystal.energy / crystal.energyStart
+      const color = CRYSTAL_COLORS[crystal.type]
+
+      // Draw crystal core
+      ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`
+      ctx.beginPath()
+      ctx.arc(crystal.x, crystal.y, options.crystalSize, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Draw energy ring
+      ctx.strokeStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha * 0.5})`
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      const ringRadius = options.crystalSize * (1 + crystal.energy * 0.5)
+      ctx.arc(crystal.x, crystal.y, ringRadius, 0, Math.PI * 2)
+      ctx.stroke()
+    })
+  }
+
+  static renderHUD(
+    ctx: CanvasRenderingContext2D,
+    populationStats: PopulationStats,
+    totalCrystals: number,
+    totalEnergy: number
+  ): void {
+    const padding = 20
+    let y = padding
+
+    // Background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)'
+    ctx.fillRect(padding - 10, y - 20, 250, 180)
+
+    // Population counts
+    ctx.font = '14px monospace'
+    Object.entries(populationStats).forEach(([species, count]) => {
+      if (species === 'total') return
+      const color = SPECIES_COLORS[species as SpeciesType]
+      ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+      ctx.fillText(`${species}: ${count}`, padding, y)
+      y += 20
+    })
+
+    // Total population
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText(`Total: ${populationStats.total}`, padding, y)
+    y += 25
+
+    // Resource stats
+    ctx.fillStyle = '#aaaaaa'
+    ctx.fillText(`Crystals: ${totalCrystals}`, padding, y)
+    y += 20
+    ctx.fillText(`Energy: ${totalEnergy.toFixed(1)}`, padding, y)
+  }
+}
+```
+
+**Rendering Decision Logic:**
+
+```typescript
+// In CanvasPanel.tsx
+const isEcosystemEngine = 'getEcosystemAgents' in engine
+const ecosystemMode = currentParameters.ecosystemMode
+
+if (isEcosystemEngine && ecosystemMode) {
+  // Ecosystem rendering
+  renderEcosystem(ctx, engine as MusicReactiveEcosystemEngine)
+} else {
+  // Standard stigmergy rendering
+  renderAgents(ctx, engine.getAgents())
 }
 ```
 
