@@ -10,8 +10,10 @@ import { PerformanceOikosPanel } from './PerformanceOikosPanel';
 import { PresetGallery } from './PresetGallery';
 import { ModelOikosPanel } from './ModelOikosPanel';
 import { AudioOikosPanel } from './AudioOikosPanel';
+import { EcosystemOikosPanel } from './EcosystemOikosPanel';
+import { ToolsOikosPanel } from './ToolsOikosPanel';
 
-type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'audio' | 'visualization' | 'effects' | 'performance';
+type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'temporal' | 'resonance' | 'ecosystem' | 'audio' | 'visualization' | 'effects' | 'performance' | 'tools';
 
 export function ParameterControlCenter() {
   const [activeTab, setActiveTab] = useState<TabType>('presets');
@@ -58,6 +60,11 @@ export function ParameterControlCenter() {
           label="🔗 Resonanz"
         />
         <Tab
+          active={activeTab === 'ecosystem'}
+          onClick={() => setActiveTab('ecosystem')}
+          label="🌿 Ecosystem"
+        />
+        <Tab
           active={activeTab === 'audio'}
           onClick={() => setActiveTab('audio')}
           label="🎵 Audio"
@@ -77,6 +84,11 @@ export function ParameterControlCenter() {
           onClick={() => setActiveTab('performance')}
           label="⚡ Performance"
         />
+        <Tab
+          active={activeTab === 'tools'}
+          onClick={() => setActiveTab('tools')}
+          label="🛠️ Tools"
+        />
       </div>
 
       <div style={styles.content}>
@@ -86,10 +98,12 @@ export function ParameterControlCenter() {
         {activeTab === 'semiotic' && <SemioticOikosPanel />}
         {activeTab === 'temporal' && <TemporalOikosPanel />}
         {activeTab === 'resonance' && <ResonanceOikosPanel />}
+        {activeTab === 'ecosystem' && <EcosystemOikosPanel />}
         {activeTab === 'audio' && <AudioOikosPanel />}
         {activeTab === 'visualization' && <VisualizationOikosPanel />}
         {activeTab === 'effects' && <EffectsOikosPanel />}
         {activeTab === 'performance' && <PerformanceOikosPanel />}
+        {activeTab === 'tools' && <ToolsOikosPanel />}
       </div>
     </div>
   );
