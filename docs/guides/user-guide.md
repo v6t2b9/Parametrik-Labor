@@ -189,6 +189,90 @@ Performance optimization and quality settings (see Performance Optimization sect
 5. Observe how patterns synchronize to harmonic passages and become chaotic during dissonant sections
 6. Watch explosive flashes on beats and smooth modulation between beats
 
+#### 🌿 Ecosystem Oikos
+**NEW!** Multi-species ecosystem with crystal consumption and energy-based lifecycles:
+
+Transforms the stigmergy system from static pheromone trails into a living ecosystem with 5 species, consumable resources, and population dynamics.
+
+**Core Features:**
+- **Enable Ecosystem Mode** - Toggle to switch between standard stigmergy and ecosystem simulation
+- **5 Species Types** - Each with unique behavior, diet, and role:
+  - **Builder** 🟠 (Orange): Eats food, produces build crystals, forms structures
+  - **Harvester** 🟢 (Green): Eats build crystals, produces food, resource gathering
+  - **Consumer** 🟣 (Magenta): Eats food and home, produces home, consumption
+  - **Decomposer** 🟪 (Purple): Eats all types, produces food, cleanup/recycling
+  - **Scout** 🔵 (Blue): Eats food, produces home, rapid exploration
+
+**Crystal System:**
+- **Formation** - Crystals form at high pheromone concentrations (threshold configurable)
+- **Types** - Build (red trails), Food (green trails), Home (blue trails)
+- **Energy** - Each crystal contains energy that depletes as consumed
+- **Decay** - Crystals decay over time (decay rate configurable)
+
+**Energy & Lifecycle:**
+- **Energy Decay** - Agents constantly lose energy (decay rate per species)
+- **Consumption** - Agents seek and eat compatible crystals to gain energy
+- **Death** - Agents die when energy reaches 0
+- **Reproduction** - High-energy agents reproduce (threshold, cost, cooldown configurable)
+- **Population Limits** - Maximum population prevents overgrowth
+
+**Population Dynamics:**
+- **Initial Population** - Starting count for each species
+- **Max Population** - Global population cap
+- **Real-time Stats** - Live population counts displayed in HUD overlay
+
+**Audio-Ecology Mapping:**
+- **Bass → Builders** - Low frequencies boost structure formation
+- **Mids → Harvesters** - Mid frequencies boost resource gathering
+- **Highs → Scouts & Decomposers** - High frequencies boost exploration/cleanup
+- **Transients → Consumers** - Percussive events boost consumption
+
+**Behavior State Machine:**
+Agents transition through behavioral states:
+- **IDLE/EXPLORE** - Random movement, sensory scanning
+- **SEEK_FOOD** - Active search when energy < 30%
+- **APPROACH_CRYSTAL** - Move toward target crystal
+- **CONSUME** - Extract energy from crystal
+- **Species-Specific** - BUILD, HARVEST, HUNT, DECOMPOSE, SCOUT
+
+**Parameters:**
+- **Crystal Settings:**
+  - Formation Threshold (0.1-0.9): Higher = fewer crystals
+  - Energy Start (0.2-2.0): Initial crystal energy
+  - Decay Rate (0.001-0.05): Crystal energy decay speed
+- **Population:**
+  - Initial counts per species
+  - Max Population (100-1000)
+- **Energy:**
+  - Decay rates per species
+  - Reproduction threshold (0.6-0.9)
+  - Reproduction cost (0.2-0.5)
+- **Audio-Ecology:**
+  - Boost strength (0-3.0): Audio modulation intensity
+  - Species-to-frequency mappings (bass/mid/high/transient)
+
+**Visual Rendering:**
+- **Species Colors** - Each species rendered in its signature color
+- **Energy Opacity** - Agent opacity reflects energy level (dimmer = low energy)
+- **Crystal Rings** - Energy rings visualize crystal strength
+- **Population HUD** - Real-time species counts, total population, crystal/energy stats
+
+**Usage:**
+1. Open Ecosystem Oikos panel
+2. Enable Ecosystem Mode
+3. Adjust initial populations for each species
+4. Configure crystal formation and energy parameters
+5. Set max population limit
+6. Enable Audio Reactivity to see bass boost builders, etc.
+7. Watch the ecosystem evolve: crystals form → agents consume → population grows/shrinks → feedback loops emerge
+
+**Emergent Behaviors:**
+- **Resource Cycles** - Builders produce → harvesters consume → food produced → builders eat
+- **Population Oscillations** - Boom-bust cycles based on resource availability
+- **Spatial Patterns** - Species cluster around preferred crystal types
+- **Audio Synchronization** - Bass-heavy music creates builder explosions, high frequencies scatter scouts
+- **Trophic Cascades** - Removing one species affects entire ecosystem
+
 ---
 
 ## Quantum-Inspired Stigmergy Models
@@ -690,11 +774,23 @@ For detailed theoretical background, see `parametrics_paper_draft.md` and `Param
 
 ## Roadmap
 
-### Phase 1: Core MVP + Quantum Extension + Audio Oikos ✅ **COMPLETE**
+### Phase 1: Core MVP + Quantum Extension + Audio Oikos + Ecosystem ✅ **COMPLETE**
 - ✅ 8-connected diffusion simulation engine
 - ✅ Canvas visualization with fullscreen mode
-- ✅ **9-dimensional parameter controls** (Model, Physical, Semiotic, Temporal, Resonance, Visualization, Effects, Performance, Audio)
+- ✅ **10-dimensional parameter controls** (Model, Physical, Semiotic, Temporal, Resonance, Ecosystem, Visualization, Effects, Performance, Audio)
 - ✅ **Quantum-Inspired Stigmergy Models** (M1, M2, M3)
+- ✅ **Multi-Species Ecosystem Mode**
+  - ✅ EcosystemEngine extending QuantumStigmergyEngine
+  - ✅ 5 species types (builder, harvester, consumer, decomposer, scout)
+  - ✅ Crystal formation from pheromone concentrations
+  - ✅ Energy-based lifecycle (consumption, decay, reproduction, death)
+  - ✅ Behavior state machines (IDLE, EXPLORE, SEEK_FOOD, APPROACH_CRYSTAL, CONSUME, species-specific)
+  - ✅ Population dynamics with configurable max limits
+  - ✅ Audio-ecology mapping (bass → builders, mids → harvesters, highs → scouts/decomposers, transients → consumers)
+  - ✅ Species-colored rendering with energy-based opacity
+  - ✅ Crystal rendering with energy rings
+  - ✅ Real-time population HUD overlay
+  - ✅ Spatial grid optimization for crystal lookups
 - ✅ **Audio Oikos - Complete Music Reactivity System**
   - ✅ AudioOikosModulator with 5 integrated classes
   - ✅ Adaptive normalization (Auto-Harmonizer)

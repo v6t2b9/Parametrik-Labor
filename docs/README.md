@@ -31,11 +31,20 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ### Guides
 - **[User Guide](./guides/user-guide.md)** - Complete guide to using the application
   - Real-time simulation features
-  - Parameter control system
+  - Parameter control system (10 Oikos dimensions)
   - Export and recording
   - Post-processing effects
   - Performance optimization
   - Preset gallery
+- **[Ecosystem Guide](./guides/ecosystem-guide.md)** - Multi-species ecosystem mode
+  - 5 species types and ecological roles
+  - Crystal formation and consumption
+  - Energy-based lifecycles
+  - Behavior state machines
+  - Audio-ecology mapping
+  - Population dynamics
+  - Emergent behaviors
+  - Technical implementation
 
 ### Installation
 - **[Main README](../README.md)** - Installation and quick start
@@ -151,7 +160,8 @@ docs/
 ├── README.md (this file)              # Documentation index
 │
 ├── guides/                             # User guides
-│   └── user-guide.md                  # Complete user guide
+│   ├── user-guide.md                  # Complete user guide
+│   └── ecosystem-guide.md             # Multi-species ecosystem guide
 │
 ├── development/                        # Developer documentation
 │   ├── DEVELOPMENT.md                 # Development guide
@@ -201,6 +211,6 @@ docs/
 
 ---
 
-**Last updated:** 2025-11-16
-**Documentation version:** 1.0
+**Last updated:** 2025-11-18
+**Documentation version:** 1.1
 **Project license:** AGPL-3.0-or-later
