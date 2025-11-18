@@ -84,30 +84,39 @@ export function ResonanceOikosPanel() {
           <h5 style={styles.speciesTitle}>🔴 Red Species Interactions</h5>
           <ParameterSlider
             label="Red → Red"
-            value={0.5}
+            value={currentValues.interactionMatrix.redToRed}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Red→Red:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, redToRed: value }
+            })}
             description="How red agents respond to red trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
           <ParameterSlider
             label="Red → Green"
-            value={0.0}
+            value={currentValues.interactionMatrix.redToGreen}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Red→Green:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, redToGreen: value }
+            })}
             description="How red agents respond to green trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
           <ParameterSlider
             label="Red → Blue"
-            value={0.0}
+            value={currentValues.interactionMatrix.redToBlue}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Red→Blue:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, redToBlue: value }
+            })}
             description="How red agents respond to blue trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
         </div>
 
@@ -116,30 +125,39 @@ export function ResonanceOikosPanel() {
           <h5 style={styles.speciesTitle}>🟢 Green Species Interactions</h5>
           <ParameterSlider
             label="Green → Red"
-            value={0.0}
+            value={currentValues.interactionMatrix.greenToRed}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Green→Red:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, greenToRed: value }
+            })}
             description="How green agents respond to red trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
           <ParameterSlider
             label="Green → Green"
-            value={0.5}
+            value={currentValues.interactionMatrix.greenToGreen}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Green→Green:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, greenToGreen: value }
+            })}
             description="How green agents respond to green trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
           <ParameterSlider
             label="Green → Blue"
-            value={0.0}
+            value={currentValues.interactionMatrix.greenToBlue}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Green→Blue:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, greenToBlue: value }
+            })}
             description="How green agents respond to blue trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
         </div>
 
@@ -148,30 +166,39 @@ export function ResonanceOikosPanel() {
           <h5 style={styles.speciesTitle}>🔵 Blue Species Interactions</h5>
           <ParameterSlider
             label="Blue → Red"
-            value={0.0}
+            value={currentValues.interactionMatrix.blueToRed}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Blue→Red:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, blueToRed: value }
+            })}
             description="How blue agents respond to red trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
           <ParameterSlider
             label="Blue → Green"
-            value={0.0}
+            value={currentValues.interactionMatrix.blueToGreen}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Blue→Green:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, blueToGreen: value }
+            })}
             description="How blue agents respond to green trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
           <ParameterSlider
             label="Blue → Blue"
-            value={0.5}
+            value={currentValues.interactionMatrix.blueToBlue}
             min={-2.0}
             max={2.0}
             step={0.1}
-            onChange={(value) => console.log('Blue→Blue:', value)}
+            onChange={(value) => updateResonanceParams({
+              interactionMatrix: { ...currentValues.interactionMatrix, blueToBlue: value }
+            })}
             description="How blue agents respond to blue trails"
+            hasOverride={hasOverride('interactionMatrix')}
           />
         </div>
 

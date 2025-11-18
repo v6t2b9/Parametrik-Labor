@@ -86,10 +86,24 @@ export interface SpeciesTemporalParams {
 // Combined temporal params (for backwards compatibility and convenience)
 export interface TemporalOikosParams extends GlobalTemporalParams, SpeciesTemporalParams {}
 
+// Species Interaction Matrix (3×3)
+export interface SpeciesInteractionMatrix {
+  redToRed: number;     // -2.0 to 2.0
+  redToGreen: number;   // -2.0 to 2.0
+  redToBlue: number;    // -2.0 to 2.0
+  greenToRed: number;   // -2.0 to 2.0
+  greenToGreen: number; // -2.0 to 2.0
+  greenToBlue: number;  // -2.0 to 2.0
+  blueToRed: number;    // -2.0 to 2.0
+  blueToGreen: number;  // -2.0 to 2.0
+  blueToBlue: number;   // -2.0 to 2.0
+}
+
 export interface ResonanceOikosParams {
-  attractionStrength: number;       // -2.0-2.0: Same-type reinforcement
-  repulsionStrength: number;        // -2.0-2.0: Cross-type influence
+  attractionStrength: number;       // -2.0-2.0: Same-type reinforcement (baseline)
+  repulsionStrength: number;        // -2.0-2.0: Cross-type influence (baseline)
   crossSpeciesInteraction: boolean; // Enable/disable cross-species
+  interactionMatrix: SpeciesInteractionMatrix; // Fine-grained 3×3 species interactions
 }
 
 // Stigmergy model types for computational validation
