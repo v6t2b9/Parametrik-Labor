@@ -19,7 +19,7 @@ npm run dev
 npm run build
 ```
 
-**Live Demo:** https://parametrik-labor.vercel.app
+**Live Demo:** [https://parametrik-labor.vercel.app](https://parametric-space-explorer.vercel.app/)
 
 ---
 
