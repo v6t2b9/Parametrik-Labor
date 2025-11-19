@@ -4,7 +4,7 @@
  */
 
 import type { Crystal } from './Crystal.js';
-import type { EcosystemAgent } from '../types/ecosystem.js';
+import type { EcosystemAgent, PopulationStats } from '../types/ecosystem.js';
 import { SPECIES_COLORS, CRYSTAL_COLORS } from '../types/ecosystem.js';
 
 export interface EcosystemRenderOptions {
@@ -184,7 +184,7 @@ export class EcosystemRenderer {
    */
   static renderHUD(
     ctx: CanvasRenderingContext2D,
-    populationStats: any,
+    populationStats: PopulationStats,
     crystalCount: number,
     totalEnergy: number
   ): void {

@@ -3,7 +3,7 @@
  * Defines the 5 core species with their behavioral parameters
  */
 
-import type { SpeciesConfig, SpeciesType, EcologyConfig } from '../types/ecosystem.js';
+import type { SpeciesConfig, SpeciesType, EcologyConfig, CrystalType } from '../types/ecosystem.js';
 
 // ============================================================================
 // Species Presets
@@ -190,7 +190,7 @@ export function getSpeciesConfig(species: SpeciesType): SpeciesConfig {
 
 export function canConsume(species: SpeciesType, crystalType: string): boolean {
   const config = SPECIES_CONFIGS[species];
-  return config.diet.includes(crystalType as any);
+  return config.diet.includes(crystalType as CrystalType);
 }
 
 export function getConversionEfficiency(crystalType: string): number {

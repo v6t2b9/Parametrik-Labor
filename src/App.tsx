@@ -23,13 +23,13 @@ function App() {
       // Try native Fullscreen API first
       if (container.requestFullscreen) {
         await container.requestFullscreen();
-      } else if ((container as any).webkitRequestFullscreen) {
+      } else if (container.webkitRequestFullscreen) {
         // iOS Safari fallback
-        await (container as any).webkitRequestFullscreen();
-      } else if ((container as any).mozRequestFullScreen) {
-        await (container as any).mozRequestFullScreen();
-      } else if ((container as any).msRequestFullscreen) {
-        await (container as any).msRequestFullscreen();
+        await container.webkitRequestFullscreen();
+      } else if (container.mozRequestFullScreen) {
+        await container.mozRequestFullScreen();
+      } else if (container.msRequestFullscreen) {
+        await container.msRequestFullscreen();
       }
       setIsFullscreen(true);
     } catch {
@@ -43,12 +43,12 @@ function App() {
     try {
       if (document.fullscreenElement) {
         await document.exitFullscreen();
-      } else if ((document as any).webkitFullscreenElement) {
-        await (document as any).webkitExitFullscreen();
-      } else if ((document as any).mozFullScreenElement) {
-        await (document as any).mozCancelFullScreen();
-      } else if ((document as any).msFullscreenElement) {
-        await (document as any).msExitFullscreen();
+      } else if (document.webkitFullscreenElement) {
+        await document.webkitExitFullscreen?.();
+      } else if (document.mozFullScreenElement) {
+        await document.mozCancelFullScreen?.();
+      } else if (document.msFullscreenElement) {
+        await document.msExitFullscreen?.();
       }
     } catch (error) {
       console.warn('Error exiting fullscreen:', error);
@@ -69,9 +69,9 @@ function App() {
     const handleFullscreenChange = () => {
       const isCurrentlyFullscreen = !!(
         document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).mozFullScreenElement ||
-        (document as any).msFullscreenElement
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
       );
       setIsFullscreen(isCurrentlyFullscreen);
     };

@@ -17,6 +17,7 @@ import type {
   PopulationStats,
   SpeciesBoosts,
   EcologyConfig,
+  SpeciesConfig,
 } from '../types/ecosystem.js';
 import type { AllParameters } from '../types/index.js';
 
@@ -208,7 +209,7 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
   /**
    * Explore behavior: wander and sense environment
    */
-  private behaviorExplore(agent: EcosystemAgent, config: any): void {
+  private behaviorExplore(agent: EcosystemAgent, config: SpeciesConfig): void {
     // Check if low energy
     if (agent.energy < 0.3) {
       agent.behaviorState = 'SEEK_FOOD';
@@ -250,7 +251,7 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
   /**
    * Seek food behavior: actively search for food crystals
    */
-  private behaviorSeekFood(agent: EcosystemAgent, config: any): void {
+  private behaviorSeekFood(agent: EcosystemAgent, config: SpeciesConfig): void {
     const nearby = this.crystalGrid.getNearby(agent.x, agent.y, 80);
     let bestCrystal: Crystal | null = null;
     let bestDistance = Infinity;
@@ -307,7 +308,7 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
   /**
    * Approach crystal behavior
    */
-  private behaviorApproachCrystal(agent: EcosystemAgent, config: any): void {
+  private behaviorApproachCrystal(agent: EcosystemAgent, config: SpeciesConfig): void {
     if (!agent.targetCrystal || agent.targetCrystal.isDepleted()) {
       agent.targetCrystal = null;
       agent.behaviorState = agent.energy < 0.3 ? 'SEEK_FOOD' : 'EXPLORE';
@@ -335,7 +336,7 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
   /**
    * Consume crystal behavior
    */
-  private behaviorConsume(agent: EcosystemAgent, config: any): void {
+  private behaviorConsume(agent: EcosystemAgent, config: SpeciesConfig): void {
     if (!agent.targetCrystal || agent.targetCrystal.isDepleted()) {
       agent.targetCrystal = null;
       agent.behaviorState = 'EXPLORE';
@@ -362,7 +363,7 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
   /**
    * Species-specific behaviors (BUILD, HARVEST, HUNT, etc.)
    */
-  private behaviorSpeciesSpecific(agent: EcosystemAgent, config: any): void {
+  private behaviorSpeciesSpecific(agent: EcosystemAgent, config: SpeciesConfig): void {
     // For now, delegate to the appropriate behavior
     // In a full implementation, each would have unique logic
 
@@ -632,7 +633,7 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
    * Override getAgents() to return ecosystem agents for pheromone trail generation
    * EcosystemAgent extends Agent interface, so this is compatible
    */
-  public override getAgents(): any[] {
+  public override getAgents(): EcosystemAgent[] {
     return this.ecosystemAgents;
   }
 }

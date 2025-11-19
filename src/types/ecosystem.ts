@@ -83,10 +83,20 @@ export interface EcosystemAgent {
   species: SpeciesType;
   energy: number;                  // 0.0 - 1.0
   behaviorState: BehaviorState;    // Current behavior
-  targetCrystal: any;              // Crystal being approached/consumed (Crystal class instance)
+  targetCrystal: import('../engine/Crystal.js').Crystal | null; // Crystal being approached/consumed
   age: number;                     // Frames alive
   reproductionCooldown: number;    // Frames until can reproduce again
   lastReproduction: number;        // Frame count of last reproduction
+
+  // Music-reactive properties (optional, added at runtime by MusicReactiveEngine)
+  __musicVelocityBoost?: number;
+  __musicAttractionPulse?: number;
+  __musicRepulsionPulse?: number;
+  __musicSpeedMult?: number;
+  __musicDepositMult?: number;
+  __musicTurnMult?: number;
+  __musicAttractionMult?: number;
+  __musicRepulsionMult?: number;
 }
 
 // ============================================================================

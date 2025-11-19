@@ -5,6 +5,7 @@
 
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
+import type { EcologyConfig } from '../types/ecosystem';
 
 export function EcosystemOikosPanel() {
   const { parameters, setParameters } = useSimulationStore();
@@ -17,12 +18,13 @@ export function EcosystemOikosPanel() {
     });
   };
 
-  const handleUpdateEcosystem = (updates: any) => {
+  const handleUpdateEcosystem = (updates: Partial<EcologyConfig>) => {
+    if (!ecosystem) return;
     setParameters({
       ecosystem: {
         ...ecosystem,
         ...updates,
-      },
+      } as EcologyConfig,
     });
   };
 

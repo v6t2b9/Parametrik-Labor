@@ -9,6 +9,7 @@ import { useAudioStore } from '../store/useAudioStore';
 import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { AUDIO_MAPPING_PRESETS } from '../audio/presets';
+import type { CurveType } from '../types/musicMappings';
 
 export function AudioOikosPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -503,7 +504,7 @@ export function AudioOikosPanel() {
           {Object.entries(AUDIO_MAPPING_PRESETS).map(([key, preset]) => (
             <button
               key={key}
-              onClick={() => loadPreset(key as any)}
+              onClick={() => loadPreset(key as keyof typeof AUDIO_MAPPING_PRESETS)}
               style={styles.presetButton}
               title={preset.description}
             >
@@ -555,7 +556,7 @@ export function AudioOikosPanel() {
               <select
                 value={mappings.tempo.tempoToSpeedCurve}
                 onChange={(e) =>
-                  updateAudioParams({ tempo: { ...mappings.tempo, tempoToSpeedCurve: e.target.value as any } })
+                  updateAudioParams({ tempo: { ...mappings.tempo, tempoToSpeedCurve: e.target.value as CurveType } })
                 }
                 style={styles.curveDropdown}
               >
@@ -615,7 +616,7 @@ export function AudioOikosPanel() {
               <select
                 value={mappings.harmony.tensionToRandomnessCurve}
                 onChange={(e) =>
-                  updateAudioParams({ harmony: { ...mappings.harmony, tensionToRandomnessCurve: e.target.value as any } })
+                  updateAudioParams({ harmony: { ...mappings.harmony, tensionToRandomnessCurve: e.target.value as CurveType } })
                 }
                 style={styles.curveDropdown}
               >
