@@ -396,21 +396,36 @@ export class QuantumStigmergyEngine {
       return 0;
     }
 
-    // Read signal from own type (attraction)
-    const ownSignal = this.trails[agent.type][idx] * resonance.attractionStrength;
+    // Use interaction matrix for fine-grained species interactions
+    const matrix = resonance.interactionMatrix;
+    let totalSignal = 0;
 
-    // Read signals from other types (repulsion/attraction)
-    let crossSignal = 0;
-    if (resonance.crossSpeciesInteraction) {
-      const types: AgentType[] = ['red', 'green', 'blue'];
-      for (const type of types) {
-        if (type !== agent.type) {
-          crossSignal += this.trails[type][idx] * resonance.repulsionStrength;
+    // Calculate signal based on agent type and interaction matrix
+    switch (agent.type) {
+      case 'red':
+        totalSignal += this.trails.red[idx] * matrix.redToRed;
+        if (resonance.crossSpeciesInteraction) {
+          totalSignal += this.trails.green[idx] * matrix.redToGreen;
+          totalSignal += this.trails.blue[idx] * matrix.redToBlue;
         }
-      }
+        break;
+      case 'green':
+        totalSignal += this.trails.green[idx] * matrix.greenToGreen;
+        if (resonance.crossSpeciesInteraction) {
+          totalSignal += this.trails.red[idx] * matrix.greenToRed;
+          totalSignal += this.trails.blue[idx] * matrix.greenToBlue;
+        }
+        break;
+      case 'blue':
+        totalSignal += this.trails.blue[idx] * matrix.blueToBlue;
+        if (resonance.crossSpeciesInteraction) {
+          totalSignal += this.trails.red[idx] * matrix.blueToRed;
+          totalSignal += this.trails.green[idx] * matrix.blueToGreen;
+        }
+        break;
     }
 
-    return ownSignal + crossSignal;
+    return totalSignal;
   }
 
   /**
@@ -442,19 +457,38 @@ export class QuantumStigmergyEngine {
     // Apply phase-dependent interpretation
     const effectiveStrength = effectiveStrengthWithPhase(magnitude, phase);
 
-    // For simplicity, cross-species interaction uses magnitude only (classical)
+    // Use interaction matrix for cross-species interactions (magnitude only)
+    const matrix = resonance.interactionMatrix;
+    let ownSignal = 0;
     let crossSignal = 0;
-    if (resonance.crossSpeciesInteraction) {
-      const types: AgentType[] = ['red', 'green', 'blue'];
-      for (const type of types) {
-        if (type !== agent.type) {
-          crossSignal += this.trails[type][idx] * resonance.repulsionStrength;
+
+    // Calculate signal based on agent type and interaction matrix
+    switch (agent.type) {
+      case 'red':
+        ownSignal = effectiveStrength * matrix.redToRed;
+        if (resonance.crossSpeciesInteraction) {
+          crossSignal += this.trails.green[idx] * matrix.redToGreen;
+          crossSignal += this.trails.blue[idx] * matrix.redToBlue;
         }
-      }
+        break;
+      case 'green':
+        ownSignal = effectiveStrength * matrix.greenToGreen;
+        if (resonance.crossSpeciesInteraction) {
+          crossSignal += this.trails.red[idx] * matrix.greenToRed;
+          crossSignal += this.trails.blue[idx] * matrix.greenToBlue;
+        }
+        break;
+      case 'blue':
+        ownSignal = effectiveStrength * matrix.blueToBlue;
+        if (resonance.crossSpeciesInteraction) {
+          crossSignal += this.trails.red[idx] * matrix.blueToRed;
+          crossSignal += this.trails.green[idx] * matrix.blueToGreen;
+        }
+        break;
     }
 
     return {
-      magnitude: effectiveStrength * resonance.attractionStrength + crossSignal,
+      magnitude: ownSignal + crossSignal,
       phase: phase,
     };
   }
