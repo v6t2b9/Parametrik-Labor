@@ -32,7 +32,8 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 #### Core Simulation
 ✅ **9-Dimensional Parameter Control** - Model, Physical, Semiotic, Temporal, Resonance, Ecosystem, Visual, Effects, Performance
 ✅ **3 Stigmergy Models** - Classical (M1), Context-Switching (M2), Quantum-Inspired (M3)
-✅ **Multi-Species Ecosystem** - 5 species with energy lifecycles, crystal consumption, population dynamics
+✅ **Multi-Species Ecosystem** - 3 basis species (red/green/blue) with species-specific parameter overrides
+✅ **Species Interaction Matrix (3×3)** - Fine-grained control of cross-species trail responses (attraction/repulsion)
 ✅ **Quantum Mechanics** - Superposition states, phase-dependent trails, interference patterns
 ✅ **51+ Presets** - 8 global + 43 dimension-specific curated configurations
 ✅ **Auto-Optimizer** - Adaptive performance scaling (30-120 FPS targets)
@@ -46,11 +47,17 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 
 #### Audio Reactivity 🎵
 ✅ **Audio Oikos Modulation System** - Real-time music analysis with 7+ spectral features
-✅ **Adaptive Normalization** - Auto-Harmonizer learns each song's unique range for maximum visual contrast
+✅ **Auto-Harmonizer (Adaptive Normalization)** - Learns each song's unique range for maximum visual contrast
+  - Advanced configuration: Window size (3-30s), Smoothing factor (0.1-10%), Exaggeration (0.5-2.0)
+  - Maximizes dynamics for quiet/narrow-range music
+✅ **Dynamic Role Mapping System** 🧬 - Audio-driven ecosystem roles
+  - 5 functional roles: Builder (bass), Harvester (mid), Consumer (arousal), Decomposer (dissonance), Scout (treble)
+  - Configurable thresholds & hysteresis (minimum duration)
+  - Role-specific behavior modifiers (speed, deposit, sensor range)
 ✅ **Interference Patterns** - Consonance → synchronized waves, Dissonance → chaotic turbulence
 ✅ **Beat Pulse Modulation** - Explosive impulse responses on beats (6x deposit flash)
 ✅ **Multi-Scale Temporal Structure** - Micro (100ms), Meso (500ms), Macro (4s) time windows
-✅ **3 Audio Presets** - Resonant Harmony, Beat Machine, Spectral Dance
+✅ **5 Audio Presets** - Default, Bass-Heavy, Ambient, Chaotic, Minimal
 
 #### Export & Sharing
 ✅ **GIF Loop Export** - 2-second looping GIFs with automatic fade-in/fade-out transitions
