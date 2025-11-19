@@ -102,14 +102,17 @@ export class MusicReactiveEcosystemEngine extends EcosystemEngine {
    * Compatibility methods for AudioSimulationBridge
    * These are no-ops for ecosystem engine as it has different modulation system
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public setBeatPulseEnabled(_enabled: boolean): void {
     // No-op: Ecosystem uses audio-ecology mapping instead
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public setInterferenceEnabled(_enabled: boolean): void {
     // No-op: Ecosystem uses audio-ecology mapping instead
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public setMultiScaleEnabled(_enabled: boolean): void {
     // No-op: Ecosystem uses audio-ecology mapping instead
   }

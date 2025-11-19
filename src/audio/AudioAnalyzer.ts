@@ -148,7 +148,7 @@ export class AudioAnalyzer {
       this.isPlaying = true;
       this.startTime = this.audioContext.currentTime;
       this.resetAnalysisState();
-    } catch (error) {
+    } catch {
       throw new Error('Microphone access denied or not available');
     }
   }

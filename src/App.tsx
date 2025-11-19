@@ -32,7 +32,7 @@ function App() {
         await (container as any).msRequestFullscreen();
       }
       setIsFullscreen(true);
-    } catch (error) {
+    } catch {
       console.warn('Fullscreen API not available, using fallback');
       // Fallback: Just set fullscreen state for CSS-based fullscreen
       setIsFullscreen(true);

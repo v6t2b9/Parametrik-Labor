@@ -47,7 +47,8 @@ export function AudioSimulationBridge() {
     } else if (!isPlaying && running) {
       toggleRunning();
     }
-  }, [isPlaying, musicEnabled, inputMode]); // Intentionally don't include running/toggleRunning to avoid loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying, musicEnabled, inputMode]); // Intentionally don't include running/toggleRunning to avoid infinite loops
 
   // Update audio analysis every animation frame
   useEffect(() => {

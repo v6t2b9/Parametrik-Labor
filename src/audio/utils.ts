@@ -83,8 +83,9 @@ export function calculateRoughness(frequencyData: Uint8Array): number {
  * @param minFreq - Minimum frequency in Hz
  * @param maxFreq - Maximum frequency in Hz
  * @param sampleRate - Audio sample rate (typically 44100 or 48000)
- * @param fftSize - FFT size used for analysis
+ * @param _fftSize - FFT size (reserved for future use)
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function getFrequencyRangeEnergy(
   frequencyData: Uint8Array,
   minFreq: number,
