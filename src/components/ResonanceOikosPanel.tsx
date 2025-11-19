@@ -20,68 +20,66 @@ export function ResonanceOikosPanel() {
       <h3 style={styles.title}>🔗 Resonance Oikos</h3>
       <p style={styles.subtitle}>Inter-system relations and cross-species dynamics</p>
 
-      {/* Universal Baseline Section */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>🌍 Universal Baseline Settings</h4>
-        <p style={styles.sectionDescription}>
-          Base attraction/repulsion values applied to all species interactions
-        </p>
-
-        <ParameterSlider
-          label="Attraction Strength"
-          value={currentValues.attractionStrength}
-          min={-2.0}
-          max={2.0}
-          step={0.1}
-          onChange={(value) => updateResonanceParams({ attractionStrength: value })}
-          description="Same-type trail following · Positive = clustering · Range: -2.0 to 2.0"
-          hasOverride={hasOverride('attractionStrength')}
-        />
-
-        <ParameterSlider
-          label="Repulsion Strength"
-          value={currentValues.repulsionStrength}
-          min={-2.0}
-          max={2.0}
-          step={0.1}
-          onChange={(value) => updateResonanceParams({ repulsionStrength: value })}
-          description="Cross-type influence · Negative = avoidance · Range: -2.0 to 2.0"
-          hasOverride={hasOverride('repulsionStrength')}
-        />
-
-        <div style={styles.checkboxContainer}>
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={currentValues.crossSpeciesInteraction}
-              onChange={(e) =>
-                updateResonanceParams({ crossSpeciesInteraction: e.target.checked })
-              }
-              style={styles.checkbox}
-            />
-            <span>Cross-Species Interaction</span>
-            {hasOverride('crossSpeciesInteraction') && <span style={styles.overrideBadge}>⚡</span>}
-          </label>
-          <p style={styles.checkboxDesc}>
-            Enable agents to sense and respond to other species' trails
+      {/* Universal Baseline Section - Only show in universal scope */}
+      {ui.activeSpeciesScope === 'universal' && (
+        <div style={styles.section}>
+          <h4 style={styles.sectionTitle}>🌍 Universal Baseline Settings</h4>
+          <p style={styles.sectionDescription}>
+            Base attraction/repulsion values applied to all species interactions
           </p>
+
+          <ParameterSlider
+            label="Attraction Strength"
+            value={currentValues.attractionStrength}
+            min={-2.0}
+            max={2.0}
+            step={0.1}
+            onChange={(value) => updateResonanceParams({ attractionStrength: value })}
+            description="Same-type trail following · Positive = clustering · Range: -2.0 to 2.0"
+            hasOverride={hasOverride('attractionStrength')}
+          />
+
+          <ParameterSlider
+            label="Repulsion Strength"
+            value={currentValues.repulsionStrength}
+            min={-2.0}
+            max={2.0}
+            step={0.1}
+            onChange={(value) => updateResonanceParams({ repulsionStrength: value })}
+            description="Cross-type influence · Negative = avoidance · Range: -2.0 to 2.0"
+            hasOverride={hasOverride('repulsionStrength')}
+          />
+
+          <div style={styles.checkboxContainer}>
+            <label style={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={currentValues.crossSpeciesInteraction}
+                onChange={(e) =>
+                  updateResonanceParams({ crossSpeciesInteraction: e.target.checked })
+                }
+                style={styles.checkbox}
+              />
+              <span>Cross-Species Interaction</span>
+              {hasOverride('crossSpeciesInteraction') && <span style={styles.overrideBadge}>⚡</span>}
+            </label>
+            <p style={styles.checkboxDesc}>
+              Enable agents to sense and respond to other species' trails
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div style={styles.divider} />
+      {/* Species-Specific Interaction Controls - Only show for specific species */}
+      {ui.activeSpeciesScope === 'red' && (
+        <div style={styles.matrixSection}>
+          <h4 style={styles.sectionTitle}>🔴 Red Species Interactions</h4>
+          <p style={styles.sectionDescription}>
+            How red agents respond to different species' pheromone trails
+            <br />
+            Positive values = attraction, Negative values = repulsion, 0 = neutral
+          </p>
 
-      {/* Species Interaction Matrix Section */}
-      <div style={styles.matrixSection}>
-        <h4 style={styles.sectionTitle}>🧬 Species Interaction Matrix (3×3)</h4>
-        <p style={styles.sectionDescription}>
-          Fine-tune how each species responds to others' pheromone trails
-          <br />
-          Positive values = attraction, Negative values = repulsion, 0 = neutral
-        </p>
-
-        {/* Red Species Interactions */}
-        <div style={styles.speciesBlock}>
-          <h5 style={styles.speciesTitle}>🔴 Red Species Interactions</h5>
           <ParameterSlider
             label="Red → Red"
             value={currentValues.interactionMatrix.redToRed}
@@ -118,11 +116,30 @@ export function ResonanceOikosPanel() {
             description="How red agents respond to blue trails"
             hasOverride={hasOverride('interactionMatrix')}
           />
-        </div>
 
-        {/* Green Species Interactions */}
-        <div style={styles.speciesBlock}>
-          <h5 style={styles.speciesTitle}>🟢 Green Species Interactions</h5>
+          <div style={styles.infoBox}>
+            <p style={styles.infoText}>
+              💡 <strong>Interaction Examples:</strong>
+              <br />
+              • Set Red→Green to +1.5 for attraction to green trails (symbiosis)
+              <br />
+              • Set Red→Blue to -1.0 to avoid blue trails (competition)
+              <br />
+              • Keep Red→Red positive (e.g., +0.5) for clustering behavior
+            </p>
+          </div>
+        </div>
+      )}
+
+      {ui.activeSpeciesScope === 'green' && (
+        <div style={styles.matrixSection}>
+          <h4 style={styles.sectionTitle}>🟢 Green Species Interactions</h4>
+          <p style={styles.sectionDescription}>
+            How green agents respond to different species' pheromone trails
+            <br />
+            Positive values = attraction, Negative values = repulsion, 0 = neutral
+          </p>
+
           <ParameterSlider
             label="Green → Red"
             value={currentValues.interactionMatrix.greenToRed}
@@ -159,11 +176,30 @@ export function ResonanceOikosPanel() {
             description="How green agents respond to blue trails"
             hasOverride={hasOverride('interactionMatrix')}
           />
-        </div>
 
-        {/* Blue Species Interactions */}
-        <div style={styles.speciesBlock}>
-          <h5 style={styles.speciesTitle}>🔵 Blue Species Interactions</h5>
+          <div style={styles.infoBox}>
+            <p style={styles.infoText}>
+              💡 <strong>Interaction Examples:</strong>
+              <br />
+              • Set Green→Red to +1.5 for attraction to red trails (symbiosis)
+              <br />
+              • Set Green→Blue to -1.0 to avoid blue trails (competition)
+              <br />
+              • Keep Green→Green positive (e.g., +0.5) for clustering behavior
+            </p>
+          </div>
+        </div>
+      )}
+
+      {ui.activeSpeciesScope === 'blue' && (
+        <div style={styles.matrixSection}>
+          <h4 style={styles.sectionTitle}>🔵 Blue Species Interactions</h4>
+          <p style={styles.sectionDescription}>
+            How blue agents respond to different species' pheromone trails
+            <br />
+            Positive values = attraction, Negative values = repulsion, 0 = neutral
+          </p>
+
           <ParameterSlider
             label="Blue → Red"
             value={currentValues.interactionMatrix.blueToRed}
@@ -200,22 +236,20 @@ export function ResonanceOikosPanel() {
             description="How blue agents respond to blue trails"
             hasOverride={hasOverride('interactionMatrix')}
           />
-        </div>
 
-        <div style={styles.infoBox}>
-          <p style={styles.infoText}>
-            💡 <strong>Interaction Examples:</strong>
-            <br />
-            • Set Red→Green to +1.5 for red agents to be attracted to green trails (symbiosis)
-            <br />
-            • Set Blue→Red to -1.0 for blue agents to avoid red trails (competition)
-            <br />
-            • Keep same-species values positive (e.g., Red→Red: +0.5) for clustering
-            <br />
-            • Use 0 for neutral interactions (no special response)
-          </p>
+          <div style={styles.infoBox}>
+            <p style={styles.infoText}>
+              💡 <strong>Interaction Examples:</strong>
+              <br />
+              • Set Blue→Red to +1.5 for attraction to red trails (symbiosis)
+              <br />
+              • Set Blue→Green to -1.0 to avoid green trails (competition)
+              <br />
+              • Keep Blue→Blue positive (e.g., +0.5) for clustering behavior
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
