@@ -180,6 +180,7 @@ export class BeatPulseModulator {
   /**
    * Trigger impulse on beat detection
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onBeatDetected(strength: number, _timestamp: number): void {
     this.currentImpulse = strength;
   }
@@ -360,7 +361,7 @@ export class AudioOikosModulator {
 
     // 3. INTERFERENCE MODULATION
     const interference = this.interferenceModulator.calculateResonance(musicalMode);
-    let modulated = this.interferenceModulator.modulateSubstrate(
+    const modulated = this.interferenceModulator.modulateSubstrate(
       interference,
       baseParams
     );
@@ -1310,7 +1311,7 @@ export class SpeciesNicheSystem {
     // Other bands energy (averaged)
     const otherBands = Object.entries(bandEnergies)
       .filter(([band]) => band !== config.primaryBand)
-      .map(([_, energy]) => energy);
+      .map(([, energy]) => energy); // Ignore band name, only take energy
     const otherEnergy = otherBands.reduce((sum, e) => sum + e, 0) / otherBands.length;
 
     // Weighted combination

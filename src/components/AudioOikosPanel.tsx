@@ -47,7 +47,7 @@ export function AudioOikosPanel() {
     if (file) {
       try {
         await loadAudioFile(file);
-      } catch (error) {
+      } catch {
         alert('Failed to load audio file. Please try a different file.');
       }
     }
@@ -57,7 +57,7 @@ export function AudioOikosPanel() {
   const handleMicrophoneStart = async () => {
     try {
       await startMicrophone();
-    } catch (error) {
+    } catch {
       alert('Microphone access denied or not available.');
     }
   };
