@@ -4,6 +4,7 @@
 
 import { create } from 'zustand';
 import { AudioAnalyzer } from '../audio/AudioAnalyzer';
+import type { AdaptiveNormalizerConfig } from '../audio/AdaptiveNormalizer';
 import type {
   MusicAnalysis,
   MusicMappingParameters,
@@ -32,6 +33,7 @@ interface AudioStore {
 
   // Adaptive normalization (Auto-Harmonizer)
   adaptiveNormalizationEnabled: boolean;
+  adaptiveNormalizerConfig: AdaptiveNormalizerConfig;
 
   // Video export
   isExporting: boolean;
@@ -54,6 +56,7 @@ interface AudioStore {
   // Actions - Adaptive Normalization
   toggleAdaptiveNormalization: () => void;
   setAdaptiveNormalization: (enabled: boolean) => void;
+  configureAdaptiveNormalizer: (config: Partial<AdaptiveNormalizerConfig>) => void;
 
   // Actions - Mappings
   updateMappings: (mappings: Partial<MusicMappingParameters>) => void;
@@ -87,6 +90,12 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   musicEnabled: false,
 
   adaptiveNormalizationEnabled: false,
+  adaptiveNormalizerConfig: {
+    windowSize: 600, // 10 seconds at 60fps
+    smoothingFactor: 0.02, // 2% update rate
+    percentileRange: [5, 95], // Ignore outliers
+    exaggeration: 1.0, // No exaggeration by default
+  },
 
   isExporting: false,
   exportProgress: 0,
@@ -235,6 +244,19 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     }
 
     set({ adaptiveNormalizationEnabled: enabled });
+  },
+
+  // Configure adaptive normalizer
+  configureAdaptiveNormalizer: (config: Partial<AdaptiveNormalizerConfig>) => {
+    const currentConfig = get().adaptiveNormalizerConfig;
+    const newConfig = { ...currentConfig, ...config };
+
+    const { analyzer } = get();
+    if (analyzer) {
+      analyzer.configureAdaptiveNormalizer(newConfig);
+    }
+
+    set({ adaptiveNormalizerConfig: newConfig });
   },
 
   // Update mappings

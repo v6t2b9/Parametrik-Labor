@@ -22,6 +22,7 @@ export function AudioOikosPanel() {
     currentAnalysis,
     musicEnabled,
     adaptiveNormalizationEnabled,
+    adaptiveNormalizerConfig,
     loadAudioFile,
     startMicrophone,
     togglePlay,
@@ -29,6 +30,7 @@ export function AudioOikosPanel() {
     setLoop,
     toggleMusic,
     toggleAdaptiveNormalization,
+    configureAdaptiveNormalizer,
   } = useAudioStore();
 
   // Audio mappings from SimulationStore (species-aware)
@@ -277,6 +279,48 @@ export function AudioOikosPanel() {
               💡 Auto-Harmonizer learns your music's actual range (e.g., 1500-3000 Hz instead of 0-8000 Hz)
               and normalizes features to maximize visual contrast. Especially effective for quiet or narrow-range music!
             </p>
+
+            {/* Advanced Configuration (only when enabled) */}
+            {adaptiveNormalizationEnabled && (
+              <div style={styles.advancedConfig}>
+                <h5 style={styles.advancedTitle}>⚙️ Advanced Configuration</h5>
+
+                <ParameterSlider
+                  label="Window Size (seconds)"
+                  value={adaptiveNormalizerConfig.windowSize! / 60} // Convert to seconds
+                  min={3}
+                  max={30}
+                  step={1}
+                  onChange={(value) => configureAdaptiveNormalizer({ windowSize: value * 60 })}
+                  description="How much history to learn from (larger = slower adaptation)"
+                />
+
+                <ParameterSlider
+                  label="Smoothing Factor"
+                  value={adaptiveNormalizerConfig.smoothingFactor! * 100} // Convert to percentage
+                  min={0.1}
+                  max={10}
+                  step={0.1}
+                  onChange={(value) => configureAdaptiveNormalizer({ smoothingFactor: value / 100 })}
+                  description="How quickly to adapt to changes (higher = faster response)"
+                />
+
+                <ParameterSlider
+                  label="Exaggeration"
+                  value={adaptiveNormalizerConfig.exaggeration!}
+                  min={0.5}
+                  max={2.0}
+                  step={0.1}
+                  onChange={(value) => configureAdaptiveNormalizer({ exaggeration: value })}
+                  description="Dramatic effect (>1 = amplify extremes, <1 = compress)"
+                />
+
+                <p style={styles.advancedHint}>
+                  🔧 These settings control how the Auto-Harmonizer learns and adapts to your music.
+                  Default values work well for most music, but feel free to experiment!
+                </p>
+              </div>
+            )}
           </div>
 
           <div style={styles.divider} />
@@ -624,6 +668,31 @@ const styles = {
     backgroundColor: '#0a0a15',
     borderRadius: '4px',
     borderLeft: '2px solid #7d5dbd',
+  } as React.CSSProperties,
+
+  // Advanced Auto-Harmonizer Config
+  advancedConfig: {
+    marginTop: '12px',
+    padding: '12px',
+    backgroundColor: '#0a0a15',
+    borderRadius: '6px',
+    border: '1px solid #2a2b3a',
+  } as React.CSSProperties,
+
+  advancedTitle: {
+    fontSize: '11px',
+    color: '#a0a0b0',
+    marginBottom: '10px',
+    fontWeight: 600,
+    margin: '0 0 10px 0',
+  } as React.CSSProperties,
+
+  advancedHint: {
+    fontSize: '9px',
+    color: '#7a7a8a',
+    lineHeight: 1.4,
+    marginTop: '10px',
+    fontStyle: 'italic' as const,
   } as React.CSSProperties,
 
   // Live Analysis
