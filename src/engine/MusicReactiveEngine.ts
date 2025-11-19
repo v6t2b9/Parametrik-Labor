@@ -217,6 +217,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
   /**
    * Apply role-based behavior modifiers to modulation
+   * Performance optimized: Eliminate closure allocation and inline calculations
    */
   private applyRoleModifiers(
     modulation: BehaviorModulation,
@@ -226,23 +227,27 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       return modulation;
     }
 
+    // Performance optimization: Get role modifiers and cache values
     const roleModifiers = getRoleModifiers(agent.currentRole);
     const intensity = agent.roleIntensity || 1.0;
 
-    // Apply modifiers with intensity scaling
+    // Performance optimization: Inline blendModifier calculation
     // Intensity 0-1 blends between neutral (1.0) and full role modifier
-    const blendModifier = (modifier: number) => {
-      return 1.0 + (modifier - 1.0) * intensity;
-    };
+    // Formula: 1.0 + (modifier - 1.0) * intensity
+    const speedBlend = 1.0 + (roleModifiers.speedMultiplier - 1.0) * intensity;
+    const turnSpeedBlend = 1.0 + (roleModifiers.turnSpeedMultiplier - 1.0) * intensity;
+    const sensorAngleBlend = 1.0 + (roleModifiers.sensorAngleMultiplier - 1.0) * intensity;
+    const sensorDistBlend = 1.0 + (roleModifiers.sensorDistMultiplier - 1.0) * intensity;
+    const depositBlend = 1.0 + (roleModifiers.depositMultiplier - 1.0) * intensity;
 
     return {
-      moveSpeedMultiplier: modulation.moveSpeedMultiplier * blendModifier(roleModifiers.speedMultiplier),
-      turnSpeedMultiplier: modulation.turnSpeedMultiplier * blendModifier(roleModifiers.turnSpeedMultiplier),
+      moveSpeedMultiplier: modulation.moveSpeedMultiplier * speedBlend,
+      turnSpeedMultiplier: modulation.turnSpeedMultiplier * turnSpeedBlend,
       turnRandomnessMultiplier: modulation.turnRandomnessMultiplier, // Not modified by role
-      sensorAngleMultiplier: modulation.sensorAngleMultiplier * blendModifier(roleModifiers.sensorAngleMultiplier),
-      sensorDistanceMultiplier: modulation.sensorDistanceMultiplier * blendModifier(roleModifiers.sensorDistMultiplier),
+      sensorAngleMultiplier: modulation.sensorAngleMultiplier * sensorAngleBlend,
+      sensorDistanceMultiplier: modulation.sensorDistanceMultiplier * sensorDistBlend,
       sensorSensitivityMultiplier: modulation.sensorSensitivityMultiplier, // Not modified by role
-      depositRateMultiplier: modulation.depositRateMultiplier * blendModifier(roleModifiers.depositMultiplier),
+      depositRateMultiplier: modulation.depositRateMultiplier * depositBlend,
       trailAttraction: modulation.trailAttraction, // Not modified by role
       explorationBiasMultiplier: modulation.explorationBiasMultiplier, // Not modified by role
     };

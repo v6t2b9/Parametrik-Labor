@@ -12,6 +12,10 @@ export class RoleAssigner {
   private roleMappings: MusicMappingParameters['roleMapping'];
   private frameCount: number = 0;
 
+  // Performance optimization: Cache dominant role calculation per frame
+  private cachedDominantRole: { role: EcosystemRole; intensity: number } | null = null;
+  private cachedFrameCount: number = -1;
+
   constructor(roleMappings: MusicMappingParameters['roleMapping']) {
     this.roleMappings = roleMappings;
   }
@@ -21,58 +25,71 @@ export class RoleAssigner {
    */
   public setRoleMappings(roleMappings: MusicMappingParameters['roleMapping']): void {
     this.roleMappings = roleMappings;
+    // Invalidate cache when config changes
+    this.cachedFrameCount = -1;
   }
 
   /**
    * Determine the dominant role based on current audio analysis
    * Returns the role with the highest signal strength above threshold
+   * Performance optimized: Caches result per frame and avoids array allocations
    */
   public getDominantRole(analysis: MusicAnalysis): { role: EcosystemRole; intensity: number } | null {
     if (!this.roleMappings.enabled) {
       return null;
     }
 
-    // Calculate signal strength for each role
-    const roleSignals: Array<{ role: EcosystemRole; intensity: number }> = [];
+    // Performance optimization: Return cached result if same frame
+    if (this.cachedFrameCount === this.frameCount) {
+      return this.cachedDominantRole;
+    }
+
+    // Calculate signal strength for each role and track max directly
+    // Performance optimization: No array allocation, direct comparison
+    let maxRole: EcosystemRole | null = null;
+    let maxIntensity = -Infinity;
 
     // Builder: High bass energy
     const builderSignal = analysis.spectral.bassEnergy;
-    if (builderSignal >= this.roleMappings.builderThreshold.bassEnergy) {
-      roleSignals.push({ role: 'builder', intensity: builderSignal });
+    if (builderSignal >= this.roleMappings.builderThreshold.bassEnergy && builderSignal > maxIntensity) {
+      maxRole = 'builder';
+      maxIntensity = builderSignal;
     }
 
     // Harvester: High mid energy
     const harvesterSignal = analysis.spectral.midEnergy;
-    if (harvesterSignal >= this.roleMappings.harvesterThreshold.midEnergy) {
-      roleSignals.push({ role: 'harvester', intensity: harvesterSignal });
+    if (harvesterSignal >= this.roleMappings.harvesterThreshold.midEnergy && harvesterSignal > maxIntensity) {
+      maxRole = 'harvester';
+      maxIntensity = harvesterSignal;
     }
 
     // Consumer: High arousal
     const consumerSignal = analysis.tempo.arousalLevel;
-    if (consumerSignal >= this.roleMappings.consumerThreshold.arousalLevel) {
-      roleSignals.push({ role: 'consumer', intensity: consumerSignal });
+    if (consumerSignal >= this.roleMappings.consumerThreshold.arousalLevel && consumerSignal > maxIntensity) {
+      maxRole = 'consumer';
+      maxIntensity = consumerSignal;
     }
 
     // Decomposer: High dissonance
     const decomposerSignal = analysis.harmony.dissonance;
-    if (decomposerSignal >= this.roleMappings.decomposerThreshold.dissonance) {
-      roleSignals.push({ role: 'decomposer', intensity: decomposerSignal });
+    if (decomposerSignal >= this.roleMappings.decomposerThreshold.dissonance && decomposerSignal > maxIntensity) {
+      maxRole = 'decomposer';
+      maxIntensity = decomposerSignal;
     }
 
     // Scout: High treble energy
     const scoutSignal = analysis.spectral.highEnergy;
-    if (scoutSignal >= this.roleMappings.scoutThreshold.highEnergy) {
-      roleSignals.push({ role: 'scout', intensity: scoutSignal });
+    if (scoutSignal >= this.roleMappings.scoutThreshold.highEnergy && scoutSignal > maxIntensity) {
+      maxRole = 'scout';
+      maxIntensity = scoutSignal;
     }
 
-    // Return role with highest intensity, or null if no roles above threshold
-    if (roleSignals.length === 0) {
-      return null;
-    }
+    // Cache result for this frame
+    const result = maxRole ? { role: maxRole, intensity: maxIntensity } : null;
+    this.cachedDominantRole = result;
+    this.cachedFrameCount = this.frameCount;
 
-    return roleSignals.reduce((max, current) =>
-      current.intensity > max.intensity ? current : max
-    );
+    return result;
   }
 
   /**
