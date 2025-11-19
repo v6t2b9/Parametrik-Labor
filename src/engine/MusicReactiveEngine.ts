@@ -20,6 +20,10 @@ import {
   MultiScaleModulator,
 } from '../audio/AudioOikosModulator';
 
+// Import Role Assignment System
+import { RoleAssigner } from '../audio/RoleAssigner';
+import { getRoleModifiers } from '../config/roleConfigs';
+
 export class MusicReactiveEngine extends QuantumStigmergyEngine {
   // Species-specific music mappings (resolved from AllParameters)
   private musicMappingsRed: MusicMappingParameters | null = null;
@@ -33,6 +37,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   private beatPulseModulator: BeatPulseModulator;
   private interferenceModulator: InterferenceModulator;
   private multiScaleModulator: MultiScaleModulator;
+  private roleAssigner: RoleAssigner | null = null;
 
   // Modulator enable flags
   private useBeatPulse: boolean = false;
@@ -68,6 +73,18 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     this.musicMappingsRed = resolveSpeciesParams(params, 'red').audio;
     this.musicMappingsGreen = resolveSpeciesParams(params, 'green').audio;
     this.musicMappingsBlue = resolveSpeciesParams(params, 'blue').audio;
+
+    // Initialize or update role assigner (using universal audio mappings for now)
+    const universalAudio = params.universal.audio;
+    if (universalAudio.roleMapping.enabled) {
+      if (!this.roleAssigner) {
+        this.roleAssigner = new RoleAssigner(universalAudio.roleMapping);
+      } else {
+        this.roleAssigner.setRoleMappings(universalAudio.roleMapping);
+      }
+    } else {
+      this.roleAssigner = null;
+    }
   }
 
   /**
@@ -113,6 +130,11 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
         analysis.rhythm.beatStrength,         // meso
         analysis.spectral.centroid            // macro
       );
+    }
+
+    // Assign roles to agents based on audio analysis
+    if (this.roleAssigner && this.musicEnabled) {
+      this.roleAssigner.assignRolesToAgents(this.getAgents(), analysis);
     }
   }
 
@@ -170,7 +192,12 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       }
 
       // Calculate behavior modulation from music for this species
-      const modulation = this.calculateBehaviorModulation(music, mappings);
+      let modulation = this.calculateBehaviorModulation(music, mappings);
+
+      // Apply role-based behavior modifiers if agent has a role
+      if (agent.currentRole) {
+        modulation = this.applyRoleModifiers(modulation, agent);
+      }
 
       // Debug log modulation values occasionally
       if (!debugLogged && Math.random() < 0.001) {
@@ -186,6 +213,39 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       // Apply modulation to agent
       this.applyModulationToAgent(agent, modulation, music, mappings);
     }
+  }
+
+  /**
+   * Apply role-based behavior modifiers to modulation
+   */
+  private applyRoleModifiers(
+    modulation: BehaviorModulation,
+    agent: Agent
+  ): BehaviorModulation {
+    if (!agent.currentRole) {
+      return modulation;
+    }
+
+    const roleModifiers = getRoleModifiers(agent.currentRole);
+    const intensity = agent.roleIntensity || 1.0;
+
+    // Apply modifiers with intensity scaling
+    // Intensity 0-1 blends between neutral (1.0) and full role modifier
+    const blendModifier = (modifier: number) => {
+      return 1.0 + (modifier - 1.0) * intensity;
+    };
+
+    return {
+      moveSpeedMultiplier: modulation.moveSpeedMultiplier * blendModifier(roleModifiers.speedMultiplier),
+      turnSpeedMultiplier: modulation.turnSpeedMultiplier * blendModifier(roleModifiers.turnSpeedMultiplier),
+      turnRandomnessMultiplier: modulation.turnRandomnessMultiplier, // Not modified by role
+      sensorAngleMultiplier: modulation.sensorAngleMultiplier * blendModifier(roleModifiers.sensorAngleMultiplier),
+      sensorDistanceMultiplier: modulation.sensorDistanceMultiplier * blendModifier(roleModifiers.sensorDistMultiplier),
+      sensorSensitivityMultiplier: modulation.sensorSensitivityMultiplier, // Not modified by role
+      depositRateMultiplier: modulation.depositRateMultiplier * blendModifier(roleModifiers.depositMultiplier),
+      trailAttraction: modulation.trailAttraction, // Not modified by role
+      explorationBiasMultiplier: modulation.explorationBiasMultiplier, // Not modified by role
+    };
   }
 
   /**
