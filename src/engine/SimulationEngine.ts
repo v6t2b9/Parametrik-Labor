@@ -185,18 +185,23 @@ export class SimulationEngine {
     const matrix = resonance.interactionMatrix;
     const crossSpecies = resonance.crossSpeciesInteraction;
 
+    // Universal Baseline Settings as global multipliers
+    const attractionMult = resonance.attractionStrength; // Multiplies same-species interactions
+    const repulsionMult = resonance.repulsionStrength;   // Multiplies cross-species interactions
+
     // Optimized calculation based on agent type
+    // Universal Settings multiply matrix values for global control
     // Early exit optimization: Only read cross-species trails if enabled
     switch (agent.type) {
       case 'red':
-        return trails.red[idx] * matrix.redToRed +
-          (crossSpecies ? trails.green[idx] * matrix.redToGreen + trails.blue[idx] * matrix.redToBlue : 0);
+        return (trails.red[idx] * matrix.redToRed * attractionMult) +
+          (crossSpecies ? (trails.green[idx] * matrix.redToGreen + trails.blue[idx] * matrix.redToBlue) * repulsionMult : 0);
       case 'green':
-        return trails.green[idx] * matrix.greenToGreen +
-          (crossSpecies ? trails.red[idx] * matrix.greenToRed + trails.blue[idx] * matrix.greenToBlue : 0);
+        return (trails.green[idx] * matrix.greenToGreen * attractionMult) +
+          (crossSpecies ? (trails.red[idx] * matrix.greenToRed + trails.blue[idx] * matrix.greenToBlue) * repulsionMult : 0);
       case 'blue':
-        return trails.blue[idx] * matrix.blueToBlue +
-          (crossSpecies ? trails.red[idx] * matrix.blueToRed + trails.green[idx] * matrix.blueToGreen : 0);
+        return (trails.blue[idx] * matrix.blueToBlue * attractionMult) +
+          (crossSpecies ? (trails.red[idx] * matrix.blueToRed + trails.green[idx] * matrix.blueToGreen) * repulsionMult : 0);
       default:
         return 0;
     }
