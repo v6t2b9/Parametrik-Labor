@@ -180,36 +180,26 @@ export class SimulationEngine {
       return 0;
     }
 
-    // Use interaction matrix for fine-grained species interactions
+    // Performance optimization: Cache trail references and matrix
+    const trails = this.trails;
     const matrix = resonance.interactionMatrix;
-    let totalSignal = 0;
+    const crossSpecies = resonance.crossSpeciesInteraction;
 
-    // Calculate signal based on agent type and interaction matrix
+    // Optimized calculation based on agent type
+    // Early exit optimization: Only read cross-species trails if enabled
     switch (agent.type) {
       case 'red':
-        totalSignal += this.trails.red[idx] * matrix.redToRed;
-        if (resonance.crossSpeciesInteraction) {
-          totalSignal += this.trails.green[idx] * matrix.redToGreen;
-          totalSignal += this.trails.blue[idx] * matrix.redToBlue;
-        }
-        break;
+        return trails.red[idx] * matrix.redToRed +
+          (crossSpecies ? trails.green[idx] * matrix.redToGreen + trails.blue[idx] * matrix.redToBlue : 0);
       case 'green':
-        totalSignal += this.trails.green[idx] * matrix.greenToGreen;
-        if (resonance.crossSpeciesInteraction) {
-          totalSignal += this.trails.red[idx] * matrix.greenToRed;
-          totalSignal += this.trails.blue[idx] * matrix.greenToBlue;
-        }
-        break;
+        return trails.green[idx] * matrix.greenToGreen +
+          (crossSpecies ? trails.red[idx] * matrix.greenToRed + trails.blue[idx] * matrix.greenToBlue : 0);
       case 'blue':
-        totalSignal += this.trails.blue[idx] * matrix.blueToBlue;
-        if (resonance.crossSpeciesInteraction) {
-          totalSignal += this.trails.red[idx] * matrix.blueToRed;
-          totalSignal += this.trails.green[idx] * matrix.blueToGreen;
-        }
-        break;
+        return trails.blue[idx] * matrix.blueToBlue +
+          (crossSpecies ? trails.red[idx] * matrix.blueToRed + trails.green[idx] * matrix.blueToGreen : 0);
+      default:
+        return 0;
     }
-
-    return totalSignal;
   }
 
   private diffuseAndDecay(): void {
