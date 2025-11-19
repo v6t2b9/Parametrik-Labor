@@ -9,12 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Species Interaction Matrix (3×3)** 🧬
-  - Fine-grained control of cross-species pheromone trail responses
-  - Per-species interaction values: Red↔Red, Red↔Green, Red↔Blue, Green↔Red, etc.
-  - Range: -2.0 (strong repulsion) to +2.0 (strong attraction), 0 = neutral
-  - Universal baseline settings + species-specific overrides
-  - UI restructured: Universal tab shows baseline, Species tabs show 3 interaction sliders each
-  - Engine integration: Both SimulationEngine and QuantumStigmergyEngine use matrix values
+  - Two-tier control system for fine-grained species interaction dynamics
+  - **Universal Baseline Settings** (global multipliers):
+    - Attraction Strength: Multiplies all same-species interactions (clustering behavior)
+    - Repulsion Strength: Multiplies all cross-species interactions (inter-species dynamics)
+    - Cross-Species Interaction: Enable/disable cross-species sensing
+  - **Interaction Matrix** (fine-grained tuning):
+    - Per-species-pair interaction values: Red↔Red, Red↔Green, Red↔Blue, etc.
+    - Range: -2.0 (strong repulsion) to +2.0 (strong attraction), 0 = neutral
+    - Species-specific overrides available
+  - UI restructured: Universal tab shows baseline multipliers, Species tabs show 3 interaction sliders each
+  - Engine integration: Both SimulationEngine and QuantumStigmergyEngine use baseline × matrix formula
   - Enables complex ecosystem dynamics (symbiosis, competition, territoriality)
 
 - **Advanced Auto-Harmonizer Configuration** ⚙️
@@ -105,6 +110,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enhanced Technology Stack section with Web Audio API mention
 - Improved documentation structure with dedicated developer docs section
 - Enhanced build process to support PWA generation
+
+### Fixed
+- **Universal Baseline Settings now functional** 🔧
+  - Fixed bug where Attraction Strength and Repulsion Strength sliders had no effect
+  - Universal Baseline Settings now work as global multipliers:
+    - Attraction Strength multiplies all same-species interactions (Red→Red, Green→Green, Blue→Blue)
+    - Repulsion Strength multiplies all cross-species interactions (Red→Green, Red→Blue, etc.)
+  - Two-tier control system: Universal = global control, Matrix = fine-tuning
+  - Cross-Species Interaction checkbox was already working correctly
+
+### Performance
+- **Optimized simulation engines for smoother animation** ⚡
+  - Species Interaction Matrix calculations optimized with early-exit patterns
+    - 66% reduction in array lookups when cross-species interaction disabled
+  - Role Modifier application optimized:
+    - Eliminated closure allocations (60,000+ allocations/second @ 1000 agents, 60 FPS)
+    - Inline calculations instead of closure functions
+    - Bundle size reduced by 80 bytes (407.56 kB → 407.48 kB)
+  - RoleAssigner optimized with frame-based caching:
+    - From O(n) to O(1) - 999 saved calculations per frame @ 1000 agents
+    - Eliminated array allocations, direct comparison instead of Array.reduce()
+  - Expected improvements: More consistent frame times, reduced frame-time spikes
 
 ## [Previous Releases]
 

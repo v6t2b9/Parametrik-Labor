@@ -33,7 +33,9 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ✅ **9-Dimensional Parameter Control** - Model, Physical, Semiotic, Temporal, Resonance, Ecosystem, Visual, Effects, Performance
 ✅ **3 Stigmergy Models** - Classical (M1), Context-Switching (M2), Quantum-Inspired (M3)
 ✅ **Multi-Species Ecosystem** - 3 basis species (red/green/blue) with species-specific parameter overrides
-✅ **Species Interaction Matrix (3×3)** - Fine-grained control of cross-species trail responses (attraction/repulsion)
+✅ **Species Interaction Matrix (3×3)** - Two-tier control system:
+  - **Universal Baseline Settings** - Global multipliers for attraction (same-species) and repulsion (cross-species)
+  - **Interaction Matrix** - Fine-grained per-species-pair tuning (-2.0 to +2.0)
 ✅ **Quantum Mechanics** - Superposition states, phase-dependent trails, interference patterns
 ✅ **51+ Presets** - 8 global + 43 dimension-specific curated configurations
 ✅ **Auto-Optimizer** - Adaptive performance scaling (30-120 FPS targets)
