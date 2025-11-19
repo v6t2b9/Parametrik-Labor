@@ -120,6 +120,34 @@ export interface MusicMappingParameters {
     arousalValenceToDepositSensitivity: number;          // 0-2
     tensionInstabilityToExplorationSensitivity: number;  // 0-2
   };
+
+  // Audio → Ecosystem Role Mapping
+  roleMapping: {
+    enabled: boolean;                    // Enable dynamic role assignment
+    minRoleDuration: number;             // Minimum frames before role can change (hysteresis)
+
+    // Thresholds for each role assignment (based on audio features)
+    builderThreshold: {
+      bassEnergy: number;                // 0-1 (high bass = builder)
+      minDuration: number;               // Frames
+    };
+    harvesterThreshold: {
+      midEnergy: number;                 // 0-1 (high mid = harvester)
+      minDuration: number;
+    };
+    consumerThreshold: {
+      arousalLevel: number;              // 0-1 (high arousal = consumer)
+      minDuration: number;
+    };
+    decomposerThreshold: {
+      dissonance: number;                // 0-1 (high dissonance = decomposer)
+      minDuration: number;
+    };
+    scoutThreshold: {
+      highEnergy: number;                // 0-1 (high treble = scout)
+      minDuration: number;
+    };
+  };
 }
 
 /**
