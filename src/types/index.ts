@@ -5,6 +5,26 @@ export * from './ecosystem.js';
 
 export type AgentType = 'red' | 'green' | 'blue';
 
+// Ecosystem roles (functional behavior modes)
+export type EcosystemRole = 'builder' | 'harvester' | 'consumer' | 'decomposer' | 'scout';
+
+// Role behavior modifiers
+export interface RoleBehaviorModifiers {
+  speedMultiplier: number;      // Speed adjustment
+  depositMultiplier: number;    // Trail deposition intensity
+  sensorDistMultiplier: number; // Sensor range
+  sensorAngleMultiplier: number; // Sensor angle
+  turnSpeedMultiplier: number;  // Turning agility
+}
+
+// Complete role configuration
+export interface RoleConfig {
+  name: EcosystemRole;
+  description: string;
+  icon: string;
+  modifiers: RoleBehaviorModifiers;
+}
+
 // Complex number type for quantum amplitudes
 export interface ComplexNumber {
   re: number;  // Real part
@@ -27,6 +47,11 @@ export interface Agent {
   angle: number;
   type: AgentType;
   rhythmPhase: number;
+
+  // Dynamic role system
+  currentRole?: EcosystemRole;
+  roleTransitionTime?: number; // Frames since last role change
+  roleIntensity?: number;      // 0-1 strength of current role assignment
 
   // M2: Context-switching state
   contextMode?: ContextMode;

@@ -5,6 +5,33 @@
 
 import type { MusicMappingParameters } from '../types/musicMappings';
 
+// Default role mapping configuration (shared across all presets)
+const DEFAULT_ROLE_MAPPING: MusicMappingParameters['roleMapping'] = {
+  enabled: false, // Disabled by default
+  minRoleDuration: 30, // 30 frames (~0.5 seconds at 60fps)
+
+  builderThreshold: {
+    bassEnergy: 0.6,
+    minDuration: 20,
+  },
+  harvesterThreshold: {
+    midEnergy: 0.6,
+    minDuration: 20,
+  },
+  consumerThreshold: {
+    arousalLevel: 0.7,
+    minDuration: 15,
+  },
+  decomposerThreshold: {
+    dissonance: 0.65,
+    minDuration: 25,
+  },
+  scoutThreshold: {
+    highEnergy: 0.65,
+    minDuration: 15,
+  },
+};
+
 /**
  * Default preset - Balanced mappings based on music psychology research
  * Suitable for most music genres
@@ -58,6 +85,8 @@ export const DEFAULT_PRESET: MusicMappingParameters = {
     arousalValenceToDepositSensitivity: 0.8,
     tensionInstabilityToExplorationSensitivity: 0.7,
   },
+
+  roleMapping: DEFAULT_ROLE_MAPPING,
 };
 
 /**
@@ -113,6 +142,8 @@ export const BASS_HEAVY_PRESET: MusicMappingParameters = {
     arousalValenceToDepositSensitivity: 1.5,
     tensionInstabilityToExplorationSensitivity: 0.3,
   },
+
+  roleMapping: DEFAULT_ROLE_MAPPING,
 };
 
 /**
@@ -168,6 +199,8 @@ export const AMBIENT_PRESET: MusicMappingParameters = {
     arousalValenceToDepositSensitivity: 0.5,
     tensionInstabilityToExplorationSensitivity: 0.3,
   },
+
+  roleMapping: DEFAULT_ROLE_MAPPING,
 };
 
 /**
@@ -223,6 +256,8 @@ export const CHAOTIC_PRESET: MusicMappingParameters = {
     arousalValenceToDepositSensitivity: 1.2,
     tensionInstabilityToExplorationSensitivity: 1.8,
   },
+
+  roleMapping: DEFAULT_ROLE_MAPPING,
 };
 
 /**
@@ -278,6 +313,8 @@ export const MINIMAL_PRESET: MusicMappingParameters = {
     arousalValenceToDepositSensitivity: 0.3,
     tensionInstabilityToExplorationSensitivity: 0.2,
   },
+
+  roleMapping: DEFAULT_ROLE_MAPPING,
 };
 
 /**

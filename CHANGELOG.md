@@ -8,6 +8,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Species Interaction Matrix (3×3)** 🧬
+  - Fine-grained control of cross-species pheromone trail responses
+  - Per-species interaction values: Red↔Red, Red↔Green, Red↔Blue, Green↔Red, etc.
+  - Range: -2.0 (strong repulsion) to +2.0 (strong attraction), 0 = neutral
+  - Universal baseline settings + species-specific overrides
+  - UI restructured: Universal tab shows baseline, Species tabs show 3 interaction sliders each
+  - Engine integration: Both SimulationEngine and QuantumStigmergyEngine use matrix values
+  - Enables complex ecosystem dynamics (symbiosis, competition, territoriality)
+
+- **Advanced Auto-Harmonizer Configuration** ⚙️
+  - Configurable adaptive normalization parameters (previously fixed)
+  - Window Size slider (3-30 seconds): Controls history length for learning
+  - Smoothing Factor slider (0.1-10%): Controls adaptation speed
+  - Exaggeration slider (0.5-2.0): Dramatic effect control (amplify/compress extremes)
+  - Real-time configuration while music is playing
+  - Optimizes visual dynamics for quiet or narrow-range music
+
+- **Dynamic Role Mapping System** 🎭
+  - Audio-driven ecosystem roles: Agents dynamically assume functional behaviors
+  - **5 Functional Roles:**
+    - 🏗️ **Builder** (triggered by bass): Slow movement, high trail deposition
+    - 🌾 **Harvester** (triggered by mid frequencies): Extended sensors, normal speed
+    - 🔥 **Consumer** (triggered by arousal/tempo): Fast movement, trail following
+    - 🍄 **Decomposer** (triggered by dissonance): Low deposit, dispersal behavior
+    - 🔭 **Scout** (triggered by treble): Very fast, long-range sensors
+  - **Role Assignment Logic:**
+    - Threshold-based assignment per audio feature
+    - Hysteresis (minimum duration) prevents rapid role switching
+    - Intensity-based signal strength (0-1) for smooth blending
+    - RoleAssigner class with configurable thresholds
+  - **Behavior Modification:**
+    - Role modifiers multiply audio-reactive modulation
+    - Per-role speed, deposit rate, sensor range/angle modifications
+    - Maintains audio reactivity while adding role-specific behavior
+  - **UI Controls:**
+    - Enable/Disable toggle in Audio tab
+    - Min Role Duration slider (10-120 frames)
+    - Per-role threshold sliders (0.3-0.9 for each role)
+    - Visual role icons and clear descriptions
+  - **Engine Integration:**
+    - MusicReactiveEngine initializes RoleAssigner when enabled
+    - Role assignment in updateMusicAnalysis()
+    - applyRoleModifiers() blends role & audio modulation
+
 - **Audio Oikos - Complete Music Reactivity System** 🎵
   - **AudioOikosModulator** - Master modulation system integrating 5 specialized classes
   - **AdaptiveNormalizer** - Auto-Harmonizer that learns each song's unique frequency range for maximum visual contrast
