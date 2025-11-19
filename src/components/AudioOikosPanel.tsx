@@ -327,6 +327,159 @@ export function AudioOikosPanel() {
         </>
       )}
 
+      {/* Dynamic Role Mapping */}
+      {musicEnabled && (
+        <>
+          <div style={styles.section}>
+            <div style={styles.toggleRow}>
+              <h4 style={styles.sectionTitle}>🧬 Dynamic Role Mapping</h4>
+              <button
+                onClick={() => {
+                  const newEnabled = !mappings.roleMapping.enabled;
+                  updateAudioParams({
+                    roleMapping: { ...mappings.roleMapping, enabled: newEnabled }
+                  });
+                }}
+                style={{
+                  ...styles.toggleButton,
+                  ...(mappings.roleMapping.enabled ? styles.toggleButtonActive : {}),
+                }}
+              >
+                {mappings.roleMapping.enabled ? 'ON' : 'OFF'}
+              </button>
+            </div>
+
+            <p style={styles.toggleDescription}>
+              {mappings.roleMapping.enabled
+                ? 'Agents dynamically assume functional roles based on audio features'
+                : 'Enable to let agents switch roles (builder, harvester, consumer, decomposer, scout)'}
+            </p>
+
+            <p style={styles.autoHarmonizerHint}>
+              💡 Role Mapping assigns ecosystem roles to agents based on real-time audio:
+              <br />
+              🏗️ Builder (bass) • 🌾 Harvester (mid) • 🔥 Consumer (arousal) • 🍄 Decomposer (dissonance) • 🔭 Scout (treble)
+            </p>
+
+            {/* Role Mapping Configuration (only when enabled) */}
+            {mappings.roleMapping.enabled && (
+              <div style={styles.advancedConfig}>
+                <h5 style={styles.advancedTitle}>⚙️ Role Assignment Thresholds</h5>
+
+                <ParameterSlider
+                  label="Min Role Duration (frames)"
+                  value={mappings.roleMapping.minRoleDuration}
+                  min={10}
+                  max={120}
+                  step={5}
+                  onChange={(value) => updateAudioParams({
+                    roleMapping: { ...mappings.roleMapping, minRoleDuration: value }
+                  })}
+                  description="Minimum frames before role can change (prevents rapid switching)"
+                />
+
+                <div style={styles.roleThresholdGroup}>
+                  <h6 style={styles.roleThresholdTitle}>🏗️ Builder (Bass Energy)</h6>
+                  <ParameterSlider
+                    label="Threshold"
+                    value={mappings.roleMapping.builderThreshold.bassEnergy}
+                    min={0.3}
+                    max={0.9}
+                    step={0.05}
+                    onChange={(value) => updateAudioParams({
+                      roleMapping: {
+                        ...mappings.roleMapping,
+                        builderThreshold: { ...mappings.roleMapping.builderThreshold, bassEnergy: value }
+                      }
+                    })}
+                    description="Bass energy level to trigger builder role"
+                  />
+                </div>
+
+                <div style={styles.roleThresholdGroup}>
+                  <h6 style={styles.roleThresholdTitle}>🌾 Harvester (Mid Energy)</h6>
+                  <ParameterSlider
+                    label="Threshold"
+                    value={mappings.roleMapping.harvesterThreshold.midEnergy}
+                    min={0.3}
+                    max={0.9}
+                    step={0.05}
+                    onChange={(value) => updateAudioParams({
+                      roleMapping: {
+                        ...mappings.roleMapping,
+                        harvesterThreshold: { ...mappings.roleMapping.harvesterThreshold, midEnergy: value }
+                      }
+                    })}
+                    description="Mid energy level to trigger harvester role"
+                  />
+                </div>
+
+                <div style={styles.roleThresholdGroup}>
+                  <h6 style={styles.roleThresholdTitle}>🔥 Consumer (Arousal Level)</h6>
+                  <ParameterSlider
+                    label="Threshold"
+                    value={mappings.roleMapping.consumerThreshold.arousalLevel}
+                    min={0.4}
+                    max={0.9}
+                    step={0.05}
+                    onChange={(value) => updateAudioParams({
+                      roleMapping: {
+                        ...mappings.roleMapping,
+                        consumerThreshold: { ...mappings.roleMapping.consumerThreshold, arousalLevel: value }
+                      }
+                    })}
+                    description="Arousal level (tempo) to trigger consumer role"
+                  />
+                </div>
+
+                <div style={styles.roleThresholdGroup}>
+                  <h6 style={styles.roleThresholdTitle}>🍄 Decomposer (Dissonance)</h6>
+                  <ParameterSlider
+                    label="Threshold"
+                    value={mappings.roleMapping.decomposerThreshold.dissonance}
+                    min={0.4}
+                    max={0.9}
+                    step={0.05}
+                    onChange={(value) => updateAudioParams({
+                      roleMapping: {
+                        ...mappings.roleMapping,
+                        decomposerThreshold: { ...mappings.roleMapping.decomposerThreshold, dissonance: value }
+                      }
+                    })}
+                    description="Dissonance level to trigger decomposer role"
+                  />
+                </div>
+
+                <div style={styles.roleThresholdGroup}>
+                  <h6 style={styles.roleThresholdTitle}>🔭 Scout (High Energy)</h6>
+                  <ParameterSlider
+                    label="Threshold"
+                    value={mappings.roleMapping.scoutThreshold.highEnergy}
+                    min={0.4}
+                    max={0.9}
+                    step={0.05}
+                    onChange={(value) => updateAudioParams({
+                      roleMapping: {
+                        ...mappings.roleMapping,
+                        scoutThreshold: { ...mappings.roleMapping.scoutThreshold, highEnergy: value }
+                      }
+                    })}
+                    description="Treble energy level to trigger scout role"
+                  />
+                </div>
+
+                <p style={styles.advancedHint}>
+                  🎯 Lower thresholds = more agents in role. Higher = only strongest signals trigger role.
+                  Each role has unique behavior: speed, deposit rate, sensor range modifications.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div style={styles.divider} />
+        </>
+      )}
+
       {/* Live Analysis */}
       {musicEnabled && (
         <>
@@ -693,6 +846,22 @@ const styles = {
     lineHeight: 1.4,
     marginTop: '10px',
     fontStyle: 'italic' as const,
+  } as React.CSSProperties,
+
+  // Role Threshold Groups
+  roleThresholdGroup: {
+    marginTop: '12px',
+    marginBottom: '12px',
+    paddingTop: '8px',
+    borderTop: '1px solid #2a2b3a',
+  } as React.CSSProperties,
+
+  roleThresholdTitle: {
+    fontSize: '11px',
+    color: '#e0e0e0',
+    marginBottom: '6px',
+    fontWeight: 600,
+    margin: '0 0 6px 0',
   } as React.CSSProperties,
 
   // Live Analysis
