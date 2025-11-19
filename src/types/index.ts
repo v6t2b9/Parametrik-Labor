@@ -285,7 +285,8 @@ export interface Preset {
   name: string;
   icon: string;
   description: string;
-  parameters: AllParameters | any; // Allow legacy format
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  parameters: AllParameters | any; // Allow legacy format for backwards compatibility
 }
 
 // Simulation State

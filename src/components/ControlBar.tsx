@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { useAudioStore } from '../store/useAudioStore';
 import GIF from 'gif.js.optimized';
+import type { AspectRatio } from '../types';
 
 interface ControlBarProps {
   onFullscreenToggle?: () => void;
@@ -33,7 +34,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const [processingProgress, setProcessingProgress] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
-  const gifEncoderRef = useRef<any>(null);
+  const gifEncoderRef = useRef<InstanceType<typeof GIF> | null>(null);
   const recordingIntervalRef = useRef<number | null>(null);
 
   function takeScreenshot() {
@@ -357,7 +358,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           </div>
           <select
             value={ui.aspectRatio}
-            onChange={(e) => setAspectRatio(e.target.value as any)}
+            onChange={(e) => setAspectRatio(e.target.value as AspectRatio)}
             style={styles.select}
             title="Canvas aspect ratio for export and display"
           >

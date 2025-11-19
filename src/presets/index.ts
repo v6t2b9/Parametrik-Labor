@@ -116,6 +116,7 @@ export const defaultParameters: AllParameters = {
 };
 
 // Legacy format converter for old presets
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function convertLegacyPreset(legacy: any): AllParameters {
   return {
     universal: {

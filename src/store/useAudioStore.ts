@@ -12,6 +12,12 @@ import type {
 } from '../types/musicMappings';
 import { DEFAULT_PRESET, getPreset, AUDIO_MAPPING_PRESETS } from '../audio/presets';
 
+interface VideoExportOptions {
+  duration?: number;
+  fps?: number;
+  quality?: number;
+}
+
 interface AudioStore {
   // Audio source
   analyzer: AudioAnalyzer | null;
@@ -67,7 +73,7 @@ interface AudioStore {
   updateAnalysis: () => void;
 
   // Actions - Video Export
-  exportVideo: (options: any) => Promise<void>;
+  exportVideo: (options: VideoExportOptions) => Promise<void>;
 
   // Cleanup
   cleanup: () => void;
@@ -320,7 +326,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   },
 
   // Export video (placeholder for now)
-  exportVideo: async (_options: any) => {
+  exportVideo: async (_options: VideoExportOptions) => {
     console.log('[Audio Oikos] Video export not yet implemented');
     set({ isExporting: true, exportProgress: 0 });
 

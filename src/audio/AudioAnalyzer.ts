@@ -78,8 +78,11 @@ export class AudioAnalyzer {
    */
   private initAudioContext(): void {
     if (!this.audioContext) {
-      this.audioContext = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        throw new Error('AudioContext not supported in this browser');
+      }
+      this.audioContext = new AudioContextClass();
 
       this.analyser = this.audioContext.createAnalyser();
       this.analyser.fftSize = this.fftSize;
