@@ -41,17 +41,23 @@ Diese Dokumentation folgt dem **Zettelkasten-Prinzip** mit **atomic notes** als 
 ### 📚 [[#concepts|Concepts]] (5 Notizen)
 Theoretische Grundlagen der Ökosemiotik
 
-### 🎛️ [[#parameters|Parameters]] (5 Notizen)
+### 🎛️ [[#parameters|Parameters]] (15 Notizen) ✅
 Atomare Parameter-Beschreibungen (1 Parameter = 1 Notiz)
 
-### ✨ [[#properties|Properties]] (3 Notizen)
+### ✨ [[#properties|Properties]] (8 Notizen) ✅
 Emergente Eigenschaften
 
 ### 🗺️ [[#meta|Meta]] (1 MOC)
 Maps of Content - Navigationshilfen
 
-### 🧪 Experiments
-→ Verlinkt zu [[../experiments/Experimentelle_Sektion_Index.md]] (nicht-atomar)
+### 🔬 [[#methods|Methods]] (4 Notizen) ✅
+Experimentelle Methodologien
+
+### 🧪 [[#experiments|Experiments]] (4 Notizen) ✅
+Experimentklassen
+
+### 📊 [[#metrics|Metrics]] (4 Notizen) ✅
+Mess- und Analysekonzepte
 
 ### 🔧 Components
 → Verlinkt zu [[../development/ARCHITECTURE.md]] (nicht-atomar)
@@ -93,7 +99,7 @@ Theoretische Grundlagen-Konzepte (atomar, Single Source of Truth):
 
 Atomare Parameter-Beschreibungen (Single Source of Truth für jeden Parameter):
 
-### Physikalische Oikos
+### Physikalische Oikos (4 Parameter)
 
 1. **[[parameters/decay-rate.md]]** ⭐
    - Range: 0.85 - 0.999
@@ -101,38 +107,95 @@ Atomare Parameter-Beschreibungen (Single Source of Truth für jeden Parameter):
    - Starke Effekte: Stabilität (+++), Clusterbildung (+++), Kristallinität (+++)
    - Kritischer Schwellenwert: ~0.94
 
-### Semiotische Oikos
+2. **[[parameters/diffusion.md]]**
+   - Range: 0 - 10
+   - Bedeutung: Räumliche Ausbreitung von Trail-Intensität
+   - Starke Effekte: Fluidität (+++), Kristallinität (---)
+   - Trade-off: Mit Decay (temporal vs. spatial)
 
-2. **[[parameters/sensor-distance.md]]** ⭐
+3. **[[parameters/fade-strength.md]]**
+   - Range: 0.0 - 1.0
+   - Bedeutung: Beschleunigung des Vergessens
+   - Starke Effekte: Stabilität (---), Kristallinität (---)
+   - Antagonistisch zu Decay (Decay erhält, Fade löscht)
+
+4. **[[parameters/trail-saturation.md]]**
+   - Range: 100 - 255
+   - Bedeutung: Maximale Umwelt-Kapazität
+   - Starke Effekte: Selbstlimitierung, Attraktor-Bildung
+   - Theoretische Bedeutung: Nicht-triviale Attraktoren
+
+### Semiotische Oikos (4 Parameter)
+
+5. **[[parameters/sensor-distance.md]]** ⭐
    - Range: 5 - 50
    - Bedeutung: Radius des zeichenvermittelten Handlungsraums
    - Starke Effekte: Separation (+++), Netzwerk (+++)
    - Theoretische Bedeutung: Separation erfordert Fernwahrnehmung
 
-3. **[[parameters/deposit-amount.md]]**
+6. **[[parameters/sensor-angle.md]]**
+   - Range: 0.1 - 1.57 (radians)
+   - Bedeutung: Breite des Wahrnehmungsfeldes
+   - Starke Effekte: Fluidität (++), Chaos (+)
+   - Komplementär zu Sensor-Distance (Distance = Reichweite, Angle = Breite)
+
+7. **[[parameters/deposit-amount.md]]**
    - Range: 1 - 30
    - Bedeutung: Stärke der Umwelt-Modifikation durch Zeichensetzung
    - Starke Effekte: Stabilität (+++), Dichte (+++)
    - Synergie: Deposit × Decay verstärken Gedächtnis-Effekt
 
-### Temporale Oikos
+8. **[[parameters/turn-speed.md]]**
+   - Range: 0.1 - 1.0
+   - Bedeutung: Reaktivität auf Zeichen
+   - Starke Effekte: Fluidität (+++), Chaos (++)
+   - Synergistisch mit Agent-Speed für Gesamt-Agilität
 
-4. **[[parameters/agent-speed.md]]**
+### Temporale Oikos (4 Parameter)
+
+9. **[[parameters/agent-speed.md]]**
    - Range: 0.5 - 5.0
    - Bedeutung: Temporale Dichte der Zeichensetzung
    - Starke Effekte: Chaos (+++), Fluidität (+++)
    - Trade-off: Schnelle Bewegung braucht hohen Decay für Stabilität
 
-### Resonanz-Oikos
+10. **[[parameters/agent-count.md]]**
+    - Range: 100 - 10000
+    - Bedeutung: Dichte der Interaktionen
+    - Starke Effekte: Clusterbildung (+++), Dichte (+++)
+    - Super-lineares Skalieren (Netzwerk-Effekte)
 
-5. **[[parameters/attraction-strength.md]]** ⭐
-   - Range: 0.0 - 2.0
-   - Bedeutung: Grad der Selbst-Resonanz
-   - Starke Effekte: Clusterbildung (+++), Separation (---) [bedingt]
-   - Komplexität: Bei hoher Attraction + starker Repulsion → beides
+11. **[[parameters/chaos-interval.md]]**
+    - Range: 0 - 1000 (frames)
+    - Bedeutung: Frequenz periodischer Destabilisierung
+    - Starke Effekte: Chaos (+++), Stabilität (---) [mit Paradox]
+    - Chaos-Injection Paradox: Moderate Werte (250-350) erhöhen Makro-Stabilität
 
-### Weitere Parameter
-→ Werden sukzessive als atomare Notizen extrahiert (siehe [[../research/Parameter_Oikos_Matrix.md]] für vollständige Liste)
+12. **[[parameters/chaos-strength.md]]**
+    - Range: 0.0 - 1.0
+    - Bedeutung: Intensität der Perturbation
+    - Starke Effekte: Chaos (+++), Stabilität (---)
+    - Wirkt mit Chaos-Interval (Frequenz × Amplitude)
+
+### Resonanz-Oikos (3 Parameter)
+
+13. **[[parameters/attraction-strength.md]]** ⭐
+    - Range: 0.0 - 2.0
+    - Bedeutung: Grad der Selbst-Resonanz
+    - Starke Effekte: Clusterbildung (+++), Separation (---) [bedingt]
+    - Komplexität: Bei hoher Attraction + starker Repulsion → beides
+
+14. **[[parameters/repulsion-strength.md]]** ⭐
+    - Range: -1.5 - 1.0
+    - Bedeutung: Stärke der Inter-Spezies-Resonanz
+    - Starke Effekte: Separation (+++), Clusterbildung (~)
+    - Kritischer Schwellenwert: Harmonie-Schwelle bei ~-0.5
+
+15. **[[parameters/cross-species-interaction.md]]** ⭐
+    - Range: true/false (boolean)
+    - Bedeutung: Ontologischer Toggle für Inter-System-Kopplung
+    - Starke Effekte: Separation (++), Fluidität (++)
+    - Theoretische Bedeutung: Voraussetzung für Repulsion
 
 ---
 
@@ -140,7 +203,7 @@ Atomare Parameter-Beschreibungen (Single Source of Truth für jeden Parameter):
 
 Emergente Eigenschaften (Single Source of Truth für jede Eigenschaft):
 
-### Strukturelle Eigenschaften
+### Strukturelle Eigenschaften (3 Properties)
 
 1. **[[properties/cluster-formation.md]]** ⭐
    - Definition: Tendenz zur Bildung räumlich konzentrierter, homogener Gruppen
@@ -153,16 +216,132 @@ Emergente Eigenschaften (Single Source of Truth für jede Eigenschaft):
    - Kritischer Schwellenwert: Harmonie-Schwelle bei Repulsion ≈ -0.5
    - Theoretische Bedeutung: Erfordert Fernwahrnehmung
 
-### Dynamische Eigenschaften
+3. **[[properties/network.md]]**
+   - Definition: Tendenz zur Bildung verzweigter, verbundener Strukturen
+   - Gefördert durch: Sensor Distance (+++), Decay (++)
+   - Theoretische Bedeutung: Small-World-Phänomen (hohe lokale + kurze globale Pfade)
 
-3. **[[properties/stability.md]]** ⭐
+### Ordnungs-Eigenschaften (2 Properties)
+
+4. **[[properties/crystallinity.md]]**
+   - Definition: Tendenz zur Bildung geometrischer, starrer, hochgeordneter Muster
+   - Gefördert durch: Decay (+++), niedrige Diffusion (---)
+   - Anti-korreliert mit: Fluidität
+   - Theoretische Bedeutung: Maximale emergente Ordnung
+
+5. **[[properties/density.md]]**
+   - Definition: Konzentration von Trail-Intensität in Hotspots
+   - Gefördert durch: Deposit (+++), Agent Count (+++), Trail Saturation (+++)
+   - Theoretische Bedeutung: Akkumulative Dynamik + Selbstlimitierung
+
+### Dynamische Eigenschaften (3 Properties)
+
+6. **[[properties/stability.md]]** ⭐
    - Definition: Zeitliche Persistenz von Strukturen
    - Gefördert durch: Decay (+++), Deposit (+++)
    - Gehemmt durch: Chaos Interval (---), Fade Strength (--)
    - Paradox: Moderate Chaos-Injection kann Stabilität erhöhen (Loop-Breaking)
 
-### Weitere Properties
-→ Werden sukzessive als atomare Notizen extrahiert: Chaos, Netzwerk, Fluidität, Kristallinität, Dichte
+7. **[[properties/fluidity.md]]**
+   - Definition: Kontinuierliche Formveränderung ohne Strukturkollaps
+   - Gefördert durch: Diffusion (+++), Agent Speed (+++), Turn Speed (+++)
+   - Anti-korreliert mit: Kristallinität
+   - Charakteristik: "Lavalampen"-Effekt, organische Morphing
+
+8. **[[properties/chaos.md]]**
+   - Definition: Irregularität, Unvorhersagbarkeit, schnelle Veränderung
+   - Gefördert durch: Chaos Interval (+++), Chaos Strength (+++), hohe Speed (+++)
+   - Anti-korreliert mit: Stabilität, Kristallinität
+   - Theoretische Bedeutung: Störungs-Dominanz über Ordnung
+
+---
+
+## Methods
+
+Experimentelle Methodologien (Atomic notes für wissenschaftliches Arbeiten):
+
+1. **[[methods/systematic-variation.md]]** ⭐
+   - Definition: Ein Parameter variieren, alle anderen konstant (ceteris paribus)
+   - Anwendung: Isolierung von Parameter-Effekten
+   - Kombination: Mit Iterative Deepening und Theory-Guided Hypotheses
+
+2. **[[methods/theory-guided-hypotheses.md]]** ⭐
+   - Definition: Hypothesen vor Experiment formulieren
+   - Workflow: Theorie → Hypothese → Experiment → Validierung
+   - Umgang mit Überraschungen: Abweichungen als wertvollste Erkenntnisse
+
+3. **[[methods/iterative-deepening.md]]**
+   - Definition: Grobe → Feine → Grenzfall-Exploration
+   - Strategie: Runde 1 (5-7 Werte), Runde 2 (10 Werte im interessanten Bereich), Runde 3 (Extreme)
+   - Effizienz: 10× effizienter als vollständige hochauflösende Exploration
+
+4. **[[methods/qualitative-quantitative-capture.md]]**
+   - Definition: Duale Erfassung (visuell + numerisch)
+   - Taxonomie: Struktur, Stabilität, Textur, Dynamik
+   - Mapping: Qualitative Deskriptoren ↔ Quantitative Metriken
+
+---
+
+## Experiments
+
+Experimentklassen (Design-Patterns für systematische Untersuchungen):
+
+1. **[[experiments/single-parameter-variation.md]]** ⭐
+   - Ziel: Isolierter Effekt eines Parameters
+   - Design: Ein Parameter variiert, alle anderen konstant (Baseline)
+   - Template: [[../experiments/Template_Parameter_Experiment.md]]
+   - Anwendung: Parameter-Oikos-Matrix befüllen, Schwellenwerte identifizieren
+
+2. **[[experiments/parameter-combination.md]]**
+   - Ziel: Interaktionseffekte (Synergie, Antagonismus)
+   - Design: 2-Parameter-Grid (z.B. 3×3 = 9 Runs)
+   - Arten: Additive, Synergetische, Antagonistische Effekte
+   - Beispiel: Decay × Diffusion Trade-off
+
+3. **[[experiments/mode-comparison.md]]**
+   - Ziel: Modi-spezifische Dynamiken verstehen
+   - Modi: MYZEL (1 Spezies), STIGMERGIE (Multi, isoliert), RESONANZ (Multi, gekoppelt)
+   - Anwendung: Ökosemiotische Wende empirisch validieren
+
+4. **[[experiments/boundary-exploration.md]]**
+   - Ziel: Theoretische Grenzen, sinnvolle Ranges definieren
+   - Design: Extreme Werte testen (sehr niedrig, sehr hoch)
+   - Kategorien: Physikalische, Stabilitäts-, Performance-, Konzeptuelle Grenzen
+   - Beispiel: Decay 0.0-1.0 → sinnvoller Bereich 0.85-0.99
+
+---
+
+## Metrics
+
+Mess- und Analysekonzepte (Quantifizierung emergenter Phänomene):
+
+### Implementiert (2 Metriken)
+
+1. **[[metrics/ridge-point-analysis.md]]** ⭐
+   - Status: Implementiert
+   - Konzept: Identifikation lokaler Maxima (Hotspots)
+   - Metriken: Ridge-Point-Anzahl, Durchschnitts-Intensität, Farbverteilung
+   - Interpretation: < 100 (wenige Cluster), 100-500 (typisch), > 500 (granular)
+
+2. **[[metrics/structural-similarity.md]]** ⭐
+   - Status: Implementiert
+   - Konzept: Pattern-Hash-Vergleich (Fingerprint)
+   - Score: 0.0-1.0 (0.0 = völlig unterschiedlich, 1.0 = identisch)
+   - Anwendung: Reproduzierbarkeit, Seed-Sensitivität, Parameter-Effekt quantifizieren
+
+### Geplant (2 Metriken)
+
+3. **[[metrics/entropy-measurement.md]]**
+   - Status: Geplant
+   - Konzept: Shannon-Entropie (Ordnung vs. Unordnung)
+   - Range: 0.0-8.0 bits (niedrig = geordnet/kristallin, hoch = chaotisch)
+   - Korrelation: Inverse zu Kristallinität, positiv zu Chaos
+
+4. **[[metrics/fractal-dimension.md]]**
+   - Status: Geplant
+   - Konzept: Box-Counting (Raum-Füllung, Selbstähnlichkeit)
+   - Range: 1.0-2.0 (1.0 = linear, 1.3-1.6 = verzweigt/kristallin, 2.0 = flächenfüllend)
+   - Anwendung: Netzwerk-Topologie, Kristallinität, Dichte-Disambiguierung
 
 ---
 
@@ -280,10 +459,13 @@ docs/
 ### Zettelkasten-Struktur (ab 2025-11-20)
 ```
 docs/zettelkasten/
-├── concepts/          # 5 atomare Konzepte
-├── parameters/        # 5 atomare Parameter (mehr folgen)
-├── properties/        # 3 atomare Properties (mehr folgen)
-└── meta/             # 1 MOC
+├── concepts/          # 5 atomare Konzepte ✅
+├── parameters/        # 15 atomare Parameter ✅
+├── properties/        # 8 atomare Properties ✅
+├── methods/           # 4 experimentelle Methodologien ✅
+├── experiments/       # 4 Experimentklassen ✅
+├── metrics/           # 4 Metriken (2 implementiert, 2 geplant) ✅
+└── meta/             # 1 MOC ✅
 ```
 
 **Vorteile**:
@@ -303,18 +485,25 @@ docs/zettelkasten/
 - ✅ 3 wichtigste Properties extrahieren (Cluster-Formation, Stability, Separation)
 - ✅ Erste MOC erstellen (Parameter-Effects-Map)
 
-## Roadmap: Phase 2 (geplant)
+## Roadmap: Phase 2 ✅ (abgeschlossen 2025-11-20)
 
-- [ ] Alle Parameter extrahieren (~20 atomare Notizen)
-- [ ] Alle Properties extrahieren (~8 atomare Notizen)
-- [ ] Experimentelle Methodik extrahieren (~10 atomare Notizen)
+- ✅ Alle 15 Parameter extrahiert (4 Physikalische, 4 Semiotische, 4 Temporale, 3 Resonanz)
+- ✅ Alle 8 Properties extrahiert (3 Strukturelle, 2 Ordnungs-, 3 Dynamische)
+- ✅ README aktualisiert mit vollständiger Übersicht
+
+## Roadmap: Phase 3.1 ✅ (abgeschlossen 2025-11-20)
+
+- ✅ 4 Methodologien extrahiert (Systematische Variation, Theorie-geleitete Hypothesen, Iterative Vertiefung, Qualitative+Quantitative Erfassung)
+- ✅ 4 Experimentklassen extrahiert (Single-Parameter, Parameter-Kombination, Modus-Vergleich, Grenzfall-Exploration)
+- ✅ 4 Metriken extrahiert (Ridge-Point-Analyse, Strukturelle Ähnlichkeit, Entropie, Fraktale Dimension)
+- ✅ README aktualisiert mit experimentellen Inhalten
+
+## Roadmap: Phase 3.2 (optional)
+
 - [ ] Zweite MOC erstellen (Experiment-Findings-Map)
-
-## Roadmap: Phase 3 (geplant)
-
-- [ ] Große Docs splitten (Dashboard_Concept, Research_Supplement_B)
 - [ ] Component-Notizen extrahieren (~15 atomare Notizen)
 - [ ] Dritte MOC erstellen (System-Architecture-Map)
+- [ ] Große Docs splitten (Dashboard_Concept, Research_Supplement_B)
 - [ ] Legacy-Docs ins `/archive/` verschieben
 
 ---
