@@ -3,46 +3,58 @@
 ```yaml
 ---
 title: Parameter-Oikos-Matrix
-type: Akkumuliertes Wissen
+type: Aggregiertes Wissen (Matrix View)
 status: Living Document
 created: 2025-11-08
-last_updated: 2025-11-08
+last_updated: 2025-11-20
 tags:
   - parameter-oikos
   - emergente-eigenschaften
   - systematisches-wissen
   - matrix
 related:
+  - "[[../zettelkasten/meta/map-parameter-effects]]"
   - "[[Experimentelle_Sektion_Index]]"
   - "[[Von_Stigmergie_zu_Oekosemiotik]]"
-  - "[[Parameter_als_Oikos]]"
 ---
 ```
 
+> **📚 Single Source of Truth**: Detaillierte Parameter-Definitionen findest du im [Zettelkasten](../zettelkasten/README.md).
+> Dieses Dokument bietet eine **Matrix-Übersicht** und **Design-Rezepte** für praktische Anwendung.
+
+---
+
 ## Über diese Matrix
 
-Die **Parameter-Oikos-Matrix** ist das **zentrale Referenzdokument** für akkumuliertes experimentelles Wissen über Parameter-Effekte in ökosemiotischen Systemen.
+Die **Parameter-Oikos-Matrix** bietet eine **tabellarische Übersicht** über Parameter-Effekte auf emergente Eigenschaften.
 
 ### Prinzip
 
 Jede Zelle repräsentiert die **beobachtete Stärke des Effekts** eines bestimmten Parameters auf eine emergente Eigenschaft.
 
 **Notation**:
-- `+++` = **starker fördernder Effekt** (Parameter erhöht diese Eigenschaft deutlich)
+- `+++` = **starker fördernder Effekt**
 - `++` = **moderater fördernder Effekt**
 - `+` = **schwacher fördernder Effekt**
-- `~` = **neutraler/ambivalenter Effekt** (kein klarer Trend)
+- `~` = **neutraler/ambivalenter Effekt**
 - `-` = **schwacher hemmender Effekt**
 - `--` = **moderater hemmender Effekt**
-- `---` = **starker hemmender Effekt** (Parameter reduziert diese Eigenschaft deutlich)
-- `?` = **noch nicht untersucht** (Platzhalter für zukünftige Experimente)
+- `---` = **starker hemmender Effekt**
+- `?` = **noch nicht untersucht**
 
 ### Verwendung
 
-1. **Vor Experiment**: Prüfe aktuelle Einträge für Kontext
+1. **Vor Experiment**: Prüfe aktuelle Matrix-Einträge für Kontext
 2. **Nach Experiment**: Update relevante Zellen basierend auf Beobachtungen
 3. **Für Theorie**: Identifiziere Muster über Parameter-Dimensionen hinweg
-4. **Für Design**: Nutze Matrix zur gezielten Muster-Erzeugung
+4. **Für Design**: Nutze [Muster-Rezepte](#muster-rezepte-parameter-kombinationen) zur gezielten Muster-Erzeugung
+
+### Verbindung zum Zettelkasten
+
+Für **detaillierte Informationen**:
+- **Parameter**: Siehe [Parameters](../zettelkasten/README.md#parameters) (15 atomare Notizen)
+- **Emergente Eigenschaften**: Siehe [Properties](../zettelkasten/README.md#properties) (8 atomare Notizen)
+- **Umfassende MOC**: [Parameter-Effects-Map](../zettelkasten/meta/map-parameter-effects.md) ⭐⭐⭐
 
 ---
 
@@ -50,239 +62,77 @@ Jede Zelle repräsentiert die **beobachtete Stärke des Effekts** eines bestimmt
 
 ### Legende Emergente Eigenschaften
 
-- **Clusterbildung**: Tendenz zur Bildung räumlich konzentrierter, homogener Gruppen
-- **Separation**: Tendenz zur räumlichen Trennung verschiedener Spezies/Muster
-- **Stabilität**: Zeitliche Persistenz emergenter Strukturen
-- **Chaos**: Irregularität, Unvorhersagbarkeit, schnelle Veränderungen
-- **Netzwerk**: Bildung verzweigter, verbundener Strukturen
-- **Fluidität**: Kontinuierliche Formveränderung ohne Strukturkollaps
-- **Kristallinität**: Geometrische, starre, hochgeordnete Muster
-- **Dichte**: Konzentration von Trail-Intensität in Hotspots
+Detaillierte Definitionen in `zettelkasten/properties/`:
+
+| Eigenschaft | Kurz-Beschreibung | Zettelkasten-Link |
+|------------|-------------------|-------------------|
+| **Clusterbildung** | Räumlich konzentrierte, homogene Gruppen | [cluster-formation.md](../zettelkasten/properties/cluster-formation.md) |
+| **Separation** | Räumliche Trennung verschiedener Spezies | [separation.md](../zettelkasten/properties/separation.md) |
+| **Stabilität** | Zeitliche Persistenz emergenter Strukturen | [stability.md](../zettelkasten/properties/stability.md) |
+| **Chaos** | Irregularität, Unvorhersagbarkeit | [chaos.md](../zettelkasten/properties/chaos.md) |
+| **Netzwerk** | Verzweigte, verbundene Strukturen | [network.md](../zettelkasten/properties/network.md) |
+| **Fluidität** | Kontinuierliche Formveränderung | [fluidity.md](../zettelkasten/properties/fluidity.md) |
+| **Kristallinität** | Geometrische, hochgeordnete Muster | [crystallinity.md](../zettelkasten/properties/crystallinity.md) |
+| **Dichte** | Konzentration von Trail-Intensität | [density.md](../zettelkasten/properties/density.md) |
 
 ---
 
 ## Matrix: Physikalische Oikos
 
-|  Parameter       | Cluster | Separation | Stabilität | Chaos | Netzwerk | Fluidität | Kristallinität | Dichte |
-|------------------|---------|------------|------------|-------|----------|-----------|----------------|--------|
-| **Decay Rate**   | +++     | +          | +++        | ---   | ++       | -         | +++            | ++     |
-| **Diffusion Freq**| ++     | --         | +          | ++    | +        | +++       | --             | -      |
-| **Fade Strength**| -       | +          | --         | +++   | -        | ++        | ---            | --     |
-| **Trail Saturation**| ++ | +          | ++         | -     | ++       | -         | +              | +++    |
+Detaillierte Parameter-Infos: [Physikalische Oikos](../zettelkasten/README.md#physikalische-oikos-4-parameter) im Zettelkasten
 
-### Erklärungen & Experiment-Links
+|  Parameter       | Cluster | Separation | Stabilität | Chaos | Netzwerk | Fluidität | Kristallinität | Dichte | Zettelkasten |
+|------------------|---------|------------|------------|-------|----------|-----------|----------------|--------|--------------|
+| **Decay Rate** ⭐ | +++     | +          | +++        | ---   | ++       | -         | +++            | ++     | [Link](../zettelkasten/parameters/decay-rate.md) |
+| **Diffusion**     | ++      | --         | +          | ++    | +        | +++       | --             | -      | [Link](../zettelkasten/parameters/diffusion.md) |
+| **Fade Strength** | -       | +          | --         | +++   | -        | ++        | ---            | --     | [Link](../zettelkasten/parameters/fade-strength.md) |
+| **Trail Saturation**| ++    | +          | ++         | -     | ++       | -         | +              | +++    | [Link](../zettelkasten/parameters/trail-saturation.md) |
 
-#### Decay Rate (0.85 - 0.999)
-
-**Clusterbildung: `+++`**
-- Hoher Decay (0.99) → Trails bleiben lange → Agents folgen alten Spuren → Cluster-Verstärkung
-- Niedriger Decay (0.85) → Trails verschwinden schnell → weniger Akkumulation
-- **Experimente**: [[Experiment_Decay_Rate_Variation]]
-
-**Stabilität: `+++`**
-- Hoher Decay → lange Gedächtnis-Horizonte → stabile Strukturen
-- Niedriger Decay → kurze Gedächtnis-Horizonte → volatile Muster
-- **Experimente**: [[Experiment_Decay_Rate_Variation]]
-
-**Chaos: `---`**
-- Hoher Decay → reduziert Chaos (Vergangenheit strukturiert Gegenwart)
-- Niedriger Decay → erhöht Chaos (nur unmittelbare Gegenwart zählt)
-
-**Kristallinität: `+++`**
-- Sehr hoher Decay (0.98-0.99) + niedrige Diffusion → kristalline Strukturen
-- **Experimente**: [[Experiment_Decay_x_Diffusion]]
-
-#### Diffusion Frequency (0 - 10)
-
-**Separation: `--`**
-- Hohe Diffusion → Spuren "vermischen sich" → weniger klare Grenzen
-- Keine Diffusion → scharfe Spuren → klare Separation
-- **Experimente**: ?
-
-**Fluidität: `+++`**
-- Hohe Diffusion → Trails "fließen" räumlich → organische Bewegung
-- **Experimente**: ?
-
-**Kristallinität: `--`**
-- Hohe Diffusion → verwischt scharfe Kanten → reduziert geometrische Muster
-
-#### Fade Strength (0.0 - 1.0)
-
-**Chaos: `+++`**
-- Hohe Fade Strength → aggressive Löschung → destabilisiert Muster
-- **Experimente**: ?
-
-**Stabilität: `--`**
-- Hohe Fade → reduziert Gedächtnis-Effekt → Instabilität
-- **Experimente**: ?
-
-#### Trail Saturation (100 - 255)
-
-**Dichte: `+++`**
-- Hohe Saturation → mehr "Kapazität" → dichtere Hotspots möglich
-- **Experimente**: ?
+**Experiment-Links**: [[Experiment_Decay_Rate_Variation]] | [[Experiment_Decay_x_Diffusion]]
 
 ---
 
 ## Matrix: Semiotische Oikos
 
-|  Parameter       | Cluster | Separation | Stabilität | Chaos | Netzwerk | Fluidität | Kristallinität | Dichte |
-|------------------|---------|------------|------------|-------|----------|-----------|----------------|--------|
-| **Sensor Distance**| +    | +++        | +          | +     | +++      | +         | -              | +      |
-| **Sensor Angle** | ++      | +          | -          | ++    | +        | ++        | -              | +      |
-| **Deposit**      | ++      | +          | +++        | -     | ++       | -         | ++             | +++    |
-| **Turn Speed**   | +       | +          | -          | +++   | +        | +++       | -              | -      |
+Detaillierte Parameter-Infos: [Semiotische Oikos](../zettelkasten/README.md#semiotische-oikos-4-parameter) im Zettelkasten
 
-### Erklärungen & Experiment-Links
+|  Parameter       | Cluster | Separation | Stabilität | Chaos | Netzwerk | Fluidität | Kristallinität | Dichte | Zettelkasten |
+|------------------|---------|------------|------------|-------|----------|-----------|----------------|--------|--------------|
+| **Sensor Distance** ⭐ | + | +++        | +          | +     | +++      | +         | -              | +      | [Link](../zettelkasten/parameters/sensor-distance.md) |
+| **Sensor Angle**  | ++      | +          | -          | ++    | +        | ++        | -              | +      | [Link](../zettelkasten/parameters/sensor-angle.md) |
+| **Deposit**       | ++      | +          | +++        | -     | ++       | -         | ++             | +++    | [Link](../zettelkasten/parameters/deposit-amount.md) |
+| **Turn Speed**    | +       | +          | -          | +++   | +        | +++       | -              | -      | [Link](../zettelkasten/parameters/turn-speed.md) |
 
-#### Sensor Distance (5 - 50)
-
-**Separation: `+++`**
-- Große Sensor Distance → Agents "sehen" weit → können Unterschiede zwischen Spezies erkennen → aktive Separation
-- Kleine Sensor Distance → lokale Interaktion → zufälligere Muster
-- **Experimente**: [[Experiment_Sensor_Distance_Variation]]
-
-**Netzwerk: `+++`**
-- Große Sensor Distance → "Fernverbindungen" möglich → verzweigte Strukturen
-- **Experimente**: [[Experiment_Sensor_Distance_Variation]]
-
-#### Sensor Angle (0.1 - 1.5)
-
-**Chaos: `++`**
-- Großer Sensor Angle → mehr "Optionen" → weniger deterministische Bewegung
-- **Experimente**: ?
-
-**Fluidität: `++`**
-- Großer Sensor Angle → breites Sichtfeld → sanftere Kurven
-- **Experimente**: ?
-
-#### Deposit (1 - 30)
-
-**Stabilität: `+++`**
-- Hoher Deposit → starke Spuren → lange Wirkung → stabile Strukturen
-- **Experimente**: ?
-
-**Dichte: `+++`**
-- Hoher Deposit → schnelle Akkumulation → dichte Hotspots
-- **Experimente**: ?
-
-#### Turn Speed (0.1 - 1.0)
-
-**Chaos: `+++`**
-- Hoher Turn Speed → schnelle Richtungswechsel → erratische Bewegung
-- **Experimente**: ?
-
-**Fluidität: `+++`**
-- Hoher Turn Speed → reaktionsschnell → fließende Anpassung
-- **Experimente**: ?
+**Experiment-Links**: [[Experiment_Sensor_Distance_Variation]]
 
 ---
 
 ## Matrix: Temporale Oikos
 
-|  Parameter       | Cluster | Separation | Stabilität | Chaos | Netzwerk | Fluidität | Kristallinität | Dichte |
-|------------------|---------|------------|------------|-------|----------|-----------|----------------|--------|
-| **Speed**        | +       | +          | -          | +++   | +        | +++       | -              | +      |
-| **Agent Count**  | +++     | -          | +          | +     | ++       | +         | -              | +++    |
-| **Chaos Interval**| -     | -          | ---        | +++   | -        | ++        | ---            | -      |
-| **Chaos Strength**| -     | +          | --         | +++   | -        | +         | --             | -      |
+Detaillierte Parameter-Infos: [Temporale Oikos](../zettelkasten/README.md#temporale-oikos-4-parameter) im Zettelkasten
 
-### Erklärungen & Experiment-Links
+|  Parameter       | Cluster | Separation | Stabilität | Chaos | Netzwerk | Fluidität | Kristallinität | Dichte | Zettelkasten |
+|------------------|---------|------------|------------|-------|----------|-----------|----------------|--------|--------------|
+| **Agent Speed**   | +       | +          | -          | +++   | +        | +++       | -              | +      | [Link](../zettelkasten/parameters/agent-speed.md) |
+| **Agent Count**   | +++     | -          | +          | +     | ++       | +         | -              | +++    | [Link](../zettelkasten/parameters/agent-count.md) |
+| **Chaos Interval**| -       | -          | ---        | +++   | -        | ++        | ---            | -      | [Link](../zettelkasten/parameters/chaos-interval.md) |
+| **Chaos Strength**| -       | +          | --         | +++   | -        | +         | --             | -      | [Link](../zettelkasten/parameters/chaos-strength.md) |
 
-#### Speed (0.5 - 5.0)
-
-**Chaos: `+++`**
-- Hohe Speed → schnelle Bewegung → volatile Muster
-- **Experimente**: ?
-
-**Fluidität: `+++`**
-- Hohe Speed → dynamische Veränderung → fließende Übergänge
-- **Experimente**: ?
-
-**Stabilität: `-`**
-- Hohe Speed → weniger Zeit für Muster-Konsolidierung
-- **Experimente**: ?
-
-#### Agent Count (100 - 8000)
-
-**Clusterbildung: `+++`**
-- Viele Agents → mehr Interaktionen → verstärkte Cluster-Effekte
-- **Experimente**: [[Experiment_Agent_Count_Skalierung]]
-
-**Dichte: `+++`**
-- Viele Agents → mehr Deposits → dichtere Trails
-- **Experimente**: [[Experiment_Agent_Count_Skalierung]]
-
-**Separation: `-`**
-- Viele Agents → Überlappung erhöht → weniger klare Trennung
-- **Experimente**: ?
-
-#### Chaos Interval (0 - 500)
-
-**Stabilität: `---`**
-- Regelmäßige Chaos-Injektion → verhindert Muster-Stabilisierung
-- **Experimente**: [[Experiment_Chaos_Injection_Periodizität]]
-
-**Chaos: `+++`**
-- Periodische Störung → erhöht Irregularität
-- **Experimente**: [[Experiment_Chaos_Injection_Periodizität]]
-
-**Kristallinität: `---`**
-- Chaos-Injection zerstört geometrische Ordnung
-- **Experimente**: ?
-
-#### Chaos Strength (0.1 - 1.0)
-
-**Chaos: `+++`**
-- Hohe Strength → starke Störungen → hohe Irregularität
-- **Experimente**: [[Experiment_Chaos_Injection_Periodizität]]
+**Experiment-Links**: [[Experiment_Agent_Count_Skalierung]] | [[Experiment_Chaos_Injection_Periodizität]]
 
 ---
 
 ## Matrix: Resonanz-Oikos
 
-|  Parameter       | Cluster | Separation | Stabilität | Chaos | Netzwerk | Fluidität | Kristallinität | Dichte |
-|------------------|---------|------------|------------|-------|----------|-----------|----------------|--------|
-| **Attraction Strength**| +++| ---     | +          | +     | -        | +         | +              | ++     |
-| **Repulsion Strength**| ---| +++     | -          | ++    | -        | +         | -              | -      |
-| **Cross-Species Interaction**| ~ | ++ | -        | +     | +        | ++        | -              | +      |
+Detaillierte Parameter-Infos: [Resonanz-Oikos](../zettelkasten/README.md#resonanz-oikos-3-parameter) im Zettelkasten
 
-### Erklärungen & Experiment-Links
+|  Parameter       | Cluster | Separation | Stabilität | Chaos | Netzwerk | Fluidität | Kristallinität | Dichte | Zettelkasten |
+|------------------|---------|------------|------------|-------|----------|-----------|----------------|--------|--------------|
+| **Attraction Strength** ⭐ | +++ | ---  | +          | +     | -        | +         | +              | ++     | [Link](../zettelkasten/parameters/attraction-strength.md) |
+| **Repulsion Strength** ⭐  | --- | +++  | -          | ++    | -        | +         | -              | -      | [Link](../zettelkasten/parameters/repulsion-strength.md) |
+| **Cross-Species Interaction** ⭐ | ~ | ++ | -      | +     | +        | ++        | -              | +      | [Link](../zettelkasten/parameters/cross-species-interaction.md) |
 
-#### Attraction Strength (0.0 - 2.0)
-
-**Clusterbildung: `+++`**
-- Hohe Attraction → Agents folgen eigenen Spuren stark → homogene Cluster
-- **Experimente**: [[Experiment_Resonanz_Harmonie_Schwelle]]
-
-**Separation: `---`**
-- Hohe Attraction zu eigener Spezies → weniger Interaktion mit anderen → Segregation
-- **Experimente**: [[Experiment_Resonanz_Harmonie_Schwelle]]
-
-#### Repulsion Strength (-1.0 - 1.0)
-
-**Separation: `+++`**
-- Starke negative Repulsion → aktive Vermeidung anderer Spezies
-- **Experimente**: [[Experiment_Resonanz_Harmonie_Schwelle]]
-
-**Clusterbildung: `---`**
-- Negative Repulsion → Meidung eigener Spezies auch → reduziert Clusterung
-- **Experimente**: ?
-
-**Chaos: `++`**
-- Starke Repulsion → erratische Ausweichbewegungen
-- **Experimente**: ?
-
-#### Cross-Species Interaction (true/false)
-
-**Separation: `++`**
-- `true` → andere Spezies werden wahrgenommen → aktive Segregation möglich
-- `false` → keine Wahrnehmung → zufällige Verteilung
-- **Experimente**: ?
-
-**Fluidität: `++`**
-- `true` → komplexe Interaktionen → dynamischere Muster
-- **Experimente**: ?
+**Experiment-Links**: [[Experiment_Resonanz_Harmonie_Schwelle]]
 
 ---
 
@@ -300,11 +150,13 @@ Empfohlene Parameter:
   attractionStrength: 1.8  # +++
   deposit: 25              # ++
   diffusionFreq: 5         # ++
-  
+
 Begründung:
   Hoher Decay + hohe Agent-Dichte + starke Attraction
   → Agents folgen alten Spuren intensiv
   → Cluster-Verstärkung
+
+Siehe auch: cluster-formation.md im Zettelkasten
 ```
 
 ### Rezept: Maximale Separation
@@ -316,11 +168,14 @@ Empfohlene Parameter:
   repulsionStrength: -0.9  # +++
   crossSpeciesInteraction: true  # ++
   sensorAngle: 0.6         # +
-  
+
 Begründung:
   Große Sensor-Reichweite + starke Repulsion
   → Agents "sehen" andere Spezies und meiden sie aktiv
   → Klare räumliche Trennung
+
+Siehe auch: separation.md im Zettelkasten
+Kritischer Schwellenwert: Harmonie-Schwelle bei Repulsion ≈ -0.5
 ```
 
 ### Rezept: Maximale Stabilität
@@ -332,11 +187,13 @@ Empfohlene Parameter:
   deposit: 30              # +++
   fadeStrength: 0.05       # -- (niedrig!)
   chaosInterval: 0         # --- (aus!)
-  
+
 Begründung:
   Hoher Decay + hoher Deposit + minimales Fade
   → Spuren bleiben sehr lange erhalten
   → Stabile, unveränderliche Muster
+
+Siehe auch: stability.md im Zettelkasten
 ```
 
 ### Rezept: Maximales Chaos
@@ -349,11 +206,14 @@ Empfohlene Parameter:
   chaosInterval: 150       # +++
   chaosStrength: 0.9       # +++
   turnSpeed: 0.8           # +++
-  
+
 Begründung:
   Aggressive Löschung + hohe Geschwindigkeit + Chaos-Injection
   → Keine Zeit für Muster-Stabilisierung
   → Permanente Turbulenz
+
+Siehe auch: chaos.md im Zettelkasten
+Paradox: Moderate Chaos-Injection kann Makro-Stabilität erhöhen!
 ```
 
 ### Rezept: Maximale Netzwerk-Bildung
@@ -365,11 +225,13 @@ Empfohlene Parameter:
   decayRate: 0.94          # ++
   agentCount: 2500         # ++
   deposit: 20              # ++
-  
+
 Begründung:
   Große Sensor-Reichweite + moderate Agent-Dichte
   → "Fernverbindungen" zwischen Trail-Segmenten
   → Verzweigte Netzwerke statt isolierte Cluster
+
+Siehe auch: network.md im Zettelkasten
 ```
 
 ### Rezept: Maximale Fluidität
@@ -381,11 +243,13 @@ Empfohlene Parameter:
   speed: 2.0               # +++
   turnSpeed: 0.6           # +++
   sensorAngle: 0.8         # ++
-  
+
 Begründung:
   Hohe Diffusion + hohe Geschwindigkeit
   → Trails "fließen" räumlich
   → Organische, nie stabile Formen
+
+Siehe auch: fluidity.md im Zettelkasten
 ```
 
 ### Rezept: Maximale Kristallinität
@@ -398,11 +262,14 @@ Empfohlene Parameter:
   deposit: 25              # ++
   sensorAngle: 0.2         # - (eng!)
   chaosInterval: 0         # --- (aus!)
-  
+
 Begründung:
   Sehr hoher Decay + minimale Diffusion + enge Sensoren
   → Scharfe Kanten + stabile Geometrie
   → Kristalline Strukturen
+
+Siehe auch: crystallinity.md im Zettelkasten
+Kritischer Schwellenwert: Decay ~0.94 für kristalline Transition
 ```
 
 ---
@@ -419,8 +286,12 @@ decayRate: 0.99 + diffusionFreq: 8 → "Lavalampe"
   - Fluid genug für Bewegung (Diffusion)
 ```
 
-**Theoretische Implikation**: 
+**Theoretische Implikation**:
 Physikalische Oikos-Parameter arbeiten **komplementär**, nicht additiv.
+
+**Siehe auch**: [Parameter-Effects-Map](../zettelkasten/meta/map-parameter-effects.md) → Parameter-Interdependenzen
+
+---
 
 ### Beobachtung 2: Attraction/Repulsion Harmonie-Schwelle
 
@@ -431,10 +302,14 @@ attractionStrength: 1.5 + repulsionStrength: -0.3 → Clusterbildung
 attractionStrength: 1.5 + repulsionStrength: -0.7 → Segregation
 ```
 
-**Theoretische Implikation**: 
+**Theoretische Implikation**:
 Es gibt **kritische Schwellenwerte**, an denen emergente Eigenschaften qualitativ umschlagen.
 
 **Experimente**: [[Experiment_Resonanz_Harmonie_Schwelle]]
+
+**Siehe auch**: [repulsion-strength.md](../zettelkasten/parameters/repulsion-strength.md) → Harmonie-Schwelle
+
+---
 
 ### Beobachtung 3: Chaos-Injection-Paradox
 
@@ -445,10 +320,10 @@ chaosInterval: 0 + hoher turnSpeed → Massen-Pulsieren (instabil)
 chaosInterval: 300 + hoher turnSpeed → Desynchronisiert → stabiler!
 ```
 
-**Theoretische Implikation**: 
+**Theoretische Implikation**:
 "Störung" ist nicht immer destabilisierend – kann **Diversität erhöhen** und dadurch robustere Muster erzeugen.
 
-**Experimente**: Dokumentiert in v3.1 Code-Kommentaren
+**Siehe auch**: [chaos-interval.md](../zettelkasten/parameters/chaos-interval.md) → Chaos-Injection Paradox
 
 ---
 
@@ -466,13 +341,12 @@ chaosInterval: 300 + hoher turnSpeed → Desynchronisiert → stabiler!
 **Kandidaten für Matrix-Erweiterung**:
 - **Symmetrie**: Grad der Spiegelung/Rotation in Mustern
 - **Periodizität**: Wiederkehrende zeitliche Muster
-- **Fraktale Selbstähnlichkeit**: Multi-Scale-Struktur
+- **Fraktale Selbstähnlichkeit**: Multi-Scale-Struktur → [fractal-dimension.md](../zettelkasten/metrics/fractal-dimension.md) (Metrik in Planung)
 - **Robustheit**: Widerstand gegen Parameter-Perturbation
-- **Attraktoren**: Tendenz zur Konvergenz auf spezifische Muster
 
 ### Meta-Fragen
 
-1. **Universalität**: Gelten Matrix-Einträge über verschiedene Modi (Myzel/Stigmergie/Resonanz) hinweg?
+1. **Universalität**: Gelten Matrix-Einträge über verschiedene Modi (Myzel/Stigmergie/Resonanz) hinweg? → Siehe [mode-comparison.md](../zettelkasten/experiments/mode-comparison.md)
 2. **Skalierung**: Wie ändern sich Effekte bei verschiedenen Grid-Sizes?
 3. **Zeitabhängigkeit**: Sind Effekte nach 500 vs. 2000 Schritten gleich?
 
@@ -489,6 +363,10 @@ chaosInterval: 300 + hoher turnSpeed → Desynchronisiert → stabiler!
 Gedächtnis-Parameter → Temporale Ausdehnung → Akkumulative Ordnung
 ```
 
+**Siehe auch**: [Theoretical-Framework-Map](../zettelkasten/meta/map-theoretical-framework.md)
+
+---
+
 ### Trade-offs identifizieren
 
 **Beispiel**: Man kann nicht gleichzeitig maximale Stabilität UND maximales Chaos haben.
@@ -498,6 +376,10 @@ Stabilität ∝ 1/Chaos
 ```
 
 Aber: Man kann **balancierte** Zustände erreichen (moderate Werte beider).
+
+**Siehe auch**: [Parameter-Effects-Map](../zettelkasten/meta/map-parameter-effects.md) → Emergente Eigenschaft-Familien
+
+---
 
 ### Emergente Eigenschaft "Familien"
 
@@ -513,28 +395,39 @@ Aber: Man kann **balancierte** Zustände erreichen (moderate Werte beider).
 - Clusterbildung vs. Separation → anti-korreliert
 - Kontrolliert durch: Resonanz-Parameter
 
+**Detailliert dokumentiert in**: [Parameter-Effects-Map](../zettelkasten/meta/map-parameter-effects.md)
+
 ---
 
 ## Update-Log
+
+### 2025-11-20: Zettelkasten-Integration
+- **Aggressive Reduktion**: Redundante Parameter-Definitionen durch Links ersetzt
+- Matrix-Tabellen erweitert um Zettelkasten-Spalte
+- Legende verlinkt auf Properties
+- Alle Abschnitte mit Zettelkasten-Links ergänzt
+- ~220 Zeilen Redundanz eliminiert
 
 ### 2025-11-08: Initial Matrix
 - Grundstruktur erstellt
 - Initiale Einträge basierend auf Preset-Beobachtungen (v3.1)
 - Muster-Rezepte hinzugefügt
 
-### [Nächstes Update]
-- Nach [[Experiment_Decay_Rate_Variation]]: Update Physikalische Oikos-Spalte
-- Nach [[Experiment_Sensor_Distance_Variation]]: Update Semiotische Oikos-Spalte
-
 ---
 
 ## Verbindungen
 
+### Zettelkasten (Single Source of Truth)
+- **Haupt-MOC**: [Parameter-Effects-Map](../zettelkasten/meta/map-parameter-effects.md) ⭐⭐⭐
+- **Alle Parameter**: [Parameters](../zettelkasten/README.md#parameters) (15 Notizen)
+- **Alle Properties**: [Properties](../zettelkasten/README.md#properties) (8 Notizen)
+- **Zettelkasten-Index**: [README](../zettelkasten/README.md)
+
+### Legacy-Dokumentation
 - **Experimentelle Sektion**: [[Experimentelle_Sektion_Index]]
-- **Theorie**: [[Von_Stigmergie_zu_Oekosemiotik]] | [[Parameter_als_Oikos]]
+- **Theorie**: [[Von_Stigmergie_zu_Oekosemiotik]]
 - **Templates**: [[Template_Parameter_Experiment]]
-- **Demonstratoren**: [[Myzel_Simulation]] | [[Fingerabdruck_Generator]]
 
 ---
 
-*Diese Matrix ist ein Living Document und wird kontinuierlich durch experimentelle Ergebnisse aktualisiert. Sie repräsentiert den aktuellen Stand des systematischen Wissens über Parameter-Oikos-Effekte.*
+*Diese Matrix bietet eine tabellarische Übersicht und praktische Design-Rezepte. Für detaillierte Definitionen siehe [Zettelkasten](../zettelkasten/README.md). Sie wird kontinuierlich durch experimentelle Ergebnisse aktualisiert.*
