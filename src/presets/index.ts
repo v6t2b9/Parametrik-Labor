@@ -95,32 +95,6 @@ export const defaultParameters: AllParameters = {
     pixelation: 1,
   },
   performance: defaultPerformanceParams,
-  // Letterbox (reactive canvas borders) params
-  letterbox: {
-    enabled: false, // Disabled by default (activate via Letterbox tab)
-
-    // Effect Style
-    effectType: 'burst' as const,
-
-    // Particle Behavior
-    particleCount: 50,
-    particleSpeed: 3.0,
-    particleLifetime: 1.0,
-    particleSize: 4,
-    spread: 90,
-
-    // Visual Properties
-    intensity: 0.8,
-    glow: 1.5,
-    colorSaturation: 1.2,
-    useAgentColor: true,
-    trailInfluence: 0.3,
-
-    // Animation
-    gravity: 0,
-    turbulence: 0.2,
-    fadeType: 'smooth' as const,
-  },
   // Quantum-inspired stigmergy model params
   modelParams: {
     model: 'M1' as const, // Default: Classical stigmergy
@@ -196,7 +170,6 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       scanlines: legacy.effects.scanlines || 0,
       pixelation: legacy.effects.pixelation || 1,
     },
-    letterbox: legacy.letterbox || defaultParameters.letterbox,
     performance: legacy.performance,
     modelParams: legacy.modelParams || defaultParameters.modelParams,
     ecosystemMode: legacy.ecosystemMode || false,

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { WebGLTrailRenderer } from './WebGLTrailRenderer';
-import { WrapEffectsRenderer } from './WrapEffectsRenderer';
 import { applyHueCycling } from '../utils/colorUtils';
 import { EcosystemRenderer } from '../engine/EcosystemRenderer';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
@@ -63,9 +62,6 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // WebGL renderer for trails (major performance boost)
   const webglRendererRef = useRef<WebGLTrailRenderer | null>(null);
 
-  // Wrap effects renderer for explosive particle effects
-  const wrapEffectsRendererRef = useRef<WrapEffectsRenderer | null>(null);
-
   // Canvas pool for temporary canvases (object pooling)
   const canvasPoolRef = useRef<CanvasPool>(new CanvasPool());
 
@@ -85,7 +81,6 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const parameters = useSimulationStore((state) => state.parameters);
   const visualization = useSimulationStore((state) => state.parameters.visualization);
   const effects = useSimulationStore((state) => state.parameters.effects);
-  const letterbox = useSimulationStore((state) => state.parameters.letterbox);
   const updatePerformanceMetrics = useSimulationStore((state) => state.updatePerformanceMetrics);
   const performAutoOptimization = useSimulationStore((state) => state.performAutoOptimization);
   const playbackSpeed = useSimulationStore((state) => state.ui.playbackSpeed);
@@ -199,13 +194,6 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       webglRendererRef.current.destroy();
     }
     webglRendererRef.current = new WebGLTrailRenderer(gridPixelSize, gridPixelSize, GRID_SIZE);
-
-    // Wrap effects renderer - initialize on first use, reset when canvas size changes
-    if (!wrapEffectsRendererRef.current) {
-      wrapEffectsRendererRef.current = new WrapEffectsRenderer();
-    } else {
-      wrapEffectsRendererRef.current.reset();
-    }
 
     // Motion blur canvas - resize when canvas size changes
     if (!motionBlurCanvasRef.current) {
@@ -555,27 +543,6 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Restore context (removes translation offset)
     ctx.restore();
-
-    // === 13. Wrap Effects (explosive particle effects) ===
-    console.log('[CanvasPanel] Wrap effects check - hasRenderer:', !!wrapEffectsRendererRef.current, 'hasEngine:', !!engine, 'enabled:', letterbox.enabled);
-    if (wrapEffectsRendererRef.current && engine && letterbox.enabled) {
-      const wrapEvents = engine.getWrapEvents();
-      const frameCount = engine.getFrameCount();
-      const gridPixelSize = Math.floor(GRID_SIZE * scale);
-
-      console.log('[CanvasPanel] Calling wrapEffectsRenderer.render with gridPixelSize:', gridPixelSize);
-
-      wrapEffectsRendererRef.current.render(
-        ctx,
-        wrapEvents,
-        letterbox,
-        canvasWidth,
-        canvasHeight,
-        gridPixelSize,
-        gridPixelSize,
-        frameCount
-      );
-    }
 
     // === 15. Motion Blur (applied to full canvas) ===
     if (effects.motionBlur > 0 && motionBlurCanvasRef.current) {

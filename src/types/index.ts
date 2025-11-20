@@ -262,7 +262,6 @@ export interface AllParameters {
   visualization: VisualizationParams;
   effects: EffectsParams;
   performance: PerformanceParams;
-  letterbox: LetterboxParams;
 
   // Quantum-inspired stigmergy model selection
   modelParams: ModelParams;
@@ -312,69 +311,9 @@ export interface EmergentProperties {
   density: number;        // 0-100
 }
 
-// === Letterbox System (Reactive Canvas Borders) ===
-
-// Wrap event: Emitted when an agent crosses the grid boundary
-export interface WrapEvent {
-  // Position where wrap occurred
-  x: number;           // 0-GRID_SIZE
-  y: number;           // 0-GRID_SIZE
-  edge: 'top' | 'bottom' | 'left' | 'right';
-
-  // Agent color (RGB directly from visualization)
-  r: number;           // 0-255
-  g: number;           // 0-255
-  b: number;           // 0-255
-
-  // Force vector (velocity)
-  vx: number;          // Velocity x-component
-  vy: number;          // Velocity y-component
-  speed: number;       // Magnitude of velocity vector
-  angle: number;       // Movement direction (radians)
-
-  // Trail intensity at wrap position (pheromone accumulation)
-  trailIntensity: {
-    red: number;       // Red channel trail value
-    green: number;     // Green channel trail value
-    blue: number;      // Blue channel trail value
-  };
-
-  timestamp: number;   // Frame timestamp for decay/interference calculations
-}
-
-// Letterbox wrap effect types
-export type WrapEffectType = 'burst' | 'sparks' | 'plasma' | 'fireworks' | 'lightning' | 'aurora';
-
-// Letterbox visualization parameters (WebGL particle effects)
-export interface LetterboxParams {
-  enabled: boolean;              // Master toggle
-
-  // Effect Style
-  effectType: WrapEffectType;    // Type of visual effect
-
-  // Particle Behavior
-  particleCount: number;         // 10-200: Particles per wrap event
-  particleSpeed: number;         // 0.5-10: Initial velocity
-  particleLifetime: number;      // 0.2-3.0: Seconds before fade
-  particleSize: number;          // 1-20: Particle render size
-  spread: number;                // 0-180: Emission cone angle (degrees)
-
-  // Visual Properties
-  intensity: number;             // 0-1: Overall effect intensity
-  glow: number;                  // 0-3: Bloom/glow amount
-  colorSaturation: number;       // 0-2: Color vibrancy
-  useAgentColor: boolean;        // Use agent species color
-  trailInfluence: number;        // 0-1: How much trail intensity affects particles
-
-  // Animation
-  gravity: number;               // -5 to 5: Particle gravity
-  turbulence: number;            // 0-1: Chaotic movement
-  fadeType: 'linear' | 'smooth' | 'sudden'; // How particles fade
-}
-
 // UI State - Matrix Navigation
 export type SpeciesScope = 'universal' | 'red' | 'green' | 'blue';
-export type OikosTab = 'presets' | 'model' | 'physical' | 'semiotic' | 'resonance' | 'audio' | 'visuals' | 'performance' | 'ecosystem' | 'letterbox';
+export type OikosTab = 'presets' | 'model' | 'physical' | 'semiotic' | 'resonance' | 'audio' | 'visuals' | 'performance' | 'ecosystem';
 
 // Aspect Ratio options
 export type AspectRatio = '1:1' | '16:9' | '9:16' | '3:2' | '2:3' | '4:3' | '3:4' | '21:9' | '9:21';
