@@ -36,20 +36,32 @@ export class LetterboxRenderer {
     offsetY: number,
     currentFrame: number
   ): void {
-    if (!params.enabled || wrapEvents.length === 0) {
+    if (!params.enabled) {
       return;
     }
 
     this.frameCount = currentFrame;
 
+    // Debug: Log wrap events (only occasionally to avoid spam)
+    if (this.frameCount % 60 === 0 && wrapEvents.length > 0) {
+      console.log(`[Letterbox] Frame ${this.frameCount}: ${wrapEvents.length} wrap events`);
+    }
+
     // Determine letterbox configuration (horizontal or vertical bars)
     const hasHorizontalBars = gridHeight < canvasHeight;
     const hasVerticalBars = gridWidth < canvasWidth;
+
+    // Debug: Log bar configuration
+    if (this.frameCount % 120 === 0) {
+      console.log(`[Letterbox] Canvas: ${canvasWidth}x${canvasHeight}, Grid: ${gridWidth}x${gridHeight}`);
+      console.log(`[Letterbox] Horizontal bars: ${hasHorizontalBars}, Vertical bars: ${hasVerticalBars}`);
+    }
 
     // Initialize state if needed
     if (hasHorizontalBars) {
       const barHeight = Math.floor((canvasHeight - gridHeight) / 2);
       if (!this.topBarState || this.topBarState.height !== barHeight) {
+        console.log(`[Letterbox] Creating horizontal bars (height: ${barHeight})`);
         this.topBarState = this.createBarState(canvasWidth, barHeight);
         this.bottomBarState = this.createBarState(canvasWidth, barHeight);
       }
@@ -58,6 +70,7 @@ export class LetterboxRenderer {
     if (hasVerticalBars) {
       const barWidth = Math.floor((canvasWidth - gridWidth) / 2);
       if (!this.leftBarState || this.leftBarState.width !== barWidth) {
+        console.log(`[Letterbox] Creating vertical bars (width: ${barWidth})`);
         this.leftBarState = this.createBarState(barWidth, canvasHeight);
         this.rightBarState = this.createBarState(barWidth, canvasHeight);
       }
@@ -127,6 +140,11 @@ export class LetterboxRenderer {
   ): void {
     const { waveField, width, height } = state;
     const size = width * height;
+
+    // Debug: Log when processing events
+    if (events.length > 0 && this.frameCount % 60 === 0) {
+      console.log(`[Letterbox] updateWaveField: Processing ${events.length} events (orientation: ${orientation})`);
+    }
 
     // 1. Decay existing waves
     for (let i = 0; i < size * 3; i++) {

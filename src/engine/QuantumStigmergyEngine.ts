@@ -706,6 +706,11 @@ export class QuantumStigmergyEngine {
 
     if (!edge) return;
 
+    // Debug: Log wrap events occasionally
+    if (this.frameCount % 120 === 0) {
+      console.log(`[WrapDetection] Agent wrapped at ${edge} edge (pos: ${wrapX.toFixed(1)}, ${wrapY.toFixed(1)})`);
+    }
+
     // Sample trail intensity at wrap position
     const gridIdx = Math.floor(wrapY) * this.gridSize + Math.floor(wrapX);
     const trailIntensity = {
