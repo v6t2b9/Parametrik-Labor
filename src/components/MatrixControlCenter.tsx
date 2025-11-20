@@ -5,6 +5,7 @@ import { SemioticOikosPanel } from './SemioticOikosPanel';
 import { ResonanceOikosPanel } from './ResonanceOikosPanel';
 import { AudioOikosPanel } from './AudioOikosPanel';
 import { VisualsOikosPanel } from './VisualsOikosPanel';
+import { LetterboxOikosPanel } from './LetterboxOikosPanel';
 import { PerformanceOikosPanel } from './PerformanceOikosPanel';
 import { ModelOikosPanel } from './ModelOikosPanel';
 import { EcosystemOikosPanel } from './EcosystemOikosPanel';
@@ -43,6 +44,7 @@ const OIKOS_TABS: OikosTabDef[] = [
   { id: 'resonance', label: 'Resonanz', icon: '🔗' },
   { id: 'audio', label: 'Audio', icon: '🎵' },
   { id: 'visuals', label: 'Visuals', icon: '🎨' },
+  { id: 'letterbox', label: 'Letterbox', icon: '🎬' },
   { id: 'performance', label: 'Performance', icon: '⚡' },
 ];
 
@@ -65,7 +67,7 @@ export function MatrixControlCenter() {
   // For species-specific tabs, filter out presets and global tabs
   const availableOikosTabs = ui.activeSpeciesScope === 'universal'
     ? OIKOS_TABS
-    : OIKOS_TABS.filter(t => !['presets', 'model', 'ecosystem', 'visuals', 'performance'].includes(t.id));
+    : OIKOS_TABS.filter(t => !['presets', 'model', 'ecosystem', 'visuals', 'letterbox', 'performance'].includes(t.id));
 
   return (
     <div style={styles.container}>
@@ -84,7 +86,7 @@ export function MatrixControlCenter() {
               onClick={() => {
                 setActiveSpeciesScope(tab.id);
                 // Switch to appropriate tab if current is not available
-                if (tab.id !== 'universal' && ['presets', 'model', 'ecosystem', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
+                if (tab.id !== 'universal' && ['presets', 'model', 'ecosystem', 'visuals', 'letterbox', 'performance'].includes(ui.activeOikosTab)) {
                   setActiveOikosTab('physical');
                 }
               }}
@@ -146,6 +148,7 @@ export function MatrixControlCenter() {
         {ui.activeOikosTab === 'resonance' && <ResonanceOikosPanel />}
         {ui.activeOikosTab === 'audio' && <AudioOikosPanel />}
         {ui.activeOikosTab === 'visuals' && <VisualsOikosPanel />}
+        {ui.activeOikosTab === 'letterbox' && <LetterboxOikosPanel />}
         {ui.activeOikosTab === 'performance' && <PerformanceOikosPanel />}
       </div>
     </div>
