@@ -616,6 +616,12 @@ const styles = {
     fontWeight: 600,
     margin: '0 0 12px 0',
   } as React.CSSProperties,
+  infoText: {
+    fontSize: '11px',
+    color: '#a0a0b0',
+    lineHeight: '1.6',
+    margin: 0,
+  } as React.CSSProperties,
   infoList: {
     fontSize: '11px',
     color: '#a0a0b0',
