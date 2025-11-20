@@ -4,7 +4,7 @@
  */
 
 import { QuantumStigmergyEngine } from './QuantumStigmergyEngine';
-import type { Agent, AllParameters } from '../types/index';
+import type { Agent, AllParameters, WrapEvent } from '../types/index';
 import { resolveSpeciesParams } from '../store/useSimulationStore';
 import type {
   MusicAnalysis,
@@ -44,6 +44,9 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   private useInterference: boolean = false;
   private useMultiScale: boolean = false;
 
+  // Store parameters for music-reactive modulation
+  private parameters: AllParameters | null = null;
+
   constructor(gridSize?: number) {
     super(gridSize);
 
@@ -68,6 +71,9 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   public setParameters(params: AllParameters): void {
     // Call parent
     super.setParameters(params);
+
+    // Store parameters for wrap event detection (needed for visualization colors)
+    this.parameters = params;
 
     // Extract species-specific audio mappings
     this.musicMappingsRed = resolveSpeciesParams(params, 'red').audio;
@@ -571,8 +577,13 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       const dx = Math.cos(agent.angle) * currentBoost;
       const dy = Math.sin(agent.angle) * currentBoost;
 
+      const oldX = agent.x;
+      const oldY = agent.y;
       agent.x += dx;
       agent.y += dy;
+
+      // Detect wrap events for letterbox visualization
+      this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
       // Wrap around edges
       const gridSize = this.getGridSize();
@@ -596,8 +607,13 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       const dx = Math.cos(agent.angle) * speedAdjust;
       const dy = Math.sin(agent.angle) * speedAdjust;
 
+      const oldX = agent.x;
+      const oldY = agent.y;
       agent.x += dx;
       agent.y += dy;
+
+      // Detect wrap events for letterbox visualization
+      this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
       const gridSize = this.getGridSize();
       if (agent.x < 0) agent.x += gridSize;
@@ -612,8 +628,13 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       const dx = Math.cos(agent.angle) * loudnessPush;
       const dy = Math.sin(agent.angle) * loudnessPush;
 
+      const oldX = agent.x;
+      const oldY = agent.y;
       agent.x += dx;
       agent.y += dy;
+
+      // Detect wrap events for letterbox visualization
+      this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
       const gridSize = this.getGridSize();
       if (agent.x < 0) agent.x += gridSize;
@@ -715,4 +736,5 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       multiScale: this.useMultiScale,
     };
   }
+
 }

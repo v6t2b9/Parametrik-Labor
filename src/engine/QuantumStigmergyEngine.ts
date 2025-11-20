@@ -11,6 +11,7 @@ import type {
   AllParameters,
   AgentType,
   ResolvedSpeciesParams,
+  WrapEvent,
 } from '../types/index.js';
 
 import {
@@ -66,6 +67,9 @@ export class QuantumStigmergyEngine {
   private gridSize: number;
   private frameCount: number = 0;
   private params: AllParameters;
+
+  // Letterbox system: Wrap events for reactive border visualization
+  private wrapEvents: WrapEvent[] = [];
 
   constructor(gridSize: number = GRID_SIZE) {
     this.gridSize = gridSize;
@@ -207,8 +211,16 @@ export class QuantumStigmergyEngine {
 
     // Move agent
     const effectiveSpeed = temporal.speed * simulationSpeed;
-    agent.x += Math.cos(agent.angle) * effectiveSpeed;
-    agent.y += Math.sin(agent.angle) * effectiveSpeed;
+    const dx = Math.cos(agent.angle) * effectiveSpeed;
+    const dy = Math.sin(agent.angle) * effectiveSpeed;
+
+    const oldX = agent.x;
+    const oldY = agent.y;
+    agent.x += dx;
+    agent.y += dy;
+
+    // Detect wrap events for letterbox visualization
+    this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
     // Wrap around edges
     this.wrapAgent(agent);
@@ -280,8 +292,16 @@ export class QuantumStigmergyEngine {
 
     // Move agent
     const effectiveSpeed = temporal.speed * simulationSpeed;
-    agent.x += Math.cos(agent.angle) * effectiveSpeed;
-    agent.y += Math.sin(agent.angle) * effectiveSpeed;
+    const dx = Math.cos(agent.angle) * effectiveSpeed;
+    const dy = Math.sin(agent.angle) * effectiveSpeed;
+
+    const oldX = agent.x;
+    const oldY = agent.y;
+    agent.x += dx;
+    agent.y += dy;
+
+    // Detect wrap events for letterbox visualization
+    this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
     // Wrap around edges
     this.wrapAgent(agent);
@@ -359,8 +379,16 @@ export class QuantumStigmergyEngine {
 
     // Move agent
     const effectiveSpeed = temporal.speed * simulationSpeed;
-    agent.x += Math.cos(agent.angle) * effectiveSpeed;
-    agent.y += Math.sin(agent.angle) * effectiveSpeed;
+    const dx = Math.cos(agent.angle) * effectiveSpeed;
+    const dy = Math.sin(agent.angle) * effectiveSpeed;
+
+    const oldX = agent.x;
+    const oldY = agent.y;
+    agent.x += dx;
+    agent.y += dy;
+
+    // Detect wrap events for letterbox visualization
+    this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
     // Wrap around edges
     this.wrapAgent(agent);
@@ -638,6 +666,93 @@ export class QuantumStigmergyEngine {
     }
   }
 
+  /**
+   * Detect and record wrap events for letterbox visualization
+   * Called before wrapping to capture the edge-crossing event
+   */
+  protected detectAndRecordWrap(
+    agent: Agent,
+    oldX: number,
+    oldY: number,
+    newX: number,
+    newY: number,
+    vx: number,
+    vy: number
+  ): void {
+    if (!this.params || !this.params.letterbox.enabled) {
+      return;
+    }
+
+    // Determine which edge was crossed
+    let edge: 'top' | 'bottom' | 'left' | 'right' | null = null;
+    let wrapX = newX;
+    let wrapY = newY;
+
+    if (newX < 0) {
+      edge = 'left';
+      wrapX = 0;
+    } else if (newX >= this.gridSize) {
+      edge = 'right';
+      wrapX = this.gridSize - 1;
+    }
+
+    if (newY < 0) {
+      edge = 'top';
+      wrapY = 0;
+    } else if (newY >= this.gridSize) {
+      edge = 'bottom';
+      wrapY = this.gridSize - 1;
+    }
+
+    if (!edge) return;
+
+    // Sample trail intensity at wrap position
+    const gridIdx = Math.floor(wrapY) * this.gridSize + Math.floor(wrapX);
+    const trailIntensity = {
+      red: this.trails.red[gridIdx] || 0,
+      green: this.trails.green[gridIdx] || 0,
+      blue: this.trails.blue[gridIdx] || 0,
+    };
+
+    // Get agent color from visualization parameters
+    const viz = this.params.visualization;
+    let r = 255, g = 255, b = 255;
+    if (agent.type === 'red') {
+      r = viz.colorRed.r;
+      g = viz.colorRed.g;
+      b = viz.colorRed.b;
+    } else if (agent.type === 'green') {
+      r = viz.colorGreen.r;
+      g = viz.colorGreen.g;
+      b = viz.colorGreen.b;
+    } else if (agent.type === 'blue') {
+      r = viz.colorBlue.r;
+      g = viz.colorBlue.g;
+      b = viz.colorBlue.b;
+    }
+
+    const speed = Math.sqrt(vx * vx + vy * vy);
+    const angle = Math.atan2(vy, vx);
+
+    const event: WrapEvent = {
+      x: wrapX,
+      y: wrapY,
+      edge,
+      r, g, b,
+      vx, vy,
+      speed,
+      angle,
+      trailIntensity,
+      timestamp: this.frameCount,
+    };
+
+    this.wrapEvents.push(event);
+    const maxHistory = this.params.letterbox.maxEventHistory || 200;
+    if (this.wrapEvents.length > maxHistory) {
+      this.wrapEvents.shift();
+    }
+  }
+
   private wrapAgent(agent: Agent): void {
     if (agent.x < 0) agent.x += this.gridSize;
     if (agent.x >= this.gridSize) agent.x -= this.gridSize;
@@ -668,5 +783,19 @@ export class QuantumStigmergyEngine {
 
   public getModel() {
     return this.params.modelParams.model;
+  }
+
+  /**
+   * Get accumulated wrap events for letterbox visualization
+   */
+  public getWrapEvents(): WrapEvent[] {
+    return this.wrapEvents;
+  }
+
+  /**
+   * Clear wrap events (called after rendering letterbox)
+   */
+  public clearWrapEvents(): void {
+    this.wrapEvents = [];
   }
 }
