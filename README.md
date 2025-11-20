@@ -179,16 +179,29 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 
 **[📖 Documentation Index](./docs/README.md)** - Complete documentation navigation
 
+### 🗂️ Zettelkasten - Knowledge Vault (NEW!)
+
+**Primary knowledge base** - 55 atomic notes following the Zettelkasten principle:
+- **[Zettelkasten Index](./docs/zettelkasten/README.md)** ⭐⭐⭐ - Single Source of Truth for all research concepts
+  - 52 atomic notes: Concepts, Parameters, Properties, Methods, Experiments, Metrics, Components
+  - 3 MOCs (Maps of Content): Parameter-Effects ⭐⭐⭐, Experimental-Methodology ⭐⭐, Theoretical-Framework ⭐⭐
+  - Bidirectional linking, YAML frontmatter, systematic organization
+
+**Key Entry Points:**
+- [Parameter-Effects-Map](./docs/zettelkasten/meta/map-parameter-effects.md) - Parameter × Property matrix, design recipes
+- [Experimental-Methodology-Map](./docs/zettelkasten/meta/map-experimental-methodology.md) - Systematic experimental workflows
+- [Theoretical-Framework-Map](./docs/zettelkasten/meta/map-theoretical-framework.md) - Core concepts connected
+
 ### User Documentation
 - **[User Guide](./docs/guides/user-guide.md)** - Complete guide to using the app
-- **[Theoretical Framework](./docs/research/parametrics_paper_draft.md)** - Parametrics theory
-- **[Parameter Matrix](./docs/research/Parameter_Oikos_Matrix.md)** - Oikos organization
+- **[Von Stigmergie zu Ökosemiotik](./docs/research/Von_Stigmergie_zu_Oekosemiotik.md)** - Theoretical foundation narrative
+- **[Parameter Matrix](./docs/research/Parameter_Oikos_Matrix.md)** - Matrix view + design recipes
 - **[Experiments](./docs/experiments/Experimentelle_Sektion_Index.md)** - Validation experiments
 
 ### Developer Documentation
 - **[Development Guide](./docs/development/DEVELOPMENT.md)** - Setup, architecture, and development workflow
-- **[Deployment Guide](./docs/development/DEPLOYMENT.md)** - Build, deploy, and PWA configuration
 - **[Architecture Overview](./docs/development/ARCHITECTURE.md)** - System architecture and design patterns
+- **[Deployment Guide](./docs/development/DEPLOYMENT.md)** - Build, deploy, and PWA configuration
 - **[Self-Hosting Guide](./SELF_HOSTING.md)** - Self-hosting with PWA support
 - **[Contributing Guidelines](./CONTRIBUTING.md)** - How to contribute to the project
 
