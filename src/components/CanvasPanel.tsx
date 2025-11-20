@@ -562,6 +562,11 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       const frameCount = engine.getFrameCount();
       const gridPixelSize = Math.floor(GRID_SIZE * scale);
 
+      // Debug: Log every 2 seconds
+      if (frameCount % 120 === 0) {
+        console.log(`[CanvasPanel] Letterbox enabled: true, Wrap events: ${wrapEvents.length}, Canvas: ${canvasWidth}x${canvasHeight}, Grid: ${gridPixelSize}x${gridPixelSize}`);
+      }
+
       letterboxRendererRef.current.render(
         ctx,
         wrapEvents,
@@ -574,6 +579,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         offsetY,
         frameCount
       );
+    } else if (letterboxRendererRef.current && frameCount % 120 === 0) {
+      // Debug: Log why letterbox is not rendering
+      console.log(`[CanvasPanel] Letterbox NOT rendering - enabled: ${letterbox.enabled}, hasRenderer: ${!!letterboxRendererRef.current}, hasEngine: ${!!engine}`);
     }
 
     // === 15. Motion Blur (applied to full canvas) ===
