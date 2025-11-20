@@ -24,7 +24,7 @@ sources:
 
 ## Verbindung zur Resonanztheorie
 
-### Klassische Resonanztheorie (Rosa, Bohmann)
+### Klassische Resonanztheorie (Rosa)
 - Subjekt ↔ Welt-Beziehung, die **nicht instrumentell** ist
 - Resonanz als Gegenpol zur Entfremdung
 
