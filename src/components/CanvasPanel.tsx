@@ -557,10 +557,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     ctx.restore();
 
     // === 13. Wrap Effects (explosive particle effects) ===
+    console.log('[CanvasPanel] Wrap effects check - hasRenderer:', !!wrapEffectsRendererRef.current, 'hasEngine:', !!engine, 'enabled:', letterbox.enabled);
     if (wrapEffectsRendererRef.current && engine && letterbox.enabled) {
       const wrapEvents = engine.getWrapEvents();
       const frameCount = engine.getFrameCount();
       const gridPixelSize = Math.floor(GRID_SIZE * scale);
+
+      console.log('[CanvasPanel] Calling wrapEffectsRenderer.render with gridPixelSize:', gridPixelSize);
 
       wrapEffectsRendererRef.current.render(
         ctx,

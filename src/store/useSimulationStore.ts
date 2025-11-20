@@ -518,10 +518,13 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     },
 
     updateLetterboxParams: (params) => {
+      console.log('[Store] updateLetterboxParams called with:', params);
       const current = get().parameters;
+      console.log('[Store] Current letterbox params before update:', current.letterbox);
       get().setParameters({
         letterbox: { ...current.letterbox, ...params },
       });
+      console.log('[Store] New letterbox params after update:', get().parameters.letterbox);
     },
 
     updatePerformanceParams: (params) => {

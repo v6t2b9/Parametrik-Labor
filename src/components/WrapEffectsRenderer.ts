@@ -98,6 +98,8 @@ export class WrapEffectsRenderer {
 
       // Color gradient based on heat (lava-like)
       vec3 color = vec3(0.0);
+      float alpha = 0.0;
+
       if (finalHeat > 0.01) {
         // Hot colors: dark red -> orange -> yellow -> white
         float t = clamp(finalHeat * u_intensity, 0.0, 1.0);
@@ -118,9 +120,14 @@ export class WrapEffectsRenderer {
 
         // Add glow
         color *= (1.0 + u_glow * finalHeat);
+        alpha = clamp(finalHeat * u_intensity * 2.0, 0.0, 1.0);
+      } else {
+        // DEBUG: Show bars even without heat (subtle dark red tint)
+        color = vec3(0.2, 0.0, 0.0);
+        alpha = 0.3;
       }
 
-      gl_FragColor = vec4(color, clamp(finalHeat * u_intensity * 2.0, 0.0, 1.0));
+      gl_FragColor = vec4(color, alpha);
     }
   `;
 
@@ -336,7 +343,10 @@ export class WrapEffectsRenderer {
     gridHeight: number,
     currentFrame: number
   ): void {
+    console.log('[WrapEffectsRenderer] render called - enabled:', params.enabled, 'canvasW:', canvasWidth, 'canvasH:', canvasHeight, 'gridW:', gridWidth, 'gridH:', gridHeight);
+
     if (!params.enabled) {
+      console.log('[WrapEffectsRenderer] Disabled, returning early');
       return;
     }
 
@@ -345,6 +355,7 @@ export class WrapEffectsRenderer {
     // Determine bar sizes
     const hasHorizontalBars = gridHeight < canvasHeight;
     const hasVerticalBars = gridWidth < canvasWidth;
+    console.log('[WrapEffectsRenderer] hasHorizontalBars:', hasHorizontalBars, 'hasVerticalBars:', hasVerticalBars);
 
     // Initialize bars if needed
     if (hasHorizontalBars) {
