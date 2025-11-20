@@ -672,8 +672,8 @@ export class QuantumStigmergyEngine {
    */
   protected detectAndRecordWrap(
     agent: Agent,
-    oldX: number,
-    oldY: number,
+    _oldX: number,
+    _oldY: number,
     newX: number,
     newY: number,
     vx: number,

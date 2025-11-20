@@ -174,7 +174,7 @@ export interface UniversalParameterSet {
   audio: import('./musicMappings').MusicMappingParameters;
 }
 
-export type BlendMode = 'additive' | 'average' | 'multiply' | 'screen';
+export type BlendMode = 'additive' | 'alpha' | 'average' | 'multiply' | 'screen';
 
 export interface HueCyclingParams {
   enabled: boolean;         // Enable/disable hue cycling

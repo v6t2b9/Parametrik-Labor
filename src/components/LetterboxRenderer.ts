@@ -254,18 +254,18 @@ export class LetterboxRenderer {
 
         if (orientation === 'horizontal') {
           // Propagate downward into bar
-          if (y > 0) neighbors.push(tempField.slice((y - 1) * width * 3 + x * 3, (y - 1) * width * 3 + x * 3 + 3));
-          if (y < height - 1) neighbors.push(tempField.slice((y + 1) * width * 3 + x * 3, (y + 1) * width * 3 + x * 3 + 3));
+          if (y > 0) neighbors.push(Array.from(tempField.slice((y - 1) * width * 3 + x * 3, (y - 1) * width * 3 + x * 3 + 3)));
+          if (y < height - 1) neighbors.push(Array.from(tempField.slice((y + 1) * width * 3 + x * 3, (y + 1) * width * 3 + x * 3 + 3)));
           // Also diffuse horizontally
-          if (x > 0) neighbors.push(tempField.slice(y * width * 3 + (x - 1) * 3, y * width * 3 + (x - 1) * 3 + 3));
-          if (x < width - 1) neighbors.push(tempField.slice(y * width * 3 + (x + 1) * 3, y * width * 3 + (x + 1) * 3 + 3));
+          if (x > 0) neighbors.push(Array.from(tempField.slice(y * width * 3 + (x - 1) * 3, y * width * 3 + (x - 1) * 3 + 3)));
+          if (x < width - 1) neighbors.push(Array.from(tempField.slice(y * width * 3 + (x + 1) * 3, y * width * 3 + (x + 1) * 3 + 3)));
         } else {
           // Propagate rightward into bar
-          if (x > 0) neighbors.push(tempField.slice(y * width * 3 + (x - 1) * 3, y * width * 3 + (x - 1) * 3 + 3));
-          if (x < width - 1) neighbors.push(tempField.slice(y * width * 3 + (x + 1) * 3, y * width * 3 + (x + 1) * 3 + 3));
+          if (x > 0) neighbors.push(Array.from(tempField.slice(y * width * 3 + (x - 1) * 3, y * width * 3 + (x - 1) * 3 + 3)));
+          if (x < width - 1) neighbors.push(Array.from(tempField.slice(y * width * 3 + (x + 1) * 3, y * width * 3 + (x + 1) * 3 + 3)));
           // Also diffuse vertically
-          if (y > 0) neighbors.push(tempField.slice((y - 1) * width * 3 + x * 3, (y - 1) * width * 3 + x * 3 + 3));
-          if (y < height - 1) neighbors.push(tempField.slice((y + 1) * width * 3 + x * 3, (y + 1) * width * 3 + x * 3 + 3));
+          if (y > 0) neighbors.push(Array.from(tempField.slice((y - 1) * width * 3 + x * 3, (y - 1) * width * 3 + x * 3 + 3)));
+          if (y < height - 1) neighbors.push(Array.from(tempField.slice((y + 1) * width * 3 + x * 3, (y + 1) * width * 3 + x * 3 + 3)));
         }
 
         // Apply diffusion
@@ -288,7 +288,7 @@ export class LetterboxRenderer {
     params: LetterboxParams,
     gridSize: number,
     orientation: 'horizontal' | 'vertical',
-    offset: number
+    _offset: number
   ): void {
     if (!params.showInterferencePattern) return;
 

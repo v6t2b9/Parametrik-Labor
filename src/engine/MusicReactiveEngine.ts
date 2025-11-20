@@ -4,7 +4,7 @@
  */
 
 import { QuantumStigmergyEngine } from './QuantumStigmergyEngine';
-import type { Agent, AllParameters, WrapEvent } from '../types/index';
+import type { Agent, AllParameters } from '../types/index';
 import { resolveSpeciesParams } from '../store/useSimulationStore';
 import type {
   MusicAnalysis,
@@ -44,8 +44,8 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   private useInterference: boolean = false;
   private useMultiScale: boolean = false;
 
-  // Store parameters for music-reactive modulation
-  private parameters: AllParameters | null = null;
+  // Store parameters for music-reactive modulation (for future use)
+  private _parameters: AllParameters | null = null;
 
   constructor(gridSize?: number) {
     super(gridSize);
@@ -72,8 +72,8 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
     // Call parent
     super.setParameters(params);
 
-    // Store parameters for wrap event detection (needed for visualization colors)
-    this.parameters = params;
+    // Store parameters for future music-reactive features
+    this._parameters = params;
 
     // Extract species-specific audio mappings
     this.musicMappingsRed = resolveSpeciesParams(params, 'red').audio;

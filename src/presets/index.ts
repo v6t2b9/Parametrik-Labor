@@ -207,6 +207,7 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       scanlines: legacy.effects.scanlines || 0,
       pixelation: legacy.effects.pixelation || 1,
     },
+    letterbox: legacy.letterbox || defaultParameters.letterbox,
     performance: legacy.performance,
     modelParams: legacy.modelParams || defaultParameters.modelParams,
     ecosystemMode: legacy.ecosystemMode || false,
