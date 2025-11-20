@@ -174,7 +174,7 @@ export interface UniversalParameterSet {
   audio: import('./musicMappings').MusicMappingParameters;
 }
 
-export type BlendMode = 'additive' | 'average' | 'multiply' | 'screen';
+export type BlendMode = 'additive' | 'alpha' | 'average' | 'multiply' | 'screen';
 
 export interface HueCyclingParams {
   enabled: boolean;         // Enable/disable hue cycling
@@ -262,6 +262,7 @@ export interface AllParameters {
   visualization: VisualizationParams;
   effects: EffectsParams;
   performance: PerformanceParams;
+  letterbox: LetterboxParams;
 
   // Quantum-inspired stigmergy model selection
   modelParams: ModelParams;
@@ -311,9 +312,77 @@ export interface EmergentProperties {
   density: number;        // 0-100
 }
 
+// === Letterbox System (Reactive Canvas Borders) ===
+
+// Wrap event: Emitted when an agent crosses the grid boundary
+export interface WrapEvent {
+  // Position where wrap occurred
+  x: number;           // 0-GRID_SIZE
+  y: number;           // 0-GRID_SIZE
+  edge: 'top' | 'bottom' | 'left' | 'right';
+
+  // Agent color (RGB directly from visualization)
+  r: number;           // 0-255
+  g: number;           // 0-255
+  b: number;           // 0-255
+
+  // Force vector (velocity)
+  vx: number;          // Velocity x-component
+  vy: number;          // Velocity y-component
+  speed: number;       // Magnitude of velocity vector
+  angle: number;       // Movement direction (radians)
+
+  // Trail intensity at wrap position (pheromone accumulation)
+  trailIntensity: {
+    red: number;       // Red channel trail value
+    green: number;     // Green channel trail value
+    blue: number;      // Blue channel trail value
+  };
+
+  timestamp: number;   // Frame timestamp for decay/interference calculations
+}
+
+// Letterbox visualization parameters
+export interface LetterboxParams {
+  enabled: boolean;    // Master toggle
+
+  // === Input Sources (combinable) ===
+  useAgentColor: boolean;          // Use agent RGB color
+  useTrailIntensity: boolean;      // Modulate by trail intensity at edge
+  useForceVector: boolean;         // Use velocity as amplitude
+
+  // Weighting of input sources (0-1)
+  agentColorWeight: number;        // How much agent color influences output
+  trailIntensityWeight: number;    // How much trail intensity modulates
+  forceVectorWeight: number;       // How much velocity affects amplitude
+
+  // === Physics (Wave Propagation) ===
+  propagationSpeed: number;        // 0.1-10: How fast waves travel in letterbox
+  decayRate: number;               // 0.8-0.999: How fast events fade
+  diffusionRate: number;           // 0-1: Spatial spreading of events
+  diffusionFreq: number;           // 1-10: How often diffusion is applied
+
+  // === Interference (Double-Slit Experiment) ===
+  interferenceEnabled: boolean;    // Enable wave interference
+  interferenceType: 'constructive' | 'destructive' | 'both';
+  waveLength: number;              // 5-50: Wavelength in pixels (affects interference pattern)
+  coherenceLength: number;         // 50-200: Distance over which events can interfere
+
+  // === Visualization ===
+  showInterferencePattern: boolean; // Visualize interference fringes
+  blendMode: BlendMode;            // Color blending mode
+  brightness: number;              // 0.1-3: Output brightness
+  blur: number;                    // 0-10: Blur effect in letterbox
+  hueCycling: boolean;             // Enable hue cycling
+  hueCyclingSpeed: number;         // 0.1-10: Hue cycle speed
+
+  // === Event History ===
+  maxEventHistory: number;         // 50-500: Max events stored for interference
+}
+
 // UI State - Matrix Navigation
 export type SpeciesScope = 'universal' | 'red' | 'green' | 'blue';
-export type OikosTab = 'presets' | 'model' | 'physical' | 'semiotic' | 'resonance' | 'audio' | 'visuals' | 'performance' | 'ecosystem';
+export type OikosTab = 'presets' | 'model' | 'physical' | 'semiotic' | 'resonance' | 'audio' | 'visuals' | 'performance' | 'ecosystem' | 'letterbox';
 
 // Aspect Ratio options
 export type AspectRatio = '1:1' | '16:9' | '9:16' | '3:2' | '2:3' | '4:3' | '3:4' | '21:9' | '9:21';

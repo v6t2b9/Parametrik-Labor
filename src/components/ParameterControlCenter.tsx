@@ -5,13 +5,14 @@ import { SemioticOikosPanel } from './SemioticOikosPanel';
 import { ResonanceOikosPanel } from './ResonanceOikosPanel';
 import { VisualizationOikosPanel } from './VisualizationOikosPanel';
 import { EffectsOikosPanel } from './EffectsOikosPanel';
+import { LetterboxOikosPanel } from './LetterboxOikosPanel';
 import { PerformanceOikosPanel } from './PerformanceOikosPanel';
 import { PresetGallery } from './PresetGallery';
 import { ModelOikosPanel } from './ModelOikosPanel';
 import { AudioOikosPanel } from './AudioOikosPanel';
 import { EcosystemOikosPanel } from './EcosystemOikosPanel';
 
-type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'resonance' | 'ecosystem' | 'audio' | 'visualization' | 'effects' | 'performance';
+type TabType = 'presets' | 'model' | 'physical' | 'semiotic' | 'resonance' | 'ecosystem' | 'audio' | 'visualization' | 'effects' | 'letterbox' | 'performance';
 
 export function ParameterControlCenter() {
   const [activeTab, setActiveTab] = useState<TabType>('presets');
@@ -73,6 +74,11 @@ export function ParameterControlCenter() {
           label="✨ Effects"
         />
         <Tab
+          active={activeTab === 'letterbox'}
+          onClick={() => setActiveTab('letterbox')}
+          label="🎬 Letterbox"
+        />
+        <Tab
           active={activeTab === 'performance'}
           onClick={() => setActiveTab('performance')}
           label="⚡ Performance"
@@ -89,6 +95,7 @@ export function ParameterControlCenter() {
         {activeTab === 'audio' && <AudioOikosPanel />}
         {activeTab === 'visualization' && <VisualizationOikosPanel />}
         {activeTab === 'effects' && <EffectsOikosPanel />}
+        {activeTab === 'letterbox' && <LetterboxOikosPanel />}
         {activeTab === 'performance' && <PerformanceOikosPanel />}
       </div>
     </div>

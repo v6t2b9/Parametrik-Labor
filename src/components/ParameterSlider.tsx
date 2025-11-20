@@ -7,6 +7,7 @@ interface ParameterSliderProps {
   onChange: (value: number) => void;
   description?: string;
   hasOverride?: boolean; // Indicator for species-specific override
+  disabled?: boolean; // Disable slider interaction
 }
 
 export function ParameterSlider({
@@ -18,19 +19,20 @@ export function ParameterSlider({
   onChange,
   description,
   hasOverride = false,
+  disabled = false,
 }: ParameterSliderProps) {
   return (
-    <div style={styles.container}>
+    <div style={{ ...styles.container, ...(disabled ? styles.containerDisabled : {}) }}>
       <div style={styles.labelRow}>
         <div style={styles.labelGroup}>
-          <label style={styles.label}>{label}</label>
+          <label style={{ ...styles.label, ...(disabled ? styles.labelDisabled : {}) }}>{label}</label>
           {hasOverride && (
             <span style={styles.overrideBadge} title="Species-specific override active">
               ⚡
             </span>
           )}
         </div>
-        <span style={styles.value}>{value.toFixed(3)}</span>
+        <span style={{ ...styles.value, ...(disabled ? styles.valueDisabled : {}) }}>{value.toFixed(3)}</span>
       </div>
       <input
         type="range"
@@ -40,8 +42,9 @@ export function ParameterSlider({
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         style={styles.slider}
+        disabled={disabled}
       />
-      {description && <p style={styles.description}>{description}</p>}
+      {description && <p style={{ ...styles.description, ...(disabled ? styles.descriptionDisabled : {}) }}>{description}</p>}
     </div>
   );
 }
@@ -92,5 +95,18 @@ const styles = {
     color: '#7d7d8d',
     marginTop: '6px',
     lineHeight: '1.5',
+  } as React.CSSProperties,
+  containerDisabled: {
+    opacity: 0.5,
+    pointerEvents: 'none',
+  } as React.CSSProperties,
+  labelDisabled: {
+    color: '#808080',
+  } as React.CSSProperties,
+  valueDisabled: {
+    color: '#606060',
+  } as React.CSSProperties,
+  descriptionDisabled: {
+    color: '#505050',
   } as React.CSSProperties,
 };
