@@ -148,7 +148,6 @@ interface SimulationStore {
   updateGlobalTemporalParams: (params: Partial<AllParameters['globalTemporal']>) => void;
   updateVisualizationParams: (params: Partial<AllParameters['visualization']>) => void;
   updateEffectsParams: (params: Partial<AllParameters['effects']>) => void;
-  updateLetterboxParams: (params: Partial<AllParameters['letterbox']>) => void;
   updatePerformanceParams: (params: Partial<AllParameters['performance']>) => void;
   updateModelParams: (params: Partial<ModelParams>) => void;
   updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => void;
@@ -275,7 +274,6 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         globalTemporal: { ...currentParams.globalTemporal, ...(params.globalTemporal || {}) },
         visualization: { ...currentParams.visualization, ...(params.visualization || {}) },
         effects: { ...currentParams.effects, ...(params.effects || {}) },
-        letterbox: { ...currentParams.letterbox, ...(params.letterbox || {}) },
         performance: { ...currentParams.performance, ...(params.performance || {}) },
         modelParams: { ...currentParams.modelParams, ...(params.modelParams || {}) },
         ecosystemMode: params.ecosystemMode !== undefined ? params.ecosystemMode : currentParams.ecosystemMode,
@@ -515,16 +513,6 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       get().setParameters({
         effects: { ...current.effects, ...params },
       });
-    },
-
-    updateLetterboxParams: (params) => {
-      console.log('[Store] updateLetterboxParams called with:', params);
-      const current = get().parameters;
-      console.log('[Store] Current letterbox params before update:', current.letterbox);
-      get().setParameters({
-        letterbox: { ...current.letterbox, ...params },
-      });
-      console.log('[Store] New letterbox params after update:', get().parameters.letterbox);
     },
 
     updatePerformanceParams: (params) => {

@@ -571,13 +571,8 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       const dx = Math.cos(agent.angle) * currentBoost;
       const dy = Math.sin(agent.angle) * currentBoost;
 
-      const oldX = agent.x;
-      const oldY = agent.y;
       agent.x += dx;
       agent.y += dy;
-
-      // Detect wrap events for letterbox visualization
-      this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
       // Wrap around edges
       const gridSize = this.getGridSize();
@@ -601,13 +596,8 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       const dx = Math.cos(agent.angle) * speedAdjust;
       const dy = Math.sin(agent.angle) * speedAdjust;
 
-      const oldX = agent.x;
-      const oldY = agent.y;
       agent.x += dx;
       agent.y += dy;
-
-      // Detect wrap events for letterbox visualization
-      this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
       const gridSize = this.getGridSize();
       if (agent.x < 0) agent.x += gridSize;
@@ -622,13 +612,8 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       const dx = Math.cos(agent.angle) * loudnessPush;
       const dy = Math.sin(agent.angle) * loudnessPush;
 
-      const oldX = agent.x;
-      const oldY = agent.y;
       agent.x += dx;
       agent.y += dy;
-
-      // Detect wrap events for letterbox visualization
-      this.detectAndRecordWrap(agent, oldX, oldY, agent.x, agent.y, dx, dy);
 
       const gridSize = this.getGridSize();
       if (agent.x < 0) agent.x += gridSize;
