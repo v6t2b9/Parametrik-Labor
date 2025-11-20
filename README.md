@@ -19,7 +19,7 @@ npm run dev
 npm run build
 ```
 
-**Live Demo:** [https://parametrik-labor.vercel.app](https://parametric-space-explorer.vercel.app/)
+**Live Demo:** [https://parametrik-labor.vercel.app](https://parametrik-labor.vercel.app/)
 
 ---
 
@@ -279,7 +279,7 @@ Select from the `📐 Aspect Ratio` dropdown in the control bar.
 
 ## 🤝 Contributing
 
-Contributions welcome! This is an open science project. See [CONTRIBUTING.md](./docs/CONTRIBUTING.md) for guidelines.
+Contributions welcome! This is an open science project. See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ---
 
