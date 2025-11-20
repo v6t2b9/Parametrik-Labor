@@ -50,8 +50,14 @@ Emergente Eigenschaften
 ### 🗺️ [[#meta|Meta]] (1 MOC)
 Maps of Content - Navigationshilfen
 
-### 🧪 Experiments
-→ Verlinkt zu [[../experiments/Experimentelle_Sektion_Index.md]] (nicht-atomar)
+### 🔬 [[#methods|Methods]] (4 Notizen) ✅
+Experimentelle Methodologien
+
+### 🧪 [[#experiments|Experiments]] (4 Notizen) ✅
+Experimentklassen
+
+### 📊 [[#metrics|Metrics]] (4 Notizen) ✅
+Mess- und Analysekonzepte
 
 ### 🔧 Components
 → Verlinkt zu [[../development/ARCHITECTURE.md]] (nicht-atomar)
@@ -250,6 +256,95 @@ Emergente Eigenschaften (Single Source of Truth für jede Eigenschaft):
 
 ---
 
+## Methods
+
+Experimentelle Methodologien (Atomic notes für wissenschaftliches Arbeiten):
+
+1. **[[methods/systematic-variation.md]]** ⭐
+   - Definition: Ein Parameter variieren, alle anderen konstant (ceteris paribus)
+   - Anwendung: Isolierung von Parameter-Effekten
+   - Kombination: Mit Iterative Deepening und Theory-Guided Hypotheses
+
+2. **[[methods/theory-guided-hypotheses.md]]** ⭐
+   - Definition: Hypothesen vor Experiment formulieren
+   - Workflow: Theorie → Hypothese → Experiment → Validierung
+   - Umgang mit Überraschungen: Abweichungen als wertvollste Erkenntnisse
+
+3. **[[methods/iterative-deepening.md]]**
+   - Definition: Grobe → Feine → Grenzfall-Exploration
+   - Strategie: Runde 1 (5-7 Werte), Runde 2 (10 Werte im interessanten Bereich), Runde 3 (Extreme)
+   - Effizienz: 10× effizienter als vollständige hochauflösende Exploration
+
+4. **[[methods/qualitative-quantitative-capture.md]]**
+   - Definition: Duale Erfassung (visuell + numerisch)
+   - Taxonomie: Struktur, Stabilität, Textur, Dynamik
+   - Mapping: Qualitative Deskriptoren ↔ Quantitative Metriken
+
+---
+
+## Experiments
+
+Experimentklassen (Design-Patterns für systematische Untersuchungen):
+
+1. **[[experiments/single-parameter-variation.md]]** ⭐
+   - Ziel: Isolierter Effekt eines Parameters
+   - Design: Ein Parameter variiert, alle anderen konstant (Baseline)
+   - Template: [[../experiments/Template_Parameter_Experiment.md]]
+   - Anwendung: Parameter-Oikos-Matrix befüllen, Schwellenwerte identifizieren
+
+2. **[[experiments/parameter-combination.md]]**
+   - Ziel: Interaktionseffekte (Synergie, Antagonismus)
+   - Design: 2-Parameter-Grid (z.B. 3×3 = 9 Runs)
+   - Arten: Additive, Synergetische, Antagonistische Effekte
+   - Beispiel: Decay × Diffusion Trade-off
+
+3. **[[experiments/mode-comparison.md]]**
+   - Ziel: Modi-spezifische Dynamiken verstehen
+   - Modi: MYZEL (1 Spezies), STIGMERGIE (Multi, isoliert), RESONANZ (Multi, gekoppelt)
+   - Anwendung: Ökosemiotische Wende empirisch validieren
+
+4. **[[experiments/boundary-exploration.md]]**
+   - Ziel: Theoretische Grenzen, sinnvolle Ranges definieren
+   - Design: Extreme Werte testen (sehr niedrig, sehr hoch)
+   - Kategorien: Physikalische, Stabilitäts-, Performance-, Konzeptuelle Grenzen
+   - Beispiel: Decay 0.0-1.0 → sinnvoller Bereich 0.85-0.99
+
+---
+
+## Metrics
+
+Mess- und Analysekonzepte (Quantifizierung emergenter Phänomene):
+
+### Implementiert (2 Metriken)
+
+1. **[[metrics/ridge-point-analysis.md]]** ⭐
+   - Status: Implementiert
+   - Konzept: Identifikation lokaler Maxima (Hotspots)
+   - Metriken: Ridge-Point-Anzahl, Durchschnitts-Intensität, Farbverteilung
+   - Interpretation: < 100 (wenige Cluster), 100-500 (typisch), > 500 (granular)
+
+2. **[[metrics/structural-similarity.md]]** ⭐
+   - Status: Implementiert
+   - Konzept: Pattern-Hash-Vergleich (Fingerprint)
+   - Score: 0.0-1.0 (0.0 = völlig unterschiedlich, 1.0 = identisch)
+   - Anwendung: Reproduzierbarkeit, Seed-Sensitivität, Parameter-Effekt quantifizieren
+
+### Geplant (2 Metriken)
+
+3. **[[metrics/entropy-measurement.md]]**
+   - Status: Geplant
+   - Konzept: Shannon-Entropie (Ordnung vs. Unordnung)
+   - Range: 0.0-8.0 bits (niedrig = geordnet/kristallin, hoch = chaotisch)
+   - Korrelation: Inverse zu Kristallinität, positiv zu Chaos
+
+4. **[[metrics/fractal-dimension.md]]**
+   - Status: Geplant
+   - Konzept: Box-Counting (Raum-Füllung, Selbstähnlichkeit)
+   - Range: 1.0-2.0 (1.0 = linear, 1.3-1.6 = verzweigt/kristallin, 2.0 = flächenfüllend)
+   - Anwendung: Netzwerk-Topologie, Kristallinität, Dichte-Disambiguierung
+
+---
+
 ## Meta
 
 Maps of Content (MOCs) - Zentrale Navigationshilfen:
@@ -367,6 +462,9 @@ docs/zettelkasten/
 ├── concepts/          # 5 atomare Konzepte ✅
 ├── parameters/        # 15 atomare Parameter ✅
 ├── properties/        # 8 atomare Properties ✅
+├── methods/           # 4 experimentelle Methodologien ✅
+├── experiments/       # 4 Experimentklassen ✅
+├── metrics/           # 4 Metriken (2 implementiert, 2 geplant) ✅
 └── meta/             # 1 MOC ✅
 ```
 
@@ -392,14 +490,20 @@ docs/zettelkasten/
 - ✅ Alle 15 Parameter extrahiert (4 Physikalische, 4 Semiotische, 4 Temporale, 3 Resonanz)
 - ✅ Alle 8 Properties extrahiert (3 Strukturelle, 2 Ordnungs-, 3 Dynamische)
 - ✅ README aktualisiert mit vollständiger Übersicht
-- [ ] Experimentelle Methodik extrahieren (~10 atomare Notizen)
+
+## Roadmap: Phase 3.1 ✅ (abgeschlossen 2025-11-20)
+
+- ✅ 4 Methodologien extrahiert (Systematische Variation, Theorie-geleitete Hypothesen, Iterative Vertiefung, Qualitative+Quantitative Erfassung)
+- ✅ 4 Experimentklassen extrahiert (Single-Parameter, Parameter-Kombination, Modus-Vergleich, Grenzfall-Exploration)
+- ✅ 4 Metriken extrahiert (Ridge-Point-Analyse, Strukturelle Ähnlichkeit, Entropie, Fraktale Dimension)
+- ✅ README aktualisiert mit experimentellen Inhalten
+
+## Roadmap: Phase 3.2 (optional)
+
 - [ ] Zweite MOC erstellen (Experiment-Findings-Map)
-
-## Roadmap: Phase 3 (geplant)
-
-- [ ] Große Docs splitten (Dashboard_Concept, Research_Supplement_B)
 - [ ] Component-Notizen extrahieren (~15 atomare Notizen)
 - [ ] Dritte MOC erstellen (System-Architecture-Map)
+- [ ] Große Docs splitten (Dashboard_Concept, Research_Supplement_B)
 - [ ] Legacy-Docs ins `/archive/` verschieben
 
 ---
