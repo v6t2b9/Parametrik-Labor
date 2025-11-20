@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { WebGLTrailRenderer } from './WebGLTrailRenderer';
+import { LetterboxRenderer } from './LetterboxRenderer';
 import { applyHueCycling } from '../utils/colorUtils';
 import { EcosystemRenderer } from '../engine/EcosystemRenderer';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
@@ -62,6 +63,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // WebGL renderer for trails (major performance boost)
   const webglRendererRef = useRef<WebGLTrailRenderer | null>(null);
 
+  // Letterbox renderer for reactive border visualization
+  const letterboxRendererRef = useRef<LetterboxRenderer | null>(null);
+
   // Canvas pool for temporary canvases (object pooling)
   const canvasPoolRef = useRef<CanvasPool>(new CanvasPool());
 
@@ -81,6 +85,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const parameters = useSimulationStore((state) => state.parameters);
   const visualization = useSimulationStore((state) => state.parameters.visualization);
   const effects = useSimulationStore((state) => state.parameters.effects);
+  const letterbox = useSimulationStore((state) => state.parameters.letterbox);
   const updatePerformanceMetrics = useSimulationStore((state) => state.updatePerformanceMetrics);
   const performAutoOptimization = useSimulationStore((state) => state.performAutoOptimization);
   const playbackSpeed = useSimulationStore((state) => state.ui.playbackSpeed);
@@ -194,6 +199,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       webglRendererRef.current.destroy();
     }
     webglRendererRef.current = new WebGLTrailRenderer(gridPixelSize, gridPixelSize, GRID_SIZE);
+
+    // Letterbox renderer - initialize on first use, reset when canvas size changes
+    if (!letterboxRendererRef.current) {
+      letterboxRendererRef.current = new LetterboxRenderer();
+    } else {
+      letterboxRendererRef.current.reset();
+    }
 
     // Motion blur canvas - resize when canvas size changes
     if (!motionBlurCanvasRef.current) {
@@ -544,7 +556,27 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // Restore context (removes translation offset)
     ctx.restore();
 
-    // === 13. Motion Blur (applied to full canvas) ===
+    // === 13. Letterbox Visualization (reactive borders) ===
+    if (letterboxRendererRef.current && engine && letterbox.enabled) {
+      const wrapEvents = engine.getWrapEvents();
+      const frameCount = engine.getFrameCount();
+      const gridPixelSize = Math.floor(GRID_SIZE * scale);
+
+      letterboxRendererRef.current.render(
+        ctx,
+        wrapEvents,
+        letterbox,
+        canvasWidth,
+        canvasHeight,
+        gridPixelSize,
+        gridPixelSize,
+        offsetX,
+        offsetY,
+        frameCount
+      );
+    }
+
+    // === 15. Motion Blur (applied to full canvas) ===
     if (effects.motionBlur > 0 && motionBlurCanvasRef.current) {
       const mbCanvas = motionBlurCanvasRef.current;
       const mbCtx = mbCanvas.getContext('2d');
@@ -561,7 +593,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
-    // === 14. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
+    // === 16. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
     const filters: string[] = [];
     if (effects.blur > 0) filters.push(`blur(${effects.blur}px)`);
     if (effects.saturation !== 1.0) filters.push(`saturate(${effects.saturation})`);
