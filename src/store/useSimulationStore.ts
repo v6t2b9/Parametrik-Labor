@@ -505,35 +505,23 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     updateVisualizationParams: (params) => {
       const current = get().parameters;
-      set({
-        parameters: {
-          ...current,
-          visualization: { ...current.visualization, ...params },
-        },
+      get().setParameters({
+        visualization: { ...current.visualization, ...params },
       });
     },
 
     updateEffectsParams: (params) => {
       const current = get().parameters;
-      set({
-        parameters: {
-          ...current,
-          effects: { ...current.effects, ...params },
-        },
+      get().setParameters({
+        effects: { ...current.effects, ...params },
       });
     },
 
     updateLetterboxParams: (params) => {
       const current = get().parameters;
-      console.log(`[Store] updateLetterboxParams called with:`, params);
-      console.log(`[Store] Current letterbox.enabled: ${current.letterbox.enabled}`);
-      set({
-        parameters: {
-          ...current,
-          letterbox: { ...current.letterbox, ...params },
-        },
+      get().setParameters({
+        letterbox: { ...current.letterbox, ...params },
       });
-      console.log(`[Store] New letterbox.enabled: ${get().parameters.letterbox.enabled}`);
     },
 
     updatePerformanceParams: (params) => {

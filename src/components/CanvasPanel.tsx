@@ -91,11 +91,6 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const playbackSpeed = useSimulationStore((state) => state.ui.playbackSpeed);
   const aspectRatio = useSimulationStore((state) => state.ui.aspectRatio);
 
-  // Debug: Log letterbox changes
-  useEffect(() => {
-    console.log(`[CanvasPanel useEffect] letterbox.enabled changed to: ${letterbox.enabled}`);
-  }, [letterbox.enabled]);
-
   // Check if ecosystem mode is active
   const ecosystemMode = parameters.ecosystemMode || false;
   const isEcosystemEngine = engine instanceof MusicReactiveEcosystemEngine;
@@ -562,34 +557,23 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     ctx.restore();
 
     // === 13. Letterbox Visualization (reactive borders) ===
-    if (letterboxRendererRef.current && engine) {
+    if (letterboxRendererRef.current && engine && letterbox.enabled) {
+      const wrapEvents = engine.getWrapEvents();
       const frameCount = engine.getFrameCount();
+      const gridPixelSize = Math.floor(GRID_SIZE * scale);
 
-      if (letterbox.enabled) {
-        const wrapEvents = engine.getWrapEvents();
-        const gridPixelSize = Math.floor(GRID_SIZE * scale);
-
-        // Debug: Log every 2 seconds
-        if (frameCount % 120 === 0) {
-          console.log(`[CanvasPanel] Letterbox enabled: true, Wrap events: ${wrapEvents.length}, Canvas: ${canvasWidth}x${canvasHeight}, Grid: ${gridPixelSize}x${gridPixelSize}`);
-        }
-
-        letterboxRendererRef.current.render(
-          ctx,
-          wrapEvents,
-          letterbox,
-          canvasWidth,
-          canvasHeight,
-          gridPixelSize,
-          gridPixelSize,
-          offsetX,
-          offsetY,
-          frameCount
-        );
-      } else if (frameCount % 120 === 0) {
-        // Debug: Log why letterbox is not rendering
-        console.log(`[CanvasPanel] Letterbox NOT rendering - enabled: ${letterbox.enabled}, hasRenderer: ${!!letterboxRendererRef.current}, hasEngine: ${!!engine}`);
-      }
+      letterboxRendererRef.current.render(
+        ctx,
+        wrapEvents,
+        letterbox,
+        canvasWidth,
+        canvasHeight,
+        gridPixelSize,
+        gridPixelSize,
+        offsetX,
+        offsetY,
+        frameCount
+      );
     }
 
     // === 15. Motion Blur (applied to full canvas) ===
