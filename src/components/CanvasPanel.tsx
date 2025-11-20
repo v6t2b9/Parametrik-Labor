@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { WebGLTrailRenderer } from './WebGLTrailRenderer';
-import { LetterboxRenderer } from './LetterboxRenderer';
+import { WrapEffectsRenderer } from './WrapEffectsRenderer';
 import { applyHueCycling } from '../utils/colorUtils';
 import { EcosystemRenderer } from '../engine/EcosystemRenderer';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
@@ -63,8 +63,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // WebGL renderer for trails (major performance boost)
   const webglRendererRef = useRef<WebGLTrailRenderer | null>(null);
 
-  // Letterbox renderer for reactive border visualization
-  const letterboxRendererRef = useRef<LetterboxRenderer | null>(null);
+  // Wrap effects renderer for explosive particle effects
+  const wrapEffectsRendererRef = useRef<WrapEffectsRenderer | null>(null);
 
   // Canvas pool for temporary canvases (object pooling)
   const canvasPoolRef = useRef<CanvasPool>(new CanvasPool());
@@ -200,11 +200,11 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     }
     webglRendererRef.current = new WebGLTrailRenderer(gridPixelSize, gridPixelSize, GRID_SIZE);
 
-    // Letterbox renderer - initialize on first use, reset when canvas size changes
-    if (!letterboxRendererRef.current) {
-      letterboxRendererRef.current = new LetterboxRenderer();
+    // Wrap effects renderer - initialize on first use, reset when canvas size changes
+    if (!wrapEffectsRendererRef.current) {
+      wrapEffectsRendererRef.current = new WrapEffectsRenderer();
     } else {
-      letterboxRendererRef.current.reset();
+      wrapEffectsRendererRef.current.reset();
     }
 
     // Motion blur canvas - resize when canvas size changes
@@ -556,13 +556,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // Restore context (removes translation offset)
     ctx.restore();
 
-    // === 13. Letterbox Visualization (reactive borders) ===
-    if (letterboxRendererRef.current && engine && letterbox.enabled) {
+    // === 13. Wrap Effects (explosive particle effects) ===
+    if (wrapEffectsRendererRef.current && engine && letterbox.enabled) {
       const wrapEvents = engine.getWrapEvents();
       const frameCount = engine.getFrameCount();
       const gridPixelSize = Math.floor(GRID_SIZE * scale);
 
-      letterboxRendererRef.current.render(
+      wrapEffectsRendererRef.current.render(
         ctx,
         wrapEvents,
         letterbox,

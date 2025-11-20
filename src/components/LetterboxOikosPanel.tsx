@@ -1,7 +1,7 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { letterboxPresets } from '../presets/tabPresets';
-import type { LetterboxParams } from '../types/index';
+import type { LetterboxParams, WrapEffectType } from '../types/index';
 
 export function LetterboxOikosPanel() {
   const letterbox = useSimulationStore((state) => state.parameters.letterbox);
@@ -11,11 +11,26 @@ export function LetterboxOikosPanel() {
     updateLetterboxParams(presetLetterbox);
   };
 
+  const effectTypes: { value: WrapEffectType; label: string; icon: string }[] = [
+    { value: 'burst', label: 'Burst', icon: '💥' },
+    { value: 'sparks', label: 'Sparks', icon: '✨' },
+    { value: 'plasma', label: 'Plasma', icon: '🔮' },
+    { value: 'fireworks', label: 'Fireworks', icon: '🎆' },
+    { value: 'lightning', label: 'Lightning', icon: '⚡' },
+    { value: 'aurora', label: 'Aurora', icon: '🌌' },
+  ];
+
+  const fadeTypes: { value: 'linear' | 'smooth' | 'sudden'; label: string }[] = [
+    { value: 'linear', label: 'Linear' },
+    { value: 'smooth', label: 'Smooth' },
+    { value: 'sudden', label: 'Sudden' },
+  ];
+
   return (
     <div style={styles.container}>
-      <h3 style={styles.title}>🎬 Letterbox Oikos</h3>
+      <h3 style={styles.title}>🎬 Wrap Effects</h3>
       <p style={styles.description}>
-        Reactive cinema-style borders that visualize agent wrap events with interference patterns
+        Explosive particle effects when agents cross grid boundaries
       </p>
 
       {/* Enable/Disable Toggle */}
@@ -27,13 +42,13 @@ export function LetterboxOikosPanel() {
             onChange={(e) => updateLetterboxParams({ enabled: e.target.checked })}
             style={styles.checkbox}
           />
-          <span style={styles.toggleText}>Enable Letterbox Visualization</span>
+          <span style={styles.toggleText}>Enable Wrap Effects</span>
         </label>
       </div>
 
       {/* Presets */}
       <div style={styles.presetsSection}>
-        <h4 style={styles.sectionTitle}>Letterbox Presets</h4>
+        <h4 style={styles.sectionTitle}>Effect Presets</h4>
         <div style={styles.presetGrid}>
           {letterboxPresets.map((preset) => (
             <button
@@ -49,310 +64,187 @@ export function LetterboxOikosPanel() {
         </div>
       </div>
 
-      {/* Section 1: Data Sources */}
-      <div style={styles.layerSection}>
-        <h4 style={styles.layerTitle}>📊 Data Sources</h4>
-        <p style={styles.layerDescription}>
-          Control which agent data influences the wave visualization
-        </p>
-        <div style={styles.section}>
-          <label style={styles.checkboxLabel}>
+      {/* Effect Type */}
+      <div style={styles.section}>
+        <h4 style={styles.sectionTitle}>Effect Style</h4>
+        <div style={styles.effectTypeGrid}>
+          {effectTypes.map((type) => (
+            <button
+              key={type.value}
+              onClick={() => updateLetterboxParams({ effectType: type.value })}
+              style={{
+                ...styles.effectTypeButton,
+                backgroundColor: letterbox.effectType === type.value ? '#7d5dbd' : '#1a1a2d',
+                borderColor: letterbox.effectType === type.value ? '#9d7dd4' : '#2a2b3a',
+              }}
+            >
+              <span style={styles.effectIcon}>{type.icon}</span>
+              <span style={styles.effectLabel}>{type.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Particle Behavior */}
+      <div style={styles.section}>
+        <h4 style={styles.sectionTitle}>⚙️ Particle Behavior</h4>
+
+        <ParameterSlider
+          label="Particle Count"
+          value={letterbox.particleCount}
+          min={10}
+          max={200}
+          step={5}
+          onChange={(value) => updateLetterboxParams({ particleCount: value })}
+          description="Number of particles spawned per wrap event"
+        />
+
+        <ParameterSlider
+          label="Speed"
+          value={letterbox.particleSpeed}
+          min={0.5}
+          max={10}
+          step={0.5}
+          onChange={(value) => updateLetterboxParams({ particleSpeed: value })}
+          description="Initial particle velocity"
+        />
+
+        <ParameterSlider
+          label="Lifetime"
+          value={letterbox.particleLifetime}
+          min={0.2}
+          max={3.0}
+          step={0.1}
+          onChange={(value) => updateLetterboxParams({ particleLifetime: value })}
+          description="Particle duration in seconds"
+        />
+
+        <ParameterSlider
+          label="Size"
+          value={letterbox.particleSize}
+          min={1}
+          max={20}
+          step={1}
+          onChange={(value) => updateLetterboxParams({ particleSize: value })}
+          description="Particle render size in pixels"
+        />
+
+        <ParameterSlider
+          label="Spread Angle"
+          value={letterbox.spread}
+          min={0}
+          max={180}
+          step={10}
+          onChange={(value) => updateLetterboxParams({ spread: value })}
+          description="Emission cone angle in degrees (0 = tight beam, 180 = hemisphere)"
+        />
+      </div>
+
+      {/* Visual Properties */}
+      <div style={styles.section}>
+        <h4 style={styles.sectionTitle}>🎨 Visual Properties</h4>
+
+        <ParameterSlider
+          label="Intensity"
+          value={letterbox.intensity}
+          min={0}
+          max={1}
+          step={0.05}
+          onChange={(value) => updateLetterboxParams({ intensity: value })}
+          description="Overall effect intensity/opacity"
+        />
+
+        <ParameterSlider
+          label="Glow"
+          value={letterbox.glow}
+          min={0}
+          max={3}
+          step={0.1}
+          onChange={(value) => updateLetterboxParams({ glow: value })}
+          description="Bloom/halo around particles"
+        />
+
+        <ParameterSlider
+          label="Color Saturation"
+          value={letterbox.colorSaturation}
+          min={0}
+          max={2}
+          step={0.1}
+          onChange={(value) => updateLetterboxParams({ colorSaturation: value })}
+          description="Color vibrancy (0 = grayscale, 1 = normal, >1 = vivid)"
+        />
+
+        <div style={styles.toggleContainer}>
+          <label style={styles.toggleLabel}>
             <input
               type="checkbox"
               checked={letterbox.useAgentColor}
               onChange={(e) => updateLetterboxParams({ useAgentColor: e.target.checked })}
               style={styles.checkbox}
             />
-            <span>Use Agent Color</span>
+            <span>Use Agent Species Color</span>
           </label>
-          <ParameterSlider
-            label="Agent Color Weight"
-            value={letterbox.agentColorWeight}
-            min={0}
-            max={3}
-            step={0.1}
-            onChange={(value) => updateLetterboxParams({ agentColorWeight: value })}
-            description="How much agent color influences wave amplitude"
-            disabled={!letterbox.useAgentColor}
-          />
-
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={letterbox.useTrailIntensity}
-              onChange={(e) => updateLetterboxParams({ useTrailIntensity: e.target.checked })}
-              style={styles.checkbox}
-            />
-            <span>Use Trail Intensity</span>
-          </label>
-          <ParameterSlider
-            label="Trail Intensity Weight"
-            value={letterbox.trailIntensityWeight}
-            min={0}
-            max={2}
-            step={0.1}
-            onChange={(value) => updateLetterboxParams({ trailIntensityWeight: value })}
-            description="How much pheromone trails at edge affect waves"
-            disabled={!letterbox.useTrailIntensity}
-          />
-
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={letterbox.useForceVector}
-              onChange={(e) => updateLetterboxParams({ useForceVector: e.target.checked })}
-              style={styles.checkbox}
-            />
-            <span>Use Force Vector (Velocity)</span>
-          </label>
-          <ParameterSlider
-            label="Force Vector Weight"
-            value={letterbox.forceVectorWeight}
-            min={0}
-            max={2}
-            step={0.1}
-            onChange={(value) => updateLetterboxParams({ forceVectorWeight: value })}
-            description="How much agent velocity/speed affects amplitude"
-            disabled={!letterbox.useForceVector}
-          />
         </div>
+
+        <ParameterSlider
+          label="Trail Influence"
+          value={letterbox.trailInfluence}
+          min={0}
+          max={1}
+          step={0.05}
+          onChange={(value) => updateLetterboxParams({ trailInfluence: value })}
+          description="How much trail intensity affects particle speed"
+        />
       </div>
 
-      {/* Section 2: Wave Physics */}
-      <div style={styles.layerSection}>
-        <h4 style={styles.layerTitle}>🌊 Wave Physics</h4>
-        <p style={styles.layerDescription}>
-          Control wave propagation, decay, and diffusion dynamics
-        </p>
-        <div style={styles.section}>
-          <ParameterSlider
-            label="Propagation Speed"
-            value={letterbox.propagationSpeed}
-            min={0.1}
-            max={10}
-            step={0.1}
-            onChange={(value) => updateLetterboxParams({ propagationSpeed: value })}
-            description="How fast waves travel from edge into bars"
-          />
-          <ParameterSlider
-            label="Decay Rate"
-            value={letterbox.decayRate}
-            min={0.5}
-            max={1}
-            step={0.01}
-            onChange={(value) => updateLetterboxParams({ decayRate: value })}
-            description="Wave amplitude decay per frame (1 = no decay, 0.9 = fast decay)"
-          />
-          <ParameterSlider
-            label="Diffusion Rate"
-            value={letterbox.diffusionRate}
-            min={0}
-            max={1}
-            step={0.05}
-            onChange={(value) => updateLetterboxParams({ diffusionRate: value })}
-            description="How much waves spread to neighbors (0 = no spread, 1 = instant diffusion)"
-          />
-          <ParameterSlider
-            label="Diffusion Frequency"
-            value={letterbox.diffusionFreq}
-            min={1}
-            max={10}
-            step={1}
-            onChange={(value) => updateLetterboxParams({ diffusionFreq: value })}
-            description="Apply diffusion every N frames (lower = smoother, higher = performance)"
-          />
-          <ParameterSlider
-            label="Max Event History"
-            value={letterbox.maxEventHistory}
-            min={50}
-            max={500}
-            step={10}
-            onChange={(value) => updateLetterboxParams({ maxEventHistory: value })}
-            description="Maximum wrap events to track (higher = more interference patterns)"
-          />
-        </div>
-      </div>
+      {/* Animation */}
+      <div style={styles.section}>
+        <h4 style={styles.sectionTitle}>⚡ Animation</h4>
 
-      {/* Section 3: Interference (Double-Slit Physics) */}
-      <div style={styles.layerSection}>
-        <h4 style={styles.layerTitle}>✨ Interference Patterns</h4>
-        <p style={styles.layerDescription}>
-          Double-slit experiment visualization - constructive/destructive wave interference
-        </p>
-        <div style={styles.section}>
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={letterbox.interferenceEnabled}
-              onChange={(e) => updateLetterboxParams({ interferenceEnabled: e.target.checked })}
-              style={styles.checkbox}
-            />
-            <span>Enable Interference</span>
-          </label>
+        <ParameterSlider
+          label="Gravity"
+          value={letterbox.gravity}
+          min={-5}
+          max={5}
+          step={0.5}
+          onChange={(value) => updateLetterboxParams({ gravity: value })}
+          description="Particle gravity (negative = float up, positive = fall down)"
+        />
 
-          <div style={styles.radioGroup}>
-            <label style={styles.radioLabel}>
-              <input
-                type="radio"
-                value="constructive"
-                checked={letterbox.interferenceType === 'constructive'}
-                onChange={() => updateLetterboxParams({ interferenceType: 'constructive' })}
-                disabled={!letterbox.interferenceEnabled}
-                style={styles.radio}
-              />
-              <span>Constructive (Peaks only)</span>
-            </label>
-            <label style={styles.radioLabel}>
-              <input
-                type="radio"
-                value="destructive"
-                checked={letterbox.interferenceType === 'destructive'}
-                onChange={() => updateLetterboxParams({ interferenceType: 'destructive' })}
-                disabled={!letterbox.interferenceEnabled}
-                style={styles.radio}
-              />
-              <span>Destructive (Valleys only)</span>
-            </label>
-            <label style={styles.radioLabel}>
-              <input
-                type="radio"
-                value="both"
-                checked={letterbox.interferenceType === 'both'}
-                onChange={() => updateLetterboxParams({ interferenceType: 'both' })}
-                disabled={!letterbox.interferenceEnabled}
-                style={styles.radio}
-              />
-              <span>Both (Peaks & Valleys)</span>
-            </label>
+        <ParameterSlider
+          label="Turbulence"
+          value={letterbox.turbulence}
+          min={0}
+          max={1}
+          step={0.05}
+          onChange={(value) => updateLetterboxParams({ turbulence: value })}
+          description="Chaotic particle movement"
+        />
+
+        <div style={styles.fadeTypeSection}>
+          <label style={styles.paramLabel}>Fade Type</label>
+          <div style={styles.fadeTypeGrid}>
+            {fadeTypes.map((type) => (
+              <button
+                key={type.value}
+                onClick={() => updateLetterboxParams({ fadeType: type.value })}
+                style={{
+                  ...styles.fadeTypeButton,
+                  backgroundColor: letterbox.fadeType === type.value ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: letterbox.fadeType === type.value ? '#9d7dd4' : '#2a2b3a',
+                }}
+              >
+                {type.label}
+              </button>
+            ))}
           </div>
-
-          <ParameterSlider
-            label="Wave Length"
-            value={letterbox.waveLength}
-            min={5}
-            max={100}
-            step={1}
-            onChange={(value) => updateLetterboxParams({ waveLength: value })}
-            description="Distance between wave peaks (smaller = tighter patterns)"
-            disabled={!letterbox.interferenceEnabled}
-          />
-          <ParameterSlider
-            label="Coherence Length"
-            value={letterbox.coherenceLength}
-            min={20}
-            max={300}
-            step={10}
-            onChange={(value) => updateLetterboxParams({ coherenceLength: value })}
-            description="How far waves remain coherent (smaller = localized interference)"
-            disabled={!letterbox.interferenceEnabled}
-          />
-
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={letterbox.showInterferencePattern}
-              onChange={(e) => updateLetterboxParams({ showInterferencePattern: e.target.checked })}
-              style={styles.checkbox}
-              disabled={!letterbox.interferenceEnabled}
-            />
-            <span>Show Interference Pattern</span>
-          </label>
         </div>
       </div>
 
-      {/* Section 4: Visual Style */}
-      <div style={styles.layerSection}>
-        <h4 style={styles.layerTitle}>🎨 Visual Style</h4>
-        <p style={styles.layerDescription}>
-          Color blending, brightness, blur, and animation effects
-        </p>
-        <div style={styles.section}>
-          <div style={styles.radioGroup}>
-            <label style={styles.radioLabel}>
-              <input
-                type="radio"
-                value="additive"
-                checked={letterbox.blendMode === 'additive'}
-                onChange={() => updateLetterboxParams({ blendMode: 'additive' })}
-                style={styles.radio}
-              />
-              <span>Additive Blend</span>
-            </label>
-            <label style={styles.radioLabel}>
-              <input
-                type="radio"
-                value="alpha"
-                checked={letterbox.blendMode === 'alpha'}
-                onChange={() => updateLetterboxParams({ blendMode: 'alpha' })}
-                style={styles.radio}
-              />
-              <span>Alpha Blend</span>
-            </label>
-            <label style={styles.radioLabel}>
-              <input
-                type="radio"
-                value="multiply"
-                checked={letterbox.blendMode === 'multiply'}
-                onChange={() => updateLetterboxParams({ blendMode: 'multiply' })}
-                style={styles.radio}
-              />
-              <span>Multiply Blend</span>
-            </label>
-          </div>
-
-          <ParameterSlider
-            label="Brightness"
-            value={letterbox.brightness}
-            min={0}
-            max={5}
-            step={0.1}
-            onChange={(value) => updateLetterboxParams({ brightness: value })}
-            description="Overall brightness multiplier"
-          />
-          <ParameterSlider
-            label="Blur"
-            value={letterbox.blur}
-            min={0}
-            max={20}
-            step={0.5}
-            onChange={(value) => updateLetterboxParams({ blur: value })}
-            description="Gaussian blur radius for softer, dreamier waves"
-          />
-
-          <label style={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={letterbox.hueCycling}
-              onChange={(e) => updateLetterboxParams({ hueCycling: e.target.checked })}
-              style={styles.checkbox}
-            />
-            <span>Hue Cycling Animation</span>
-          </label>
-          <ParameterSlider
-            label="Hue Cycling Speed"
-            value={letterbox.hueCyclingSpeed}
-            min={0.1}
-            max={10}
-            step={0.1}
-            onChange={(value) => updateLetterboxParams({ hueCyclingSpeed: value })}
-            description="Speed of color cycling through hue spectrum"
-            disabled={!letterbox.hueCycling}
-          />
-        </div>
-      </div>
-
-      {/* Info Box */}
+      {/* Info */}
       <div style={styles.infoBox}>
         <p style={styles.infoText}>
-          💡 <strong>Double-Slit Experiment:</strong> When multiple agents wrap at nearby positions,
-          their waves interfere like light passing through slits. Constructive interference creates
-          bright bands, destructive interference creates dark bands.
-          <br/><br/>
-          🎬 <strong>Cinema Letterbox:</strong> Only horizontal OR vertical bars are shown at once,
-          depending on your aspect ratio. 16:9 landscape = top/bottom bars. 9:16 portrait = left/right bars.
-          <br/><br/>
-          ⚡ <strong>Performance Tip:</strong> Higher diffusion frequency (fewer updates) improves FPS.
-          Lower max event history reduces interference calculations.
+          💡 <strong>Tip:</strong> Try different presets to explore various moods - from meditative aurora flows to explosive fireworks!
         </p>
       </div>
     </div>
@@ -363,7 +255,7 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: '20px',
     padding: '16px',
   } as React.CSSProperties,
   title: {
@@ -379,19 +271,25 @@ const styles = {
   toggleSection: {
     padding: '12px',
     backgroundColor: '#0a0a15',
-    borderRadius: '8px',
+    borderRadius: '6px',
     border: '1px solid #2a2b3a',
   } as React.CSSProperties,
   toggleLabel: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: '10px',
     cursor: 'pointer',
     fontSize: '14px',
-    color: '#fff',
+    color: '#e0e0e0',
   } as React.CSSProperties,
   toggleText: {
     fontWeight: 600,
+  } as React.CSSProperties,
+  checkbox: {
+    width: '20px',
+    height: '20px',
+    cursor: 'pointer',
+    accentColor: '#7d5dbd',
   } as React.CSSProperties,
   presetsSection: {
     display: 'flex',
@@ -401,13 +299,14 @@ const styles = {
   sectionTitle: {
     margin: 0,
     fontSize: '14px',
-    color: '#aaa',
+    color: '#9d7dd4',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
+    fontWeight: 600,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
     gap: '8px',
   } as React.CSSProperties,
   presetButton: {
@@ -435,60 +334,60 @@ const styles = {
     flexDirection: 'column',
     gap: '12px',
   } as React.CSSProperties,
-  layerSection: {
-    marginBottom: '24px',
-    padding: '16px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '8px',
-    border: '1px solid #2a2b3a',
-  } as React.CSSProperties,
-  layerTitle: {
-    margin: '0 0 6px 0',
-    fontSize: '15px',
-    color: '#9d7dd4',
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  } as React.CSSProperties,
-  layerDescription: {
-    margin: '0 0 16px 0',
-    fontSize: '11px',
-    color: '#7d7d8d',
-    lineHeight: '1.4',
-  } as React.CSSProperties,
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
+  effectTypeGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '8px',
-    fontSize: '13px',
-    color: '#ccc',
-    cursor: 'pointer',
   } as React.CSSProperties,
-  checkbox: {
-    width: '16px',
-    height: '16px',
-    cursor: 'pointer',
-  } as React.CSSProperties,
-  radioGroup: {
+  effectTypeButton: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
-    padding: '8px',
-    backgroundColor: '#05050a',
-    borderRadius: '6px',
-  } as React.CSSProperties,
-  radioLabel: {
-    display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '13px',
-    color: '#ccc',
+    gap: '4px',
+    padding: '10px',
+    border: '2px solid',
+    borderRadius: '8px',
     cursor: 'pointer',
+    transition: 'all 0.2s',
   } as React.CSSProperties,
-  radio: {
-    width: '16px',
-    height: '16px',
+  effectIcon: {
+    fontSize: '24px',
+  } as React.CSSProperties,
+  effectLabel: {
+    fontSize: '11px',
+    color: '#e0e0e0',
+    fontWeight: 600,
+  } as React.CSSProperties,
+  toggleContainer: {
+    padding: '10px',
+    backgroundColor: '#0a0a15',
+    borderRadius: '6px',
+    border: '1px solid #2a2b3a',
+  } as React.CSSProperties,
+  paramLabel: {
+    fontSize: '13px',
+    color: '#e0e0e0',
+    fontWeight: 500,
+    marginBottom: '8px',
+    display: 'block',
+  } as React.CSSProperties,
+  fadeTypeSection: {
+    marginTop: '8px',
+  } as React.CSSProperties,
+  fadeTypeGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '8px',
+  } as React.CSSProperties,
+  fadeTypeButton: {
+    padding: '10px',
+    border: '2px solid',
+    borderRadius: '6px',
     cursor: 'pointer',
+    transition: 'all 0.2s',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#e0e0e0',
   } as React.CSSProperties,
   infoBox: {
     padding: '12px',

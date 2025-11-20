@@ -342,42 +342,34 @@ export interface WrapEvent {
   timestamp: number;   // Frame timestamp for decay/interference calculations
 }
 
-// Letterbox visualization parameters
+// Letterbox wrap effect types
+export type WrapEffectType = 'burst' | 'sparks' | 'plasma' | 'fireworks' | 'lightning' | 'aurora';
+
+// Letterbox visualization parameters (WebGL particle effects)
 export interface LetterboxParams {
-  enabled: boolean;    // Master toggle
+  enabled: boolean;              // Master toggle
 
-  // === Input Sources (combinable) ===
-  useAgentColor: boolean;          // Use agent RGB color
-  useTrailIntensity: boolean;      // Modulate by trail intensity at edge
-  useForceVector: boolean;         // Use velocity as amplitude
+  // Effect Style
+  effectType: WrapEffectType;    // Type of visual effect
 
-  // Weighting of input sources (0-1)
-  agentColorWeight: number;        // How much agent color influences output
-  trailIntensityWeight: number;    // How much trail intensity modulates
-  forceVectorWeight: number;       // How much velocity affects amplitude
+  // Particle Behavior
+  particleCount: number;         // 10-200: Particles per wrap event
+  particleSpeed: number;         // 0.5-10: Initial velocity
+  particleLifetime: number;      // 0.2-3.0: Seconds before fade
+  particleSize: number;          // 1-20: Particle render size
+  spread: number;                // 0-180: Emission cone angle (degrees)
 
-  // === Physics (Wave Propagation) ===
-  propagationSpeed: number;        // 0.1-10: How fast waves travel in letterbox
-  decayRate: number;               // 0.8-0.999: How fast events fade
-  diffusionRate: number;           // 0-1: Spatial spreading of events
-  diffusionFreq: number;           // 1-10: How often diffusion is applied
+  // Visual Properties
+  intensity: number;             // 0-1: Overall effect intensity
+  glow: number;                  // 0-3: Bloom/glow amount
+  colorSaturation: number;       // 0-2: Color vibrancy
+  useAgentColor: boolean;        // Use agent species color
+  trailInfluence: number;        // 0-1: How much trail intensity affects particles
 
-  // === Interference (Double-Slit Experiment) ===
-  interferenceEnabled: boolean;    // Enable wave interference
-  interferenceType: 'constructive' | 'destructive' | 'both';
-  waveLength: number;              // 5-50: Wavelength in pixels (affects interference pattern)
-  coherenceLength: number;         // 50-200: Distance over which events can interfere
-
-  // === Visualization ===
-  showInterferencePattern: boolean; // Visualize interference fringes
-  blendMode: BlendMode;            // Color blending mode
-  brightness: number;              // 0.1-3: Output brightness
-  blur: number;                    // 0-10: Blur effect in letterbox
-  hueCycling: boolean;             // Enable hue cycling
-  hueCyclingSpeed: number;         // 0.1-10: Hue cycle speed
-
-  // === Event History ===
-  maxEventHistory: number;         // 50-500: Max events stored for interference
+  // Animation
+  gravity: number;               // -5 to 5: Particle gravity
+  turbulence: number;            // 0-1: Chaotic movement
+  fadeType: 'linear' | 'smooth' | 'sudden'; // How particles fade
 }
 
 // UI State - Matrix Navigation
