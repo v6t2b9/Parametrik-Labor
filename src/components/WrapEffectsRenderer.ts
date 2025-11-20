@@ -336,7 +336,10 @@ export class WrapEffectsRenderer {
     gridHeight: number,
     currentFrame: number
   ): void {
+    console.log('[WrapEffectsRenderer] render called - enabled:', params.enabled, 'canvasW:', canvasWidth, 'canvasH:', canvasHeight, 'gridW:', gridWidth, 'gridH:', gridHeight);
+
     if (!params.enabled) {
+      console.log('[WrapEffectsRenderer] Disabled, returning early');
       return;
     }
 
@@ -345,6 +348,7 @@ export class WrapEffectsRenderer {
     // Determine bar sizes
     const hasHorizontalBars = gridHeight < canvasHeight;
     const hasVerticalBars = gridWidth < canvasWidth;
+    console.log('[WrapEffectsRenderer] hasHorizontalBars:', hasHorizontalBars, 'hasVerticalBars:', hasVerticalBars);
 
     // Initialize bars if needed
     if (hasHorizontalBars) {
