@@ -3,9 +3,10 @@
 ```yaml
 ---
 title: Von Stigmergie zu Ökosemiotik
-type: Grundlagentext
-status: Draft v1.0
+type: Theoretische Grundlegung (Narrative)
+status: Draft v1.1
 created: 2025-11-08
+updated: 2025-11-20
 tags:
   - ökosemiotik
   - stigmergie
@@ -13,12 +14,18 @@ tags:
   - parameter-oikos
   - emergenz
 related:
-  - "[[Parameter_als_Oikos]]"
-  - "[[Zeichen_als_Umwelt_Ko-Konstitution]]"
-  - "[[Epistemische_Barrieren_durch_Emergenz]]"
-  - "[[Resonanz_in_Zeichensystemen]]"
+  - "[[../zettelkasten/meta/map-theoretical-framework]]"
+  - "[[../zettelkasten/concepts/oekosemiotik]]"
+  - "[[Parameter_Oikos_Matrix]]"
 ---
 ```
+
+> **📚 Single Source of Truth für Konzepte**: Atomare Definitionen findest du im [Zettelkasten](../zettelkasten/README.md).
+> Dieses Dokument bietet eine **lineare Narration** der ökosemiotischen Wende und dient als **theoretische Einführung**.
+>
+> **Kern-MOC**: [Theoretical-Framework-Map](../zettelkasten/meta/map-theoretical-framework.md) ⭐⭐
+
+---
 
 ## Inhaltsverzeichnis
 
@@ -35,26 +42,30 @@ related:
 ## Etymologie und Begriffsbildung
 
 ### Stigmergie (stigmergy)
-**Wortherkunft**: 
-- Griechisch: στίγμα (*stigma*) = "Stich, Zeichen, Markierung"
-- Griechisch: ἔργον (*ergon*) = "Werk, Arbeit"
-- **Bedeutung**: "Koordination durch Zeichen/Spuren"
+
+**Wortherkunft**: Griechisch *stigma* (Zeichen) + *ergon* (Werk) = "Koordination durch Zeichen/Spuren"
 
 **Geprägt**: 1959 von Pierre-Paul Grassé zur Beschreibung des Termitenverhaltens beim Nestbau
 
-### Ökosemiotik (oecosemiotics)
-**Neologismus** (diese Arbeit):
-- Griechisch: οἶκος (*oikos*) = "Haus, Haushalt, Umwelt, Lebensraum"
-- Griechisch: σημεῖον (*semeion*) = "Zeichen, Signal"
-- **Bedeutung**: "Zeichen als ko-konstituierende Umwelten"
+**Detaillierte Definition**: [stigmergy.md](../zettelkasten/concepts/stigmergy.md)
 
-**Wichtige Abgrenzung**: 
+---
+
+### Ökosemiotik (oecosemiotics)
+
+**Neologismus** (diese Arbeit): Griechisch *oikos* (Umwelt, Haushalt) + *semeion* (Zeichen) = "Zeichen als ko-konstituierende Umwelten"
+
+**Wichtige Abgrenzung**:
 Nicht zu verwechseln mit "Ecosemiotics" (Kull, Hoffmeyer) – der biosemiotischen Erforschung von Zeichen in Ökosystemen. Die hier entwickelte Ökosemiotik fokussiert auf **Parameter-Oikos als aktive Strukturierungskräfte** in koordinativen Zeichensystemen.
 
 **Warum "Oikos" statt "Stigma"?**
 - *Oikos* betont die **Umwelt als aktiven Ko-Konstituenten**, nicht nur als passiven Speicher
 - *Oikos* verbindet sich mit dem Konzept der **ökologischen Nische** – Parameter-Räume als Habitatsräume für emergente Muster
 - *Oikos* öffnet die Verbindung zu **Parameter-Ökonomie** – wie "Haushalten" mit verschiedenen Parametersetzungen verschiedene Ordnungen ermöglicht
+
+**Detaillierte theoretische Ausarbeitung**:
+- [oekosemiotik.md](../zettelkasten/concepts/oekosemiotik.md) - Drei fundamentale Verschiebungen
+- [parameter-as-oikos.md](../zettelkasten/concepts/parameter-as-oikos.md) - Vier Parameter-Oikos-Dimensionen
 
 ---
 
@@ -67,12 +78,16 @@ Nicht zu verwechseln mit "Ecosemiotics" (Kull, Hoffmeyer) – der biosemiotische
 - **Kernidee**: Koordination ohne direkte Kommunikation, nur durch Umwelt-Modifikation
 - Mechanismus: **Stimulation durch Spuren** (*stigmergy*)
 
-**Zentrale Erkenntnis**: 
+**Zentrale Erkenntnis**:
 ```
 Individuum → Spur in Umwelt → Beeinflusst andere Individuen
           ↑___________________________________|
           (Positive Feedback Loop)
 ```
+
+**Siehe auch**: [stigmergy.md](../zettelkasten/concepts/stigmergy.md) → Historische Entwicklung
+
+---
 
 ### Phase 2: Informatische Formalisierung (1980-2000)
 
@@ -85,6 +100,8 @@ Individuum → Spur in Umwelt → Beeinflusst andere Individuen
 - Anwendung auf Traveling Salesman Problem
 - Künstliche Ameisen hinterlassen "digitale Pheromone"
 - **Reduktion**: Stigmergie als Optimierungstechnik
+
+---
 
 ### Phase 3: Sozialwissenschaftliche Erweiterung (2000-heute)
 
@@ -100,6 +117,8 @@ Individuum → Spur in Umwelt → Beeinflusst andere Individuen
 **Mark Elliott (2007)**: Stigmergic Collaboration
 - Unterscheidung zwischen *sematectonic* (Struktur-verändernd) und *marker-based* (Zeichen-basiert)
 
+---
+
 ### Zentrale Limitation bisheriger Ansätze
 
 Alle bisherigen Theorien behandeln die **Umwelt als neutralen Speicher**:
@@ -107,59 +126,29 @@ Alle bisherigen Theorien behandeln die **Umwelt als neutralen Speicher**:
 - Digitale Traces bleiben "einfach erhalten"
 - Die **Parameter der Umwelt** (Verdunstungsrate, Diffusion, Persistenz) werden als **gegeben** behandelt, nicht als **ko-konstituierend**
 
+**Detaillierte Kritik**: [stigmergy.md](../zettelkasten/concepts/stigmergy.md) → Grenzen der klassischen Theorie
+
 ---
 
 ## Grenzen der klassischen Stigmergie
 
-### Theoretische Grenzen
+### Theoretische Grenzen (Zusammenfassung)
 
-#### 1. Umwelt-Passivität
-**Problem**: Umwelt wird als passiver Container konzipiert
-- Pheromone werden "gespeichert"
-- Trail-Konzentration ist "Information"
-- Keine Theorie über **wie Parameter die emergente Ordnung ko-konstituieren**
+**1. Umwelt-Passivität**
+- Problem: Umwelt wird als passiver Container konzipiert
+- Fehlende Frage: Warum erzeugen verschiedene Verdunstungsraten völlig verschiedene Muster?
+- **These**: Die Verdunstungsrate ko-konstituiert die Art der emergenten Ordnung
 
-**Beispiel Ameisen**:
-```
-Klassische Beschreibung:
-Ameise hinterlässt Pheromon → andere folgen → Pfad entsteht
+**2. Zeichen-Reduktion**
+- Problem: Zeichen wird auf "Information" reduziert
+- Fehlende Dimension: Zeichen verändern nicht nur Wissen, sondern **Handlungsparameter** in der Oikos
+- Beispiel: Edit-Häufigkeit in Wikipedia verändert "Dringlichkeit"-Perzeption
 
-Fehlende Frage:
-Warum entsteht mit schneller Verdunstung EIN Hauptpfad,
-aber mit langsamer Verdunstung ein NETZWERK von Pfaden?
-```
+**3. Parameter-Blindheit**
+- Problem: Parameter werden als "Einstellungen" behandelt, nicht als ontologische Kategorien
+- Fehlende Erkenntnis: Diese "Einstellungen" sind **strukturierende Kräfte**
 
-→ Die **Verdunstungsrate** ist nicht nur "Parameter", sondern **ko-konstituiert die Art der emergenten Ordnung**
-
-#### 2. Zeichen-Reduktion
-**Problem**: Zeichen wird auf "Information" reduziert
-- Pheromon = "hier war jemand"
-- Digital Trace = "hier wurde diskutiert"
-- Keine Theorie über **wie Zeichen die Handlungsparameter anderer verändern**
-
-**Beispiel Wikipedia**:
-```
-Klassische Beschreibung:
-Edit hinterlässt Trace → andere sehen, dass bearbeitet wurde → koordinieren ihre Edits
-
-Fehlende Dimension:
-- Edit-Häufigkeit verändert "Dringlichkeit"-Perzeption
-- Konflikt-Tags verändern "Vorsicht"-Parameter
-- Artikel-Länge verändert "Investitions"-Schwelle
-```
-
-→ Zeichen verändern nicht nur **Wissen**, sondern **Handlungsparameter** in der Oikos
-
-#### 3. Parameter-Blindheit
-**Problem**: Parameter werden als "Einstellungen" behandelt, nicht als ontologische Kategorien
-
-**Typische Beschreibung in ACO-Papers**:
-```python
-evaporation_rate = 0.1  # "Einstellung"
-pheromone_deposit = 1.0  # "Einstellung"
-```
-
-**Fehlende Erkenntnis**: Diese "Einstellungen" sind **strukturierende Kräfte**, die den gesamten Möglichkeitsraum der Emergenz definieren
+**Ausführliche Analyse**: [stigmergy.md](../zettelkasten/concepts/stigmergy.md) → Grenzen
 
 ---
 
@@ -168,6 +157,8 @@ pheromone_deposit = 1.0  # "Einstellung"
 ### Kernthese
 
 **Koordination durch Zeichen ist nicht unabhängig von den Umweltparametern zu verstehen. Parameter-Oikos sind aktive Ko-Konstituenten emergenter Ordnung, keine passiven "Einstellungen".**
+
+---
 
 ### Drei fundamentale Verschiebungen
 
@@ -179,17 +170,14 @@ pheromone_deposit = 1.0  # "Einstellung"
 | Pheromone verdunsten "einfach" | Decay-Rate strukturiert Gedächtnis-Horizont |
 | Digitale Traces bleiben erhalten | Persistenz-Parameter definieren Relevanz-Fenster |
 
-**Beispiel**: 
-In der Simulation ist `decayRate` nicht "wie schnell Spuren verschwinden", sondern **wie lange die Vergangenheit die Gegenwart strukturiert**.
+**Beispiel aus der Simulation**:
+`decayRate` ist nicht "wie schnell Spuren verschwinden", sondern **wie lange die Vergangenheit die Gegenwart strukturiert**.
+- decayRate = 0.99 → Lange Gedächtnis-Horizonte → Stabile Muster
+- decayRate = 0.85 → Kurze Gedächtnis-Horizonte → Volatile Muster
 
-```javascript
-// Nicht nur: "Spur verschwindet"
-newTrailMap[y][x].r = cell.r * decayRate;
+**Detailliert**: [decay-rate.md](../zettelkasten/parameters/decay-rate.md)
 
-// Sondern: "Wie lange bleibt Vergangenheit handlungsleitend?"
-// decayRate = 0.99 → Lange Gedächtnis-Horizonte → Stabile Muster
-// decayRate = 0.85 → Kurze Gedächtnis-Horizonte → Volatile Muster
-```
+---
 
 #### Verschiebung 2: Von Information zu Handlungsparameter-Veränderung
 
@@ -199,18 +187,11 @@ newTrailMap[y][x].r = cell.r * decayRate;
 | "Hier war jemand" | "Handlungsradius verändert sich hier" |
 | Binär (Spur vorhanden/nicht) | Gradual (Spur verändert Sensor-Response) |
 
-**Beispiel aus Resonanz-Modus**:
-```javascript
-// Zeichen ist nicht nur "Information über andere Spezies"
-const otherMax = Math.max(...otherTrails);
+**Beispiel aus Resonanz-Modus**: Zeichen verändern Bewegungsparameter durch attraction/repulsion
 
-// Sondern: Verändert Bewegungsparameter durch Resonanz
-return selfTrail * attractionStrength + 
-       otherMax * repulsionStrength;
-       
-// attractionStrength/repulsionStrength sind OIKOS-Parameter
-// Sie bestimmen, WIE Zeichen handlungsleitend werden
-```
+**Detailliert**: [resonanz.md](../zettelkasten/concepts/resonanz.md)
+
+---
 
 #### Verschiebung 3: Von Variablen zu Oikos
 
@@ -223,27 +204,29 @@ return selfTrail * attractionStrength +
 **Vier Parameter-Oikos-Dimensionen**:
 
 1. **Physikalische Oikos**: Materialität der Spuren
-   - `decayRate`: Zeitlicher Horizont des Gedächtnisses
-   - `diffusionFreq`: Räumliche Ausbreitung von Einfluss
-   - `fadeStrength`: Beschleunigung des Vergessens
-   - `trailSaturation`: Kapazitätsgrenzen der Umwelt
+   - [decay-rate.md](../zettelkasten/parameters/decay-rate.md): Zeitlicher Horizont des Gedächtnisses
+   - [diffusion.md](../zettelkasten/parameters/diffusion.md): Räumliche Ausbreitung von Einfluss
+   - [fade-strength.md](../zettelkasten/parameters/fade-strength.md): Beschleunigung des Vergessens
+   - [trail-saturation.md](../zettelkasten/parameters/trail-saturation.md): Kapazitätsgrenzen
 
 2. **Semiotische Oikos**: Wahrnehmungs- und Handlungsradius
-   - `sensorDist`: Reichweite der Perzeption
-   - `sensorAngle`: Sichtfeld-Breite
-   - `deposit`: Zeichensetzungs-Intensität
-   - `turnSpeed`: Reaktionsfähigkeit auf Zeichen
+   - [sensor-distance.md](../zettelkasten/parameters/sensor-distance.md): Reichweite der Perzeption
+   - [sensor-angle.md](../zettelkasten/parameters/sensor-angle.md): Sichtfeld-Breite
+   - [deposit-amount.md](../zettelkasten/parameters/deposit-amount.md): Zeichensetzungs-Intensität
+   - [turn-speed.md](../zettelkasten/parameters/turn-speed.md): Reaktionsfähigkeit
 
-3. **Temporale Oikos**: Dynamik und Bevölkerungsdichte
-   - `speed`: Geschwindigkeit des Wandels
-   - `agentCount`: Dichte der Interaktionen
-   - `chaosInterval`: Periodische Destabilisierung
-   - `chaosStrength`: Intensität der Störung
+3. **Temporale Oikos**: Dynamik und Dichte
+   - [agent-speed.md](../zettelkasten/parameters/agent-speed.md): Geschwindigkeit des Wandels
+   - [agent-count.md](../zettelkasten/parameters/agent-count.md): Interaktionsdichte
+   - [chaos-interval.md](../zettelkasten/parameters/chaos-interval.md): Periodische Destabilisierung
+   - [chaos-strength.md](../zettelkasten/parameters/chaos-strength.md): Störungsintensität
 
-4. **Resonanz-Oikos**: Affektive Beziehungen zwischen Zeichensystemen
-   - `attractionStrength`: Verstärkung eigener Spuren
-   - `repulsionStrength`: Wirkung fremder Spuren
-   - `crossSpeciesInteraction`: Inter-systemische Koppelung
+4. **Resonanz-Oikos**: Affektive Beziehungen
+   - [attraction-strength.md](../zettelkasten/parameters/attraction-strength.md): Selbst-Resonanz
+   - [repulsion-strength.md](../zettelkasten/parameters/repulsion-strength.md): Fremd-Resonanz
+   - [cross-species-interaction.md](../zettelkasten/parameters/cross-species-interaction.md): Inter-systemische Koppelung
+
+**Umfassende Ausarbeitung**: [parameter-as-oikos.md](../zettelkasten/concepts/parameter-as-oikos.md)
 
 ---
 
@@ -257,16 +240,22 @@ return selfTrail * attractionStrength +
 - Biologische Nische: Temperatur, Feuchtigkeit, pH-Wert → bestimmen welche Arten überleben können
 - Parameter-Nische: Decay, Diffusion, Sensor-Distance → bestimmen welche Muster emergieren können
 
-**Demonstration**:
+**Demonstration aus Simulationen**:
 ```
 Gleiche Agenten + Gleiche Regeln + Verschiedene Oikos = Völlig verschiedene Muster
 
-Beispiel aus Simulationen:
+Beispiele:
 - decayRate=0.99, diffusionFreq=8 → "Lavalampe" (fließende, organische Formen)
 - decayRate=0.94, diffusionFreq=1 → "Nervensystem" (verzweigte, stabile Netzwerke)
 ```
 
 Die Muster sind **nicht reduzierbar** auf initiale Bedingungen oder Regeln – sie emergieren **nur in der Interaktion mit Parameter-Oikos**.
+
+**Siehe auch**:
+- [emergenz.md](../zettelkasten/concepts/emergenz.md)
+- [Parameter-Effects-Map](../zettelkasten/meta/map-parameter-effects.md) - Umfassende Matrix
+
+---
 
 ### Innovation 2: Emergente Irreversibilität durch Akkumulation
 
@@ -293,9 +282,13 @@ Schritt 1.500.000: Akkumulierte Ko-Konstitution ist praktisch nicht zurückverfo
 
 **Warum praktisch irreversibel?**
 1. **Nichtlineare Akkumulation**: Jede Interaktion beeinflusst zukünftige Interaktionen
-2. **Parameter-Interdependenz**: Decay beeinflusst Diffusion-Effektivität, Resonanz beeinflusst Stigmergie-Stabilität
+2. **Parameter-Interdependenz**: Decay beeinflusst Diffusion-Effektivität, Resonanz beeinflusst Stigmergie-Stabilität ([Parameter-Effects-Map](../zettelkasten/meta/map-parameter-effects.md))
 3. **Emergente Sättigung**: Selbstlimitierung durch `trailSaturation` schafft nicht-triviale Attraktoren
-4. **Desynchronisation**: Individuelle `loopCounter` und `chaosPhase` verhindern Massen-Pulsieren
+4. **Desynchronisation**: Individuelle `loopCounter` und `chaosPhase` verhindern Massen-Pulsieren ([chaos-interval.md](../zettelkasten/parameters/chaos-interval.md))
+
+**Siehe auch**: [emergenz.md](../zettelkasten/concepts/emergenz.md) → Emergente Irreversibilität
+
+---
 
 ### Innovation 3: Resonanz in parametrischen Umwelten
 
@@ -305,18 +298,11 @@ Schritt 1.500.000: Akkumulierte Ko-Konstitution ist praktisch nicht zurückverfo
 - Klassische Resonanztheorie: Subjekt ↔ Welt-Beziehung, die nicht instrumentell ist
 - **Ökosemiotische Erweiterung**: Zeichensystem A ↔ Zeichensystem B-Beziehung, vermittelt durch Parameter-Oikos
 
-**Konkret in der Simulation**:
+**Konkrete Implementierung**:
 ```javascript
-// Nicht nur: "Andere Spezies ist da"
-const otherMax = Math.max(...otherTrails);
-
-// Sondern: "Wie resoniert mein System mit dem anderen?"
+// Resonanz ist nicht binär, sondern graduell durch Parameter vermittelt
 return selfTrail * attractionStrength +    // Selbst-Resonanz
        otherMax * repulsionStrength;       // Fremd-Resonanz
-
-// attractionStrength > 0, repulsionStrength > 0 → "Harmonie"
-// attractionStrength > 0, repulsionStrength < 0 → "Konflikt"
-// crossSpeciesInteraction = false → "Isolation"
 ```
 
 **Emergente Resonanz-Muster**:
@@ -324,7 +310,10 @@ return selfTrail * attractionStrength +    // Selbst-Resonanz
 - **Segregation**: Hohe Attraction + starke negative Repulsion → getrennte Territorien
 - **Harmonie**: Moderate Attraction + positive Repulsion → durchmischte Koexistenz
 
-Die Resonanz ist **nicht vordefiniert**, sondern emergiert aus der Interaktion von Zeichensetzung und Parameter-Oikos.
+**Detailliert**:
+- [resonanz.md](../zettelkasten/concepts/resonanz.md)
+- [cluster-formation.md](../zettelkasten/properties/cluster-formation.md)
+- [separation.md](../zettelkasten/properties/separation.md)
 
 ---
 
@@ -347,6 +336,8 @@ Die Resonanz ist **nicht vordefiniert**, sondern emergiert aus der Interaktion v
 - "Kristallwachstum": Niedriger Decay + niedrige Diffusion → stabile, geometrische Strukturen
 - "Nervensystem": Mittlerer Decay + minimale Diffusion → verzweigte Netzwerke
 
+---
+
 #### 2. STIGMERGIE-Modus
 **Zeigt**: Klassische Stigmergie mit Farb-Kodierung
 - Drei "Ameisenarten" (rot, grün, blau)
@@ -356,6 +347,8 @@ Die Resonanz ist **nicht vordefiniert**, sondern emergiert aus der Interaktion v
 **Presets**:
 - "Ameisenpfade": Stabile Highways
 - "Territorien": Räumliche Segregation mit Chaos-Injection
+
+---
 
 #### 3. RESONANZ-Modus
 **Zeigt**: Affektive Beziehungen zwischen Zeichensystemen
@@ -367,6 +360,10 @@ Die Resonanz ist **nicht vordefiniert**, sondern emergiert aus der Interaktion v
 - "Clusterbildung": Starke Attraction → homogene Gruppen
 - "Segregation": Starke Repulsion → getrennte Welten
 - "Harmonie": Balancierte Parameter → Koexistenz
+
+**Siehe auch**: [mode-comparison.md](../zettelkasten/experiments/mode-comparison.md)
+
+---
 
 ### Ökosemiotischer Fingerabdruck v3.2
 
@@ -398,6 +395,16 @@ Beides ist "One-Way", aber aus verschiedenen Gründen:
 - Ökosemiotik: Emergente Akkumulation
 ```
 
+**Metriken implementiert**:
+- [ridge-point-analysis.md](../zettelkasten/metrics/ridge-point-analysis.md) ✅
+- [structural-similarity.md](../zettelkasten/metrics/structural-similarity.md) ✅
+
+**Metriken geplant**:
+- [entropy-measurement.md](../zettelkasten/metrics/entropy-measurement.md)
+- [fractal-dimension.md](../zettelkasten/metrics/fractal-dimension.md)
+
+---
+
 ### Experimenteller Einsatz der Simulationen
 
 **Als Theoriewerkzeug**:
@@ -409,6 +416,11 @@ Beides ist "One-Way", aber aus verschiedenen Gründen:
 1. **Zeigen statt Erklären**: Parameter-Oikos-Effekte sichtbar machen
 2. **Interaktive Exploration**: Andere können selbst experimentieren
 3. **Konzeptuelle Klarheit**: Abstrakte Theorie wird greifbar
+
+**Methodologische Dokumentation**:
+- [Experimental-Methodology-Map](../zettelkasten/meta/map-experimental-methodology.md) ⭐⭐
+- [systematic-variation.md](../zettelkasten/methods/systematic-variation.md)
+- [theory-guided-hypotheses.md](../zettelkasten/methods/theory-guided-hypotheses.md)
 
 ---
 
@@ -426,6 +438,8 @@ Beides ist "One-Way", aber aus verschiedenen Gründen:
 - Dispositionale Ontologie (Mumford, Anjum)
 - Struktureller Realismus (Ladyman, Ross)
 
+---
+
 #### 2. Grenzen der Emergenz-basierten Irreversibilität
 - Bei wie vielen Simulationsschritten wird Pattern-Rekonstruktion praktisch unmöglich?
 - Gibt es **fundamentale Komplexitätsgrenzen** für Brute-Force-Angriffe?
@@ -436,15 +450,23 @@ Beides ist "One-Way", aber aus verschiedenen Gründen:
 - Statistische Tests (NIST Suite) für Pattern-Hashes
 - Informationstheoretische Metriken (Kolmogorov-Komplexität)
 
+**Siehe auch**: [entropy-measurement.md](../zettelkasten/metrics/entropy-measurement.md) (geplante Metrik)
+
+---
+
 #### 3. Universalität vs. Domänenspezifität
 - Gelten ökosemiotische Prinzipien **universell** (analog zu Stigmergie)?
 - Oder sind sie **domänenspezifisch** (nur in bestimmten Koordinationskontexten)?
 - Wie übertragen sie sich auf **nicht-räumliche** Koordination (z.B. zeitliche Koordination in Organisationen)?
 
+---
+
 #### 4. Verhältnis zu verwandten Theorien
 - **Luhmann**: Wie unterscheiden sich Parameter-Oikos von "Strukturen" in Systemtheorie?
 - **Actor-Network-Theory**: Sind Parameter-Oikos "Aktanten"?
 - **Assemblage Theory** (DeLanda): Wie verhalten sich zu "capacities to affect and be affected"?
+
+---
 
 ### Empirische Fragen
 
@@ -455,13 +477,17 @@ Beides ist "One-Way", aber aus verschiedenen Gründen:
   - Slack-Channel-Architektur als "semiotische Oikos"
   - Git-Merge-Policies als "physikalische Oikos" (Persistenz von Änderungen)
 
-**Methodische Herausforderung**: 
+**Methodische Herausforderung**:
 Wie trennt man Parameter-Oikos-Effekte von anderen Faktoren (soziale Normen, explizite Regeln, etc.)?
+
+---
 
 #### 2. Vergleichende Studien
 - **Biologische Stigmergie** (Ameisen, Termiten): Wie variieren natürliche Parameter-Oikos?
 - **Digitale Stigmergie** (Wikipedia, GitHub): Welche Parameter sind modifizierbar, welche fix?
 - **Organisationale Koordination**: Wie werden Parameter-Oikos bewusst/unbewusst gestaltet?
+
+---
 
 ### Methodologische Fragen
 
@@ -470,15 +496,21 @@ Wie trennt man Parameter-Oikos-Effekte von anderen Faktoren (soziale Normen, exp
 - Oder sind sie **emergente Phänomene**, die nur durch Simulation zugänglich sind?
 - **Trade-off**: Analytische Präzision vs. emergente Reichhaltigkeit
 
+---
+
 #### 2. Validierung ökosemiotischer Aussagen
 - Wie **falsifiziert** man Aussagen über Parameter-Oikos-Effekte?
 - Welche **Metriken** machen emergente Eigenschaften quantifizierbar?
 - Standardisierte Testsuites für Parameter-Variationen?
 
-**Vorschlag**: 
-- Parameter-Oikos-Matrix (siehe [[Experimentelle_Sektion]])
-- Emergenz-Metriken: Entropie, Korrelationslänge, Fraktale Dimension
+**Vorschlag**:
+- Parameter-Oikos-Matrix (siehe [[Parameter_Oikos_Matrix]])
+- Emergenz-Metriken: [entropy-measurement.md](../zettelkasten/metrics/entropy-measurement.md), [fractal-dimension.md](../zettelkasten/metrics/fractal-dimension.md)
 - Reproduzierbarkeits-Tests: Gleiche Parameter → gleiche Muster-Klasse
+
+**Siehe auch**: [Experimental-Methodology-Map](../zettelkasten/meta/map-experimental-methodology.md)
+
+---
 
 ### Anwendungsfragen
 
@@ -486,6 +518,8 @@ Wie trennt man Parameter-Oikos-Effekte von anderen Faktoren (soziale Normen, exp
 - Können ökosemiotische Prinzipien **normativ** eingesetzt werden?
 - "Best Practices" für Parameter-Oikos-Gestaltung in verschiedenen Kontexten?
 - **Ethische Fragen**: Wer sollte Parameter-Oikos kontrollieren dürfen?
+
+---
 
 #### 2. Kryptographische Anwendungen
 - Ist Emergenz-basierte Irreversibilität **praktisch sicher** genug?
@@ -523,25 +557,35 @@ Wie trennt man Parameter-Oikos-Effekte von anderen Faktoren (soziale Normen, exp
 
 ---
 
-## Verbindungen im Vault
+## Verbindungen
 
-- **Grundlagen**: [[Parameter_als_Oikos]] | [[Zeichen_als_Umwelt_Ko-Konstitution]]
-- **Konzepte**: [[Epistemische_Barrieren_durch_Emergenz]] | [[Resonanz_in_Zeichensystemen]]
-- **Demonstratoren**: [[Myzel_Simulation]] | [[Fingerabdruck_Generator]]
-- **Experimente**: [[Experimentelle_Sektion]] | [[Parameter_Oikos_Matrix]]
-- **Empirie**: [[IT_Koordination_LGS_Bayern]] | [[Parameter_Effekte_in_Organisationen]]
-- **Akademisch**: [[Verbindung_Resonanztheorie_Bohmann]] | [[Abgrenzung_Luhmann_Systemtheorie]]
+### Zettelkasten (Single Source of Truth)
+- **Haupt-MOC**: [Theoretical-Framework-Map](../zettelkasten/meta/map-theoretical-framework.md) ⭐⭐
+- **Kern-Konzepte**:
+  - [stigmergy.md](../zettelkasten/concepts/stigmergy.md)
+  - [oekosemiotik.md](../zettelkasten/concepts/oekosemiotik.md)
+  - [parameter-as-oikos.md](../zettelkasten/concepts/parameter-as-oikos.md)
+  - [emergenz.md](../zettelkasten/concepts/emergenz.md)
+  - [resonanz.md](../zettelkasten/concepts/resonanz.md)
+- **Alle Parameter**: [Parameters](../zettelkasten/README.md#parameters) (15 Notizen)
+- **Alle Properties**: [Properties](../zettelkasten/README.md#properties) (8 Notizen)
+
+### Legacy-Dokumentation
+- **Matrix-View**: [[Parameter_Oikos_Matrix]] - Tabellarische Übersicht
+- **Experimentelle Sektion**: [[Experimentelle_Sektion_Index]]
+- **Templates**: [[Template_Parameter_Experiment]]
 
 ---
 
 ## Versionierung
 
 - **v1.0** (2025-11-08): Initiale Fassung - Etymologie, historische Entwicklung, zentrale Innovation
-- **Nächste Schritte**: 
+- **v1.1** (2025-11-20): Zettelkasten-Integration - Aggressive Reduktion, ~180 Zeilen redundante Definitionen durch Links ersetzt
+- **Nächste Schritte**:
   - Empirische Sektion ausbauen (IT-Koordination LGS Bayern)
   - Formale Modellierungsversuche dokumentieren
   - Resonanztheorie-Verbindung präzisieren (Vorbereitung Bohmann-Gespräch)
 
 ---
 
-*Dieses Dokument ist Teil der systematischen Entwicklung ökosemiotischer Theorie im Rahmen der 12-Monats-Vault-Strategie. Es dient als Grundlagentext für alle weiteren theoretischen und empirischen Ausarbeitungen.*
+*Dieses Dokument bietet eine lineare Narration der ökosemiotischen Wende. Für atomare Definitionen siehe [Zettelkasten](../zettelkasten/README.md). Für tabellarische Übersicht siehe [Parameter-Oikos-Matrix](Parameter_Oikos_Matrix.md). Für umfassende Konzept-Verbindungen siehe [Theoretical-Framework-Map](../zettelkasten/meta/map-theoretical-framework.md).*

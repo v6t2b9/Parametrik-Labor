@@ -102,16 +102,48 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 
 ## For Researchers
 
-### Theoretical Framework
-- **[Parametrics Paper Draft](./research/parametrics_paper_draft.md)** - Theoretical foundation
-- **[Von Stigmergie zu Ökosemiotik](./research/Von_Stigmergie_zu_Oekosemiotik.md)** - From stigmergy to ecosemiotics
-- **[Parameter Oikos Matrix](./research/Parameter_Oikos_Matrix.md)** - Parameter organization framework
-- **[Ökosemiotik Labor V5](./research/OekosemiotikLaborV5.md)** - Ecosemiotic laboratory concepts
+### 📚 Zettelkasten - Knowledge Vault (NEW!)
+
+**Primary knowledge base for research** - Atomic notes following the Zettelkasten principle:
+- **[Zettelkasten Index](./zettelkasten/README.md)** ⭐⭐⭐ - **Start here!**
+  - 52 atomic notes + 3 MOCs (Maps of Content)
+  - Single Source of Truth for all concepts, parameters, and properties
+  - Bidirectional linking, YAML frontmatter, systematic organization
+
+**Key MOCs (Navigation Guides)**:
+- **[Parameter-Effects-Map](./zettelkasten/meta/map-parameter-effects.md)** ⭐⭐⭐ - Parameter × Property matrix, critical thresholds, design recipes
+- **[Experimental-Methodology-Map](./zettelkasten/meta/map-experimental-methodology.md)** ⭐⭐ - 4 experimental workflows, methods, metrics, best practices
+- **[Theoretical-Framework-Map](./zettelkasten/meta/map-theoretical-framework.md)** ⭐⭐ - 5 core concepts connected, historical development, research questions
+
+**Quick Links by Topic**:
+- **Concepts**: [5 core concepts](./zettelkasten/README.md#concepts) - Stigmergy, Ökosemiotik, Parameter-as-Oikos, Emergenz, Resonanz
+- **Parameters**: [15 parameters](./zettelkasten/README.md#parameters) - Organized by 4 Oikos dimensions
+- **Properties**: [8 emergent properties](./zettelkasten/README.md#properties) - Structural, Order, Dynamic
+- **Methods**: [4 methodologies](./zettelkasten/README.md#methods) - Systematic variation, theory-guided hypotheses
+- **Experiments**: [4 experiment classes](./zettelkasten/README.md#experiments) - Design patterns for investigations
+- **Metrics**: [4 metrics](./zettelkasten/README.md#metrics) - Quantifying emergent phenomena
+- **Components**: [8 system components](./zettelkasten/README.md#components) - Architecture (Simulation, Application, Infrastructure)
+
+---
+
+### Theoretical Framework (Narrative Documents)
+
+**Linear narratives and aggregate views** (for definitions see Zettelkasten):
+- **[Von Stigmergie zu Ökosemiotik](./research/Von_Stigmergie_zu_Oekosemiotik.md)** - Theoretical foundation narrative
+- **[Parameter Oikos Matrix](./research/Parameter_Oikos_Matrix.md)** - Matrix view + design recipes
+- **[Parametrics Paper Draft](./research/parametrics_paper_draft.md)** - Academic paper (WIP)
+- **[Ökosemiotik Labor V5](./research/OekosemiotikLaborV5.md)** - Laboratory concepts
+
+---
 
 ### Experiments
 - **[Experimental Section Index](./experiments/Experimentelle_Sektion_Index.md)** - Overview of experiments
 - **[Decay Rate Variation Experiment](./experiments/Experiment_Decay_Rate_Variation.md)** - Parameter variation study
 - **[Experiment Template](./experiments/Template_Parameter_Experiment.md)** - Template for new experiments
+
+**See also**: [Experimental-Methodology-Map](./zettelkasten/meta/map-experimental-methodology.md) for systematic workflows
+
+---
 
 ### Scientific Models
 See [User Guide - Model Oikos](./guides/user-guide.md#-model-oikos) for detailed information on:
@@ -159,6 +191,20 @@ Outdated or superseded documentation (kept for historical reference):
 docs/
 ├── README.md (this file)              # Documentation index
 │
+├── zettelkasten/ ⭐⭐⭐                  # PRIMARY KNOWLEDGE BASE
+│   ├── README.md                      # Zettelkasten index
+│   ├── concepts/                      # 5 core theoretical concepts
+│   ├── parameters/                    # 15 atomic parameter notes
+│   ├── properties/                    # 8 emergent property notes
+│   ├── methods/                       # 4 experimental methodologies
+│   ├── experiments/                   # 4 experiment class patterns
+│   ├── metrics/                       # 4 metrics (2 implemented, 2 planned)
+│   ├── components/                    # 8 system architecture components
+│   └── meta/                          # 3 MOCs (Maps of Content)
+│       ├── map-parameter-effects.md       ⭐⭐⭐
+│       ├── map-experimental-methodology.md ⭐⭐
+│       └── map-theoretical-framework.md   ⭐⭐
+│
 ├── guides/                             # User guides
 │   ├── user-guide.md                  # Complete user guide
 │   └── ecosystem-guide.md             # Multi-species ecosystem guide
@@ -168,11 +214,11 @@ docs/
 │   ├── ARCHITECTURE.md                # Architecture details
 │   └── DEPLOYMENT.md                  # Deployment guide
 │
-├── research/                           # Scientific papers and theory
-│   ├── parametrics_paper_draft.md    # Theoretical framework
-│   ├── Von_Stigmergie_zu_Oekosemiotik.md
-│   ├── Parameter_Oikos_Matrix.md
-│   └── OekosemiotikLaborV5.md
+├── research/                           # Scientific papers and theory (narratives)
+│   ├── Von_Stigmergie_zu_Oekosemiotik.md  # Theoretical foundation
+│   ├── Parameter_Oikos_Matrix.md          # Matrix view + design recipes
+│   ├── parametrics_paper_draft.md         # Academic paper (WIP)
+│   └── OekosemiotikLaborV5.md             # Laboratory concepts
 │
 ├── experiments/                        # Experimental protocols
 │   ├── Experimentelle_Sektion_Index.md
@@ -211,6 +257,6 @@ docs/
 
 ---
 
-**Last updated:** 2025-11-18
-**Documentation version:** 1.1
+**Last updated:** 2025-11-20
+**Documentation version:** 1.2 (Zettelkasten integration)
 **Project license:** AGPL-3.0-or-later
