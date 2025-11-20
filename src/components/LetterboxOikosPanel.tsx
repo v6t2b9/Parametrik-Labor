@@ -1,12 +1,13 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { letterboxPresets } from '../presets/tabPresets';
+import type { LetterboxParams } from '../types/index';
 
 export function LetterboxOikosPanel() {
   const letterbox = useSimulationStore((state) => state.parameters.letterbox);
   const updateLetterboxParams = useSimulationStore((state) => state.updateLetterboxParams);
 
-  const loadPreset = (presetLetterbox: typeof letterbox) => {
+  const loadPreset = (presetLetterbox: Partial<LetterboxParams>) => {
     updateLetterboxParams(presetLetterbox);
   };
 
