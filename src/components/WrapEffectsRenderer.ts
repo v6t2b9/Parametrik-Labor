@@ -24,7 +24,6 @@ const MAX_PARTICLES = 10000;
 
 export class WrapEffectsRenderer {
   private particles: Particle[] = [];
-  private frameCount: number = 0;
 
   /**
    * Spawn particles from a wrap event
@@ -208,8 +207,6 @@ export class WrapEffectsRenderer {
     if (!params.enabled) {
       return;
     }
-
-    this.frameCount = currentFrame;
 
     // Spawn new particles from recent wrap events
     for (const event of wrapEvents) {
