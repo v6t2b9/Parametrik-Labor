@@ -1,3 +1,5 @@
+import { colors, spacing, typography, effects } from '../design-system';
+
 interface ParameterSliderProps {
   label: string;
   value: number;
@@ -28,7 +30,7 @@ export function ParameterSlider({
           <label style={{ ...styles.label, ...(disabled ? styles.labelDisabled : {}) }}>{label}</label>
           {hasOverride && (
             <span style={styles.overrideBadge} title="Species-specific override active">
-              ⚡
+              ●
             </span>
           )}
         </div>
@@ -51,49 +53,50 @@ export function ParameterSlider({
 
 const styles = {
   container: {
-    marginBottom: '20px',
+    marginBottom: spacing.xl,
   } as React.CSSProperties,
   labelRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '8px',
+    marginBottom: spacing.sm,
   } as React.CSSProperties,
   labelGroup: {
     display: 'flex',
     alignItems: 'center',
-    gap: '6px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   label: {
-    fontSize: '13px',
-    color: '#e0e0e0',
+    ...typography.body,
+    color: colors.text.primary,
     fontWeight: 600,
   } as React.CSSProperties,
   overrideBadge: {
-    fontSize: '12px',
+    ...typography.caption,
+    color: colors.accent.primary,
     opacity: 0.7,
   } as React.CSSProperties,
   value: {
-    fontSize: '13px',
-    color: '#7d5dbd',
+    ...typography.body,
+    color: colors.accent.primary,
     fontFamily: 'monospace',
     fontWeight: 600,
   } as React.CSSProperties,
   slider: {
     width: '100%',
     height: '8px',
-    borderRadius: '4px',
+    borderRadius: effects.borderRadius.sm,
     outline: 'none',
-    background: '#2a2b3a',
+    background: colors.border.primary,
     cursor: 'pointer',
     WebkitAppearance: 'none',
     appearance: 'none',
-    transition: 'background 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   description: {
-    fontSize: '11px',
-    color: '#7d7d8d',
-    marginTop: '6px',
+    ...typography.caption,
+    color: colors.text.muted,
+    marginTop: spacing.sm,
     lineHeight: '1.5',
   } as React.CSSProperties,
   containerDisabled: {

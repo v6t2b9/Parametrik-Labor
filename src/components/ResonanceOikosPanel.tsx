@@ -1,6 +1,7 @@
 import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { AgentType } from '../types';
+import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function ResonanceOikosPanel() {
   const { parameters, updateResonanceParams, ui } = useSimulationStore();
@@ -17,13 +18,13 @@ export function ResonanceOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>🔗 Resonance Oikos</h3>
+      <h3 style={styles.title}>Resonance Oikos</h3>
       <p style={styles.subtitle}>Inter-system relations and cross-species dynamics</p>
 
       {/* Universal Baseline Section - Only show in universal scope */}
       {ui.activeSpeciesScope === 'universal' && (
         <div style={styles.section}>
-          <h4 style={styles.sectionTitle}>🌍 Universal Baseline Settings</h4>
+          <h4 style={styles.sectionTitle}>Universal Baseline Settings</h4>
           <p style={styles.sectionDescription}>
             Base attraction/repulsion values applied to all species interactions
           </p>
@@ -73,7 +74,7 @@ export function ResonanceOikosPanel() {
       {/* Species-Specific Interaction Controls - Only show for specific species */}
       {ui.activeSpeciesScope === 'red' && (
         <div style={styles.matrixSection}>
-          <h4 style={styles.sectionTitle}>🔴 Red Species Interactions</h4>
+          <h4 style={styles.sectionTitle}>Red Species Interactions</h4>
           <p style={styles.sectionDescription}>
             How red agents respond to different species' pheromone trails
             <br />
@@ -119,7 +120,7 @@ export function ResonanceOikosPanel() {
 
           <div style={styles.infoBox}>
             <p style={styles.infoText}>
-              💡 <strong>Interaction Examples:</strong>
+              <strong>Interaction Examples:</strong>
               <br />
               • Set Red→Green to +1.5 for attraction to green trails (symbiosis)
               <br />
@@ -133,7 +134,7 @@ export function ResonanceOikosPanel() {
 
       {ui.activeSpeciesScope === 'green' && (
         <div style={styles.matrixSection}>
-          <h4 style={styles.sectionTitle}>🟢 Green Species Interactions</h4>
+          <h4 style={styles.sectionTitle}>Green Species Interactions</h4>
           <p style={styles.sectionDescription}>
             How green agents respond to different species' pheromone trails
             <br />
@@ -179,7 +180,7 @@ export function ResonanceOikosPanel() {
 
           <div style={styles.infoBox}>
             <p style={styles.infoText}>
-              💡 <strong>Interaction Examples:</strong>
+              <strong>Interaction Examples:</strong>
               <br />
               • Set Green→Red to +1.5 for attraction to red trails (symbiosis)
               <br />
@@ -193,7 +194,7 @@ export function ResonanceOikosPanel() {
 
       {ui.activeSpeciesScope === 'blue' && (
         <div style={styles.matrixSection}>
-          <h4 style={styles.sectionTitle}>🔵 Blue Species Interactions</h4>
+          <h4 style={styles.sectionTitle}>Blue Species Interactions</h4>
           <p style={styles.sectionDescription}>
             How blue agents respond to different species' pheromone trails
             <br />
@@ -239,7 +240,7 @@ export function ResonanceOikosPanel() {
 
           <div style={styles.infoBox}>
             <p style={styles.infoText}>
-              💡 <strong>Interaction Examples:</strong>
+              <strong>Interaction Examples:</strong>
               <br />
               • Set Blue→Red to +1.5 for attraction to red trails (symbiosis)
               <br />
@@ -256,79 +257,74 @@ export function ResonanceOikosPanel() {
 
 const styles = {
   panel: {
-    padding: '16px',
-    backgroundColor: '#13141f',
-    borderRadius: '6px',
-    border: '1px solid #2a2b3a',
+    padding: spacing.lg,
+    backgroundColor: colors.bg.secondary,
+    borderRadius: effects.borderRadius.md,
+    border: `1px solid ${colors.border.primary}`,
     maxHeight: '80vh',
     overflowY: 'auto',
   } as React.CSSProperties,
   title: {
-    fontSize: '16px',
-    color: '#e0e0e0',
-    marginBottom: '4px',
-    fontWeight: 600,
+    ...createHeaderStyle('h2'),
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
   subtitle: {
-    fontSize: '11px',
-    color: '#a0a0b0',
-    marginBottom: '16px',
+    ...createSubtitleStyle(),
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
   section: {
-    marginBottom: '16px',
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
   sectionTitle: {
-    fontSize: '14px',
-    color: '#9d7dd4',
-    marginBottom: '6px',
-    fontWeight: 600,
+    ...createHeaderStyle('h3'),
+    color: colors.accent.light,
+    marginBottom: spacing.sm,
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   } as React.CSSProperties,
   sectionDescription: {
-    fontSize: '11px',
-    color: '#7d7d8d',
-    marginBottom: '12px',
+    ...typography.caption,
+    color: colors.text.muted,
+    marginBottom: spacing.md,
     lineHeight: '1.4',
   } as React.CSSProperties,
   divider: {
     height: '1px',
-    backgroundColor: '#2a2b3a',
-    margin: '20px 0',
+    backgroundColor: colors.border.primary,
+    margin: `${spacing.xl} 0`,
   } as React.CSSProperties,
   matrixSection: {
-    marginTop: '20px',
+    marginTop: spacing.xl,
   } as React.CSSProperties,
   speciesBlock: {
-    marginBottom: '24px',
-    padding: '16px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '8px',
-    border: '1px solid #2a2b3a',
+    marginBottom: spacing.xxl,
+    padding: spacing.lg,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   speciesTitle: {
-    fontSize: '13px',
-    color: '#e0e0e0',
-    marginBottom: '12px',
-    fontWeight: 600,
-    margin: '0 0 12px 0',
+    ...typography.h3,
+    color: colors.text.primary,
+    marginBottom: spacing.md,
+    margin: `0 0 ${spacing.md} 0`,
   } as React.CSSProperties,
   checkboxContainer: {
-    marginTop: '16px',
-    padding: '12px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '6px',
+    marginTop: spacing.lg,
+    padding: spacing.md,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
   } as React.CSSProperties,
   checkboxLabel: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '14px',
-    color: '#e0e0e0',
+    gap: spacing.sm,
+    fontSize: typography.h3.fontSize,
+    color: colors.text.primary,
     cursor: 'pointer',
   } as React.CSSProperties,
   checkbox: {
-    marginRight: '4px',
+    marginRight: spacing.xs,
     cursor: 'pointer',
     width: '18px',
     height: '18px',
@@ -336,25 +332,25 @@ const styles = {
   overrideBadge: {
     fontSize: '12px',
     opacity: 0.7,
-    marginLeft: '4px',
+    marginLeft: spacing.xs,
   } as React.CSSProperties,
   checkboxDesc: {
-    fontSize: '11px',
-    color: '#6a6a7a',
-    marginTop: '6px',
+    ...typography.caption,
+    color: colors.text.tertiary,
+    marginTop: spacing.sm,
     marginLeft: '26px',
     lineHeight: '1.4',
   } as React.CSSProperties,
   infoBox: {
-    padding: '12px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '6px',
+    padding: spacing.md,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
     border: '1px solid #3d2d5d',
-    marginTop: '16px',
+    marginTop: spacing.lg,
   } as React.CSSProperties,
   infoText: {
-    fontSize: '11px',
-    color: '#a0a0b0',
+    ...typography.caption,
+    color: colors.text.secondary,
     lineHeight: '1.6',
     margin: 0,
   } as React.CSSProperties,

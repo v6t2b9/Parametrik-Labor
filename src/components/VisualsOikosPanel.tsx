@@ -2,6 +2,7 @@ import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { ColorPicker } from './ColorPicker';
 import { visualPresets, effectsPresets } from '../presets/tabPresets';
+import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function VisualsOikosPanel() {
   const { parameters, updateVisualizationParams, updateEffectsParams } = useSimulationStore();
@@ -9,14 +10,14 @@ export function VisualsOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>🎨 Visuals & Effects</h3>
+      <h3 style={styles.title}>Visuals & Effects</h3>
       <p style={styles.subtitle}>
         Complete visual control - from colors to post-processing effects
       </p>
 
       {/* Visual Presets Section */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>📦 Visual Presets</h4>
+        <h4 style={styles.sectionTitle}>Visual Presets</h4>
         <p style={styles.sectionDescription}>
           Pre-configured color schemes with matching blend modes and trail settings
         </p>
@@ -39,7 +40,7 @@ export function VisualsOikosPanel() {
 
       {/* Effect Presets Section */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>📦 Effect Presets</h4>
+        <h4 style={styles.sectionTitle}>Effect Presets</h4>
         <p style={styles.sectionDescription}>
           Pre-configured post-processing combinations for different moods
         </p>
@@ -62,10 +63,10 @@ export function VisualsOikosPanel() {
 
       {/* Visual Parameters */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>🎨 Visual Parameters</h4>
+        <h4 style={styles.sectionTitle}>Visual Parameters</h4>
 
         <ParameterSlider
-          label="✨ Brightness"
+          label="Brightness"
           value={visualization.brightness}
           min={0.5}
           max={5.0}
@@ -75,7 +76,7 @@ export function VisualsOikosPanel() {
         />
 
         <ParameterSlider
-          label="🌫️ Trail Intensity"
+          label="Trail Intensity"
           value={visualization.trailIntensity}
           min={80}
           max={280}
@@ -86,16 +87,16 @@ export function VisualsOikosPanel() {
 
         {/* Blend Mode Section */}
         <div style={styles.blendModeSection}>
-          <label style={styles.paramLabel}>🎭 Blend Mode</label>
+          <label style={styles.paramLabel}>Blend Mode</label>
           <p style={styles.paramDescription}>
             How the three species colors are mixed together
           </p>
           <div style={styles.blendModeGrid}>
             {[
-              { mode: 'additive' as const, label: '✨ Additive', desc: 'Bright luminous mix, auto-normalized on overlap' },
-              { mode: 'average' as const, label: '🎨 Average', desc: 'Soft balanced mix without oversaturation' },
-              { mode: 'multiply' as const, label: '🌓 Multiply', desc: 'Darker mix with high contrast' },
-              { mode: 'screen' as const, label: '🌟 Screen', desc: 'Bright soft combination for organic flows' },
+              { mode: 'additive' as const, label: 'Additive', desc: 'Bright luminous mix, auto-normalized on overlap' },
+              { mode: 'average' as const, label: 'Average', desc: 'Soft balanced mix without oversaturation' },
+              { mode: 'multiply' as const, label: 'Multiply', desc: 'Darker mix with high contrast' },
+              { mode: 'screen' as const, label: 'Screen', desc: 'Bright soft combination for organic flows' },
             ].map((item) => (
               <button
                 key={item.mode}
@@ -115,7 +116,7 @@ export function VisualsOikosPanel() {
 
         {/* Lab Mode / Lavalamp Mode Toggle */}
         <div style={styles.labModeSection}>
-          <label style={styles.paramLabel}>🔬 Visualization Mode</label>
+          <label style={styles.paramLabel}>Visualization Mode</label>
           <p style={styles.paramDescription}>
             Switch between pure lavalamp aesthetics and scientific agent view
           </p>
@@ -129,7 +130,7 @@ export function VisualsOikosPanel() {
               }}
               title="Pure trail visualization - meditative lavalamp experience"
             >
-              🌈 Lavalamp Mode
+              Lavalamp Mode
             </button>
             <button
               onClick={() => updateVisualizationParams({ showAgents: true })}
@@ -140,7 +141,7 @@ export function VisualsOikosPanel() {
               }}
               title="Show agent markers - scientific analysis mode"
             >
-              🔬 Lab Mode
+              Lab Mode
             </button>
           </div>
 
@@ -161,7 +162,7 @@ export function VisualsOikosPanel() {
                   }}
                   title="Simple circular dots"
                 >
-                  ⚫ Dots
+                  Dots
                 </button>
                 <button
                   onClick={() => updateVisualizationParams({ useTriangles: true })}
@@ -172,7 +173,7 @@ export function VisualsOikosPanel() {
                   }}
                   title="Directional triangles showing movement orientation"
                 >
-                  🔺 Triangles
+                  Triangles
                 </button>
               </div>
             </div>
@@ -184,7 +185,7 @@ export function VisualsOikosPanel() {
 
       {/* Post-Processing Effects */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>✨ Post-Processing Effects</h4>
+        <h4 style={styles.sectionTitle}>Post-Processing Effects</h4>
 
         {/* Blur & Glow */}
         <div style={styles.subsection}>
@@ -320,31 +321,31 @@ export function VisualsOikosPanel() {
 
       {/* Color Channels - Interactive Pickers */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>🎨 Color Channels</h4>
+        <h4 style={styles.sectionTitle}>Color Channels</h4>
         <p style={styles.sectionDescription}>
           Customize the colors for each species and background (visual only, doesn't affect simulation)
         </p>
         <div style={styles.colorGrid}>
           <ColorPicker
-            label="🔴 Red Species"
+            label="Red Species"
             color={visualization.colorRed}
             onChange={(color) => updateVisualizationParams({ colorRed: color })}
           />
 
           <ColorPicker
-            label="🟢 Green Species"
+            label="Green Species"
             color={visualization.colorGreen}
             onChange={(color) => updateVisualizationParams({ colorGreen: color })}
           />
 
           <ColorPicker
-            label="🔵 Blue Species"
+            label="Blue Species"
             color={visualization.colorBlue}
             onChange={(color) => updateVisualizationParams({ colorBlue: color })}
           />
 
           <ColorPicker
-            label="⬛ Background"
+            label="Background"
             color={visualization.colorBg}
             onChange={(color) => updateVisualizationParams({ colorBg: color })}
           />
@@ -355,7 +356,7 @@ export function VisualsOikosPanel() {
 
       {/* Hue Cycling Section */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>🌈 Hue Cycling</h4>
+        <h4 style={styles.sectionTitle}>Hue Cycling</h4>
         <p style={styles.sectionDescription}>
           Automatic color transitions for flowing animations. Enable cycling and configure the hue range and speed.
         </p>
@@ -379,7 +380,7 @@ export function VisualsOikosPanel() {
         {visualization.hueCycling.enabled && (
           <div style={styles.hueCyclingControls}>
             <ParameterSlider
-              label="🎨 Start Hue"
+              label="Start Hue"
               value={visualization.hueCycling.startHue}
               min={0}
               max={360}
@@ -391,7 +392,7 @@ export function VisualsOikosPanel() {
             />
 
             <ParameterSlider
-              label="🎨 End Hue"
+              label="End Hue"
               value={visualization.hueCycling.endHue}
               min={0}
               max={360}
@@ -403,7 +404,7 @@ export function VisualsOikosPanel() {
             />
 
             <ParameterSlider
-              label="⚡ Cycle Speed"
+              label="Cycle Speed"
               value={visualization.hueCycling.speed}
               min={0.1}
               max={10.0}
@@ -416,7 +417,7 @@ export function VisualsOikosPanel() {
 
             <div style={styles.infoBox}>
               <p style={styles.infoText}>
-                💡 <strong>Hue Wheel Reference:</strong> The hue value oscillates between start and end points.
+                <strong>Hue Wheel Reference:</strong> The hue value oscillates between start and end points.
                 <br/>
                 • <strong>0° = Red</strong>, 60° = Yellow, 120° = Green, 180° = Cyan, 240° = Blue, 300° = Magenta, 360° = Red
                 <br/>
@@ -431,7 +432,7 @@ export function VisualsOikosPanel() {
 
       {/* Tips */}
       <div style={styles.infoBox}>
-        <h5 style={styles.infoTitle}>💡 Pro Tips</h5>
+        <h5 style={styles.infoTitle}>Pro Tips</h5>
         <ul style={styles.infoList}>
           <li><strong>Additive</strong> + low Trail Intensity = crisp glowing structures</li>
           <li><strong>Average</strong> + high Brightness = saturated colors without white-out</li>
@@ -447,67 +448,66 @@ export function VisualsOikosPanel() {
 
 const styles = {
   panel: {
-    padding: '20px',
-    backgroundColor: '#13141f',
-    borderRadius: '8px',
-    border: '1px solid #2a2b3a',
+    padding: spacing.xl,
+    backgroundColor: colors.bg.secondary,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   title: {
+    ...createHeaderStyle('h2'),
     fontSize: '18px',
-    color: '#e0e0e0',
-    marginBottom: '4px',
-    fontWeight: 600,
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
   subtitle: {
+    ...createSubtitleStyle(),
     fontSize: '12px',
-    color: '#a0a0b0',
-    marginBottom: '24px',
+    marginBottom: spacing.xxl,
   } as React.CSSProperties,
   section: {
-    marginBottom: '24px',
+    marginBottom: spacing.xxl,
   } as React.CSSProperties,
   sectionTitle: {
     fontSize: '15px',
-    color: '#9d7dd4',
-    marginBottom: '8px',
+    color: colors.accent.light,
+    marginBottom: spacing.sm,
     fontWeight: 600,
   } as React.CSSProperties,
   sectionDescription: {
-    fontSize: '11px',
-    color: '#7d7d8d',
-    marginBottom: '12px',
+    ...typography.caption,
+    color: colors.text.muted,
+    marginBottom: spacing.md,
     lineHeight: '1.4',
   } as React.CSSProperties,
   subsection: {
-    marginTop: '20px',
+    marginTop: spacing.xl,
   } as React.CSSProperties,
   subsectionTitle: {
-    fontSize: '13px',
-    color: '#b0b0c0',
-    marginBottom: '12px',
+    ...typography.h3,
+    color: colors.text.secondary,
+    marginBottom: spacing.md,
     fontWeight: 600,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   presetButton: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     padding: '10px 8px',
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '6px',
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
     cursor: 'pointer',
-    transition: 'all 0.2s',
-    fontSize: '11px',
-    color: '#e0e0e0',
+    transition: effects.transition.normal,
+    ...typography.caption,
+    color: colors.text.primary,
   } as React.CSSProperties,
   presetIcon: {
     fontSize: '24px',
-    marginBottom: '4px',
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
   presetName: {
     fontSize: '9px',
@@ -516,115 +516,115 @@ const styles = {
   } as React.CSSProperties,
   divider: {
     height: '1px',
-    backgroundColor: '#2a2b3a',
-    margin: '24px 0',
+    backgroundColor: colors.border.primary,
+    margin: `${spacing.xxl} 0`,
   } as React.CSSProperties,
   paramLabel: {
-    fontSize: '14px',
-    color: '#e0e0e0',
+    ...typography.h3,
+    color: colors.text.primary,
     fontWeight: 500,
-    marginBottom: '6px',
+    marginBottom: spacing.sm,
     display: 'block',
   } as React.CSSProperties,
   paramDescription: {
-    fontSize: '11px',
-    color: '#7d7d8d',
-    marginBottom: '12px',
+    ...typography.caption,
+    color: colors.text.muted,
+    marginBottom: spacing.md,
     lineHeight: '1.3',
   } as React.CSSProperties,
   blendModeSection: {
-    marginTop: '20px',
+    marginTop: spacing.xl,
   } as React.CSSProperties,
   blendModeGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   blendModeButton: {
-    padding: '12px',
+    padding: spacing.md,
     border: '2px solid',
-    borderRadius: '8px',
+    borderRadius: effects.borderRadius.lg,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     fontWeight: 600,
     fontSize: '12px',
   } as React.CSSProperties,
   blendModeLabel: {
     display: 'block',
     textAlign: 'center',
-    color: '#e0e0e0',
+    color: colors.text.primary,
   } as React.CSSProperties,
   labModeSection: {
-    marginTop: '20px',
+    marginTop: spacing.xl,
   } as React.CSSProperties,
   toggleGroup: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   toggleButton: {
-    padding: '12px',
+    padding: spacing.md,
     border: '2px solid',
-    borderRadius: '8px',
+    borderRadius: effects.borderRadius.lg,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     fontWeight: 600,
     fontSize: '12px',
-    color: '#e0e0e0',
+    color: colors.text.primary,
   } as React.CSSProperties,
   colorGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '12px',
-    marginTop: '12px',
+    gap: spacing.md,
+    marginTop: spacing.md,
   } as React.CSSProperties,
   toggleContainer: {
-    marginBottom: '16px',
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
   toggleLabel: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '13px',
-    color: '#e0e0e0',
+    gap: spacing.sm,
+    ...typography.h3,
+    color: colors.text.primary,
     cursor: 'pointer',
   } as React.CSSProperties,
   checkbox: {
     width: '18px',
     height: '18px',
     cursor: 'pointer',
-    accentColor: '#7d5dbd',
+    accentColor: colors.accent.primary,
   } as React.CSSProperties,
   hueCyclingControls: {
-    marginTop: '16px',
-    padding: '16px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '6px',
+    marginTop: spacing.lg,
+    padding: spacing.lg,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
     border: '1px solid #3d2d5d',
   } as React.CSSProperties,
   infoBox: {
-    padding: '16px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '6px',
+    padding: spacing.lg,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
     border: '1px solid #3d2d5d',
-    marginTop: '24px',
+    marginTop: spacing.xxl,
   } as React.CSSProperties,
   infoTitle: {
-    fontSize: '13px',
-    color: '#9d7dd4',
-    marginBottom: '12px',
+    ...typography.h3,
+    color: colors.accent.light,
+    marginBottom: spacing.md,
     fontWeight: 600,
-    margin: '0 0 12px 0',
+    margin: `0 0 ${spacing.md} 0`,
   } as React.CSSProperties,
   infoText: {
-    fontSize: '11px',
-    color: '#a0a0b0',
+    ...typography.caption,
+    color: colors.text.secondary,
     lineHeight: '1.6',
     margin: 0,
   } as React.CSSProperties,
   infoList: {
-    fontSize: '11px',
-    color: '#a0a0b0',
+    ...typography.caption,
+    color: colors.text.secondary,
     lineHeight: '1.7',
     margin: 0,
     paddingLeft: '20px',

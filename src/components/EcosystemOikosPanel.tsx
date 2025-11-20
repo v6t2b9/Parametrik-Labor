@@ -6,6 +6,7 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { EcologyConfig } from '../types/ecosystem';
+import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function EcosystemOikosPanel() {
   const { parameters, setParameters } = useSimulationStore();
@@ -30,39 +31,14 @@ export function EcosystemOikosPanel() {
 
   if (!ecosystem) {
     return (
-      <div
-        style={{
-          padding: '20px',
-          backgroundColor: '#1a1a1a',
-          color: '#e0e0e0',
-        }}
-      >
-        <h2
-          style={{
-            fontSize: '20px',
-            fontWeight: 'bold',
-            marginBottom: '15px',
-            color: '#4fc3f7',
-          }}
-        >
-          🌿 Ecosystem Oikos
+      <div style={styles.panel}>
+        <h2 style={styles.title}>
+          Ecosystem Oikos
         </h2>
-        <p style={{ color: '#b0b0b0', marginBottom: '20px' }}>
+        <p style={styles.text}>
           Ecosystem configuration not initialized. Enable ecosystem mode to configure.
         </p>
-        <button
-          onClick={handleToggleEcosystem}
-          style={{
-            padding: '12px 24px',
-            backgroundColor: '#4fc3f7',
-            color: '#000',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '14px',
-          }}
-        >
+        <button onClick={handleToggleEcosystem} style={styles.enableButton}>
           Enable Ecosystem Mode
         </button>
       </div>
@@ -70,64 +46,30 @@ export function EcosystemOikosPanel() {
   }
 
   return (
-    <div
-      style={{
-        padding: '20px',
-        backgroundColor: '#1a1a1a',
-        color: '#e0e0e0',
-        maxHeight: '80vh',
-        overflowY: 'auto',
-      }}
-    >
-      <h2
-        style={{
-          fontSize: '20px',
-          fontWeight: 'bold',
-          marginBottom: '15px',
-          color: '#4fc3f7',
-        }}
-      >
-        🌿 Ecosystem Oikos
+    <div style={styles.panel}>
+      <h2 style={styles.title}>
+        Ecosystem Oikos
       </h2>
 
-      <p
-        style={{
-          fontSize: '14px',
-          marginBottom: '20px',
-          color: '#b0b0b0',
-          lineHeight: '1.6',
-        }}
-      >
+      <p style={styles.subtitle}>
         Multi-species ecosystem with crystal consumption and energy metabolism
       </p>
 
       {/* Ecosystem Mode Toggle */}
-      <div style={{ marginBottom: '30px' }}>
+      <div style={{ marginBottom: spacing.xxxl }}>
         <button
           onClick={handleToggleEcosystem}
           style={{
-            padding: '12px 24px',
-            backgroundColor: ecosystemMode ? '#66bb6a' : '#424242',
-            color: ecosystemMode ? '#000' : '#e0e0e0',
-            border: ecosystemMode ? '2px solid #66bb6a' : '1px solid #666',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '14px',
-            width: '100%',
+            ...styles.toggleButton,
+            backgroundColor: ecosystemMode ? '#66bb6a' : colors.bg.tertiary,
+            color: ecosystemMode ? '#000' : colors.text.primary,
+            border: ecosystemMode ? '2px solid #66bb6a' : `1px solid ${colors.border.primary}`,
           }}
         >
-          {ecosystemMode ? '✓ Ecosystem Mode Active' : 'Enable Ecosystem Mode'}
+          {ecosystemMode ? 'Ecosystem Mode Active' : 'Enable Ecosystem Mode'}
         </button>
         {ecosystemMode && (
-          <p
-            style={{
-              fontSize: '12px',
-              color: '#888',
-              marginTop: '8px',
-              fontStyle: 'italic',
-            }}
-          >
+          <p style={styles.activeNote}>
             Agents now consume crystals for energy and reproduce
           </p>
         )}
@@ -135,15 +77,8 @@ export function EcosystemOikosPanel() {
 
       {/* Crystal Settings */}
       <div style={{ marginBottom: '25px' }}>
-        <h3
-          style={{
-            fontSize: '16px',
-            fontWeight: 'bold',
-            marginBottom: '12px',
-            color: '#90caf9',
-          }}
-        >
-          💎 Crystal Settings
+        <h3 style={styles.sectionTitle}>
+          Crystal Settings
         </h3>
 
         <ParameterSlider
@@ -183,15 +118,8 @@ export function EcosystemOikosPanel() {
 
       {/* Population Settings */}
       <div style={{ marginBottom: '25px' }}>
-        <h3
-          style={{
-            fontSize: '16px',
-            fontWeight: 'bold',
-            marginBottom: '12px',
-            color: '#90caf9',
-          }}
-        >
-          👥 Population Settings
+        <h3 style={styles.sectionTitle}>
+          Population Settings
         </h3>
 
         <ParameterSlider
@@ -211,40 +139,24 @@ export function EcosystemOikosPanel() {
           description="Maximum total number of agents across all species"
         />
 
-        <div
-          style={{
-            marginTop: '12px',
-            padding: '12px',
-            backgroundColor: '#252525',
-            borderRadius: '6px',
-            fontSize: '12px',
-            color: '#aaa',
-          }}
-        >
+        <div style={styles.infoBox}>
           <div style={{ marginBottom: '6px', fontWeight: 'bold' }}>
             Initial Population:
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
-            <div>🔨 Builder: {ecosystem.population.initialPopulation.builder}</div>
-            <div>🌾 Harvester: {ecosystem.population.initialPopulation.harvester}</div>
-            <div>🦁 Consumer: {ecosystem.population.initialPopulation.consumer}</div>
-            <div>🍄 Decomposer: {ecosystem.population.initialPopulation.decomposer}</div>
-            <div>🔭 Scout: {ecosystem.population.initialPopulation.scout}</div>
+            <div>Builder: {ecosystem.population.initialPopulation.builder}</div>
+            <div>Harvester: {ecosystem.population.initialPopulation.harvester}</div>
+            <div>Consumer: {ecosystem.population.initialPopulation.consumer}</div>
+            <div>Decomposer: {ecosystem.population.initialPopulation.decomposer}</div>
+            <div>Scout: {ecosystem.population.initialPopulation.scout}</div>
           </div>
         </div>
       </div>
 
       {/* Audio-Ecology Mapping */}
       <div style={{ marginBottom: '25px' }}>
-        <h3
-          style={{
-            fontSize: '16px',
-            fontWeight: 'bold',
-            marginBottom: '12px',
-            color: '#90caf9',
-          }}
-        >
-          🎵 Audio-Ecology Mapping
+        <h3 style={styles.sectionTitle}>
+          Audio-Ecology Mapping
         </h3>
 
         <ParameterSlider
@@ -264,32 +176,23 @@ export function EcosystemOikosPanel() {
           description="How strongly audio features influence species activity"
         />
 
-        <div
-          style={{
-            marginTop: '12px',
-            padding: '12px',
-            backgroundColor: '#252525',
-            borderRadius: '6px',
-            fontSize: '12px',
-            color: '#aaa',
-          }}
-        >
+        <div style={styles.infoBox}>
           <div style={{ marginBottom: '6px', fontWeight: 'bold' }}>
             Audio Feature → Species Mapping:
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <div>
-              🎸 <strong>Bass</strong> → {ecosystem.audioEcology.bassBoosts.join(', ')}
+              <strong>Bass</strong> → {ecosystem.audioEcology.bassBoosts.join(', ')}
             </div>
             <div>
-              🎹 <strong>Mids</strong> → {ecosystem.audioEcology.midBoosts.join(', ')}
+              <strong>Mids</strong> → {ecosystem.audioEcology.midBoosts.join(', ')}
             </div>
             <div>
-              🎺 <strong>Highs</strong> →{' '}
+              <strong>Highs</strong> →{' '}
               {ecosystem.audioEcology.highBoosts.join(', ')}
             </div>
             <div>
-              🥁 <strong>Beats</strong> →{' '}
+              <strong>Beats</strong> →{' '}
               {ecosystem.audioEcology.transientBoosts.join(', ')}
             </div>
           </div>
@@ -297,35 +200,101 @@ export function EcosystemOikosPanel() {
       </div>
 
       {/* Species Info */}
-      <div
-        style={{
-          padding: '12px',
-          backgroundColor: '#252525',
-          borderRadius: '6px',
-          border: '1px solid #333',
-        }}
-      >
-        <div style={{ marginBottom: '8px', fontWeight: 'bold', fontSize: '14px' }}>
+      <div style={styles.speciesBox}>
+        <div style={{ marginBottom: spacing.sm, fontWeight: 'bold', ...typography.h3 }}>
           Species Roles:
         </div>
-        <div style={{ fontSize: '11px', color: '#888', lineHeight: '1.6' }}>
+        <div style={styles.speciesText}>
           <div style={{ marginBottom: '4px' }}>
-            <strong style={{ color: 'rgb(255, 150, 50)' }}>🔨 Builder:</strong> Creates structures (eats food → builds)
+            <strong style={{ color: 'rgb(255, 150, 50)' }}>Builder:</strong> Creates structures (eats food → builds)
           </div>
           <div style={{ marginBottom: '4px' }}>
-            <strong style={{ color: 'rgb(100, 255, 150)' }}>🌾 Harvester:</strong> Converts resources (eats build → food)
+            <strong style={{ color: 'rgb(100, 255, 150)' }}>Harvester:</strong> Converts resources (eats build → food)
           </div>
           <div style={{ marginBottom: '4px' }}>
-            <strong style={{ color: 'rgb(255, 100, 255)' }}>🦁 Consumer:</strong> Hunts food (eats food → marks territory)
+            <strong style={{ color: 'rgb(255, 100, 255)' }}>Consumer:</strong> Hunts food (eats food → marks territory)
           </div>
           <div style={{ marginBottom: '4px' }}>
-            <strong style={{ color: 'rgb(150, 100, 200)' }}>🍄 Decomposer:</strong> Recycles all (eats all → explores)
+            <strong style={{ color: 'rgb(150, 100, 200)' }}>Decomposer:</strong> Recycles all (eats all → explores)
           </div>
           <div>
-            <strong style={{ color: 'rgb(100, 200, 255)' }}>🔭 Scout:</strong> Explores territory (fast, marks paths)
+            <strong style={{ color: 'rgb(100, 200, 255)' }}>Scout:</strong> Explores territory (fast, marks paths)
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+const styles = {
+  panel: {
+    padding: spacing.xl,
+    backgroundColor: colors.bg.secondary,
+    color: colors.text.primary,
+    maxHeight: '80vh',
+    overflowY: 'auto',
+  } as React.CSSProperties,
+  title: {
+    ...createHeaderStyle('h1'),
+    marginBottom: spacing.md,
+    color: '#4fc3f7',
+  } as React.CSSProperties,
+  subtitle: {
+    ...createSubtitleStyle(),
+    marginBottom: spacing.xl,
+    color: colors.text.secondary,
+    lineHeight: '1.6',
+  } as React.CSSProperties,
+  text: {
+    color: colors.text.secondary,
+    marginBottom: spacing.xl,
+  } as React.CSSProperties,
+  enableButton: {
+    padding: `${spacing.md} ${spacing.xxl}`,
+    backgroundColor: '#4fc3f7',
+    color: '#000',
+    border: 'none',
+    borderRadius: effects.borderRadius.lg,
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    ...typography.h3,
+  } as React.CSSProperties,
+  toggleButton: {
+    padding: `${spacing.md} ${spacing.xxl}`,
+    borderRadius: effects.borderRadius.lg,
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    ...typography.h3,
+    width: '100%',
+  } as React.CSSProperties,
+  activeNote: {
+    ...typography.caption,
+    color: colors.text.tertiary,
+    marginTop: spacing.sm,
+    fontStyle: 'italic',
+  } as React.CSSProperties,
+  sectionTitle: {
+    ...createHeaderStyle('h2'),
+    marginBottom: spacing.md,
+    color: '#90caf9',
+  } as React.CSSProperties,
+  infoBox: {
+    marginTop: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.bg.tertiary,
+    borderRadius: effects.borderRadius.md,
+    ...typography.caption,
+    color: colors.text.secondary,
+  } as React.CSSProperties,
+  speciesBox: {
+    padding: spacing.md,
+    backgroundColor: colors.bg.tertiary,
+    borderRadius: effects.borderRadius.md,
+    border: `1px solid ${colors.border.primary}`,
+  } as React.CSSProperties,
+  speciesText: {
+    fontSize: '11px',
+    color: colors.text.tertiary,
+    lineHeight: '1.6',
+  } as React.CSSProperties,
+};

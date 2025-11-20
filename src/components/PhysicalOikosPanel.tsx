@@ -2,6 +2,7 @@ import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulation
 import { ParameterSlider } from './ParameterSlider';
 import { physicsPresets } from '../presets/tabPresets';
 import type { AgentType } from '../types';
+import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function PhysicalOikosPanel() {
   const { parameters, updatePhysicalParams, ui } = useSimulationStore();
@@ -20,12 +21,12 @@ export function PhysicalOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>🌊 Physical Oikos</h3>
+      <h3 style={styles.title}>Physical Oikos</h3>
       <p style={styles.subtitle}>Trace materiality and environmental dynamics</p>
 
       {/* Physics Presets Section */}
       <div style={styles.presetSection}>
-        <h4 style={styles.presetTitle}>📦 Physics Presets</h4>
+        <h4 style={styles.presetTitle}>Physics Presets</h4>
         <p style={styles.presetDescription}>Quick configurations for different physical behaviors</p>
         <div style={styles.presetGrid}>
           {physicsPresets.map((preset) => (
@@ -93,67 +94,62 @@ export function PhysicalOikosPanel() {
 
 const styles = {
   panel: {
-    padding: '16px',
-    backgroundColor: '#13141f',
-    borderRadius: '6px',
-    border: '1px solid #2a2b3a',
+    padding: spacing.lg,
+    backgroundColor: colors.bg.secondary,
+    borderRadius: effects.borderRadius.md,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   title: {
-    fontSize: '16px',
-    color: '#e0e0e0',
-    marginBottom: '4px',
-    fontWeight: 600,
+    ...createHeaderStyle('h2'),
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
   subtitle: {
-    fontSize: '11px',
-    color: '#a0a0b0',
-    marginBottom: '16px',
+    ...createSubtitleStyle(),
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
   presetSection: {
-    marginBottom: '16px',
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
   presetTitle: {
-    fontSize: '13px',
-    color: '#e0e0e0',
-    marginBottom: '6px',
-    fontWeight: 600,
+    ...createHeaderStyle('h3'),
+    marginBottom: spacing.sm,
   } as React.CSSProperties,
   presetDescription: {
-    fontSize: '10px',
-    color: '#a0a0b0',
-    marginBottom: '10px',
+    ...typography.caption,
+    color: colors.text.secondary,
+    marginBottom: spacing.md,
     lineHeight: 1.4,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   presetButton: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '10px 8px',
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '6px',
+    padding: `${spacing.sm} ${spacing.sm}`,
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
     cursor: 'pointer',
-    transition: 'all 0.2s',
-    fontSize: '11px',
-    color: '#e0e0e0',
+    transition: effects.transition.normal,
+    ...typography.caption,
+    color: colors.text.primary,
     minHeight: '60px', // Touch-friendly
   } as React.CSSProperties,
   presetIcon: {
     fontSize: '20px',
-    marginBottom: '4px',
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
   presetName: {
-    fontSize: '10px',
+    ...typography.caption,
     textAlign: 'center',
   } as React.CSSProperties,
   divider: {
     height: '1px',
-    backgroundColor: '#2a2b3a',
-    marginBottom: '16px',
+    backgroundColor: colors.border.primary,
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
 };

@@ -1,26 +1,27 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { builtInPresets } from '../presets';
 import { useState, useRef } from 'react';
+import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 // Categorize presets by their pattern formation characteristics
 const presetCategories = {
   organic: {
-    title: '🌊 Organisch & Fließend',
+    title: 'Organisch & Fließend',
     description: 'Weiche, fließende Muster mit organischer Dynamik',
     presets: ['Plasma Dream', 'Aurora Sky', 'Lava Flow'],
   },
   energetic: {
-    title: '🔥 Energetisch & Chaotisch',
+    title: 'Energetisch & Chaotisch',
     description: 'Wilde, energiegeladene Strukturen mit hoher Dynamik',
     presets: ['Neon Jungle', 'Electric Storm'],
   },
   stable: {
-    title: '🏔️ Stabil & Strukturiert',
+    title: 'Stabil & Strukturiert',
     description: 'Präzise, geometrische Muster mit klaren Formen',
     presets: ['Crystal Cave'],
   },
   special: {
-    title: '📺 Spezialeffekte',
+    title: 'Spezialeffekte',
     description: 'Thematische Looks mit speziellen visuellen Effekten',
     presets: ['Digital Rain', 'Retro Arcade'],
   },
@@ -61,7 +62,7 @@ export function PresetGallery() {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h3 style={styles.title}>🎯 Master Preset Gallery</h3>
+        <h3 style={styles.title}>Master Preset Gallery</h3>
         <p style={styles.subtitle}>
           Erkunde die beeindruckende Vielfalt der Musterbildung - jedes Preset zeigt einzigartige emergente Strukturen
         </p>
@@ -70,7 +71,7 @@ export function PresetGallery() {
       {/* Custom Preset Management Section */}
       <div style={styles.customSection}>
         <div style={styles.categoryHeader}>
-          <h4 style={styles.categoryTitle}>💾 Eigene Presets verwalten</h4>
+          <h4 style={styles.categoryTitle}>Eigene Presets verwalten</h4>
           <p style={styles.categoryDescription}>Speichere deine aktuellen Einstellungen oder lade eigene Presets</p>
         </div>
 
@@ -147,7 +148,7 @@ export function PresetGallery() {
       })}
 
       <div style={styles.infoBox}>
-        <h5 style={styles.infoTitle}>💡 About Master Presets</h5>
+        <h5 style={styles.infoTitle}>About Master Presets</h5>
         <p style={styles.infoText}>
           Each preset is a complete system configuration affecting all parameters:
           <strong> Physics, Semiotic Behavior, Temporal Dynamics, Resonance, Visuals,</strong> and <strong>Effects</strong>.
@@ -162,188 +163,177 @@ export function PresetGallery() {
 
 const styles = {
   container: {
-    padding: '20px',
-    backgroundColor: '#13141f',
-    borderRadius: '8px',
-    border: '1px solid #2a2b3a',
+    padding: spacing.xl,
+    backgroundColor: colors.bg.secondary,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   customSection: {
-    marginBottom: '32px',
-    padding: '20px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '8px',
-    border: '2px solid #3d2d5d',
+    marginBottom: spacing.xxxl,
+    padding: spacing.xl,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   customControls: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
+    gap: spacing.lg,
   } as React.CSSProperties,
   exportSection: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   importSection: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   inputLabel: {
-    fontSize: '12px',
-    color: '#a0a0b0',
+    ...typography.caption,
+    color: colors.text.secondary,
     fontWeight: 500,
   } as React.CSSProperties,
   input: {
-    padding: '10px 12px',
-    backgroundColor: '#13141f',
-    border: '1px solid #2a2b3a',
-    borderRadius: '6px',
-    color: '#e0e0e0',
-    fontSize: '13px',
+    padding: `${spacing.sm} ${spacing.md}`,
+    backgroundColor: colors.bg.secondary,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
+    color: colors.text.primary,
+    fontSize: typography.body.fontSize,
     fontFamily: 'inherit',
   } as React.CSSProperties,
   exportButton: {
-    padding: '12px 16px',
-    backgroundColor: '#5d8fbd',
+    padding: `${spacing.md} ${spacing.lg}`,
+    backgroundColor: colors.semantic.info,
     color: '#ffffff',
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
+    borderRadius: effects.borderRadius.md,
+    ...typography.body,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   fileInput: {
     display: 'none',
   } as React.CSSProperties,
   importButton: {
     display: 'inline-block',
-    padding: '12px 16px',
-    backgroundColor: '#5dbd7d',
+    padding: `${spacing.md} ${spacing.lg}`,
+    backgroundColor: colors.semantic.success,
     color: '#ffffff',
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
+    borderRadius: effects.borderRadius.md,
+    ...typography.body,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     textAlign: 'center',
   } as React.CSSProperties,
   statusMessage: {
-    marginTop: '16px',
-    padding: '12px 16px',
-    borderRadius: '6px',
+    marginTop: spacing.lg,
+    padding: `${spacing.md} ${spacing.lg}`,
+    borderRadius: effects.borderRadius.md,
     border: '1px solid',
-    fontSize: '13px',
-    color: '#e0e0e0',
+    ...typography.body,
+    color: colors.text.primary,
     textAlign: 'center',
   } as React.CSSProperties,
   header: {
-    marginBottom: '32px',
+    marginBottom: spacing.xxxl,
     textAlign: 'center',
-    paddingBottom: '20px',
-    borderBottom: '2px solid #2a2b3a',
+    paddingBottom: spacing.xl,
+    borderBottom: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   title: {
-    fontSize: '24px',
-    color: '#e0e0e0',
-    marginBottom: '8px',
-    fontWeight: 700,
+    ...createHeaderStyle('h1'),
+    marginBottom: spacing.sm,
   } as React.CSSProperties,
   subtitle: {
-    fontSize: '13px',
-    color: '#a0a0b0',
+    ...createSubtitleStyle(),
     lineHeight: '1.5',
     maxWidth: '600px',
     margin: '0 auto',
   } as React.CSSProperties,
   category: {
-    marginBottom: '36px',
+    marginBottom: spacing.xxxl,
   } as React.CSSProperties,
   categoryHeader: {
-    marginBottom: '16px',
-    paddingLeft: '4px',
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
   categoryTitle: {
-    fontSize: '16px',
-    color: '#9d7dd4',
-    marginBottom: '4px',
-    fontWeight: 600,
+    ...createHeaderStyle('h2'),
+    color: colors.accent.light,
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
   categoryDescription: {
-    fontSize: '12px',
-    color: '#7d7d8d',
-    margin: 0,
+    ...createSubtitleStyle(),
   } as React.CSSProperties,
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-    gap: '16px',
+    gap: spacing.lg,
   } as React.CSSProperties,
   card: {
     display: 'flex',
     flexDirection: 'column',
-    padding: '20px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '8px',
-    border: '2px solid #2a2b3a',
-    transition: 'all 0.3s',
+    padding: spacing.xl,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
+    transition: effects.transition.slow,
     cursor: 'pointer',
   } as React.CSSProperties,
   cardIcon: {
     fontSize: '48px',
-    marginBottom: '12px',
+    marginBottom: spacing.md,
     textAlign: 'center',
   } as React.CSSProperties,
   cardContent: {
     flex: 1,
-    marginBottom: '16px',
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
   presetName: {
-    fontSize: '16px',
-    color: '#e0e0e0',
-    marginBottom: '10px',
-    fontWeight: 600,
+    ...typography.h2,
+    color: colors.text.primary,
     textAlign: 'center',
-    margin: '0 0 10px 0',
+    margin: `0 0 ${spacing.sm} 0`,
   } as React.CSSProperties,
   description: {
-    fontSize: '12px',
-    color: '#8a8a9a',
+    ...typography.caption,
+    color: colors.text.muted,
     lineHeight: '1.5',
     textAlign: 'center',
     minHeight: '54px',
   } as React.CSSProperties,
   loadButton: {
     width: '100%',
-    padding: '12px 16px',
-    backgroundColor: '#7d5dbd',
+    padding: `${spacing.md} ${spacing.lg}`,
+    backgroundColor: colors.accent.primary,
     color: '#ffffff',
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
+    borderRadius: effects.borderRadius.md,
+    ...typography.body,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   infoBox: {
-    marginTop: '32px',
-    padding: '20px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '8px',
-    border: '2px solid #3d2d5d',
+    marginTop: spacing.xxxl,
+    padding: spacing.xl,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   infoTitle: {
-    fontSize: '14px',
-    color: '#9d7dd4',
-    marginBottom: '12px',
-    fontWeight: 600,
-    margin: '0 0 12px 0',
+    ...createHeaderStyle('h3'),
+    color: colors.accent.light,
+    marginBottom: spacing.md,
   } as React.CSSProperties,
   infoText: {
-    fontSize: '12px',
-    color: '#a0a0b0',
+    ...typography.caption,
+    color: colors.text.secondary,
     lineHeight: '1.6',
     margin: 0,
   } as React.CSSProperties,

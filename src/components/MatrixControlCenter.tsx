@@ -10,6 +10,7 @@ import { ModelOikosPanel } from './ModelOikosPanel';
 import { EcosystemOikosPanel } from './EcosystemOikosPanel';
 import { PresetGallery } from './PresetGallery';
 import type { SpeciesScope, OikosTab } from '../types';
+import { colors, spacing, typography, effects } from '../design-system';
 
 // Mobile breakpoint
 const MOBILE_BREAKPOINT = 768;
@@ -71,7 +72,7 @@ export function MatrixControlCenter() {
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
-        <h2 style={styles.title}>🎛️ Matrix Parameter Control</h2>
+        <h2 style={styles.title}>Matrix Parameter Control</h2>
       </div>
 
       {/* Species Scope Tabs Row (Tabs + Info inline) */}
@@ -154,21 +155,20 @@ export function MatrixControlCenter() {
 
 const styles = {
   container: {
-    backgroundColor: '#13141f',
-    borderRadius: '8px',
-    border: '1px solid #2a2b3a',
+    backgroundColor: colors.bg.secondary,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
   } as React.CSSProperties,
   header: {
-    padding: '10px 16px',
-    borderBottom: '1px solid #2a2b3a',
+    padding: `${spacing.md} ${spacing.lg}`,
+    borderBottom: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   title: {
-    fontSize: '15px',
-    color: '#e0e0e0',
-    fontWeight: 700,
+    ...typography.h2,
+    color: colors.text.primary,
     margin: 0,
   } as React.CSSProperties,
 
@@ -177,9 +177,9 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: '16px',
-    padding: '8px 16px',
-    borderBottom: '1px solid #2a2b3a',
+    gap: spacing.lg,
+    padding: `${spacing.sm} ${spacing.lg}`,
+    borderBottom: `1px solid ${colors.border.primary}`,
     overflowX: 'auto',
     scrollbarWidth: 'thin',
   } as React.CSSProperties,
@@ -187,45 +187,45 @@ const styles = {
   // Species Tabs
   speciesTabs: {
     display: 'flex',
-    gap: '6px',
+    gap: spacing.sm,
     flex: '0 0 auto', // Don't grow, don't shrink
   } as React.CSSProperties,
   speciesTab: {
     display: 'flex',
     alignItems: 'center',
-    gap: '6px',
-    padding: '8px 12px',
+    gap: spacing.sm,
+    padding: `${spacing.sm} ${spacing.md}`,
     backgroundColor: 'transparent',
-    color: '#a0a0b0',
+    color: colors.text.secondary,
     border: 'none',
-    borderRadius: '6px 6px 0 0',
-    fontSize: '13px',
+    borderRadius: `${effects.borderRadius.md} ${effects.borderRadius.md} 0 0`,
+    ...typography.body,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     whiteSpace: 'nowrap',
     minWidth: '44px', // Touch-friendly minimum
   } as React.CSSProperties,
   speciesTabActive: {
-    backgroundColor: '#13141f',
-    color: '#e0e0e0',
-    borderBottom: '3px solid #7d5dbd',
+    backgroundColor: colors.bg.secondary,
+    color: colors.text.primary,
+    borderBottom: `3px solid ${colors.accent.primary}`,
   } as React.CSSProperties,
   speciesIcon: {
     fontSize: '16px',
   } as React.CSSProperties,
   speciesLabel: {
-    fontSize: '12px',
+    ...typography.caption,
   } as React.CSSProperties,
 
   // Scope Info inline (rechts neben Tabs)
   scopeInfoInline: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    padding: '6px 12px',
-    paddingLeft: '10px',
-    borderRadius: '4px',
+    gap: spacing.sm,
+    padding: `${spacing.sm} ${spacing.md}`,
+    paddingLeft: spacing.sm,
+    borderRadius: effects.borderRadius.sm,
     flex: '1 1 auto', // Can grow and shrink
     minWidth: 0, // Allow text truncation
   } as React.CSSProperties,
@@ -234,8 +234,8 @@ const styles = {
     flex: '0 0 auto',
   } as React.CSSProperties,
   scopeTextInline: {
-    fontSize: '11px',
-    color: '#a0a0b0',
+    ...typography.caption,
+    color: colors.text.secondary,
     lineHeight: 1.3,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
@@ -245,9 +245,9 @@ const styles = {
   // Oikos Tabs (Horizontal Axis)
   oikosTabs: {
     display: 'flex',
-    gap: '6px',
-    padding: '8px 16px',
-    borderBottom: '2px solid #2a2b3a',
+    gap: spacing.sm,
+    padding: `${spacing.sm} ${spacing.lg}`,
+    borderBottom: `1px solid ${colors.border.primary}`,
     overflowX: 'auto',
     scrollbarWidth: 'thin',
     WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
@@ -255,23 +255,23 @@ const styles = {
   oikosTab: {
     display: 'flex',
     alignItems: 'center',
-    gap: '6px',
-    padding: '8px 12px',
-    backgroundColor: '#13141f',
-    color: '#a0a0b0',
-    border: '1px solid #2a2b3a',
-    borderRadius: '6px',
-    fontSize: '12px',
+    gap: spacing.sm,
+    padding: `${spacing.sm} ${spacing.md}`,
+    backgroundColor: colors.bg.secondary,
+    color: colors.text.secondary,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
+    ...typography.caption,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     whiteSpace: 'nowrap',
     minWidth: '44px', // Touch-friendly
   } as React.CSSProperties,
   oikosTabActive: {
-    backgroundColor: '#1a1b2a',
-    color: '#7d5dbd',
-    borderColor: '#7d5dbd',
+    backgroundColor: colors.bg.tertiary,
+    color: colors.accent.primary,
+    borderColor: colors.accent.primary,
   } as React.CSSProperties,
   tabIcon: {
     fontSize: '14px',
@@ -279,7 +279,7 @@ const styles = {
 
   // Content
   content: {
-    padding: '16px',
+    padding: spacing.lg,
     maxHeight: '400px',
     overflowY: 'auto',
     flex: 1,
