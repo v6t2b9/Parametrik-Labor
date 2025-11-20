@@ -24,7 +24,11 @@ export function LetterboxOikosPanel() {
           <input
             type="checkbox"
             checked={letterbox.enabled}
-            onChange={(e) => updateLetterboxParams({ enabled: e.target.checked })}
+            onChange={(e) => {
+              console.log(`[LetterboxPanel] Checkbox clicked, new value: ${e.target.checked}`);
+              updateLetterboxParams({ enabled: e.target.checked });
+              console.log(`[LetterboxPanel] updateLetterboxParams called with enabled: ${e.target.checked}`);
+            }}
             style={styles.checkbox}
           />
           <span style={styles.toggleText}>Enable Letterbox Visualization</span>
