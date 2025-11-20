@@ -55,8 +55,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // Responsive canvas size (based on window size in fullscreen and aspect ratio)
   const [canvasWidth, setCanvasWidth] = useState(DEFAULT_CANVAS_SIZE);
   const [canvasHeight, setCanvasHeight] = useState(DEFAULT_CANVAS_SIZE);
-  const [scaleX, setScaleX] = useState(DEFAULT_CANVAS_SIZE / GRID_SIZE);
-  const [scaleY, setScaleY] = useState(DEFAULT_CANVAS_SIZE / GRID_SIZE);
+  const [scale, setScale] = useState(DEFAULT_CANVAS_SIZE / GRID_SIZE);
+  const [offsetX, setOffsetX] = useState(0);
+  const [offsetY, setOffsetY] = useState(0);
 
   // WebGL renderer for trails (major performance boost)
   const webglRendererRef = useRef<WebGLTrailRenderer | null>(null);
@@ -136,8 +137,14 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
         setCanvasWidth(finalWidth);
         setCanvasHeight(finalHeight);
-        setScaleX(finalWidth / GRID_SIZE);
-        setScaleY(finalHeight / GRID_SIZE);
+
+        // Calculate uniform scale and offsets for centered square grid (no distortion)
+        const uniformScale = Math.min(finalWidth, finalHeight) / GRID_SIZE;
+        const gridWidth = GRID_SIZE * uniformScale;
+        const gridHeight = GRID_SIZE * uniformScale;
+        setScale(uniformScale);
+        setOffsetX((finalWidth - gridWidth) / 2);
+        setOffsetY((finalHeight - gridHeight) / 2);
       } else {
         // Normal mode: calculate canvas size based on aspect ratio
         const baseSize = DEFAULT_CANVAS_SIZE;
@@ -159,8 +166,14 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
         setCanvasWidth(Math.floor(width));
         setCanvasHeight(Math.floor(height));
-        setScaleX(width / GRID_SIZE);
-        setScaleY(height / GRID_SIZE);
+
+        // Calculate uniform scale and offsets for centered square grid (no distortion)
+        const uniformScale = Math.min(width, height) / GRID_SIZE;
+        const gridWidth = GRID_SIZE * uniformScale;
+        const gridHeight = GRID_SIZE * uniformScale;
+        setScale(uniformScale);
+        setOffsetX((width - gridWidth) / 2);
+        setOffsetY((height - gridHeight) / 2);
       }
     };
 
@@ -175,11 +188,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // Initialize/update WebGL renderer, motion blur canvas, and scanline pattern when canvas size changes
   useEffect(() => {
     // WebGL renderer - recreate when canvas size changes
-    // Use actual canvas dimensions (not square) for correct aspect ratio
+    // Use square grid size for correct rendering without distortion
+    const gridPixelSize = Math.floor(GRID_SIZE * scale);
     if (webglRendererRef.current) {
       webglRendererRef.current.destroy();
     }
-    webglRendererRef.current = new WebGLTrailRenderer(canvasWidth, canvasHeight, GRID_SIZE);
+    webglRendererRef.current = new WebGLTrailRenderer(gridPixelSize, gridPixelSize, GRID_SIZE);
 
     // Motion blur canvas - resize when canvas size changes
     if (!motionBlurCanvasRef.current) {
@@ -213,7 +227,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         webglRendererRef.current = null;
       }
     };
-  }, [canvasWidth, canvasHeight]);
+  }, [canvasWidth, canvasHeight, scale]);
 
   // Render function with post-processing effects (OPTIMIZED)
   const render = useCallback(() => {
@@ -228,6 +242,17 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // Apply hue cycling if enabled (using performance.now() for smooth animation)
     const currentVisualization = applyHueCycling(visualization, performance.now());
 
+    // === 0. Fill entire canvas with background (letterbox/pillarbox bars) ===
+    ctx.fillStyle = `rgb(${currentVisualization.colorBg.r}, ${currentVisualization.colorBg.g}, ${currentVisualization.colorBg.b})`;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    // Save context state before applying offset
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+
+    // Calculate grid pixel size
+    const gridPixelSize = Math.floor(GRID_SIZE * scale);
+
     // === 1. Render base trails ===
     // Hybrid approach: WebGL for trails (fast, smooth lavalamp effects)
     //                  CPU for agent pixels (precise positioning)
@@ -240,9 +265,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     } else {
       // CPU rendering (slower but visually accurate)
       ctx.fillStyle = `rgb(${currentVisualization.colorBg.r}, ${currentVisualization.colorBg.g}, ${currentVisualization.colorBg.b})`;
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);
 
-      const imageData = ctx.createImageData(canvasWidth, canvasHeight);
+      const imageData = ctx.createImageData(gridPixelSize, gridPixelSize);
       const data = imageData.data;
 
       for (let y = 0; y < GRID_SIZE; y++) {
@@ -253,12 +278,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
           const greenVal = trails.green[idx];
           const blueVal = trails.blue[idx];
 
-          // Scale to canvas size (scaleX/scaleY blocks)
-          for (let dy = 0; dy < scaleY; dy++) {
-            for (let dx = 0; dx < scaleX; dx++) {
-              const canvasX = x * scaleX + dx;
-              const canvasY = y * scaleY + dy;
-              const pixelIdx = (canvasY * canvasWidth + canvasX) * 4;
+          // Scale to grid pixel size (uniform scale blocks)
+          for (let dy = 0; dy < scale; dy++) {
+            for (let dx = 0; dx < scale; dx++) {
+              const canvasX = x * scale + dx;
+              const canvasY = y * scale + dy;
+              const pixelIdx = (canvasY * gridPixelSize + canvasX) * 4;
 
               // Initialize with background
               data[pixelIdx] = currentVisualization.colorBg.r;
@@ -334,114 +359,40 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // === 2. Pixelation (Lo-Fi Effect) - OPTIMIZED with object pooling ===
     if (effects.pixelation > 1) {
       const pixelSize = Math.floor(effects.pixelation);
-      const smallWidth = Math.floor(canvasWidth / pixelSize);
-      const smallHeight = Math.floor(canvasHeight / pixelSize);
+      const smallWidth = Math.floor(gridPixelSize / pixelSize);
+      const smallHeight = Math.floor(gridPixelSize / pixelSize);
 
-      const tempCanvas = canvasPool.acquire(smallWidth, smallHeight);
+      // Create a temporary canvas to capture current grid content
+      const tempCanvas = canvasPool.acquire(gridPixelSize, gridPixelSize);
       const tempCtx = tempCanvas.getContext('2d');
 
       if (tempCtx) {
-        // Downsample
-        tempCtx.imageSmoothingEnabled = false;
-        tempCtx.drawImage(canvas, 0, 0, smallWidth, smallHeight);
+        // Capture current grid content (context is already translated)
+        tempCtx.drawImage(canvas, offsetX, offsetY, gridPixelSize, gridPixelSize, 0, 0, gridPixelSize, gridPixelSize);
 
-        // Upsample back
-        ctx.imageSmoothingEnabled = false;
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-        ctx.drawImage(tempCanvas, 0, 0, canvasWidth, canvasHeight);
-        ctx.imageSmoothingEnabled = true;
-      }
+        // Create downsampled version
+        const smallCanvas = canvasPool.acquire(smallWidth, smallHeight);
+        const smallCtx = smallCanvas.getContext('2d');
 
-      canvasPool.release(tempCanvas);
-    }
+        if (smallCtx) {
+          smallCtx.imageSmoothingEnabled = false;
+          smallCtx.drawImage(tempCanvas, 0, 0, smallWidth, smallHeight);
 
-    // === 3. Motion Blur ===
-    if (effects.motionBlur > 0 && motionBlurCanvasRef.current) {
-      const mbCanvas = motionBlurCanvasRef.current;
-      const mbCtx = mbCanvas.getContext('2d');
-      if (mbCtx) {
-        // Draw current frame to motion blur canvas with opacity
-        mbCtx.globalAlpha = 1 - effects.motionBlur;
-        mbCtx.drawImage(canvas, 0, 0);
-        mbCtx.globalAlpha = 1;
+          // Upsample back to grid
+          ctx.imageSmoothingEnabled = false;
+          ctx.clearRect(0, 0, gridPixelSize, gridPixelSize);
+          ctx.drawImage(smallCanvas, 0, 0, gridPixelSize, gridPixelSize);
+          ctx.imageSmoothingEnabled = true;
 
-        // Draw motion blur canvas back to main canvas
-        ctx.globalAlpha = effects.motionBlur;
-        ctx.drawImage(mbCanvas, 0, 0);
-        ctx.globalAlpha = 1;
+          canvasPool.release(smallCanvas);
+        }
+
+        canvasPool.release(tempCanvas);
       }
     }
 
-    // === 4. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
-    const filters: string[] = [];
-    if (effects.blur > 0) filters.push(`blur(${effects.blur}px)`);
-    if (effects.saturation !== 1.0) filters.push(`saturate(${effects.saturation})`);
-    if (effects.contrast !== 1.0) filters.push(`contrast(${effects.contrast})`);
-    if (effects.hueShift !== 0) filters.push(`hue-rotate(${effects.hueShift}deg)`);
-
-    if (filters.length > 0) {
-      // Use temp canvas to apply filters (can't draw canvas onto itself with filter)
-      const tempCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
-      const tempCtx = tempCanvas.getContext('2d');
-
-      if (tempCtx) {
-        // Copy current canvas to temp
-        tempCtx.drawImage(canvas, 0, 0);
-
-        // Apply filters and draw back to main canvas
-        ctx.filter = filters.join(' ');
-        ctx.drawImage(tempCanvas, 0, 0);
-        ctx.filter = 'none';
-      }
-
-      canvasPool.release(tempCanvas);
-    }
-
-    // === 5. Bloom Effect ===
-    if (effects.bloom > 0) {
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.globalAlpha = effects.bloom;
-      ctx.filter = `blur(${Math.max(8, effects.blur + 8)}px) brightness(1.5)`;
-      ctx.drawImage(canvas, 0, 0);
-      ctx.filter = 'none';
-      ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = 'source-over';
-    }
-
-    // === 6. Chromatic Aberration - OPTIMIZED with object pooling ===
-    if (effects.chromaticAberration > 0) {
-      const savedCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
-      const savedCtx = savedCanvas.getContext('2d');
-
-      if (savedCtx) {
-        // Save the original image before any modifications
-        savedCtx.drawImage(canvas, 0, 0);
-
-        // Clear main canvas
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
-        const offset = effects.chromaticAberration;
-
-        // Use lighter composite to combine offset images for RGB shift effect
-        ctx.globalCompositeOperation = 'lighter';
-        ctx.globalAlpha = 0.4;  // Reduce brightness since we're drawing 3 times
-
-        // Draw shifted left (red channel effect)
-        ctx.drawImage(savedCanvas, -offset, 0);
-
-        // Draw center (green channel effect)
-        ctx.drawImage(savedCanvas, 0, 0);
-
-        // Draw shifted right (blue channel effect)
-        ctx.drawImage(savedCanvas, offset, 0);
-
-        // Reset composite mode and alpha
-        ctx.globalAlpha = 1.0;
-        ctx.globalCompositeOperation = 'source-over';
-      }
-
-      canvasPool.release(savedCanvas);
-    }
+    // Note: Motion Blur and CSS Filters will be applied after we restore the context
+    // This is needed so they can work on the full canvas including letterbox bars
 
     // === 7. Wave Distortion - REMOVED FOR PERFORMANCE ===
     // This effect caused 5-10ms overhead due to getImageData() GPU stall
@@ -459,8 +410,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         const ecosystemAgents = ecosystemEngine.getEcosystemAgents();
 
         ecosystemAgents.forEach((agent) => {
-          const x = agent.x * scaleX;
-          const y = agent.y * scaleY;
+          const x = agent.x * scale;
+          const y = agent.y * scale;
 
           // Get species color
           const color = SPECIES_COLORS[agent.species];
@@ -493,8 +444,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       } else {
         // Standard stigmergy agent rendering
         agents.forEach((agent) => {
-          const x = agent.x * scaleX;
-          const y = agent.y * scaleY;
+          const x = agent.x * scale;
+          const y = agent.y * scale;
 
           ctx.fillStyle =
             agent.type === 'red'
@@ -531,18 +482,18 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // === 9. Vignette (Screen Overlay) ===
     // Applied AFTER agents for correct layering - darkens edges
     if (effects.vignette > 0) {
-      const centerX = canvasWidth / 2;
-      const centerY = canvasHeight / 2;
-      const maxRadius = Math.max(canvasWidth, canvasHeight) * 0.7;
+      const centerX = gridPixelSize / 2;
+      const centerY = gridPixelSize / 2;
+      const maxRadius = Math.max(gridPixelSize, gridPixelSize) * 0.7;
       const gradient = ctx.createRadialGradient(
-        centerX, centerY, Math.min(canvasWidth, canvasHeight) * 0.3,
+        centerX, centerY, Math.min(gridPixelSize, gridPixelSize) * 0.3,
         centerX, centerY, maxRadius
       );
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
       gradient.addColorStop(1, `rgba(0, 0, 0, ${effects.vignette})`);
 
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);
     }
 
     // === 10. Scanlines (Top Screen Overlay - CRT Effect) ===
@@ -551,7 +502,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       ctx.globalCompositeOperation = 'multiply';
       ctx.globalAlpha = effects.scanlines;
       ctx.fillStyle = scanlinePatternRef.current;
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+      ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
     }
@@ -563,8 +514,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
       // Render crystals using EcosystemRenderer
       const renderOptions = {
-        scaleX,
-        scaleY,
+        scaleX: scale,
+        scaleY: scale,
         showAgents: currentVisualization.showAgents,
         useTriangles: currentVisualization.useTriangles,
         showCrystals: true,
@@ -590,9 +541,101 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
+    // Restore context (removes translation offset)
+    ctx.restore();
+
+    // === 13. Motion Blur (applied to full canvas) ===
+    if (effects.motionBlur > 0 && motionBlurCanvasRef.current) {
+      const mbCanvas = motionBlurCanvasRef.current;
+      const mbCtx = mbCanvas.getContext('2d');
+      if (mbCtx) {
+        // Draw current frame to motion blur canvas with opacity
+        mbCtx.globalAlpha = 1 - effects.motionBlur;
+        mbCtx.drawImage(canvas, 0, 0);
+        mbCtx.globalAlpha = 1;
+
+        // Draw motion blur canvas back to main canvas
+        ctx.globalAlpha = effects.motionBlur;
+        ctx.drawImage(mbCanvas, 0, 0);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // === 14. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
+    const filters: string[] = [];
+    if (effects.blur > 0) filters.push(`blur(${effects.blur}px)`);
+    if (effects.saturation !== 1.0) filters.push(`saturate(${effects.saturation})`);
+    if (effects.contrast !== 1.0) filters.push(`contrast(${effects.contrast})`);
+    if (effects.hueShift !== 0) filters.push(`hue-rotate(${effects.hueShift}deg)`);
+
+    if (filters.length > 0) {
+      // Use temp canvas to apply filters (can't draw canvas onto itself with filter)
+      const tempCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx) {
+        // Copy current canvas to temp
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // Apply filters and draw back to main canvas
+        ctx.filter = filters.join(' ');
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        ctx.drawImage(tempCanvas, 0, 0);
+        ctx.filter = 'none';
+      }
+
+      canvasPool.release(tempCanvas);
+    }
+
+    // === 15. Bloom Effect ===
+    if (effects.bloom > 0) {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.globalAlpha = effects.bloom;
+      ctx.filter = `blur(${Math.max(8, effects.blur + 8)}px) brightness(1.5)`;
+      ctx.drawImage(canvas, 0, 0);
+      ctx.filter = 'none';
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // === 16. Chromatic Aberration - OPTIMIZED with object pooling ===
+    if (effects.chromaticAberration > 0) {
+      const savedCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
+      const savedCtx = savedCanvas.getContext('2d');
+
+      if (savedCtx) {
+        // Save the original image before any modifications
+        savedCtx.drawImage(canvas, 0, 0);
+
+        // Clear main canvas
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        const offset = effects.chromaticAberration;
+
+        // Use lighter composite to combine offset images for RGB shift effect
+        ctx.globalCompositeOperation = 'lighter';
+        ctx.globalAlpha = 0.4;  // Reduce brightness since we're drawing 3 times
+
+        // Draw shifted left (red channel effect)
+        ctx.drawImage(savedCanvas, -offset, 0);
+
+        // Draw center (green channel effect)
+        ctx.drawImage(savedCanvas, 0, 0);
+
+        // Draw shifted right (blue channel effect)
+        ctx.drawImage(savedCanvas, offset, 0);
+
+        // Reset composite mode and alpha
+        ctx.globalAlpha = 1.0;
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      canvasPool.release(savedCanvas);
+    }
+
     // Release all pooled canvases
     canvasPool.releaseAll();
-  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scaleX, scaleY, engine, ecosystemMode, isEcosystemEngine]);
+  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scale, offsetX, offsetY, engine, ecosystemMode, isEcosystemEngine]);
 
   // Animation loop with playback speed control
   useEffect(() => {
