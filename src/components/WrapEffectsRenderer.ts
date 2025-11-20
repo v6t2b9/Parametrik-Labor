@@ -343,19 +343,22 @@ export class WrapEffectsRenderer {
     gridHeight: number,
     currentFrame: number
   ): void {
-    console.log('[WrapEffectsRenderer] render called - enabled:', params.enabled, 'canvasW:', canvasWidth, 'canvasH:', canvasHeight, 'gridW:', gridWidth, 'gridH:', gridHeight);
-
     if (!params.enabled) {
-      console.log('[WrapEffectsRenderer] Disabled, returning early');
       return;
     }
+
+    // DEBUG: Draw a simple red rectangle to verify render is called
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+    ctx.fillRect(10, 10, 100, 50);
+    ctx.fillStyle = 'white';
+    ctx.font = '12px monospace';
+    ctx.fillText('WrapEffects Active', 15, 35);
 
     const time = currentFrame * 0.016; // Approximate time in seconds
 
     // Determine bar sizes
     const hasHorizontalBars = gridHeight < canvasHeight;
     const hasVerticalBars = gridWidth < canvasWidth;
-    console.log('[WrapEffectsRenderer] hasHorizontalBars:', hasHorizontalBars, 'hasVerticalBars:', hasVerticalBars);
 
     // Initialize bars if needed
     if (hasHorizontalBars) {
