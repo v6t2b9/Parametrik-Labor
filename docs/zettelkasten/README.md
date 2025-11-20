@@ -47,7 +47,7 @@ Atomare Parameter-Beschreibungen (1 Parameter = 1 Notiz)
 ### ✨ [[#properties|Properties]] (8 Notizen) ✅
 Emergente Eigenschaften
 
-### 🗺️ [[#meta|Meta]] (1 MOC)
+### 🗺️ [[#meta|Meta]] (3 MOCs) ✅
 Maps of Content - Navigationshilfen
 
 ### 🔬 [[#methods|Methods]] (4 Notizen) ✅
@@ -59,8 +59,8 @@ Experimentklassen
 ### 📊 [[#metrics|Metrics]] (4 Notizen) ✅
 Mess- und Analysekonzepte
 
-### 🔧 Components
-→ Verlinkt zu [[../development/ARCHITECTURE.md]] (nicht-atomar)
+### 🔧 [[#components|Components]] (8 Notizen) ✅
+System-Komponenten (Kern-Architektur)
 
 ---
 
@@ -345,22 +345,90 @@ Mess- und Analysekonzepte (Quantifizierung emergenter Phänomene):
 
 ---
 
+## Components
+
+System-Komponenten (Kern-Architektur des Parametrik-Labors):
+
+### Simulation-Layer (3 Komponenten)
+
+1. **[[components/quantum-stigmergy-engine.md]]** ⭐
+   - Kern-Simulations-Engine
+   - Update-Loop: Sense → Turn → Move → Deposit
+   - 3 Modell-Varianten: M1 (Classical), M2 (Context-Switching), M3 (Quantum-Inspired)
+
+2. **[[components/agent-system.md]]** ⭐
+   - Agent-Struktur (Position, Angle, Quantum State)
+   - 4 Kern-Operationen: Sensing, Steering, Movement, Deposition
+   - Parameter-abhängig: sensor-distance, turn-speed, agent-speed, deposit
+
+3. **[[components/trail-system.md]]** ⭐
+   - Trail-Map (Float32Array)
+   - Decay (Temporal Forgetting), Diffusion (Spatial Spreading)
+   - Decay × Diffusion Trade-off
+
+### Application-Layer (3 Komponenten)
+
+4. **[[components/zustand-store.md]]**
+   - Globaler State Management (Zustand Library)
+   - Parameter, Simulation State, UI State
+   - Presets: RESONANZ, MYZEL, STIGMERGIE, CRYSTAL, CHAOS
+
+5. **[[components/react-components.md]]**
+   - UI Component Tree (React)
+   - Oikos-Panels: Physical, Semiotic, Temporal, Resonance
+   - Parameter-Flow: UI → Zustand → Engine
+
+6. **[[components/webgl-renderer.md]]**
+   - WebGL-basiertes Rendering (GPU-beschleunigt)
+   - Trail-Map Visualisierung, Bloom/Glow-Effekte
+   - Multi-Spezies-Farben (R, G, B)
+
+### Infrastructure-Layer (2 Komponenten)
+
+7. **[[components/pwa-architecture.md]]**
+   - Progressive Web App
+   - Service Worker Caching, Offline-Verfügbarkeit
+   - Installierbar (Desktop/Mobile)
+
+8. **[[components/ecosystem-engine.md]]**
+   - Multi-Spezies-Erweiterung (extends QuantumStigmergyEngine)
+   - 5 Spezies-Typen: Builder, Harvester, Consumer, Decomposer, Scout
+   - Energie-System, Behavior State Machines, Crystal System
+
+---
+
 ## Meta
 
 Maps of Content (MOCs) - Zentrale Navigationshilfen:
 
 1. **[[meta/map-parameter-effects.md]]** ⭐⭐⭐
-   - **DIE zentrale MOC** für Parameter-Effekte
+   - **Zentrale MOC für Parameter-Effekte**
    - Vollständige Parameter × Property Matrix
    - Kritische Schwellenwerte (Decay ~0.94, Repulsion ~-0.5)
    - Parameter-Interdependenzen (Decay × Diffusion, Attraction × Repulsion, Speed × Decay)
    - Emergente Eigenschaft-Familien (Ordnung, Dynamik, Soziale Struktur)
    - Design-Rezepte für gezielte Muster-Erzeugung
 
+2. **[[meta/map-experimental-methodology.md]]** ⭐⭐
+   - **Zentrale MOC für experimentelles Arbeiten**
+   - 4 Experimentelle Workflows (Neuer Parameter, Interaktion, Parameter-Bereich, Modi-Vergleich)
+   - Methoden-Übersicht (Systematic Variation, Theory-Guided Hypotheses, Iterative Deepening, Dual Capture)
+   - Experimentklassen-Übersicht (4 Design-Patterns)
+   - Metriken-Übersicht (2 implementiert, 2 geplant)
+   - Kritische Schwellenwerte (Experimentelle Befunde)
+   - Interaktionstypen (Additiv, Synergetisch, Antagonistisch, Qualitative Umkehrung)
+   - Best Practices & Häufige Fehler
+
+3. **[[meta/map-theoretical-framework.md]]** ⭐⭐
+   - **Zentrale MOC für theoretische Fundierung**
+   - Alle 5 Kern-Konzepte verbunden (Stigmergie → Ökosemiotik → Parameter-as-Oikos)
+   - Theoretische Entwicklung (1959 Grassé → 2024 Ökosemiotik)
+   - Drei zentrale Thesen der Ökosemiotik
+   - Theorie × Empirie Verbindungen
+   - Offene Forschungsfragen (theoretisch, empirisch, methodologisch)
+
 ### Zukünftige MOCs (geplant)
 
-- `map-experiment-findings.md` - Aggregierte experimentelle Befunde
-- `map-theoretical-framework.md` - Konzept-Beziehungen
 - `map-system-architecture.md` - Component-Verbindungen (für Entwickler)
 
 ---
@@ -465,7 +533,8 @@ docs/zettelkasten/
 ├── methods/           # 4 experimentelle Methodologien ✅
 ├── experiments/       # 4 Experimentklassen ✅
 ├── metrics/           # 4 Metriken (2 implementiert, 2 geplant) ✅
-└── meta/             # 1 MOC ✅
+├── components/        # 8 System-Komponenten ✅
+└── meta/             # 3 MOCs (Parameter-Effects, Experimental-Methodology, Theoretical-Framework) ✅
 ```
 
 **Vorteile**:
@@ -498,12 +567,21 @@ docs/zettelkasten/
 - ✅ 4 Metriken extrahiert (Ridge-Point-Analyse, Strukturelle Ähnlichkeit, Entropie, Fraktale Dimension)
 - ✅ README aktualisiert mit experimentellen Inhalten
 
-## Roadmap: Phase 3.2 (optional)
+## Roadmap: Phase 3.2 ✅ (abgeschlossen 2025-11-20)
 
-- [ ] Zweite MOC erstellen (Experiment-Findings-Map)
-- [ ] Component-Notizen extrahieren (~15 atomare Notizen)
-- [ ] Dritte MOC erstellen (System-Architecture-Map)
+- ✅ Zweite MOC erstellt (Experimental-Methodology-Map)
+- ✅ README aktualisiert mit Phase 3.2 Inhalten
+
+## Roadmap: Phase 3.3 ✅ (abgeschlossen 2025-11-20)
+
+- ✅ 8 Component-Notizen extrahiert (3 Simulation, 3 Application, 2 Infrastructure Layer)
+- ✅ Dritte MOC erstellt (Theoretical-Framework-Map)
+- ✅ README aktualisiert mit Components und dritter MOC
+
+## Roadmap: Zukünftige Phasen (optional)
+
 - [ ] Große Docs splitten (Dashboard_Concept, Research_Supplement_B)
+- [ ] Vierte MOC erstellen (System-Architecture-Map für Entwickler)
 - [ ] Legacy-Docs ins `/archive/` verschieben
 
 ---
