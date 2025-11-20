@@ -91,6 +91,11 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const playbackSpeed = useSimulationStore((state) => state.ui.playbackSpeed);
   const aspectRatio = useSimulationStore((state) => state.ui.aspectRatio);
 
+  // Debug: Log letterbox changes
+  useEffect(() => {
+    console.log(`[CanvasPanel useEffect] letterbox.enabled changed to: ${letterbox.enabled}`);
+  }, [letterbox.enabled]);
+
   // Check if ecosystem mode is active
   const ecosystemMode = parameters.ecosystemMode || false;
   const isEcosystemEngine = engine instanceof MusicReactiveEcosystemEngine;
