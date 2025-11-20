@@ -95,6 +95,43 @@ export const defaultParameters: AllParameters = {
     pixelation: 1,
   },
   performance: defaultPerformanceParams,
+  // Letterbox (reactive canvas borders) params
+  letterbox: {
+    enabled: false, // Disabled by default (activate via Letterbox tab)
+
+    // Input sources
+    useAgentColor: true,
+    useTrailIntensity: true,
+    useForceVector: true,
+
+    // Weighting
+    agentColorWeight: 1.0,
+    trailIntensityWeight: 0.5,
+    forceVectorWeight: 0.3,
+
+    // Physics
+    propagationSpeed: 2.0,
+    decayRate: 0.95,
+    diffusionRate: 0.3,
+    diffusionFreq: 3,
+
+    // Interference (Double-slit)
+    interferenceEnabled: true,
+    interferenceType: 'both' as const,
+    waveLength: 20,
+    coherenceLength: 100,
+
+    // Visualization
+    showInterferencePattern: true,
+    blendMode: 'additive' as const,
+    brightness: 1.5,
+    blur: 2,
+    hueCycling: false,
+    hueCyclingSpeed: 2.0,
+
+    // Event history
+    maxEventHistory: 200,
+  },
   // Quantum-inspired stigmergy model params
   modelParams: {
     model: 'M1' as const, // Default: Classical stigmergy
