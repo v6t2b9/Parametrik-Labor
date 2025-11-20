@@ -334,8 +334,6 @@ export class WrapEffectsRenderer {
     canvasHeight: number,
     gridWidth: number,
     gridHeight: number,
-    offsetX: number,
-    offsetY: number,
     currentFrame: number
   ): void {
     if (!params.enabled) {

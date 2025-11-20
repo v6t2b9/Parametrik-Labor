@@ -570,8 +570,6 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         canvasHeight,
         gridPixelSize,
         gridPixelSize,
-        offsetX,
-        offsetY,
         frameCount
       );
     }
