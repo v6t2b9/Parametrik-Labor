@@ -44,9 +44,6 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   private useInterference: boolean = false;
   private useMultiScale: boolean = false;
 
-  // Store parameters for music-reactive modulation (for future use)
-  private _parameters: AllParameters | null = null;
-
   constructor(gridSize?: number) {
     super(gridSize);
 
@@ -71,9 +68,6 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   public setParameters(params: AllParameters): void {
     // Call parent
     super.setParameters(params);
-
-    // Store parameters for future music-reactive features
-    this._parameters = params;
 
     // Extract species-specific audio mappings
     this.musicMappingsRed = resolveSpeciesParams(params, 'red').audio;

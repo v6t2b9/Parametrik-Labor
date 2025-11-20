@@ -242,7 +242,8 @@ export class LetterboxRenderer {
     const tempField = new Float32Array(waveField);
 
     const diffusionRate = params.diffusionRate;
-    const propagationSpeed = params.propagationSpeed;
+    // Note: propagationSpeed could be used for directional wave velocity in future
+    const _propagationSpeed = params.propagationSpeed;
 
     // Diffuse along the perpendicular axis (into the bar)
     for (let y = 0; y < height; y++) {
