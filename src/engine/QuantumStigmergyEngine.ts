@@ -747,8 +747,8 @@ export class QuantumStigmergyEngine {
     };
 
     this.wrapEvents.push(event);
-    const maxHistory = this.params.letterbox.maxEventHistory || 200;
-    if (this.wrapEvents.length > maxHistory) {
+    // Keep last 200 events for particle spawning
+    if (this.wrapEvents.length > 200) {
       this.wrapEvents.shift();
     }
   }

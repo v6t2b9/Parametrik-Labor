@@ -99,38 +99,27 @@ export const defaultParameters: AllParameters = {
   letterbox: {
     enabled: false, // Disabled by default (activate via Letterbox tab)
 
-    // Input sources
+    // Effect Style
+    effectType: 'burst' as const,
+
+    // Particle Behavior
+    particleCount: 50,
+    particleSpeed: 3.0,
+    particleLifetime: 1.0,
+    particleSize: 4,
+    spread: 90,
+
+    // Visual Properties
+    intensity: 0.8,
+    glow: 1.5,
+    colorSaturation: 1.2,
     useAgentColor: true,
-    useTrailIntensity: true,
-    useForceVector: true,
+    trailInfluence: 0.3,
 
-    // Weighting
-    agentColorWeight: 1.0,
-    trailIntensityWeight: 0.5,
-    forceVectorWeight: 0.3,
-
-    // Physics
-    propagationSpeed: 2.0,
-    decayRate: 0.95,
-    diffusionRate: 0.3,
-    diffusionFreq: 3,
-
-    // Interference (Double-slit)
-    interferenceEnabled: true,
-    interferenceType: 'both' as const,
-    waveLength: 20,
-    coherenceLength: 100,
-
-    // Visualization
-    showInterferencePattern: true,
-    blendMode: 'additive' as const,
-    brightness: 1.5,
-    blur: 2,
-    hueCycling: false,
-    hueCyclingSpeed: 2.0,
-
-    // Event history
-    maxEventHistory: 200,
+    // Animation
+    gravity: 0,
+    turbulence: 0.2,
+    fadeType: 'smooth' as const,
   },
   // Quantum-inspired stigmergy model params
   modelParams: {
