@@ -80,8 +80,6 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const engine = useSimulationStore((state) => state.engine);
   const running = useSimulationStore((state) => state.running);
   const parameters = useSimulationStore((state) => state.parameters);
-  const visualization = useSimulationStore((state) => state.parameters.visualization);
-  const effects = useSimulationStore((state) => state.parameters.effects);
   const updatePerformanceMetrics = useSimulationStore((state) => state.updatePerformanceMetrics);
   const performAutoOptimization = useSimulationStore((state) => state.performAutoOptimization);
   const playbackSpeed = useSimulationStore((state) => state.ui.playbackSpeed);
@@ -250,6 +248,10 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // Read trails and agents directly from engine (avoids creating new references)
     const trails = engine.getTrails();
     const agents = engine.getAgents();
+
+    // Read visualization and effects from parameters (avoids creating new references on store updates)
+    const visualization = parameters.visualization;
+    const effects = parameters.effects;
 
     // Apply hue cycling if enabled (using performance.now() for smooth animation)
     const currentVisualization = applyHueCycling(visualization, performance.now());
@@ -649,7 +651,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Release all pooled canvases
     canvasPool.releaseAll();
-  }, [visualization, effects, canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine]);
+  }, [canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine]);
+  // Note: parameters is intentionally NOT in deps - it's read inside callback to prevent recreation on every slider change
 
   // Update ref to latest render function
   useEffect(() => {
