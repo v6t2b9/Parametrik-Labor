@@ -151,9 +151,9 @@ export function AudioOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>Audio Oikos</h3>
+      <h3 style={styles.title}>Audio</h3>
       <p style={styles.subtitle}>
-        Music-reactive visualization — Music acts as stigmergic perturbation
+        Music-reactive visualization controls
       </p>
 
       {/* Audio Source Section */}
@@ -493,10 +493,7 @@ export function AudioOikosPanel() {
 
       {/* Presets */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Mapping Presets</h4>
-        <p style={styles.presetDescription}>
-          Quick configurations for different music genres
-        </p>
+        <h4 style={styles.sectionTitle}>Presets</h4>
 
         <div style={styles.presetGrid}>
           {Object.entries(AUDIO_MAPPING_PRESETS).map(([key, preset]) => (
@@ -928,13 +925,6 @@ const styles = {
   } as React.CSSProperties,
 
   // Presets
-  presetDescription: {
-    fontSize: '10px',
-    color: colors.text.secondary,
-    marginBottom: '10px',
-    lineHeight: 1.4,
-  } as React.CSSProperties,
-
   presetGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))',
@@ -943,9 +933,9 @@ const styles = {
 
   presetButton: {
     display: 'flex',
-    flexDirection: 'column' as const,
+    flexDirection: 'column',
     alignItems: 'center',
-    padding: '10px 8px',
+    padding: `${spacing.sm} ${spacing.sm}`,
     backgroundColor: colors.bg.subtle,
     border: `1px solid ${colors.border.primary}`,
     borderRadius: effects.borderRadius.md,

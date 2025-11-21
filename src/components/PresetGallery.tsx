@@ -1,28 +1,24 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { builtInPresets } from '../presets';
 import { useState, useRef } from 'react';
-import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { colors, spacing, typography, effects, createHeaderStyle } from '../design-system';
 
 // Categorize presets by their pattern formation characteristics
 const presetCategories = {
   organic: {
-    title: 'Organisch & Fließend',
-    description: 'Weiche, fließende Muster mit organischer Dynamik',
+    title: 'Organic & Flowing',
     presets: ['Plasma Dream', 'Aurora Sky', 'Lava Flow'],
   },
   energetic: {
-    title: 'Energetisch & Chaotisch',
-    description: 'Wilde, energiegeladene Strukturen mit hoher Dynamik',
+    title: 'Energetic & Chaotic',
     presets: ['Neon Jungle', 'Electric Storm'],
   },
   stable: {
-    title: 'Stabil & Strukturiert',
-    description: 'Präzise, geometrische Muster mit klaren Formen',
+    title: 'Stable & Structured',
     presets: ['Crystal Cave'],
   },
   special: {
-    title: 'Spezialeffekte',
-    description: 'Thematische Looks mit speziellen visuellen Effekten',
+    title: 'Special Effects',
     presets: ['Digital Rain', 'Retro Arcade'],
   },
 };
@@ -35,8 +31,8 @@ export function PresetGallery() {
 
   const handleExport = () => {
     exportCurrentPreset(presetName);
-    setImportStatus({ type: 'success', message: `Preset "${presetName}" wurde erfolgreich exportiert!` });
-    setTimeout(() => setImportStatus(null), 3000);
+    setImportStatus({ type: 'success', message: `Exported "${presetName}"` });
+    setTimeout(() => setImportStatus(null), 2000);
   };
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,9 +42,9 @@ export function PresetGallery() {
     const result = await importPresetFromFile(file);
 
     if (result.success) {
-      setImportStatus({ type: 'success', message: 'Preset wurde erfolgreich geladen!' });
+      setImportStatus({ type: 'success', message: 'Preset loaded' });
     } else {
-      setImportStatus({ type: 'error', message: result.error || 'Fehler beim Laden des Presets' });
+      setImportStatus({ type: 'error', message: result.error || 'Load failed' });
     }
 
     // Reset file input
@@ -56,55 +52,38 @@ export function PresetGallery() {
       fileInputRef.current.value = '';
     }
 
-    setTimeout(() => setImportStatus(null), 5000);
+    setTimeout(() => setImportStatus(null), 3000);
   };
 
   return (
     <div style={styles.container}>
-      <div style={styles.header}>
-        <h3 style={styles.title}>Master Preset Gallery</h3>
-        <p style={styles.subtitle}>
-          Erkunde die beeindruckende Vielfalt der Musterbildung - jedes Preset zeigt einzigartige emergente Strukturen
-        </p>
-      </div>
-
-      {/* Custom Preset Management Section */}
-      <div style={styles.customSection}>
-        <div style={styles.categoryHeader}>
-          <h4 style={styles.categoryTitle}>Eigene Presets verwalten</h4>
-          <p style={styles.categoryDescription}>Speichere deine aktuellen Einstellungen oder lade eigene Presets</p>
+      {/* Import/Export Bar */}
+      <div style={styles.toolbar}>
+        <div style={styles.toolbarLeft}>
+          <input
+            type="text"
+            value={presetName}
+            onChange={(e) => setPresetName(e.target.value)}
+            style={styles.input}
+            placeholder="preset-name"
+          />
+          <button onClick={handleExport} style={styles.toolButton}>
+            Export
+          </button>
         </div>
-
-        <div style={styles.customControls}>
-          <div style={styles.exportSection}>
-            <label style={styles.inputLabel}>Preset-Name:</label>
-            <input
-              type="text"
-              value={presetName}
-              onChange={(e) => setPresetName(e.target.value)}
-              style={styles.input}
-              placeholder="mein-preset"
-            />
-            <button onClick={handleExport} style={styles.exportButton}>
-              ⬇️ Aktuelles Preset exportieren
-            </button>
-          </div>
-
-          <div style={styles.importSection}>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={handleImport}
-              style={styles.fileInput}
-              id="preset-file-input"
-            />
-            <label htmlFor="preset-file-input" style={styles.importButton}>
-              ⬆️ Preset importieren (.json)
-            </label>
-          </div>
+        <div style={styles.toolbarRight}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            style={styles.fileInput}
+            id="preset-file-input"
+          />
+          <label htmlFor="preset-file-input" style={styles.toolButton}>
+            Import
+          </label>
         </div>
-
         {importStatus && (
           <div style={{
             ...styles.statusMessage,
@@ -121,24 +100,17 @@ export function PresetGallery() {
 
         return (
           <div key={categoryKey} style={styles.category}>
-            <div style={styles.categoryHeader}>
-              <h4 style={styles.categoryTitle}>{category.title}</h4>
-              <p style={styles.categoryDescription}>{category.description}</p>
-            </div>
-
+            <h4 style={styles.categoryTitle}>{category.title}</h4>
             <div style={styles.grid}>
               {categoryPresets.map((preset) => (
                 <div key={preset.name} style={styles.card}>
                   <div style={styles.cardIcon}>{preset.icon}</div>
-                  <div style={styles.cardContent}>
-                    <h5 style={styles.presetName}>{preset.name}</h5>
-                    <p style={styles.description}>{preset.description}</p>
-                  </div>
+                  <h5 style={styles.presetName}>{preset.name}</h5>
                   <button
                     onClick={() => loadPreset(preset.parameters)}
                     style={styles.loadButton}
                   >
-                    ▶️ Load Preset
+                    Load
                   </button>
                 </div>
               ))}
@@ -146,195 +118,120 @@ export function PresetGallery() {
           </div>
         );
       })}
-
-      <div style={styles.infoBox}>
-        <h5 style={styles.infoTitle}>About Master Presets</h5>
-        <p style={styles.infoText}>
-          Each preset is a complete system configuration affecting all parameters:
-          <strong> Physics, Semiotic Behavior, Temporal Dynamics, Resonance, Visuals,</strong> and <strong>Effects</strong>.
-          <br/><br/>
-          These carefully crafted combinations showcase the system's ability to generate vastly different pattern formations
-          from the same underlying rules - a testament to the richness of emergent behavior!
-        </p>
-      </div>
     </div>
   );
 }
 
 const styles = {
   container: {
-    padding: spacing.xl,
+    padding: spacing.lg,
     backgroundColor: colors.bg.secondary,
-    borderRadius: effects.borderRadius.lg,
-    border: `1px solid ${colors.border.primary}`,
-  } as React.CSSProperties,
-  customSection: {
-    marginBottom: spacing.xxxl,
-    padding: spacing.xl,
-    backgroundColor: colors.bg.subtle,
     borderRadius: effects.borderRadius.md,
     border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
-  customControls: {
+  toolbar: {
     display: 'flex',
-    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: spacing.lg,
+    padding: `${spacing.md} ${spacing.lg}`,
+    marginBottom: spacing.xl,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
+    border: `1px solid ${colors.border.primary}`,
+    flexWrap: 'wrap',
   } as React.CSSProperties,
-  exportSection: {
+  toolbarLeft: {
     display: 'flex',
-    flexDirection: 'column',
     gap: spacing.sm,
+    alignItems: 'center',
+    flex: 1,
+    minWidth: '200px',
   } as React.CSSProperties,
-  importSection: {
+  toolbarRight: {
     display: 'flex',
-    flexDirection: 'column',
     gap: spacing.sm,
-  } as React.CSSProperties,
-  inputLabel: {
-    ...typography.caption,
-    color: colors.text.secondary,
-    fontWeight: 500,
   } as React.CSSProperties,
   input: {
     padding: `${spacing.sm} ${spacing.md}`,
     backgroundColor: colors.bg.secondary,
     border: `1px solid ${colors.border.primary}`,
-    borderRadius: effects.borderRadius.md,
+    borderRadius: effects.borderRadius.sm,
     color: colors.text.primary,
-    fontSize: typography.body.fontSize,
+    ...typography.body,
     fontFamily: 'inherit',
+    flex: 1,
+    minWidth: '120px',
   } as React.CSSProperties,
-  exportButton: {
-    padding: `${spacing.md} ${spacing.lg}`,
-    backgroundColor: colors.semantic.info,
-    color: '#ffffff',
+  toolButton: {
+    padding: `${spacing.sm} ${spacing.lg}`,
+    backgroundColor: colors.border.primary,
+    color: colors.text.primary,
     border: 'none',
-    borderRadius: effects.borderRadius.md,
+    borderRadius: effects.borderRadius.sm,
     ...typography.body,
     fontWeight: 600,
     cursor: 'pointer',
     transition: effects.transition.normal,
+    whiteSpace: 'nowrap',
   } as React.CSSProperties,
   fileInput: {
     display: 'none',
   } as React.CSSProperties,
-  importButton: {
-    display: 'inline-block',
-    padding: `${spacing.md} ${spacing.lg}`,
-    backgroundColor: colors.semantic.success,
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: effects.borderRadius.md,
-    ...typography.body,
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: effects.transition.normal,
-    textAlign: 'center',
-  } as React.CSSProperties,
   statusMessage: {
-    marginTop: spacing.lg,
-    padding: `${spacing.md} ${spacing.lg}`,
-    borderRadius: effects.borderRadius.md,
+    position: 'absolute',
+    top: '50%',
+    right: spacing.lg,
+    transform: 'translateY(-50%)',
+    padding: `${spacing.xs} ${spacing.md}`,
+    borderRadius: effects.borderRadius.sm,
     border: '1px solid',
-    ...typography.body,
+    ...typography.caption,
     color: colors.text.primary,
-    textAlign: 'center',
-  } as React.CSSProperties,
-  header: {
-    marginBottom: spacing.xxxl,
-    textAlign: 'center',
-    paddingBottom: spacing.xl,
-    borderBottom: `1px solid ${colors.border.primary}`,
-  } as React.CSSProperties,
-  title: {
-    ...createHeaderStyle('h1'),
-    marginBottom: spacing.sm,
-  } as React.CSSProperties,
-  subtitle: {
-    ...createSubtitleStyle(),
-    lineHeight: '1.5',
-    maxWidth: '600px',
-    margin: '0 auto',
   } as React.CSSProperties,
   category: {
     marginBottom: spacing.xxxl,
   } as React.CSSProperties,
-  categoryHeader: {
-    marginBottom: spacing.lg,
-  } as React.CSSProperties,
   categoryTitle: {
-    ...createHeaderStyle('h2'),
-    color: colors.accent.light,
-    marginBottom: spacing.xs,
-  } as React.CSSProperties,
-  categoryDescription: {
-    ...createSubtitleStyle(),
+    ...createHeaderStyle('h3'),
+    color: colors.text.secondary,
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-    gap: spacing.lg,
+    gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+    gap: spacing.md,
   } as React.CSSProperties,
   card: {
     display: 'flex',
     flexDirection: 'column',
-    padding: spacing.xl,
+    alignItems: 'center',
+    padding: spacing.lg,
     backgroundColor: colors.bg.subtle,
-    borderRadius: effects.borderRadius.lg,
+    borderRadius: effects.borderRadius.md,
     border: `1px solid ${colors.border.primary}`,
-    transition: effects.transition.slow,
-    cursor: 'pointer',
+    transition: effects.transition.normal,
+    gap: spacing.sm,
   } as React.CSSProperties,
   cardIcon: {
-    fontSize: '48px',
-    marginBottom: spacing.md,
-    textAlign: 'center',
-  } as React.CSSProperties,
-  cardContent: {
-    flex: 1,
-    marginBottom: spacing.lg,
+    fontSize: '36px',
   } as React.CSSProperties,
   presetName: {
-    ...typography.h2,
+    ...typography.body,
     color: colors.text.primary,
     textAlign: 'center',
-    margin: `0 0 ${spacing.sm} 0`,
-  } as React.CSSProperties,
-  description: {
-    ...typography.caption,
-    color: colors.text.muted,
-    lineHeight: '1.5',
-    textAlign: 'center',
-    minHeight: '54px',
+    margin: 0,
   } as React.CSSProperties,
   loadButton: {
     width: '100%',
-    padding: `${spacing.md} ${spacing.lg}`,
-    backgroundColor: colors.accent.primary,
-    color: '#ffffff',
+    padding: `${spacing.sm} ${spacing.md}`,
+    backgroundColor: colors.border.primary,
+    color: colors.text.primary,
     border: 'none',
-    borderRadius: effects.borderRadius.md,
-    ...typography.body,
+    borderRadius: effects.borderRadius.sm,
+    ...typography.caption,
     fontWeight: 600,
     cursor: 'pointer',
     transition: effects.transition.normal,
-  } as React.CSSProperties,
-  infoBox: {
-    marginTop: spacing.xxxl,
-    padding: spacing.xl,
-    backgroundColor: colors.bg.subtle,
-    borderRadius: effects.borderRadius.lg,
-    border: `1px solid ${colors.border.primary}`,
-  } as React.CSSProperties,
-  infoTitle: {
-    ...createHeaderStyle('h3'),
-    color: colors.accent.light,
-    marginBottom: spacing.md,
-  } as React.CSSProperties,
-  infoText: {
-    ...typography.caption,
-    color: colors.text.secondary,
-    lineHeight: '1.6',
-    margin: 0,
   } as React.CSSProperties,
 };

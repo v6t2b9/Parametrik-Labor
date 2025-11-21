@@ -21,13 +21,12 @@ export function SemioticOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>Semiotic Oikos</h3>
-      <p style={styles.subtitle}>Perception-action coupling and sign production</p>
+      <h3 style={styles.title}>Behavior</h3>
+      <p style={styles.subtitle}>Agent sensing and movement parameters</p>
 
       {/* Species Presets Section */}
       <div style={styles.presetSection}>
-        <h4 style={styles.presetTitle}>Species Presets</h4>
-        <p style={styles.presetDescription}>Quick configurations for different agent behaviors</p>
+        <h4 style={styles.presetTitle}>Presets</h4>
         <div style={styles.presetGrid}>
           {speciesPresets.map((preset) => (
             <button
@@ -112,13 +111,7 @@ const styles = {
   } as React.CSSProperties,
   presetTitle: {
     ...createHeaderStyle('h3'),
-    marginBottom: spacing.sm,
-  } as React.CSSProperties,
-  presetDescription: {
-    ...typography.caption,
-    color: colors.text.secondary,
     marginBottom: spacing.md,
-    lineHeight: 1.4,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',

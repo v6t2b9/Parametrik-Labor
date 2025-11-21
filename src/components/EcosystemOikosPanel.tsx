@@ -33,7 +33,7 @@ export function EcosystemOikosPanel() {
     return (
       <div style={styles.panel}>
         <h2 style={styles.title}>
-          Ecosystem Oikos
+          Ecosystem
         </h2>
         <p style={styles.text}>
           Ecosystem configuration not initialized. Enable ecosystem mode to configure.
@@ -48,11 +48,11 @@ export function EcosystemOikosPanel() {
   return (
     <div style={styles.panel}>
       <h2 style={styles.title}>
-        Ecosystem Oikos
+        Ecosystem
       </h2>
 
       <p style={styles.subtitle}>
-        Multi-species ecosystem with crystal consumption and energy metabolism
+        Multi-species ecosystem controls
       </p>
 
       {/* Ecosystem Mode Toggle */}

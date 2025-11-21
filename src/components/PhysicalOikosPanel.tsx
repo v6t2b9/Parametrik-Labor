@@ -21,13 +21,12 @@ export function PhysicalOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>Physical Oikos</h3>
-      <p style={styles.subtitle}>Trace materiality and environmental dynamics</p>
+      <h3 style={styles.title}>Physics</h3>
+      <p style={styles.subtitle}>Trail decay and diffusion settings</p>
 
       {/* Physics Presets Section */}
       <div style={styles.presetSection}>
-        <h4 style={styles.presetTitle}>Physics Presets</h4>
-        <p style={styles.presetDescription}>Quick configurations for different physical behaviors</p>
+        <h4 style={styles.presetTitle}>Presets</h4>
         <div style={styles.presetGrid}>
           {physicsPresets.map((preset) => (
             <button
@@ -112,13 +111,7 @@ const styles = {
   } as React.CSSProperties,
   presetTitle: {
     ...createHeaderStyle('h3'),
-    marginBottom: spacing.sm,
-  } as React.CSSProperties,
-  presetDescription: {
-    ...typography.caption,
-    color: colors.text.secondary,
     marginBottom: spacing.md,
-    lineHeight: 1.4,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',
