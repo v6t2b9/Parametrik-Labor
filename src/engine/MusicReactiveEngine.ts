@@ -44,8 +44,8 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
   private useInterference: boolean = false;
   private useMultiScale: boolean = false;
 
-  constructor(gridSize?: number) {
-    super(gridSize);
+  constructor(gridWidth?: number, gridHeight?: number) {
+    super(gridWidth, gridHeight);
 
     // Initialize modulators (disabled by default)
     // New AudioOikosModulator interface: separate parameters

@@ -63,12 +63,14 @@ export class QuantumStigmergyEngine {
   private phases: PheromonePhases; // For M3
   private tempTrails: Trails;
   private tempPhases: PheromonePhases;
-  private gridSize: number;
+  protected gridWidth: number;
+  protected gridHeight: number;
   private frameCount: number = 0;
   private params: AllParameters;
 
-  constructor(gridSize: number = GRID_SIZE) {
-    this.gridSize = gridSize;
+  constructor(gridWidth: number = GRID_SIZE, gridHeight: number = GRID_SIZE) {
+    this.gridWidth = gridWidth;
+    this.gridHeight = gridHeight;
     this.trails = this.createTrails();
     this.phases = this.createPhases();
     this.tempTrails = this.createTrails();
@@ -77,7 +79,7 @@ export class QuantumStigmergyEngine {
   }
 
   private createTrails(): Trails {
-    const size = this.gridSize * this.gridSize;
+    const size = this.gridWidth * this.gridHeight;
     return {
       red: new Float32Array(size),
       green: new Float32Array(size),
@@ -86,7 +88,7 @@ export class QuantumStigmergyEngine {
   }
 
   private createPhases(): PheromonePhases {
-    const size = this.gridSize * this.gridSize;
+    const size = this.gridWidth * this.gridHeight;
     return {
       red: new Float32Array(size),
       green: new Float32Array(size),
@@ -105,8 +107,8 @@ export class QuantumStigmergyEngine {
 
     for (let i = 0; i < count; i++) {
       const agent: Agent = {
-        x: Math.random() * this.gridSize,
-        y: Math.random() * this.gridSize,
+        x: Math.random() * this.gridWidth,
+        y: Math.random() * this.gridHeight,
         angle: Math.random() * Math.PI * 2,
         type: types[i % 3],
         rhythmPhase: Math.random() * Math.PI * 2,
@@ -233,7 +235,7 @@ export class QuantumStigmergyEngine {
     // Check local pheromone density for context switching
     const x = Math.floor(agent.x);
     const y = Math.floor(agent.y);
-    const idx = y * this.gridSize + x;
+    const idx = y * this.gridWidth + x;
     const localDensity = this.trails[agent.type][idx];
 
     // Update context mode
@@ -396,12 +398,12 @@ export class QuantumStigmergyEngine {
     const y = agent.y + Math.sin(angle) * distance;
 
     // Wrap coordinates
-    const wx = ((x % this.gridSize) + this.gridSize) % this.gridSize;
-    const wy = ((y % this.gridSize) + this.gridSize) % this.gridSize;
+    const wx = ((x % this.gridWidth) + this.gridWidth) % this.gridWidth;
+    const wy = ((y % this.gridHeight) + this.gridHeight) % this.gridHeight;
 
-    const idx = Math.floor(wy) * this.gridSize + Math.floor(wx);
+    const idx = Math.floor(wy) * this.gridWidth + Math.floor(wx);
 
-    if (idx < 0 || idx >= this.gridSize * this.gridSize) {
+    if (idx < 0 || idx >= this.gridWidth * this.gridHeight) {
       return 0;
     }
 
@@ -445,12 +447,12 @@ export class QuantumStigmergyEngine {
     const y = agent.y + Math.sin(angle) * distance;
 
     // Wrap coordinates
-    const wx = ((x % this.gridSize) + this.gridSize) % this.gridSize;
-    const wy = ((y % this.gridSize) + this.gridSize) % this.gridSize;
+    const wx = ((x % this.gridWidth) + this.gridWidth) % this.gridWidth;
+    const wy = ((y % this.gridHeight) + this.gridHeight) % this.gridHeight;
 
-    const idx = Math.floor(wy) * this.gridSize + Math.floor(wx);
+    const idx = Math.floor(wy) * this.gridWidth + Math.floor(wx);
 
-    if (idx < 0 || idx >= this.gridSize * this.gridSize) {
+    if (idx < 0 || idx >= this.gridWidth * this.gridHeight) {
       return { magnitude: 0, phase: 0 };
     }
 
@@ -503,9 +505,9 @@ export class QuantumStigmergyEngine {
   private depositTrail(agent: Agent, deposit: number, saturation: number): void {
     const x = Math.floor(agent.x);
     const y = Math.floor(agent.y);
-    const idx = y * this.gridSize + x;
+    const idx = y * this.gridWidth + x;
 
-    if (idx >= 0 && idx < this.gridSize * this.gridSize) {
+    if (idx >= 0 && idx < this.gridWidth * this.gridHeight) {
       const currentValue = this.trails[agent.type][idx];
       const newValue = Math.min(currentValue + deposit, saturation);
       this.trails[agent.type][idx] = newValue;
@@ -523,9 +525,9 @@ export class QuantumStigmergyEngine {
   ): void {
     const x = Math.floor(agent.x);
     const y = Math.floor(agent.y);
-    const idx = y * this.gridSize + x;
+    const idx = y * this.gridWidth + x;
 
-    if (idx >= 0 && idx < this.gridSize * this.gridSize) {
+    if (idx >= 0 && idx < this.gridWidth * this.gridHeight) {
       const currentValue = this.trails[agent.type][idx];
       const newValue = Math.min(currentValue + deposit, saturation);
       this.trails[agent.type][idx] = newValue;
@@ -554,20 +556,20 @@ export class QuantumStigmergyEngine {
       const trails = this.trails[channel];
       const temp = this.tempTrails[channel];
 
-      for (let y = 0; y < this.gridSize; y++) {
-        for (let x = 0; x < this.gridSize; x++) {
-          const idx = y * this.gridSize + x;
+      for (let y = 0; y < this.gridHeight; y++) {
+        for (let x = 0; x < this.gridWidth; x++) {
+          const idx = y * this.gridWidth + x;
 
           // Get neighbors (8-connected)
           const neighbors = [
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + x],
-            trails[((y + 1) % this.gridSize) * this.gridSize + x],
-            trails[y * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[y * this.gridSize + ((x + 1) % this.gridSize)],
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + ((x + 1) % this.gridSize)],
-            trails[((y + 1) % this.gridSize) * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[((y + 1) % this.gridSize) * this.gridSize + ((x + 1) % this.gridSize)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + x],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + x],
+            trails[y * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[y * this.gridWidth + ((x + 1) % this.gridWidth)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + ((x + 1) % this.gridWidth)],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + ((x + 1) % this.gridWidth)],
           ];
 
           const sum = neighbors.reduce((a, b) => a + b, 0) + trails[idx];
@@ -605,20 +607,20 @@ export class QuantumStigmergyEngine {
       const temp = this.tempTrails[channel];
       const tempPhases = this.tempPhases[channel];
 
-      for (let y = 0; y < this.gridSize; y++) {
-        for (let x = 0; x < this.gridSize; x++) {
-          const idx = y * this.gridSize + x;
+      for (let y = 0; y < this.gridHeight; y++) {
+        for (let x = 0; x < this.gridWidth; x++) {
+          const idx = y * this.gridWidth + x;
 
           // Diffuse magnitude (same as classical)
           const neighbors = [
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + x],
-            trails[((y + 1) % this.gridSize) * this.gridSize + x],
-            trails[y * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[y * this.gridSize + ((x + 1) % this.gridSize)],
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + ((x + 1) % this.gridSize)],
-            trails[((y + 1) % this.gridSize) * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[((y + 1) % this.gridSize) * this.gridSize + ((x + 1) % this.gridSize)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + x],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + x],
+            trails[y * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[y * this.gridWidth + ((x + 1) % this.gridWidth)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + ((x + 1) % this.gridWidth)],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + ((x + 1) % this.gridWidth)],
           ];
 
           const sum = neighbors.reduce((a, b) => a + b, 0) + trails[idx];
@@ -648,10 +650,10 @@ export class QuantumStigmergyEngine {
   }
 
   private wrapAgent(agent: Agent): void {
-    if (agent.x < 0) agent.x += this.gridSize;
-    if (agent.x >= this.gridSize) agent.x -= this.gridSize;
-    if (agent.y < 0) agent.y += this.gridSize;
-    if (agent.y >= this.gridSize) agent.y -= this.gridSize;
+    if (agent.x < 0) agent.x += this.gridWidth;
+    if (agent.x >= this.gridWidth) agent.x -= this.gridWidth;
+    if (agent.y < 0) agent.y += this.gridHeight;
+    if (agent.y >= this.gridHeight) agent.y -= this.gridHeight;
   }
 
   // Public API
@@ -671,8 +673,17 @@ export class QuantumStigmergyEngine {
     return this.frameCount;
   }
 
+  public getGridWidth(): number {
+    return this.gridWidth;
+  }
+
+  public getGridHeight(): number {
+    return this.gridHeight;
+  }
+
+  // Deprecated: For backwards compatibility
   public getGridSize(): number {
-    return this.gridSize;
+    return this.gridWidth;
   }
 
   public getModel() {

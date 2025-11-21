@@ -10,7 +10,8 @@ export class WebGLTrailRenderer {
   private gl: WebGLRenderingContext | null = null;
   private program: WebGLProgram | null = null;
   private canvas: HTMLCanvasElement;
-  private gridSize: number;
+  private gridWidth: number;
+  private gridHeight: number;
   private canvasWidth: number;
   private canvasHeight: number;
 
@@ -36,10 +37,11 @@ export class WebGLTrailRenderer {
     brightness?: WebGLUniformLocation | null;
   } = {};
 
-  constructor(canvasWidth: number, canvasHeight: number, gridSize: number) {
+  constructor(canvasWidth: number, canvasHeight: number, gridWidth: number, gridHeight: number = gridWidth) {
     this.canvasWidth = canvasWidth;
     this.canvasHeight = canvasHeight;
-    this.gridSize = gridSize;
+    this.gridWidth = gridWidth;
+    this.gridHeight = gridHeight;
     this.canvas = document.createElement('canvas');
     this.canvas.width = canvasWidth;
     this.canvas.height = canvasHeight;
@@ -256,8 +258,8 @@ export class WebGLTrailRenderer {
       gl.TEXTURE_2D,
       0,
       gl.LUMINANCE,
-      this.gridSize,
-      this.gridSize,
+      this.gridWidth,
+      this.gridHeight,
       0,
       gl.LUMINANCE,
       gl.FLOAT,

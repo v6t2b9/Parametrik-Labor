@@ -2,6 +2,18 @@ import type { Agent, Trails, AllParameters, AgentType, ResolvedSpeciesParams } f
 
 const GRID_SIZE = 400;
 
+// Helper: Calculate grid dimensions from aspect ratio while maintaining similar area
+export function calculateGridDimensions(aspectRatio: string): { width: number; height: number } {
+  const [w, h] = aspectRatio.split(':').map(Number);
+  const baseArea = GRID_SIZE * GRID_SIZE; // 160,000
+
+  // Calculate dimensions that maintain the aspect ratio and approximate area
+  const width = Math.round(Math.sqrt(baseArea * w / h));
+  const height = Math.round(Math.sqrt(baseArea * h / w));
+
+  return { width, height };
+}
+
 // Helper: Merge universal + species overrides
 function resolveSpeciesParams(
   params: AllParameters,
@@ -37,19 +49,21 @@ export class SimulationEngine {
   private agents: Agent[] = [];
   private trails: Trails;
   private tempTrails: Trails;
-  private gridSize: number;
+  protected gridWidth: number;
+  protected gridHeight: number;
   private frameCount: number = 0;
   private params: AllParameters;
 
-  constructor(gridSize: number = GRID_SIZE) {
-    this.gridSize = gridSize;
+  constructor(gridWidth: number = GRID_SIZE, gridHeight: number = GRID_SIZE) {
+    this.gridWidth = gridWidth;
+    this.gridHeight = gridHeight;
     this.trails = this.createTrails();
     this.tempTrails = this.createTrails();
     this.params = {} as AllParameters; // Will be set via setParameters
   }
 
   private createTrails(): Trails {
-    const size = this.gridSize * this.gridSize;
+    const size = this.gridWidth * this.gridHeight;
     return {
       red: new Float32Array(size),
       green: new Float32Array(size),
@@ -67,8 +81,8 @@ export class SimulationEngine {
 
     for (let i = 0; i < count; i++) {
       this.agents.push({
-        x: Math.random() * this.gridSize,
-        y: Math.random() * this.gridSize,
+        x: Math.random() * this.gridWidth,
+        y: Math.random() * this.gridHeight,
         angle: Math.random() * Math.PI * 2,
         type: types[i % 3],
         rhythmPhase: Math.random() * Math.PI * 2,
@@ -141,17 +155,17 @@ export class SimulationEngine {
     agent.y += Math.sin(agent.angle) * effectiveSpeed;
 
     // Wrap around edges
-    if (agent.x < 0) agent.x += this.gridSize;
-    if (agent.x >= this.gridSize) agent.x -= this.gridSize;
-    if (agent.y < 0) agent.y += this.gridSize;
-    if (agent.y >= this.gridSize) agent.y -= this.gridSize;
+    if (agent.x < 0) agent.x += this.gridWidth;
+    if (agent.x >= this.gridWidth) agent.x -= this.gridWidth;
+    if (agent.y < 0) agent.y += this.gridHeight;
+    if (agent.y >= this.gridHeight) agent.y -= this.gridHeight;
 
     // Deposit chemical trace
     const x = Math.floor(agent.x);
     const y = Math.floor(agent.y);
-    const idx = y * this.gridSize + x;
+    const idx = y * this.gridWidth + x;
 
-    if (idx >= 0 && idx < this.gridSize * this.gridSize) {
+    if (idx >= 0 && idx < this.gridWidth * this.gridHeight) {
       const currentValue = this.trails[agent.type][idx];
       const newValue = Math.min(
         currentValue + semiotic.deposit,
@@ -171,12 +185,12 @@ export class SimulationEngine {
     const y = agent.y + Math.sin(angle) * distance;
 
     // Wrap coordinates
-    const wx = ((x % this.gridSize) + this.gridSize) % this.gridSize;
-    const wy = ((y % this.gridSize) + this.gridSize) % this.gridSize;
+    const wx = ((x % this.gridWidth) + this.gridWidth) % this.gridWidth;
+    const wy = ((y % this.gridHeight) + this.gridHeight) % this.gridHeight;
 
-    const idx = Math.floor(wy) * this.gridSize + Math.floor(wx);
+    const idx = Math.floor(wy) * this.gridWidth + Math.floor(wx);
 
-    if (idx < 0 || idx >= this.gridSize * this.gridSize) {
+    if (idx < 0 || idx >= this.gridWidth * this.gridHeight) {
       return 0;
     }
 
@@ -216,22 +230,22 @@ export class SimulationEngine {
       const trails = this.trails[channel];
       const temp = this.tempTrails[channel];
 
-      for (let y = 0; y < this.gridSize; y++) {
-        for (let x = 0; x < this.gridSize; x++) {
-          const idx = y * this.gridSize + x;
+      for (let y = 0; y < this.gridHeight; y++) {
+        for (let x = 0; x < this.gridWidth; x++) {
+          const idx = y * this.gridWidth + x;
 
           // Get neighbors (8-connected: includes diagonals)
           const neighbors = [
             // 4-connected (cardinal directions)
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + x],
-            trails[((y + 1) % this.gridSize) * this.gridSize + x],
-            trails[y * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[y * this.gridSize + ((x + 1) % this.gridSize)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + x],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + x],
+            trails[y * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[y * this.gridWidth + ((x + 1) % this.gridWidth)],
             // 4 diagonals
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[((y - 1 + this.gridSize) % this.gridSize) * this.gridSize + ((x + 1) % this.gridSize)],
-            trails[((y + 1) % this.gridSize) * this.gridSize + ((x - 1 + this.gridSize) % this.gridSize)],
-            trails[((y + 1) % this.gridSize) * this.gridSize + ((x + 1) % this.gridSize)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + ((x + 1) % this.gridWidth)],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
+            trails[((y + 1) % this.gridHeight) * this.gridWidth + ((x + 1) % this.gridWidth)],
           ];
 
           const sum = neighbors.reduce((a, b) => a + b, 0) + trails[idx];
@@ -267,7 +281,16 @@ export class SimulationEngine {
     return this.frameCount;
   }
 
+  public getGridWidth(): number {
+    return this.gridWidth;
+  }
+
+  public getGridHeight(): number {
+    return this.gridHeight;
+  }
+
+  // Deprecated: For backwards compatibility
   public getGridSize(): number {
-    return this.gridSize;
+    return this.gridWidth;
   }
 }
