@@ -37,7 +37,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   // Video recording state
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [videoFormat, setVideoFormat] = useState<'webm' | 'gif'>('webm');
+  const [videoFormat, setVideoFormat] = useState<'webm' | 'gif' | 'mp4' | 'live-photo'>('webm');
   const [videoDuration, setVideoDuration] = useState<3 | 8 | 12>(3);
   const [videoQuality, setVideoQuality] = useState<'standard' | 'high' | 'very-high'>('high');
   const [videoFPS, setVideoFPS] = useState<30 | 60>(30);
@@ -50,8 +50,8 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
   // Get quality parameters based on preset and format
   function getQualityParams() {
-    if (videoFormat === 'webm') {
-      // WebM bitrate settings
+    if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'live-photo') {
+      // WebM/MP4 bitrate settings (same for both)
       const bitrateMap = {
         'standard': 8000000,   // 8 Mbps
         'high': 12000000,      // 12 Mbps
@@ -94,19 +94,64 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     const maxFrames = videoDuration * videoFPS; // Use selected FPS
     const frameDelay = Math.round(1000 / videoFPS); // ms per frame
 
-    if (videoFormat === 'webm') {
-      // WebM recording with MediaRecorder
+    if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'live-photo') {
+      // Video recording with MediaRecorder (WebM, MP4, or Live Photo)
       try {
         const qualityParams = getQualityParams() as { bitrate: number };
-        const stream = canvas.captureStream(videoFPS); // Use selected FPS
-        const options: MediaRecorderOptions = {
-          mimeType: 'video/webm;codecs=vp9',
-          videoBitsPerSecond: qualityParams.bitrate,
-        };
+        const stream = canvas.captureStream(videoFPS);
 
-        // Fallback to vp8 if vp9 not supported
-        if (!MediaRecorder.isTypeSupported(options.mimeType!)) {
-          options.mimeType = 'video/webm;codecs=vp8';
+        let options: MediaRecorderOptions;
+        let fileExtension: string;
+        let mimeType: string;
+
+        if (videoFormat === 'mp4' || videoFormat === 'live-photo') {
+          // Try MP4 with H.264 (best for iOS)
+          const mp4Codecs = [
+            'video/mp4;codecs=h264',
+            'video/mp4;codecs=avc1',
+            'video/mp4'
+          ];
+
+          const supportedCodec = mp4Codecs.find(codec => MediaRecorder.isTypeSupported(codec));
+
+          if (supportedCodec) {
+            options = {
+              mimeType: supportedCodec,
+              videoBitsPerSecond: qualityParams.bitrate,
+            };
+            fileExtension = 'mp4';
+            mimeType = 'video/mp4';
+          } else {
+            // Fallback to WebM if MP4 not supported
+            console.warn('MP4 not supported, falling back to WebM');
+            options = {
+              mimeType: 'video/webm;codecs=vp9',
+              videoBitsPerSecond: qualityParams.bitrate,
+            };
+            fileExtension = 'webm';
+            mimeType = 'video/webm';
+          }
+        } else {
+          // WebM with VP9
+          options = {
+            mimeType: 'video/webm;codecs=vp9',
+            videoBitsPerSecond: qualityParams.bitrate,
+          };
+
+          // Fallback to vp8 if vp9 not supported
+          if (!MediaRecorder.isTypeSupported(options.mimeType!)) {
+            options.mimeType = 'video/webm;codecs=vp8';
+          }
+          fileExtension = 'webm';
+          mimeType = 'video/webm';
+        }
+
+        // For Live Photo, capture a keyframe image at the start
+        let keyframeBlob: Blob | null = null;
+        if (videoFormat === 'live-photo') {
+          canvas.toBlob((blob) => {
+            keyframeBlob = blob;
+          }, 'image/jpeg', 0.95);
         }
 
         const mediaRecorder = new MediaRecorder(stream, options);
@@ -120,19 +165,41 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         };
 
         mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunksRef.current, { type: 'video/webm' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `parametric-video-${Date.now()}.webm`;
-          a.style.display = 'none';
-          document.body.appendChild(a);
-          a.click();
+          const blob = new Blob(recordedChunksRef.current, { type: mimeType });
+          const timestamp = Date.now();
+
+          // Download video
+          const videoUrl = URL.createObjectURL(blob);
+          const videoLink = document.createElement('a');
+          videoLink.href = videoUrl;
+          videoLink.download = `parametric-${videoFormat === 'live-photo' ? 'livephoto' : 'video'}-${timestamp}.${fileExtension}`;
+          videoLink.style.display = 'none';
+          document.body.appendChild(videoLink);
+          videoLink.click();
+
+          // For Live Photo, also download the keyframe
+          if (videoFormat === 'live-photo' && keyframeBlob) {
+            const savedKeyframeBlob = keyframeBlob; // Capture in closure to avoid null issues
+            setTimeout(() => {
+              const imgUrl = URL.createObjectURL(savedKeyframeBlob);
+              const imgLink = document.createElement('a');
+              imgLink.href = imgUrl;
+              imgLink.download = `parametric-livephoto-${timestamp}-keyframe.jpg`;
+              imgLink.style.display = 'none';
+              document.body.appendChild(imgLink);
+              imgLink.click();
+
+              setTimeout(() => {
+                document.body.removeChild(imgLink);
+                URL.revokeObjectURL(imgUrl);
+              }, 100);
+            }, 200);
+          }
 
           // Delay cleanup to ensure download starts
           setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            document.body.removeChild(videoLink);
+            URL.revokeObjectURL(videoUrl);
             recordedChunksRef.current = [];
             setIsRecording(false);
             setIsProcessing(false);
@@ -148,8 +215,8 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           }
         }, duration);
       } catch (error) {
-        console.error('WebM recording error:', error);
-        alert('WebM recording not supported. Try GIF format instead.');
+        console.error('Video recording error:', error);
+        alert(`${videoFormat.toUpperCase()} recording failed. Try a different format.`);
         setIsRecording(false);
       }
     } else {
@@ -243,7 +310,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     }
 
     if (isRecording) {
-      if (videoFormat === 'webm') {
+      if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'live-photo') {
         return `Recording... ${videoDuration}s`;
       } else {
         const maxFrames = videoDuration * videoFPS;
@@ -309,12 +376,19 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
               <label style={styles.videoLabel}>Format:</label>
               <select
                 value={videoFormat}
-                onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif')}
+                onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif' | 'mp4' | 'live-photo')}
                 disabled={isRecording || isProcessing}
                 style={styles.videoSelect}
-                title={videoFormat === 'webm' ? 'WebM video format (smaller files)' : 'GIF format (universal support)'}
+                title={
+                  videoFormat === 'webm' ? 'WebM video format (VP9, universal browser support)' :
+                  videoFormat === 'mp4' ? 'MP4 video format (H.264, iOS compatible)' :
+                  videoFormat === 'live-photo' ? 'MP4 video + keyframe JPG for iOS Live Photos/Wallpapers' :
+                  'GIF format (universal support)'
+                }
               >
                 <option value="webm">WebM</option>
+                <option value="mp4">MP4 (iOS)</option>
+                <option value="live-photo">Live Photo</option>
                 <option value="gif">GIF</option>
               </select>
             </div>
@@ -371,7 +445,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             </button>
             {(isRecording || isProcessing) && (
               <div style={styles.videoProgress}>
-                {isRecording && videoFormat === 'webm' && <span>Recording: {videoDuration}s</span>}
+                {isRecording && (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'live-photo') && <span>Recording: {videoDuration}s</span>}
                 {isRecording && videoFormat === 'gif' && <span>Frames: {recordedFrameCount}/{videoDuration * videoFPS}</span>}
                 {isProcessing && <span>Processing: {processingProgress}%</span>}
               </div>
