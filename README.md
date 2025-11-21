@@ -30,7 +30,16 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ✅ **WebGL-Accelerated Rendering** - GPU-based trail rendering for high performance
 ✅ **Flexible Aspect Ratios** - 1:1, 16:9, 9:16, 3:2, 4:3, 21:9, and more
 ✅ **4 Blend Modes** - Additive, Average, Multiply, Screen
-✅ **11+ Post-Processing Effects** - Motion blur, bloom, chromatic aberration, vignette, scanlines, pixelation
+✅ **20+ Visual Effect Presets** - Cinematic (Blockbuster, Cyberpunk Dreams, Golden Hour, War Film), Psychedelic (Infinite Spiral, Mandala Magic, Liquid Fractal), Geometric (Rorschach, Tunnel Vision, Recursive Mandala, Warp Speed), Classic (Neon Glow, Traumhaft, Meditation)
+✅ **7 Advanced Post-Processing Effects** ⭐ NEW
+  - **Feedback/Echo** - Recursive rendering with zoom, rotation, and offset
+  - **Kaleidoscope** - Radial mirroring with 2-12 segments for mandala patterns
+  - **Radial Blur** - Tunnel/explosion effects with adjustable center and quality
+  - **Better Bloom** - Multi-pass Gaussian bloom with threshold and radius control
+  - **Displacement Map** - Organic distortions with animatable noise patterns
+  - **Color Mapping/LUT** - Cinematic film grading (Teal & Orange, Bleach Bypass, Warm Vintage, Cool Cyberpunk)
+  - **Mirror/Symmetry** - Horizontal, vertical, quad symmetry modes
+✅ **11 Classic Effects** - Motion blur, bloom (simple), chromatic aberration, vignette, scanlines, pixelation, blur, saturation, contrast, hue shift
 ✅ **High-DPI Support** - Sharp rendering on retina displays (up to 2x devicePixelRatio)
 
 #### Export & Sharing 📤

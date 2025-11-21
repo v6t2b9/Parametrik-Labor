@@ -242,6 +242,20 @@ export interface EffectsParams {
   radialBlurCenterX: number;     // 0-1: X position of center (0.5 = middle)
   radialBlurCenterY: number;     // 0-1: Y position of center (0.5 = middle)
   radialBlurQuality: number;     // 2-10: Number of samples (higher = smoother but slower, 4-6 recommended)
+
+  // Displacement Map Effect (Organic Distortion)
+  displacementStrength: number;  // 0-50: Pixel offset amount (0 = off, 20 = medium, 50 = extreme)
+  displacementScale: number;     // 0.5-5.0: Noise pattern scale (lower = larger patterns, higher = fine detail)
+  displacementTime: number;      // 0-1: Animation phase (0 = frozen, 1 = full cycle)
+  displacementAngle: number;     // 0-360: Direction bias in degrees (0 = right, 90 = down, etc.)
+
+  // Color Mapping/LUT (Film Grading)
+  colorLUT: 'none' | 'teal-orange' | 'bleach-bypass' | 'warm-vintage' | 'cool-cyberpunk'; // Color grading preset
+  colorLUTIntensity: number;     // 0-1: LUT effect strength (0 = off, 1 = full effect)
+
+  // Mirror/Symmetry Effect
+  mirrorMode: 'none' | 'horizontal' | 'vertical' | 'both' | 'quad'; // Symmetry mode
+  mirrorPosition: number;        // 0-1: Mirror axis position (0.5 = center)
 }
 
 export type QualityPreset = 'low' | 'medium' | 'high' | 'ultra';

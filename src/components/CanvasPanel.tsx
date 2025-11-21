@@ -449,6 +449,101 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
+    // === 2.3. Mirror/Symmetry Effect ===
+    // Simple mirroring along horizontal, vertical, or both axes
+    if (effects.mirrorMode !== 'none') {
+      const tempCanvas = canvasPool.acquire(gridPixelWidth, gridPixelHeight);
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx && tempCanvas.width === gridPixelWidth && tempCanvas.height === gridPixelHeight) {
+        // Capture current grid content
+        tempCtx.drawImage(canvas, offsetX, offsetY, gridPixelWidth, gridPixelHeight, 0, 0, gridPixelWidth, gridPixelHeight);
+
+        // Clear grid area
+        ctx.clearRect(0, 0, gridPixelWidth, gridPixelHeight);
+
+        const mirrorPos = effects.mirrorPosition;
+
+        if (effects.mirrorMode === 'horizontal') {
+          // Left half original, right half mirrored
+          const splitX = gridPixelWidth * mirrorPos;
+          ctx.drawImage(tempCanvas, 0, 0, splitX, gridPixelHeight, 0, 0, splitX, gridPixelHeight);
+          ctx.save();
+          ctx.translate(splitX, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(tempCanvas, 0, 0, splitX, gridPixelHeight, -splitX, 0, splitX, gridPixelHeight);
+          ctx.restore();
+        } else if (effects.mirrorMode === 'vertical') {
+          // Top half original, bottom half mirrored
+          const splitY = gridPixelHeight * mirrorPos;
+          ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, splitY, 0, 0, gridPixelWidth, splitY);
+          ctx.save();
+          ctx.translate(0, splitY);
+          ctx.scale(1, -1);
+          ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, splitY, 0, -splitY, gridPixelWidth, splitY);
+          ctx.restore();
+        } else if (effects.mirrorMode === 'both') {
+          // Quarter grid mirrored in both axes
+          const splitX = gridPixelWidth * mirrorPos;
+          const splitY = gridPixelHeight * mirrorPos;
+
+          // Top-left original
+          ctx.drawImage(tempCanvas, 0, 0, splitX, splitY, 0, 0, splitX, splitY);
+
+          // Top-right (mirrored horizontally)
+          ctx.save();
+          ctx.translate(splitX, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(tempCanvas, 0, 0, splitX, splitY, -splitX, 0, splitX, splitY);
+          ctx.restore();
+
+          // Bottom-left (mirrored vertically)
+          ctx.save();
+          ctx.translate(0, splitY);
+          ctx.scale(1, -1);
+          ctx.drawImage(tempCanvas, 0, 0, splitX, splitY, 0, -splitY, splitX, splitY);
+          ctx.restore();
+
+          // Bottom-right (mirrored both)
+          ctx.save();
+          ctx.translate(splitX, splitY);
+          ctx.scale(-1, -1);
+          ctx.drawImage(tempCanvas, 0, 0, splitX, splitY, -splitX, -splitY, splitX, splitY);
+          ctx.restore();
+        } else if (effects.mirrorMode === 'quad') {
+          // 4-way symmetry (center mirror)
+          const halfW = gridPixelWidth / 2;
+          const halfH = gridPixelHeight / 2;
+
+          // Top-left quadrant (original)
+          ctx.drawImage(tempCanvas, 0, 0, halfW, halfH, 0, 0, halfW, halfH);
+
+          // Top-right (mirror horizontally)
+          ctx.save();
+          ctx.translate(gridPixelWidth, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(tempCanvas, 0, 0, halfW, halfH, 0, 0, halfW, halfH);
+          ctx.restore();
+
+          // Bottom-left (mirror vertically)
+          ctx.save();
+          ctx.translate(0, gridPixelHeight);
+          ctx.scale(1, -1);
+          ctx.drawImage(tempCanvas, 0, 0, halfW, halfH, 0, 0, halfW, halfH);
+          ctx.restore();
+
+          // Bottom-right (mirror both)
+          ctx.save();
+          ctx.translate(gridPixelWidth, gridPixelHeight);
+          ctx.scale(-1, -1);
+          ctx.drawImage(tempCanvas, 0, 0, halfW, halfH, 0, 0, halfW, halfH);
+          ctx.restore();
+        }
+
+        canvasPool.release(tempCanvas);
+      }
+    }
+
     // === 2.5. Kaleidoscope Effect (Radial Mirroring) ===
     // Creates symmetrical mandala patterns by mirroring the grid in radial segments
     if (effects.kaleidoscopeSegments >= 2) {
@@ -589,6 +684,71 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
           }
         });
       }
+    }
+
+    // === 8.5. Displacement Map (Organic Distortion) ===
+    if (effects.displacementStrength > 0) {
+      // Simple 2D noise function (simplified Perlin-like)
+      const noise = (x: number, y: number): number => {
+        // Combine multiple sine waves for organic noise pattern
+        const s1 = Math.sin(x * 0.1 + y * 0.1) * 0.5;
+        const s2 = Math.sin(x * 0.3 - y * 0.2) * 0.3;
+        const s3 = Math.sin(x * 0.05 + y * 0.15) * 0.2;
+        return (s1 + s2 + s3); // Range: approximately -1 to 1
+      };
+
+      // Get current canvas data
+      const sourceCanvas = canvasPoolRef.current.acquire(gridPixelWidth, gridPixelHeight);
+      const sourceCtx = sourceCanvas.getContext('2d', { willReadFrequently: true })!;
+      sourceCtx.drawImage(canvas!, 0, 0);
+
+      const sourceData = sourceCtx.getImageData(0, 0, gridPixelWidth, gridPixelHeight);
+      const destData = ctx.createImageData(gridPixelWidth, gridPixelHeight);
+      const src = sourceData.data;
+      const dest = destData.data;
+
+      const scale = effects.displacementScale;
+      const strength = effects.displacementStrength;
+      const time = effects.displacementTime;
+      const angleRad = (effects.displacementAngle * Math.PI) / 180;
+      const dirX = Math.cos(angleRad);
+      const dirY = Math.sin(angleRad);
+
+      // Displacement pass
+      for (let y = 0; y < gridPixelHeight; y++) {
+        for (let x = 0; x < gridPixelWidth; x++) {
+          // Calculate noise value at this position (with animation)
+          const noiseValue = noise(
+            (x * scale) + (time * 100),
+            (y * scale) + (time * 100)
+          );
+
+          // Calculate displacement offset (with directional bias)
+          const offsetX = noiseValue * strength * dirX;
+          const offsetY = noiseValue * strength * dirY;
+
+          // Sample from source position (with wrapping for seamless edges)
+          const srcX = Math.floor(x + offsetX);
+          const srcY = Math.floor(y + offsetY);
+
+          // Clamp to canvas bounds
+          const sampledX = Math.max(0, Math.min(gridPixelWidth - 1, srcX));
+          const sampledY = Math.max(0, Math.min(gridPixelHeight - 1, srcY));
+
+          const destIdx = (y * gridPixelWidth + x) * 4;
+          const srcIdx = (sampledY * gridPixelWidth + sampledX) * 4;
+
+          // Copy RGBA
+          dest[destIdx] = src[srcIdx];
+          dest[destIdx + 1] = src[srcIdx + 1];
+          dest[destIdx + 2] = src[srcIdx + 2];
+          dest[destIdx + 3] = src[srcIdx + 3];
+        }
+      }
+
+      // Write displaced image back
+      ctx.putImageData(destData, 0, 0);
+      canvasPoolRef.current.release(sourceCanvas);
     }
 
     // === 9. Vignette (Screen Overlay) ===
@@ -752,6 +912,90 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
 
       canvasPool.release(tempCanvas);
+    }
+
+    // === 16.5. Color Mapping/LUT (Film Grading) ===
+    // Apply cinematic color grading using Look-Up Tables
+    if (effects.colorLUT !== 'none' && effects.colorLUTIntensity > 0) {
+      const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
+      const data = imageData.data;
+
+      // LUT functions for different film grading presets
+      const applyLUT = (r: number, g: number, b: number): [number, number, number] => {
+        const intensity = effects.colorLUTIntensity;
+
+        if (effects.colorLUT === 'teal-orange') {
+          // Teal & Orange (Hollywood blockbuster look)
+          // Push shadows to teal, highlights to orange
+          const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+          const isHighlight = luminance > 128;
+
+          if (isHighlight) {
+            // Orange highlights
+            const newR = r + (30 * intensity);
+            const newG = g + (10 * intensity);
+            const newB = b - (20 * intensity);
+            return [newR, newG, newB];
+          } else {
+            // Teal shadows
+            const newR = r - (20 * intensity);
+            const newG = g + (10 * intensity);
+            const newB = b + (30 * intensity);
+            return [newR, newG, newB];
+          }
+        } else if (effects.colorLUT === 'bleach-bypass') {
+          // Bleach Bypass (desaturated, high contrast)
+          const avg = (r + g + b) / 3;
+          const newR = r + (avg - r) * 0.3 * intensity;
+          const newG = g + (avg - g) * 0.3 * intensity;
+          const newB = b + (avg - b) * 0.3 * intensity;
+          // Boost contrast
+          const contrast = 1 + (0.5 * intensity);
+          return [
+            ((newR - 128) * contrast + 128),
+            ((newG - 128) * contrast + 128),
+            ((newB - 128) * contrast + 128),
+          ];
+        } else if (effects.colorLUT === 'warm-vintage') {
+          // Warm Vintage (golden hour, sepia tones)
+          const newR = r + (40 * intensity);
+          const newG = g + (15 * intensity);
+          const newB = b - (30 * intensity);
+          return [newR, newG, newB];
+        } else if (effects.colorLUT === 'cool-cyberpunk') {
+          // Cool Cyberpunk (cyan/magenta/purple)
+          const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+          const isDark = luminance < 100;
+
+          if (isDark) {
+            // Purple/blue shadows
+            const newR = r + (20 * intensity);
+            const newG = g - (10 * intensity);
+            const newB = b + (50 * intensity);
+            return [newR, newG, newB];
+          } else {
+            // Cyan/magenta highlights
+            const newR = r + (30 * intensity);
+            const newG = g + (20 * intensity);
+            const newB = b + (40 * intensity);
+            return [newR, newG, newB];
+          }
+        }
+
+        return [r, g, b];
+      };
+
+      // Apply LUT to each pixel
+      for (let i = 0; i < data.length; i += 4) {
+        const [newR, newG, newB] = applyLUT(data[i], data[i + 1], data[i + 2]);
+
+        // Lerp between original and LUT based on intensity
+        data[i] = Math.max(0, Math.min(255, newR));
+        data[i + 1] = Math.max(0, Math.min(255, newG));
+        data[i + 2] = Math.max(0, Math.min(255, newB));
+      }
+
+      ctx.putImageData(imageData, 0, 0);
     }
 
     // === 17. Bloom Effect ===
