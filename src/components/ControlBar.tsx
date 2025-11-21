@@ -39,12 +39,35 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [videoFormat, setVideoFormat] = useState<'webm' | 'gif'>('webm');
   const [videoDuration, setVideoDuration] = useState<3 | 8 | 12>(3);
+  const [videoQuality, setVideoQuality] = useState<'standard' | 'high' | 'very-high'>('high');
+  const [videoFPS, setVideoFPS] = useState<30 | 60>(30);
   const [recordedFrameCount, setRecordedFrameCount] = useState(0);
   const [processingProgress, setProcessingProgress] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
   const gifEncoderRef = useRef<InstanceType<typeof GIF> | null>(null);
   const recordingIntervalRef = useRef<number | null>(null);
+
+  // Get quality parameters based on preset and format
+  function getQualityParams() {
+    if (videoFormat === 'webm') {
+      // WebM bitrate settings
+      const bitrateMap = {
+        'standard': 8000000,   // 8 Mbps
+        'high': 12000000,      // 12 Mbps
+        'very-high': 18000000  // 18 Mbps
+      };
+      return { bitrate: bitrateMap[videoQuality] };
+    } else {
+      // GIF quality settings
+      const gifQualityMap = {
+        'standard': { quality: 10, dithering: false as const },
+        'high': { quality: 5, dithering: false as const },
+        'very-high': { quality: 2, dithering: 'FloydSteinberg' as const }
+      };
+      return gifQualityMap[videoQuality];
+    }
+  }
 
   function takeScreenshot() {
     const canvas = document.querySelector('canvas');
@@ -68,15 +91,17 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     setIsRecording(true);
 
     const duration = videoDuration * 1000; // Convert to milliseconds
-    const maxFrames = videoDuration * 30; // 30 FPS
+    const maxFrames = videoDuration * videoFPS; // Use selected FPS
+    const frameDelay = Math.round(1000 / videoFPS); // ms per frame
 
     if (videoFormat === 'webm') {
       // WebM recording with MediaRecorder
       try {
-        const stream = canvas.captureStream(30); // 30 FPS
+        const qualityParams = getQualityParams() as { bitrate: number };
+        const stream = canvas.captureStream(videoFPS); // Use selected FPS
         const options: MediaRecorderOptions = {
           mimeType: 'video/webm;codecs=vp9',
-          videoBitsPerSecond: 5000000, // 5 Mbps
+          videoBitsPerSecond: qualityParams.bitrate,
         };
 
         // Fallback to vp8 if vp9 not supported
@@ -131,9 +156,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       // GIF recording with gif.js
       console.log('Starting GIF video recording...');
       try {
+        const qualityParams = getQualityParams() as { quality: number; dithering: false | 'FloydSteinberg' };
         const gif = new GIF({
           workers: 2,
-          quality: 10,
+          quality: qualityParams.quality,
+          dither: qualityParams.dithering,
           width: canvas.width,
           height: canvas.height,
           workerScript: '/gif.worker.js',
@@ -176,7 +203,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           }, 100);
         });
 
-        // Capture frames at 30 FPS
+        // Capture frames at selected FPS
         let capturedFrameCount = 0;
         recordingIntervalRef.current = window.setInterval(() => {
           if (capturedFrameCount >= maxFrames) {
@@ -193,14 +220,14 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             return;
           }
 
-          gif.addFrame(canvas, { copy: true, delay: 33 }); // 33ms = ~30fps
+          gif.addFrame(canvas, { copy: true, delay: frameDelay });
           capturedFrameCount++;
           setRecordedFrameCount(capturedFrameCount);
 
-          if (capturedFrameCount % 30 === 0) {
+          if (capturedFrameCount % videoFPS === 0) {
             console.log(`Captured ${capturedFrameCount}/${maxFrames} video frames`);
           }
-        }, 33);
+        }, frameDelay);
       } catch (error) {
         console.error('GIF recording error:', error);
         alert('GIF recording failed. Please try again.');
@@ -219,7 +246,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       if (videoFormat === 'webm') {
         return `Recording... ${videoDuration}s`;
       } else {
-        const maxFrames = videoDuration * 30;
+        const maxFrames = videoDuration * videoFPS;
         return `Capturing... ${recordedFrameCount}/${maxFrames}`;
       }
     }
@@ -285,6 +312,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
                 onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif')}
                 disabled={isRecording || isProcessing}
                 style={styles.videoSelect}
+                title={videoFormat === 'webm' ? 'WebM video format (smaller files)' : 'GIF format (universal support)'}
               >
                 <option value="webm">WebM</option>
                 <option value="gif">GIF</option>
@@ -303,6 +331,37 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
                 <option value={12}>12s</option>
               </select>
             </div>
+            <div style={styles.videoOption}>
+              <label style={styles.videoLabel}>Quality:</label>
+              <select
+                value={videoQuality}
+                onChange={(e) => setVideoQuality(e.target.value as 'standard' | 'high' | 'very-high')}
+                disabled={isRecording || isProcessing}
+                style={styles.videoSelect}
+                title={
+                  videoQuality === 'standard' ? 'Good balance (8 Mbps WebM / Quality 10 GIF)' :
+                  videoQuality === 'high' ? 'High quality, recommended (12 Mbps WebM / Quality 5 GIF)' :
+                  'Maximum quality (18 Mbps WebM / Quality 2 GIF + Dithering)'
+                }
+              >
+                <option value="standard">Standard</option>
+                <option value="high">High</option>
+                <option value="very-high">Very High</option>
+              </select>
+            </div>
+            <div style={styles.videoOption}>
+              <label style={styles.videoLabel}>FPS:</label>
+              <select
+                value={videoFPS}
+                onChange={(e) => setVideoFPS(parseInt(e.target.value) as 30 | 60)}
+                disabled={isRecording || isProcessing}
+                style={styles.videoSelect}
+                title={videoFPS === 30 ? '30 FPS (smaller files)' : '60 FPS (smoother, larger files)'}
+              >
+                <option value={30}>30 FPS</option>
+                <option value={60}>60 FPS</option>
+              </select>
+            </div>
             <button
               onClick={startRecording}
               disabled={isRecording || isProcessing}
@@ -313,7 +372,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             {(isRecording || isProcessing) && (
               <div style={styles.videoProgress}>
                 {isRecording && videoFormat === 'webm' && <span>Recording: {videoDuration}s</span>}
-                {isRecording && videoFormat === 'gif' && <span>Frames: {recordedFrameCount}/{videoDuration * 30}</span>}
+                {isRecording && videoFormat === 'gif' && <span>Frames: {recordedFrameCount}/{videoDuration * videoFPS}</span>}
                 {isProcessing && <span>Processing: {processingProgress}%</span>}
               </div>
             )}
