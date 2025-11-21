@@ -169,7 +169,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           const timestamp = Date.now();
 
           // Check if Web Share API is available (iOS Safari supports this)
-          const canShare = navigator.share && videoFormat === 'ios-video';
+          const canShare = typeof navigator.share !== 'undefined' && videoFormat === 'ios-video';
 
           if (canShare) {
             try {
@@ -185,7 +185,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
               }
 
               // Check if files can be shared
-              if (navigator.canShare && navigator.canShare({ files })) {
+              if (typeof navigator.canShare !== 'undefined' && navigator.canShare({ files })) {
                 await navigator.share({
                   files,
                   title: 'Parametric Animation',
