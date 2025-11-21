@@ -754,8 +754,96 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       canvasPool.release(tempCanvas);
     }
 
-    // === 15. Bloom Effect ===
-    if (effects.bloom > 0) {
+    // === 17. Bloom Effect ===
+    // Choose between Simple Bloom (legacy) and Better Bloom (multi-pass Gaussian)
+    const useBetterBloom = effects.bloomIntensity > 0;
+
+    if (useBetterBloom) {
+      // === 17a. Better Bloom (Multi-Pass Gaussian) ===
+      // Professional quality bloom with threshold extraction and multi-pass blur
+      const bloomDownscale = 4; // Downscale factor (4 = 1/4 size)
+      const bloomWidth = Math.floor(canvasWidth / bloomDownscale);
+      const bloomHeight = Math.floor(canvasHeight / bloomDownscale);
+
+      // Step 1: Extract bright pixels to temp canvas
+      const brightCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
+      const brightCtx = brightCanvas.getContext('2d');
+
+      if (brightCtx && brightCanvas.width === canvasWidth && brightCanvas.height === canvasHeight) {
+        // Copy canvas
+        brightCtx.drawImage(canvas, 0, 0);
+
+        // Extract bright pixels (threshold)
+        if (effects.bloomThreshold > 0) {
+          const imageData = brightCtx.getImageData(0, 0, canvasWidth, canvasHeight);
+          const data = imageData.data;
+          const threshold = effects.bloomThreshold * 255;
+
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+
+            // Calculate brightness (perceived luminance)
+            const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            // If below threshold, set to black
+            if (brightness < threshold) {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+            }
+          }
+
+          brightCtx.putImageData(imageData, 0, 0);
+        }
+
+        // Step 2: Downscale to bloom canvas
+        const bloomCanvas = canvasPool.acquire(bloomWidth, bloomHeight);
+        const bloomCtx = bloomCanvas.getContext('2d');
+
+        if (bloomCtx && bloomCanvas.width === bloomWidth && bloomCanvas.height === bloomHeight) {
+          bloomCtx.imageSmoothingEnabled = true;
+          bloomCtx.imageSmoothingQuality = 'high';
+          bloomCtx.drawImage(brightCanvas, 0, 0, bloomWidth, bloomHeight);
+
+          // Step 3: Multi-pass Gaussian blur
+          const blurPasses = Math.floor(effects.bloomRadius);
+          for (let pass = 0; pass < blurPasses; pass++) {
+            const tempBloom = canvasPool.acquire(bloomWidth, bloomHeight);
+            const tempBloomCtx = tempBloom.getContext('2d');
+
+            if (tempBloomCtx) {
+              // Apply blur (each pass = 2px blur, accumulates)
+              tempBloomCtx.filter = 'blur(2px)';
+              tempBloomCtx.drawImage(bloomCanvas, 0, 0);
+              tempBloomCtx.filter = 'none';
+
+              // Copy back
+              bloomCtx.clearRect(0, 0, bloomWidth, bloomHeight);
+              bloomCtx.drawImage(tempBloom, 0, 0);
+            }
+
+            canvasPool.release(tempBloom);
+          }
+
+          // Step 4: Upscale bloom and blend with main canvas
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.globalAlpha = effects.bloomIntensity;
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(bloomCanvas, 0, 0, canvasWidth, canvasHeight);
+          ctx.globalAlpha = 1;
+          ctx.globalCompositeOperation = 'source-over';
+
+          canvasPool.release(bloomCanvas);
+        }
+
+        canvasPool.release(brightCanvas);
+      }
+    } else if (effects.bloom > 0) {
+      // === 17b. Simple Bloom (Legacy) ===
+      // Kept for backward compatibility and performance
       ctx.globalCompositeOperation = 'lighter';
       ctx.globalAlpha = effects.bloom;
       ctx.filter = `blur(${Math.max(8, effects.blur + 8)}px) brightness(1.5)`;

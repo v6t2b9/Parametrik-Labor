@@ -199,7 +199,12 @@ export interface VisualizationParams {
 export interface EffectsParams {
   // Blur & Glow
   blur: number;              // 0-20px: Gaussian blur radius
-  bloom: number;             // 0-1: Additive glow/bloom strength
+  bloom: number;             // 0-1: Simple additive bloom strength (legacy/simple mode)
+
+  // Better Bloom (Multi-Pass Gaussian)
+  bloomThreshold: number;    // 0-1: Brightness threshold for bloom (0 = all pixels, 0.7 = only bright pixels)
+  bloomRadius: number;       // 1-10: Blur radius in passes (higher = softer, wider glow)
+  bloomIntensity: number;    // 0-2: Bloom strength multiplier (1 = normal, 2 = extreme)
 
   // Color Grading
   saturation: number;        // 0-3: Color saturation (1 = normal)

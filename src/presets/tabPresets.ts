@@ -509,6 +509,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 0,
       bloom: 0,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 1.0,
       contrast: 1.0,
       hueShift: 0,
@@ -539,6 +542,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 1.5,
       bloom: 0.15,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 1.1,
       contrast: 1.05,
       hueShift: 0,
@@ -569,6 +575,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 8,
       bloom: 0.5,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 0.85,
       contrast: 0.9,
       hueShift: 0,
@@ -599,6 +608,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 3,
       bloom: 0.8,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 2.5,
       contrast: 1.4,
       hueShift: 0,
@@ -629,6 +641,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 4,
       bloom: 0.6,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 2.2,
       contrast: 1.3,
       hueShift: 180,
@@ -659,6 +674,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 0.5,
       bloom: 0.2,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 0.9,
       contrast: 1.3,
       hueShift: 0,
@@ -689,6 +707,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 6,
       bloom: 0.35,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 1.2,
       contrast: 0.95,
       hueShift: 0,
@@ -719,6 +740,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 15,
       bloom: 0.6,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 0.7,
       contrast: 0.8,
       hueShift: 0,
@@ -749,6 +773,9 @@ export const effectsPresets: EffectsPreset[] = [
     params: {
       blur: 0,
       bloom: 0.1,
+      bloomThreshold: 0.7,
+      bloomRadius: 4,
+      bloomIntensity: 1.0,
       saturation: 1.4,
       contrast: 1.2,
       hueShift: 0,

@@ -196,14 +196,50 @@ export function VisualsOikosPanel() {
             description="Gaussian blur radius (px) - creates softer, dreamier visuals"
           />
           <ParameterSlider
-            label="Bloom"
+            label="Bloom (Simple)"
             value={effectsParams.bloom}
             min={0}
             max={1}
             step={0.05}
             onChange={(value) => updateEffectsParams({ bloom: value })}
-            description="Additive glow strength - adds ethereal luminous halos"
+            description="Simple additive glow (legacy mode) - fast but basic. Use Better Bloom for professional quality."
           />
+        </div>
+
+        {/* Better Bloom (Professional) */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Better Bloom (Professional Multi-Pass)</h5>
+          <ParameterSlider
+            label="Bloom Intensity"
+            value={effectsParams.bloomIntensity}
+            min={0}
+            max={2}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ bloomIntensity: value })}
+            description="Bloom strength (0 = off, 1 = normal, 2 = extreme) - professional quality glow"
+          />
+          {effectsParams.bloomIntensity > 0 && (
+            <>
+              <ParameterSlider
+                label="Bloom Threshold"
+                value={effectsParams.bloomThreshold}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(value) => updateEffectsParams({ bloomThreshold: value })}
+                description="Brightness threshold (0 = all pixels glow, 0.7 = only bright pixels glow)"
+              />
+              <ParameterSlider
+                label="Bloom Radius"
+                value={effectsParams.bloomRadius}
+                min={1}
+                max={10}
+                step={1}
+                onChange={(value) => updateEffectsParams({ bloomRadius: value })}
+                description="Glow spread/softness (1 = tight, 4 = balanced, 10 = very wide & soft)"
+              />
+            </>
+          )}
         </div>
 
         {/* Color Grading */}
@@ -571,6 +607,9 @@ export function VisualsOikosPanel() {
           <li><strong>Radial Blur 0.3-0.5</strong> = subtle motion, <strong>0.7+</strong> = extreme tunnel effect</li>
           <li><strong>Radial Blur + Feedback</strong> = explosive recursive spirals from center</li>
           <li><strong>Radial Blur off-center</strong> (Center X/Y ≠ 0.5) = asymmetric motion blur</li>
+          <li><strong>Better Bloom Threshold 0.7</strong> = only bright areas glow (film-like), <strong>0.3</strong> = more glow</li>
+          <li><strong>Better Bloom Radius 4-6</strong> = balanced cinematic glow, <strong>8-10</strong> = very soft & wide</li>
+          <li><strong>Better Bloom + High Brightness</strong> = AAA game quality glow on bright trails</li>
         </ul>
       </div>
     </div>

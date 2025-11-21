@@ -84,6 +84,9 @@ export const defaultParameters: AllParameters = {
   effects: {
     blur: 0,
     bloom: 0.4,
+    bloomThreshold: 0.7,
+    bloomRadius: 4,
+    bloomIntensity: 1.0,
     saturation: 1.0,
     contrast: 1.0,
     hueShift: 0,
