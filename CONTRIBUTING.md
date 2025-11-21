@@ -225,6 +225,37 @@ src/
 - **Types/Interfaces:** PascalCase
 - **CSS classes:** kebab-case
 
+#### ⚠️ Important: Avoiding Variable Shadowing
+
+**Never shadow design system imports!** The design system exports commonly named objects like `colors`, `spacing`, `typography`, and `effects`. Always use descriptive names for local variables to avoid conflicts:
+
+```tsx
+// ❌ BAD - Shadows design system import
+import { colors, spacing, effects } from '../design-system';
+const effects = useSimulationStore((state) => state.parameters.effects);
+
+// ✅ GOOD - Descriptive parameter names
+import { colors, spacing, effects } from '../design-system';
+const effectsParams = useSimulationStore((state) => state.parameters.effects);
+```
+
+**Parameter naming convention:**
+- Use suffix `*Params` for parameter objects from the store
+- Examples: `effectsParams`, `visualizationParams`, `physicalParams`
+
+**Zustand store selectors:**
+- Always use **selector functions** instead of destructuring
+- This ensures stable references and prevents unnecessary re-renders
+
+```tsx
+// ❌ BAD - Unstable references
+const { parameters, updateParams } = useSimulationStore();
+
+// ✅ GOOD - Stable selector references
+const parameters = useSimulationStore((state) => state.parameters);
+const updateParams = useSimulationStore((state) => state.updateParams);
+```
+
 ---
 
 ## Commit Guidelines

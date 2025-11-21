@@ -651,8 +651,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Release all pooled canvases
     canvasPool.releaseAll();
-  }, [canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine]);
-  // Note: parameters is intentionally NOT in deps - it's read inside callback to prevent recreation on every slider change
+  }, [canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine, parameters]);
+  // Note: parameters is now included in deps to ensure visualization/effects updates are reflected immediately
 
   // Update ref to latest render function
   useEffect(() => {

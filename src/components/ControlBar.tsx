@@ -177,9 +177,9 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         });
 
         // Capture frames at 30 FPS
-        let frameCount = 0;
+        let capturedFrameCount = 0;
         recordingIntervalRef.current = window.setInterval(() => {
-          if (frameCount >= maxFrames) {
+          if (capturedFrameCount >= maxFrames) {
             console.log('All video frames captured, starting render...');
             // Auto-stop and start rendering
             if (recordingIntervalRef.current) {
@@ -194,11 +194,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           }
 
           gif.addFrame(canvas, { copy: true, delay: 33 }); // 33ms = ~30fps
-          frameCount++;
-          setRecordedFrameCount(frameCount);
+          capturedFrameCount++;
+          setRecordedFrameCount(capturedFrameCount);
 
-          if (frameCount % 30 === 0) {
-            console.log(`Captured ${frameCount}/${maxFrames} video frames`);
+          if (capturedFrameCount % 30 === 0) {
+            console.log(`Captured ${capturedFrameCount}/${maxFrames} video frames`);
           }
         }, 33);
       } catch (error) {

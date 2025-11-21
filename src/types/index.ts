@@ -285,8 +285,16 @@ export interface Preset {
   name: string;
   icon: string;
   description: string;
+
+  /**
+   * LEGACY COMPATIBILITY
+   * Accepts both AllParameters (new format) and any (old format).
+   * Old format is converted using convertLegacyPreset() at runtime.
+   *
+   * @deprecated Use AllParameters directly for new presets
+   */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  parameters: AllParameters | any; // Allow legacy format for backwards compatibility
+  parameters: AllParameters | any;
 }
 
 // Simulation State
@@ -326,8 +334,15 @@ export interface UIState {
   // Mobile UI
   controlPanelOpen: boolean;         // Drawer state on mobile
 
-  // Legacy
-  simulationSpeed: number;           // 1x, 2x, 5x, etc.
+  /**
+   * LEGACY FIELD
+   * This was used for discrete speed multipliers (1x, 2x, 5x).
+   * Now handled by globalTemporal.simulationSpeed.
+   *
+   * @deprecated Use globalTemporal.simulationSpeed instead
+   * TODO: Remove in v2.0.0 - migrate all references
+   */
+  simulationSpeed: number;
 
   // Playback speed (overall animation speed multiplier)
   playbackSpeed: number;             // 0.1x to 2x, controls frame rate
