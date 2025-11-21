@@ -1,7 +1,7 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { builtInPresets } from '../presets';
 import { useState, useRef } from 'react';
-import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { colors, spacing, typography, effects, createHeaderStyle } from '../design-system';
 
 // Categorize presets by their pattern formation characteristics
 const presetCategories = {
