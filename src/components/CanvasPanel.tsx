@@ -578,6 +578,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     }
 
     // === 16. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
+    // Apply filters individually to ensure they are not overridden
     const filters: string[] = [];
     if (effects.blur > 0) filters.push(`blur(${effects.blur}px)`);
     if (effects.saturation !== 1.0) filters.push(`saturate(${effects.saturation})`);
@@ -589,14 +590,15 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       const tempCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
       const tempCtx = tempCanvas.getContext('2d');
 
-      if (tempCtx) {
-        // Copy current canvas to temp
-        tempCtx.drawImage(canvas, 0, 0);
+      if (tempCtx && tempCanvas.width === canvasWidth && tempCanvas.height === canvasHeight) {
+        // Copy current canvas to temp (preserve all content)
+        tempCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        tempCtx.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
 
         // Apply filters and draw back to main canvas
-        ctx.filter = filters.join(' ');
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-        ctx.drawImage(tempCanvas, 0, 0);
+        ctx.filter = filters.join(' ');
+        ctx.drawImage(tempCanvas, 0, 0, canvasWidth, canvasHeight);
         ctx.filter = 'none';
       }
 
