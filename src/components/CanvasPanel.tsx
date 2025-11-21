@@ -5,6 +5,7 @@ import { applyHueCycling } from '../utils/colorUtils';
 import { EcosystemRenderer } from '../engine/EcosystemRenderer';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
 import { SPECIES_COLORS } from '../types/ecosystem';
+import { calculateGridDimensions } from '../engine/SimulationEngine';
 
 const DEFAULT_CANVAS_SIZE = 800;
 
@@ -92,9 +93,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // Responsive canvas sizing based on fullscreen mode and aspect ratio
   useEffect(() => {
     const updateCanvasSize = () => {
-      // Get grid dimensions from engine
-      const gridWidth = engine.getGridWidth ? engine.getGridWidth() : 400;
-      const gridHeight = engine.getGridHeight ? engine.getGridHeight() : 400;
+      // Calculate grid dimensions from aspect ratio
+      const { width: gridWidth, height: gridHeight } = calculateGridDimensions(aspectRatio);
       const [ratioW, ratioH] = getAspectRatioMultipliers(aspectRatio);
 
       if (isFullscreen) {
@@ -185,14 +185,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       window.addEventListener('resize', updateCanvasSize);
       return () => window.removeEventListener('resize', updateCanvasSize);
     }
-  }, [isFullscreen, aspectRatio, engine]);
+  }, [isFullscreen, aspectRatio]); // Removed engine dependency to prevent unnecessary updates
 
   // Initialize/update WebGL renderer, motion blur canvas, and scanline pattern when canvas size changes
   useEffect(() => {
     // WebGL renderer - recreate when canvas size changes
-    // Get grid dimensions from engine
-    const gridWidth = engine.getGridWidth ? engine.getGridWidth() : 400;
-    const gridHeight = engine.getGridHeight ? engine.getGridHeight() : 400;
+    // Calculate grid dimensions from aspect ratio
+    const { width: gridWidth, height: gridHeight } = calculateGridDimensions(aspectRatio);
     const gridPixelWidth = Math.floor(gridWidth * scale);
     const gridPixelHeight = Math.floor(gridHeight * scale);
     if (webglRendererRef.current) {
@@ -232,7 +231,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         webglRendererRef.current = null;
       }
     };
-  }, [canvasWidth, canvasHeight, scale]);
+  }, [canvasWidth, canvasHeight, scale, aspectRatio]);
 
   // Render function with post-processing effects (OPTIMIZED)
   const render = useCallback(() => {
@@ -255,9 +254,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     ctx.save();
     ctx.translate(offsetX, offsetY);
 
-    // Get grid dimensions from engine
-    const gridWidth = engine.getGridWidth ? engine.getGridWidth() : 400;
-    const gridHeight = engine.getGridHeight ? engine.getGridHeight() : 400;
+    // Calculate grid dimensions from aspect ratio
+    const { width: gridWidth, height: gridHeight } = calculateGridDimensions(aspectRatio);
     const gridPixelWidth = Math.floor(gridWidth * scale);
     const gridPixelHeight = Math.floor(gridHeight * scale);
 
@@ -643,7 +641,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Release all pooled canvases
     canvasPool.releaseAll();
-  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scale, offsetX, offsetY, engine, ecosystemMode, isEcosystemEngine]);
+  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scale, offsetX, offsetY, aspectRatio, engine, ecosystemMode, isEcosystemEngine]);
 
   // Animation loop with playback speed control
   useEffect(() => {
