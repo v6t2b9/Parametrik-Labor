@@ -17,10 +17,7 @@ export function VisualsOikosPanel() {
 
       {/* Visual Presets Section */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Visual Presets</h4>
-        <p style={styles.sectionDescription}>
-          Pre-configured color schemes with matching blend modes and trail settings
-        </p>
+        <h4 style={styles.sectionTitle}>Presets</h4>
         <div style={styles.presetGrid}>
           {visualPresets.map((preset) => (
             <button
@@ -40,10 +37,7 @@ export function VisualsOikosPanel() {
 
       {/* Effect Presets Section */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Effect Presets</h4>
-        <p style={styles.sectionDescription}>
-          Pre-configured post-processing combinations for different moods
-        </p>
+        <h4 style={styles.sectionTitle}>Presets</h4>
         <div style={styles.presetGrid}>
           {effectsPresets.map((preset) => (
             <button
@@ -496,7 +490,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '10px 8px',
+    padding: `${spacing.sm} ${spacing.sm}`,
     backgroundColor: colors.bg.subtle,
     border: `1px solid ${colors.border.primary}`,
     borderRadius: effects.borderRadius.md,
@@ -504,6 +498,7 @@ const styles = {
     transition: effects.transition.normal,
     ...typography.caption,
     color: colors.text.primary,
+    minHeight: '60px',
   } as React.CSSProperties,
   presetIcon: {
     fontSize: '24px',

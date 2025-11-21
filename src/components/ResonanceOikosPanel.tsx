@@ -18,8 +18,8 @@ export function ResonanceOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>Resonance Oikos</h3>
-      <p style={styles.subtitle}>Inter-system relations and cross-species dynamics</p>
+      <h3 style={styles.title}>Resonance</h3>
+      <p style={styles.subtitle}>Cross-species interaction controls</p>
 
       {/* Universal Baseline Section - Only show in universal scope */}
       {ui.activeSpeciesScope === 'universal' && (

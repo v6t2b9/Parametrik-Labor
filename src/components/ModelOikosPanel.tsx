@@ -19,11 +19,11 @@ export function ModelOikosPanel() {
   return (
     <div style={styles.panel}>
       <h2 style={styles.title}>
-        Model Oikos
+        Model
       </h2>
 
       <p style={styles.subtitle}>
-        Quantum-inspired stigmergy computational models
+        Stigmergy model selection
       </p>
 
       {/* Model Selection */}

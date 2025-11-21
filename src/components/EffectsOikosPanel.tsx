@@ -13,14 +13,14 @@ export function EffectsOikosPanel() {
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.title}>Effects Oikos</h3>
+      <h3 style={styles.title}>Effects</h3>
       <p style={styles.description}>
-        Post-processing layer stack - effects are rendered in order from base to top
+        Post-processing effects stack
       </p>
 
       {/* Presets */}
       <div style={styles.presetsSection}>
-        <h4 style={styles.sectionTitle}>Effect Presets</h4>
+        <h4 style={styles.sectionTitle}>Presets</h4>
         <div style={styles.presetGrid}>
           {effectsPresets.map((preset) => (
             <button
@@ -224,14 +224,15 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: spacing.xs,
-    padding: `${spacing.md} ${spacing.sm}`,
-    backgroundColor: colors.bg.tertiary,
+    padding: `${spacing.sm} ${spacing.sm}`,
+    backgroundColor: colors.bg.subtle,
     border: `1px solid ${colors.border.primary}`,
-    borderRadius: effects.borderRadius.lg,
+    borderRadius: effects.borderRadius.md,
     cursor: 'pointer',
     transition: effects.transition.normal,
+    ...typography.caption,
     color: colors.text.primary,
+    minHeight: '60px',
   } as React.CSSProperties,
   presetIcon: {
     fontSize: '24px',
