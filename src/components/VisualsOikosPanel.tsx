@@ -278,15 +278,6 @@ export function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ chromaticAberration: value })}
             description="RGB channel offset (px) - creates retro glitch or CRT-style effects"
           />
-          <ParameterSlider
-            label="Wave Distortion"
-            value={effectsParams.waveDistortion}
-            min={0}
-            max={1}
-            step={0.05}
-            onChange={(value) => updateEffectsParams({ waveDistortion: value })}
-            description="Sine wave amplitude - higher values create liquid/psychedelic warping"
-          />
         </div>
 
         {/* Retro / Lo-Fi */}
