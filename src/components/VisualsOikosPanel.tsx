@@ -6,7 +6,7 @@ import { colors, spacing, typography, effects, createHeaderStyle, createSubtitle
 
 export function VisualsOikosPanel() {
   const visualization = useSimulationStore((state) => state.parameters.visualization);
-  const effects = useSimulationStore((state) => state.parameters.effects);
+  const effectsParams = useSimulationStore((state) => state.parameters.effects);
   const updateVisualizationParams = useSimulationStore((state) => state.updateVisualizationParams);
   const updateEffectsParams = useSimulationStore((state) => state.updateEffectsParams);
 
@@ -188,7 +188,7 @@ export function VisualsOikosPanel() {
           <h5 style={styles.subsectionTitle}>Blur & Glow</h5>
           <ParameterSlider
             label="Blur"
-            value={effects.blur}
+            value={effectsParams.blur}
             min={0}
             max={20}
             step={0.5}
@@ -197,7 +197,7 @@ export function VisualsOikosPanel() {
           />
           <ParameterSlider
             label="Bloom"
-            value={effects.bloom}
+            value={effectsParams.bloom}
             min={0}
             max={1}
             step={0.05}
@@ -211,7 +211,7 @@ export function VisualsOikosPanel() {
           <h5 style={styles.subsectionTitle}>Color Grading</h5>
           <ParameterSlider
             label="Saturation"
-            value={effects.saturation}
+            value={effectsParams.saturation}
             min={0}
             max={3}
             step={0.1}
@@ -220,7 +220,7 @@ export function VisualsOikosPanel() {
           />
           <ParameterSlider
             label="Contrast"
-            value={effects.contrast}
+            value={effectsParams.contrast}
             min={0}
             max={3}
             step={0.05}
@@ -229,7 +229,7 @@ export function VisualsOikosPanel() {
           />
           <ParameterSlider
             label="Hue Shift"
-            value={effects.hueShift}
+            value={effectsParams.hueShift}
             min={0}
             max={360}
             step={5}
@@ -243,7 +243,7 @@ export function VisualsOikosPanel() {
           <h5 style={styles.subsectionTitle}>Motion & Trails</h5>
           <ParameterSlider
             label="Motion Blur"
-            value={effects.motionBlur}
+            value={effectsParams.motionBlur}
             min={0}
             max={0.95}
             step={0.05}
@@ -257,7 +257,7 @@ export function VisualsOikosPanel() {
           <h5 style={styles.subsectionTitle}>Atmospheric</h5>
           <ParameterSlider
             label="Vignette"
-            value={effects.vignette}
+            value={effectsParams.vignette}
             min={0}
             max={1}
             step={0.05}
@@ -271,7 +271,7 @@ export function VisualsOikosPanel() {
           <h5 style={styles.subsectionTitle}>Psychedelic / Distortion</h5>
           <ParameterSlider
             label="Chromatic Aberration"
-            value={effects.chromaticAberration}
+            value={effectsParams.chromaticAberration}
             min={0}
             max={15}
             step={0.5}
@@ -280,7 +280,7 @@ export function VisualsOikosPanel() {
           />
           <ParameterSlider
             label="Wave Distortion"
-            value={effects.waveDistortion}
+            value={effectsParams.waveDistortion}
             min={0}
             max={1}
             step={0.05}
@@ -294,7 +294,7 @@ export function VisualsOikosPanel() {
           <h5 style={styles.subsectionTitle}>Retro / Lo-Fi</h5>
           <ParameterSlider
             label="Scanlines"
-            value={effects.scanlines}
+            value={effectsParams.scanlines}
             min={0}
             max={1}
             step={0.05}
@@ -303,7 +303,7 @@ export function VisualsOikosPanel() {
           />
           <ParameterSlider
             label="Pixelation"
-            value={effects.pixelation}
+            value={effectsParams.pixelation}
             min={1}
             max={16}
             step={1}
