@@ -1,6 +1,7 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { QualityPreset } from '../types/index.js';
+import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function PerformanceOikosPanel() {
   const { parameters, performanceMetrics, updatePerformanceParams, applyQualityPreset, reset } = useSimulationStore();
@@ -15,16 +16,16 @@ export function PerformanceOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>⚡ Performance & Quality</h3>
+      <h3 style={styles.title}>Performance & Quality</h3>
       <p style={styles.subtitle}>Adaptive quality for smooth fluid motion</p>
 
       {/* Reset Parameters Button */}
       <div style={styles.resetSection}>
         <button onClick={reset} style={styles.resetButton}>
-          🔄 Reset All Parameters to Default
+          Reset All Parameters to Default
         </button>
         <p style={styles.resetWarning}>
-          ⚠️ This resets all parameters to default values, not just the simulation state!
+          This resets all parameters to default values, not just the simulation state!
         </p>
       </div>
 
@@ -64,7 +65,7 @@ export function PerformanceOikosPanel() {
         </div>
         {performanceMetrics.avgFPS > 0 && performanceMetrics.avgFPS < performance.targetFPS * 0.7 && (
           <div style={styles.warningBox}>
-            ⚠️ Low performance detected. Try reducing quality or enabling auto-optimizer.
+            Low performance detected. Try reducing quality or enabling auto-optimizer.
           </div>
         )}
       </div>
@@ -81,7 +82,7 @@ export function PerformanceOikosPanel() {
             style={styles.checkbox}
           />
           <span style={styles.toggleText}>
-            {performance.autoOptimize ? '✓ Auto-Optimizer Active' : '○ Auto-Optimizer Disabled'}
+            {performance.autoOptimize ? 'Auto-Optimizer Active' : 'Auto-Optimizer Disabled'}
           </span>
         </label>
         <p style={styles.toggleDescription}>
@@ -93,7 +94,7 @@ export function PerformanceOikosPanel() {
       <div style={styles.divider} />
 
       {/* Quality Preset Selection */}
-      <h4 style={styles.sectionTitle}>📦 Quality Presets</h4>
+      <h4 style={styles.sectionTitle}>Quality Presets</h4>
       <p style={styles.sectionDescription}>Balanced configurations for different hardware capabilities</p>
       <div style={styles.presetGrid}>
         {qualityPresets.map((preset) => (
@@ -130,7 +131,7 @@ export function PerformanceOikosPanel() {
 
       {/* Performance Info */}
       <div style={styles.infoSection}>
-        <h4 style={styles.infoTitle}>💡 How it works</h4>
+        <h4 style={styles.infoTitle}>How it works</h4>
         <ul style={styles.infoList}>
           <li>Quality Preset sets base parameters for agents & effects</li>
           <li>Auto-Optimizer dynamically reduces quality when FPS drops</li>
@@ -152,48 +153,47 @@ export function PerformanceOikosPanel() {
 
 const styles = {
   panel: {
-    padding: '20px',
-    backgroundColor: '#13141f',
-    borderRadius: '8px',
-    border: '1px solid #2a2b3a',
+    padding: spacing.xl,
+    backgroundColor: colors.bg.secondary,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   title: {
+    ...createHeaderStyle('h2'),
     fontSize: '18px',
-    color: '#e0e0e0',
-    marginBottom: '4px',
-    fontWeight: 600,
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
   subtitle: {
+    ...createSubtitleStyle(),
     fontSize: '12px',
-    color: '#a0a0b0',
-    marginBottom: '20px',
+    marginBottom: spacing.xl,
   } as React.CSSProperties,
   resetSection: {
-    marginTop: '20px',
-    marginBottom: '20px',
+    marginTop: spacing.xl,
+    marginBottom: spacing.xl,
   } as React.CSSProperties,
   resetButton: {
     width: '100%',
-    padding: '12px 20px',
+    padding: `${spacing.md} ${spacing.xl}`,
     backgroundColor: '#3a2b2b',
     color: '#ffaaaa',
     border: '2px solid #5a3a3a',
-    borderRadius: '8px',
-    fontSize: '14px',
+    borderRadius: effects.borderRadius.lg,
+    fontSize: typography.h3.fontSize,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   resetWarning: {
-    fontSize: '11px',
+    ...typography.caption,
     color: '#ff8888',
-    marginTop: '8px',
+    marginTop: spacing.sm,
     marginBottom: '0',
     textAlign: 'center',
     lineHeight: '1.4',
   } as React.CSSProperties,
   statusSection: {
-    marginBottom: '20px',
+    marginBottom: spacing.xl,
   } as React.CSSProperties,
   statusGrid: {
     display: 'grid',
@@ -202,16 +202,16 @@ const styles = {
     marginBottom: '10px',
   } as React.CSSProperties,
   statusBox: {
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '6px',
-    padding: '12px',
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
+    padding: spacing.md,
     textAlign: 'center',
   } as React.CSSProperties,
   statusLabel: {
     fontSize: '10px',
-    color: '#808090',
-    marginBottom: '4px',
+    color: colors.text.tertiary,
+    marginBottom: spacing.xs,
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   } as React.CSSProperties,
@@ -223,20 +223,20 @@ const styles = {
   warningBox: {
     backgroundColor: 'rgba(255, 107, 107, 0.1)',
     border: '1px solid rgba(255, 107, 107, 0.3)',
-    borderRadius: '6px',
+    borderRadius: effects.borderRadius.md,
     padding: '10px',
     color: '#ff6b6b',
     fontSize: '12px',
     textAlign: 'center',
   } as React.CSSProperties,
   toggleSection: {
-    marginBottom: '20px',
+    marginBottom: spacing.xl,
   } as React.CSSProperties,
   toggleLabel: {
     display: 'flex',
     alignItems: 'center',
     cursor: 'pointer',
-    marginBottom: '8px',
+    marginBottom: spacing.sm,
   } as React.CSSProperties,
   checkbox: {
     marginRight: '10px',
@@ -245,26 +245,26 @@ const styles = {
     cursor: 'pointer',
   } as React.CSSProperties,
   toggleText: {
-    fontSize: '14px',
-    color: '#e0e0e0',
+    ...typography.h3,
+    color: colors.text.primary,
     fontWeight: 600,
   } as React.CSSProperties,
   toggleDescription: {
-    fontSize: '11px',
-    color: '#808090',
+    ...typography.caption,
+    color: colors.text.tertiary,
     marginLeft: '28px',
     marginTop: '0',
     lineHeight: '1.4',
   } as React.CSSProperties,
   sectionTitle: {
-    fontSize: '14px',
-    color: '#e0e0e0',
-    marginBottom: '6px',
+    ...typography.h3,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
     fontWeight: 600,
   } as React.CSSProperties,
   sectionDescription: {
     fontSize: '10px',
-    color: '#a0a0b0',
+    color: colors.text.secondary,
     marginBottom: '10px',
     lineHeight: 1.4,
   } as React.CSSProperties,
@@ -277,61 +277,61 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '16px 12px',
-    backgroundColor: '#0a0a15',
-    border: '2px solid #2a2b3a',
-    borderRadius: '8px',
+    padding: `${spacing.lg} ${spacing.md}`,
+    backgroundColor: colors.bg.subtle,
+    border: `2px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.lg,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   presetButtonActive: {
     backgroundColor: '#1a1a2e',
-    borderColor: '#7d5dbd',
+    borderColor: colors.accent.primary,
     boxShadow: '0 0 10px rgba(125, 93, 189, 0.3)',
   } as React.CSSProperties,
   presetIcon: {
     fontSize: '28px',
-    marginBottom: '8px',
+    marginBottom: spacing.sm,
   } as React.CSSProperties,
   presetLabel: {
-    fontSize: '14px',
+    ...typography.h3,
     fontWeight: 600,
-    color: '#e0e0e0',
-    marginBottom: '4px',
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
   presetDescription: {
     fontSize: '10px',
-    color: '#808090',
+    color: colors.text.tertiary,
     textAlign: 'center',
     lineHeight: '1.3',
   } as React.CSSProperties,
   divider: {
     height: '1px',
-    backgroundColor: '#2a2b3a',
-    marginBottom: '20px',
+    backgroundColor: colors.border.primary,
+    marginBottom: spacing.xl,
   } as React.CSSProperties,
   infoSection: {
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '6px',
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
     padding: '14px',
   } as React.CSSProperties,
   infoTitle: {
-    fontSize: '13px',
-    color: '#a0a0b0',
+    ...typography.h3,
+    color: colors.text.secondary,
     marginBottom: '10px',
     fontWeight: 600,
     margin: '0 0 10px 0',
   } as React.CSSProperties,
   infoList: {
-    fontSize: '11px',
-    color: '#808090',
+    ...typography.caption,
+    color: colors.text.tertiary,
     lineHeight: '1.6',
     margin: 0,
     paddingLeft: '20px',
   } as React.CSSProperties,
   subList: {
-    marginTop: '4px',
-    paddingLeft: '16px',
+    marginTop: spacing.xs,
+    paddingLeft: spacing.lg,
   } as React.CSSProperties,
 };

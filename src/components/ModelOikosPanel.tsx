@@ -6,6 +6,7 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { StigmergyModel } from '../types/index';
+import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function ModelOikosPanel() {
   const { parameters, updateModelParams } = useSimulationStore();
@@ -16,41 +17,19 @@ export function ModelOikosPanel() {
   };
 
   return (
-    <div style={{
-      padding: '20px',
-      backgroundColor: '#1a1a1a',
-      color: '#e0e0e0',
-      maxHeight: '80vh',
-      overflowY: 'auto',
-    }}>
-      <h2 style={{
-        fontSize: '20px',
-        fontWeight: 'bold',
-        marginBottom: '15px',
-        color: '#4fc3f7',
-      }}>
-        🧬 Model Oikos
+    <div style={styles.panel}>
+      <h2 style={styles.title}>
+        Model Oikos
       </h2>
 
-      <p style={{
-        fontSize: '14px',
-        marginBottom: '20px',
-        color: '#b0b0b0',
-        lineHeight: '1.6',
-      }}>
+      <p style={styles.subtitle}>
         Quantum-inspired stigmergy computational models
       </p>
 
       {/* Model Selection */}
-      <div style={{ marginBottom: '30px' }}>
-        <label style={{
-          display: 'block',
-          marginBottom: '10px',
-          fontSize: '14px',
-          fontWeight: 'bold',
-          color: '#90caf9',
-        }}>
-          📦 Model Selection
+      <div style={{ marginBottom: spacing.xxxl }}>
+        <label style={styles.sectionTitle}>
+          Model Selection
         </label>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -58,22 +37,17 @@ export function ModelOikosPanel() {
           <button
             onClick={() => handleModelChange('M1')}
             style={{
-              padding: '12px 16px',
-              backgroundColor: model === 'M1' ? '#4fc3f7' : '#2a2a2a',
-              color: model === 'M1' ? '#000' : '#e0e0e0',
-              border: model === 'M1' ? '2px solid #4fc3f7' : '1px solid #444',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              textAlign: 'left',
-              fontSize: '14px',
-              transition: 'all 0.2s ease',
+              ...styles.modelButton,
+              backgroundColor: model === 'M1' ? '#4fc3f7' : colors.bg.tertiary,
+              color: model === 'M1' ? '#000' : colors.text.primary,
+              border: model === 'M1' ? '2px solid #4fc3f7' : `1px solid ${colors.border.primary}`,
               fontWeight: model === 'M1' ? 'bold' : 'normal',
             }}
           >
-            <div style={{ marginBottom: '4px' }}>
+            <div style={{ marginBottom: spacing.xs }}>
               <strong>M1: Classical Stigmergy</strong> (Baseline)
             </div>
-            <div style={{ fontSize: '12px', opacity: 0.8 }}>
+            <div style={styles.modelDescription}>
               Standard pheromone-based navigation. Agents sense and follow trails.
               <br />
               <em>7 parameters</em>
@@ -84,22 +58,17 @@ export function ModelOikosPanel() {
           <button
             onClick={() => handleModelChange('M2')}
             style={{
-              padding: '12px 16px',
-              backgroundColor: model === 'M2' ? '#4fc3f7' : '#2a2a2a',
-              color: model === 'M2' ? '#000' : '#e0e0e0',
-              border: model === 'M2' ? '2px solid #4fc3f7' : '1px solid #444',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              textAlign: 'left',
-              fontSize: '14px',
-              transition: 'all 0.2s ease',
+              ...styles.modelButton,
+              backgroundColor: model === 'M2' ? '#4fc3f7' : colors.bg.tertiary,
+              color: model === 'M2' ? '#000' : colors.text.primary,
+              border: model === 'M2' ? '2px solid #4fc3f7' : `1px solid ${colors.border.primary}`,
               fontWeight: model === 'M2' ? 'bold' : 'normal',
             }}
           >
-            <div style={{ marginBottom: '4px' }}>
+            <div style={{ marginBottom: spacing.xs }}>
               <strong>M2: Context-Switching</strong>
             </div>
-            <div style={{ fontSize: '12px', opacity: 0.8 }}>
+            <div style={styles.modelDescription}>
               Classical + explore/exploit modes. Agents switch based on local density.
               <br />
               <em>10 parameters (7 base + 3 context)</em>
@@ -110,22 +79,17 @@ export function ModelOikosPanel() {
           <button
             onClick={() => handleModelChange('M3')}
             style={{
-              padding: '12px 16px',
-              backgroundColor: model === 'M3' ? '#4fc3f7' : '#2a2a2a',
-              color: model === 'M3' ? '#000' : '#e0e0e0',
-              border: model === 'M3' ? '2px solid #4fc3f7' : '1px solid #444',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              textAlign: 'left',
-              fontSize: '14px',
-              transition: 'all 0.2s ease',
+              ...styles.modelButton,
+              backgroundColor: model === 'M3' ? '#4fc3f7' : colors.bg.tertiary,
+              color: model === 'M3' ? '#000' : colors.text.primary,
+              border: model === 'M3' ? '2px solid #4fc3f7' : `1px solid ${colors.border.primary}`,
               fontWeight: model === 'M3' ? 'bold' : 'normal',
             }}
           >
-            <div style={{ marginBottom: '4px' }}>
-              <strong>M3: Quantum-Inspired</strong> ⚛️
+            <div style={{ marginBottom: spacing.xs }}>
+              <strong>M3: Quantum-Inspired</strong>
             </div>
-            <div style={{ fontSize: '12px', opacity: 0.8 }}>
+            <div style={styles.modelDescription}>
               Superposition states + phase-dependent trails + interference.
               <br />
               <em>11 parameters (7 base + 4 quantum)</em>
@@ -135,45 +99,26 @@ export function ModelOikosPanel() {
       </div>
 
       {/* Model-Specific Parameters */}
-      <div style={{
-        borderTop: '1px solid #444',
-        paddingTop: '20px',
-      }}>
+      <div style={styles.paramsSection}>
         {model === 'M1' && (
           <div>
-            <h3 style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              marginBottom: '15px',
-              color: '#90caf9',
-            }}>
+            <h3 style={styles.modelTitle}>
               M1: Classical Parameters
             </h3>
-            <p style={{ fontSize: '13px', color: '#b0b0b0', marginBottom: '10px' }}>
+            <p style={styles.modelInfo}>
               Uses standard Physical, Semiotic, Temporal, and Resonance parameters.
               <br />
               Configure in their respective Oikos tabs.
             </p>
-            <div style={{
-              padding: '12px',
-              backgroundColor: '#2a2a2a',
-              borderRadius: '6px',
-              fontSize: '12px',
-              color: '#90caf9',
-            }}>
-              ✓ No additional parameters for M1
+            <div style={styles.infoBox}>
+              No additional parameters for M1
             </div>
           </div>
         )}
 
         {model === 'M2' && (
           <div>
-            <h3 style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              marginBottom: '15px',
-              color: '#90caf9',
-            }}>
+            <h3 style={styles.modelTitle}>
               M2: Context-Switching Parameters
             </h3>
 
@@ -207,15 +152,7 @@ export function ModelOikosPanel() {
               description="Noise magnitude in explore mode"
             />
 
-            <div style={{
-              marginTop: '15px',
-              padding: '12px',
-              backgroundColor: '#2a2a2a',
-              borderRadius: '6px',
-              fontSize: '12px',
-              color: '#b0b0b0',
-              lineHeight: '1.5',
-            }}>
+            <div style={styles.howItWorksBox}>
               <strong style={{ color: '#4fc3f7' }}>How it works:</strong><br />
               Agents switch between <strong>explore</strong> (seeking new areas with noise)
               and <strong>exploit</strong> (following strong trails deterministically).
@@ -225,12 +162,7 @@ export function ModelOikosPanel() {
 
         {model === 'M3' && (
           <div>
-            <h3 style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              marginBottom: '15px',
-              color: '#90caf9',
-            }}>
+            <h3 style={styles.modelTitle}>
               M3: Quantum-Inspired Parameters
             </h3>
 
@@ -274,15 +206,7 @@ export function ModelOikosPanel() {
               description="Environmental phase fluctuations"
             />
 
-            <div style={{
-              marginTop: '15px',
-              padding: '12px',
-              backgroundColor: '#2a2a2a',
-              borderRadius: '6px',
-              fontSize: '12px',
-              color: '#b0b0b0',
-              lineHeight: '1.5',
-            }}>
+            <div style={styles.howItWorksBox}>
               <strong style={{ color: '#4fc3f7' }}>Quantum Features:</strong><br />
               • <strong>Superposition:</strong> Agents maintain probability amplitudes for directions<br />
               • <strong>Phase:</strong> Trails have complex phases; old trails become repulsive<br />
@@ -290,35 +214,19 @@ export function ModelOikosPanel() {
               • <strong>Context:</strong> Colony state changes trail interpretation
             </div>
 
-            <div style={{
-              marginTop: '10px',
-              padding: '12px',
-              backgroundColor: '#1a3a2a',
-              borderRadius: '6px',
-              fontSize: '11px',
-              color: '#a0d0b0',
-              lineHeight: '1.5',
-            }}>
+            <div style={styles.expectedBox}>
               <strong>Expected Behaviors:</strong><br />
-              ✓ Order effects: A→B ≠ B→A (asymmetric exploration)<br />
-              ✓ Interference: Trail combinations show non-additive responses<br />
-              ✓ Context-dependence: Same trail = different response based on history
+              Order effects: A→B ≠ B→A (asymmetric exploration)<br />
+              Interference: Trail combinations show non-additive responses<br />
+              Context-dependence: Same trail = different response based on history
             </div>
           </div>
         )}
       </div>
 
       {/* Info Footer */}
-      <div style={{
-        marginTop: '25px',
-        padding: '15px',
-        backgroundColor: '#1a2a3a',
-        borderRadius: '8px',
-        fontSize: '12px',
-        color: '#a0c0d0',
-        lineHeight: '1.6',
-      }}>
-        <strong style={{ color: '#4fc3f7' }}>📚 About Quantum-Inspired Stigmergy:</strong>
+      <div style={styles.footerBox}>
+        <strong style={{ color: '#4fc3f7' }}>About Quantum-Inspired Stigmergy:</strong>
         <br />
         This implementation is based on <strong>Supplement B: Computational Model Protocol</strong>
         from the quantum biosemiotics research program. The three models allow computational
@@ -330,3 +238,90 @@ export function ModelOikosPanel() {
     </div>
   );
 }
+
+const styles = {
+  panel: {
+    padding: spacing.xl,
+    backgroundColor: colors.bg.secondary,
+    color: colors.text.primary,
+    maxHeight: '80vh',
+    overflowY: 'auto',
+  } as React.CSSProperties,
+  title: {
+    ...createHeaderStyle('h1'),
+    marginBottom: spacing.md,
+    color: '#4fc3f7',
+  } as React.CSSProperties,
+  subtitle: {
+    ...createSubtitleStyle(),
+    marginBottom: spacing.xl,
+    color: colors.text.secondary,
+    lineHeight: '1.6',
+  } as React.CSSProperties,
+  sectionTitle: {
+    ...createHeaderStyle('h3'),
+    display: 'block',
+    marginBottom: '10px',
+    color: '#90caf9',
+  } as React.CSSProperties,
+  modelButton: {
+    padding: `${spacing.md} ${spacing.lg}`,
+    borderRadius: effects.borderRadius.lg,
+    cursor: 'pointer',
+    textAlign: 'left',
+    ...typography.h3,
+    transition: effects.transition.normal,
+  } as React.CSSProperties,
+  modelDescription: {
+    fontSize: '12px',
+    opacity: 0.8,
+  } as React.CSSProperties,
+  paramsSection: {
+    borderTop: `1px solid ${colors.border.primary}`,
+    paddingTop: spacing.xl,
+  } as React.CSSProperties,
+  modelTitle: {
+    ...createHeaderStyle('h2'),
+    marginBottom: spacing.md,
+    color: '#90caf9',
+  } as React.CSSProperties,
+  modelInfo: {
+    ...typography.body,
+    color: colors.text.secondary,
+    marginBottom: '10px',
+  } as React.CSSProperties,
+  infoBox: {
+    padding: spacing.md,
+    backgroundColor: colors.bg.tertiary,
+    borderRadius: effects.borderRadius.md,
+    ...typography.caption,
+    color: '#90caf9',
+  } as React.CSSProperties,
+  howItWorksBox: {
+    marginTop: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.bg.tertiary,
+    borderRadius: effects.borderRadius.md,
+    ...typography.caption,
+    color: colors.text.secondary,
+    lineHeight: '1.5',
+  } as React.CSSProperties,
+  expectedBox: {
+    marginTop: '10px',
+    padding: spacing.md,
+    backgroundColor: '#1a3a2a',
+    borderRadius: effects.borderRadius.md,
+    fontSize: '11px',
+    color: '#a0d0b0',
+    lineHeight: '1.5',
+  } as React.CSSProperties,
+  footerBox: {
+    marginTop: '25px',
+    padding: spacing.md,
+    backgroundColor: '#1a2a3a',
+    borderRadius: effects.borderRadius.lg,
+    ...typography.caption,
+    color: '#a0c0d0',
+    lineHeight: '1.6',
+  } as React.CSSProperties,
+};

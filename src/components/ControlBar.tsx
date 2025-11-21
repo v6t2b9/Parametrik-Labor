@@ -3,6 +3,7 @@ import { useSimulationStore } from '../store/useSimulationStore';
 import { useAudioStore } from '../store/useAudioStore';
 import GIF from 'gif.js.optimized';
 import type { AspectRatio } from '../types';
+import { colors, spacing, typography, effects } from '../design-system';
 
 interface ControlBarProps {
   onFullscreenToggle?: () => void;
@@ -203,19 +204,19 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   // Get button label based on current state
   function getRecordButtonLabel() {
     if (isProcessing) {
-      return `⏳ Processing... ${processingProgress}%`;
+      return `Processing... ${processingProgress}%`;
     }
 
     if (isRecording) {
       if (videoFormat === 'webm') {
-        return `🔴 Recording... ${videoDuration}s`;
+        return `Recording... ${videoDuration}s`;
       } else {
         const maxFrames = videoDuration * 30;
-        return `🔴 Capturing... ${recordedFrameCount}/${maxFrames}`;
+        return `Capturing... ${recordedFrameCount}/${maxFrames}`;
       }
     }
 
-    return '🎥 Start Recording';
+    return 'Start Recording';
   }
 
   return (
@@ -224,14 +225,14 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       <div style={styles.topRow}>
         <div style={styles.left}>
           <button onClick={handlePlayPause} style={styles.playButton}>
-            {running ? '⏸️ Pause' : '▶️ Play'}
+            {running ? 'Pause' : 'Play'}
           </button>
           <button onClick={reset} style={styles.button}>
-            🔄 Reset
+            Reset
           </button>
           {onFullscreenToggle && (
             <button onClick={onFullscreenToggle} style={styles.button}>
-              ⛶ Fullscreen
+              Fullscreen
             </button>
           )}
           <button
@@ -240,17 +241,17 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             style={styles.button}
             title="Take screenshot (PNG)"
           >
-            📸 Screenshot
+            Screenshot
           </button>
           <button
             onClick={() => setShowVideoPanel(!showVideoPanel)}
             style={{
               ...styles.button,
-              ...(showVideoPanel ? { backgroundColor: '#7d5dbd', color: '#ffffff' } : {})
+              ...(showVideoPanel ? { backgroundColor: colors.accent.primary, color: '#ffffff' } : {})
             }}
             title="Record video"
           >
-            🎥 Video
+            Video
           </button>
         </div>
 
@@ -317,7 +318,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         {/* Agent Count Slider */}
         <div style={styles.sliderContainer}>
           <div style={styles.sliderHeader}>
-            <label style={styles.sliderLabel}>🔢 Agent Count</label>
+            <label style={styles.sliderLabel}>Agent Count</label>
             <span style={styles.sliderValue}>{parameters.globalTemporal.agentCount.toLocaleString()}</span>
           </div>
           <input
@@ -335,7 +336,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         {/* Agent Speed Slider */}
         <div style={styles.sliderContainer}>
           <div style={styles.sliderHeader}>
-            <label style={styles.sliderLabel}>⚡ Agent Speed</label>
+            <label style={styles.sliderLabel}>Agent Speed</label>
             <span style={styles.sliderValue}>{parameters.globalTemporal.simulationSpeed.toFixed(2)}x</span>
           </div>
           <input
@@ -353,7 +354,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         {/* Aspect Ratio Selector */}
         <div style={styles.sliderContainer}>
           <div style={styles.sliderHeader}>
-            <label style={styles.sliderLabel}>📐 Aspect Ratio</label>
+            <label style={styles.sliderLabel}>Aspect Ratio</label>
             <span style={styles.sliderValue}>{ui.aspectRatio}</span>
           </div>
           <select
@@ -382,104 +383,104 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
-    padding: '12px 16px',
-    backgroundColor: '#13141f',
-    borderRadius: '8px',
-    border: '1px solid #2a2b3a',
+    gap: spacing.md,
+    padding: `${spacing.md} ${spacing.lg}`,
+    backgroundColor: colors.bg.secondary,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   topRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexWrap: 'wrap',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   left: {
     display: 'flex',
-    gap: '8px',
+    gap: spacing.sm,
     flexWrap: 'wrap',
   } as React.CSSProperties,
   right: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
+    gap: spacing.md,
   } as React.CSSProperties,
   playButton: {
-    padding: '10px 20px',
-    backgroundColor: '#7d5dbd',
+    padding: `${spacing.sm} ${spacing.xl}`,
+    backgroundColor: colors.accent.primary,
     color: '#ffffff',
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
+    borderRadius: effects.borderRadius.md,
+    ...typography.h3,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'background-color 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   button: {
-    padding: '10px 16px',
-    backgroundColor: '#2a2b3a',
-    color: '#e0e0e0',
+    padding: `${spacing.sm} ${spacing.lg}`,
+    backgroundColor: colors.border.primary,
+    color: colors.text.primary,
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
+    borderRadius: effects.borderRadius.md,
+    ...typography.h3,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'background-color 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   fullscreenButton: {
-    padding: '10px 16px',
-    backgroundColor: '#3a3b4a',
-    color: '#e0e0e0',
-    border: '1px solid #5d5dbd',
-    borderRadius: '6px',
-    fontSize: '14px',
+    padding: `${spacing.sm} ${spacing.lg}`,
+    backgroundColor: colors.bg.tertiary,
+    color: colors.text.primary,
+    border: `1px solid ${colors.accent.primary}`,
+    borderRadius: effects.borderRadius.md,
+    ...typography.h3,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   recordingButton: {
-    padding: '10px 16px',
-    backgroundColor: '#bd5d5d',
+    padding: `${spacing.sm} ${spacing.lg}`,
+    backgroundColor: colors.semantic.error,
     color: '#ffffff',
     border: '1px solid #ff6b6b',
-    borderRadius: '6px',
-    fontSize: '14px',
+    borderRadius: effects.borderRadius.md,
+    ...typography.h3,
     fontWeight: 600,
     cursor: 'not-allowed',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     opacity: 0.9,
   } as React.CSSProperties,
   frameCount: {
-    fontSize: '14px',
-    color: '#a0a0b0',
+    ...typography.h3,
+    color: colors.text.secondary,
     fontFamily: 'monospace',
   } as React.CSSProperties,
   statsLabel: {
-    fontSize: '13px',
-    color: '#8a8a9a',
+    ...typography.body,
+    color: colors.text.muted,
   } as React.CSSProperties,
   statsValue: {
-    color: '#7d5dbd',
+    color: colors.accent.primary,
     fontFamily: 'monospace',
     fontWeight: 600,
   } as React.CSSProperties,
   statsSeparator: {
     color: '#4a4a5a',
-    fontSize: '14px',
+    ...typography.h3,
   } as React.CSSProperties,
   slidersRow: {
     display: 'flex',
     justifyContent: 'flex-start',
-    gap: '32px',
-    paddingTop: '12px',
-    borderTop: '1px solid #2a2b3a',
+    gap: spacing.xxxl,
+    paddingTop: spacing.md,
+    borderTop: `1px solid ${colors.border.primary}`,
     flexWrap: 'wrap',
   } as React.CSSProperties,
   sliderContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px',
+    gap: spacing.sm,
     minWidth: '280px',
     maxWidth: '360px',
     flex: 1,
@@ -490,111 +491,111 @@ const styles = {
     alignItems: 'center',
   } as React.CSSProperties,
   sliderLabel: {
-    fontSize: '13px',
-    color: '#e0e0e0',
+    ...typography.body,
+    color: colors.text.primary,
     fontWeight: 600,
   } as React.CSSProperties,
   sliderValue: {
-    fontSize: '13px',
-    color: '#7d5dbd',
+    ...typography.body,
+    color: colors.accent.primary,
     fontFamily: 'monospace',
     fontWeight: 600,
   } as React.CSSProperties,
   slider: {
     width: '100%',
     height: '8px',
-    borderRadius: '4px',
+    borderRadius: effects.borderRadius.sm,
     outline: 'none',
-    background: 'linear-gradient(to right, #7d5dbd 0%, #7d5dbd 50%, #2a2b3a 50%, #2a2b3a 100%)',
+    background: `linear-gradient(to right, ${colors.accent.primary} 0%, ${colors.accent.primary} 50%, ${colors.border.primary} 50%, ${colors.border.primary} 100%)`,
     cursor: 'pointer',
     WebkitAppearance: 'none',
     appearance: 'none',
   } as React.CSSProperties,
   select: {
     width: '100%',
-    padding: '8px 12px',
-    backgroundColor: '#2a2b3a',
-    color: '#e0e0e0',
-    border: '1px solid #3a3b4a',
-    borderRadius: '6px',
-    fontSize: '13px',
+    padding: `${spacing.sm} ${spacing.md}`,
+    backgroundColor: colors.border.primary,
+    color: colors.text.primary,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
+    ...typography.body,
     fontWeight: 500,
     cursor: 'pointer',
     outline: 'none',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   formatSelect: {
-    padding: '10px 12px',
-    backgroundColor: '#2a2b3a',
-    color: '#e0e0e0',
-    border: '1px solid #3a3b4a',
-    borderRadius: '6px',
-    fontSize: '13px',
+    padding: `${spacing.sm} ${spacing.md}`,
+    backgroundColor: colors.border.primary,
+    color: colors.text.primary,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
+    ...typography.body,
     fontWeight: 600,
     cursor: 'pointer',
     outline: 'none',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   // Video Panel Styles
   videoPanel: {
-    paddingTop: '12px',
-    borderTop: '1px solid #2a2b3a',
+    paddingTop: spacing.md,
+    borderTop: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   videoPanelContent: {
     display: 'flex',
     alignItems: 'center',
-    gap: '16px',
+    gap: spacing.lg,
     flexWrap: 'wrap',
   } as React.CSSProperties,
   videoOption: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   videoLabel: {
-    fontSize: '13px',
-    color: '#e0e0e0',
+    ...typography.body,
+    color: colors.text.primary,
     fontWeight: 600,
     minWidth: '60px',
   } as React.CSSProperties,
   videoSelect: {
-    padding: '8px 12px',
-    backgroundColor: '#2a2b3a',
-    color: '#e0e0e0',
-    border: '1px solid #3a3b4a',
-    borderRadius: '6px',
-    fontSize: '13px',
+    padding: `${spacing.sm} ${spacing.md}`,
+    backgroundColor: colors.border.primary,
+    color: colors.text.primary,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
+    ...typography.body,
     fontWeight: 600,
     cursor: 'pointer',
     outline: 'none',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     minWidth: '100px',
   } as React.CSSProperties,
   recordButton: {
-    padding: '8px 20px',
-    backgroundColor: '#7d5dbd',
+    padding: `${spacing.sm} ${spacing.xl}`,
+    backgroundColor: colors.accent.primary,
     color: '#ffffff',
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
+    borderRadius: effects.borderRadius.md,
+    ...typography.body,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'background-color 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
   recordButtonDisabled: {
-    padding: '8px 20px',
+    padding: `${spacing.sm} ${spacing.xl}`,
     backgroundColor: '#4a4a5a',
-    color: '#8a8a9a',
+    color: colors.text.muted,
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '13px',
+    borderRadius: effects.borderRadius.md,
+    ...typography.body,
     fontWeight: 600,
     cursor: 'not-allowed',
     opacity: 0.6,
   } as React.CSSProperties,
   videoProgress: {
-    fontSize: '13px',
-    color: '#7d5dbd',
+    ...typography.body,
+    color: colors.accent.primary,
     fontFamily: 'monospace',
     fontWeight: 600,
   } as React.CSSProperties,

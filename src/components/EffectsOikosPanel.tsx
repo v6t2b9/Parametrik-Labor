@@ -1,18 +1,19 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { effectsPresets } from '../presets/tabPresets';
+import { colors, spacing, typography, effects, createHeaderStyle } from '../design-system';
 
 export function EffectsOikosPanel() {
-  const effects = useSimulationStore((state) => state.parameters.effects);
+  const effectsParams = useSimulationStore((state) => state.parameters.effects);
   const updateEffectsParams = useSimulationStore((state) => state.updateEffectsParams);
 
-  const loadPreset = (presetEffects: typeof effects) => {
+  const loadPreset = (presetEffects: typeof effectsParams) => {
     updateEffectsParams(presetEffects);
   };
 
   return (
     <div style={styles.container}>
-      <h3 style={styles.title}>✨ Effects Oikos</h3>
+      <h3 style={styles.title}>Effects Oikos</h3>
       <p style={styles.description}>
         Post-processing layer stack - effects are rendered in order from base to top
       </p>
@@ -37,14 +38,14 @@ export function EffectsOikosPanel() {
 
       {/* Layer 1: Base Effects */}
       <div style={styles.layerSection}>
-        <h4 style={styles.layerTitle}>🎨 Layer 1: Color Grading (Base)</h4>
+        <h4 style={styles.layerTitle}>Layer 1: Color Grading (Base)</h4>
         <p style={styles.layerDescription}>
           Foundation color adjustments applied to the base image
         </p>
         <div style={styles.section}>
           <ParameterSlider
             label="Saturation"
-            value={effects.saturation}
+            value={effectsParams.saturation}
             min={0}
             max={3}
             step={0.1}
@@ -53,7 +54,7 @@ export function EffectsOikosPanel() {
           />
           <ParameterSlider
             label="Contrast"
-            value={effects.contrast}
+            value={effectsParams.contrast}
             min={0}
             max={3}
             step={0.05}
@@ -62,7 +63,7 @@ export function EffectsOikosPanel() {
           />
           <ParameterSlider
             label="Hue Shift"
-            value={effects.hueShift}
+            value={effectsParams.hueShift}
             min={0}
             max={360}
             step={5}
@@ -74,14 +75,14 @@ export function EffectsOikosPanel() {
 
       {/* Layer 2: Spatial Effects */}
       <div style={styles.layerSection}>
-        <h4 style={styles.layerTitle}>🌫️ Layer 2: Spatial Effects</h4>
+        <h4 style={styles.layerTitle}>Layer 2: Spatial Effects</h4>
         <p style={styles.layerDescription}>
           Blur, glow, and motion effects applied after color grading
         </p>
         <div style={styles.section}>
           <ParameterSlider
             label="Blur"
-            value={effects.blur}
+            value={effectsParams.blur}
             min={0}
             max={20}
             step={0.5}
@@ -90,7 +91,7 @@ export function EffectsOikosPanel() {
           />
           <ParameterSlider
             label="Bloom"
-            value={effects.bloom}
+            value={effectsParams.bloom}
             min={0}
             max={1}
             step={0.05}
@@ -99,7 +100,7 @@ export function EffectsOikosPanel() {
           />
           <ParameterSlider
             label="Motion Blur"
-            value={effects.motionBlur}
+            value={effectsParams.motionBlur}
             min={0}
             max={0.95}
             step={0.05}
@@ -111,14 +112,14 @@ export function EffectsOikosPanel() {
 
       {/* Layer 3: Distortion Effects */}
       <div style={styles.layerSection}>
-        <h4 style={styles.layerTitle}>🌀 Layer 3: Distortion & Lo-Fi</h4>
+        <h4 style={styles.layerTitle}>Layer 3: Distortion & Lo-Fi</h4>
         <p style={styles.layerDescription}>
           Spatial distortions and pixelation effects
         </p>
         <div style={styles.section}>
           <ParameterSlider
             label="Chromatic Aberration"
-            value={effects.chromaticAberration}
+            value={effectsParams.chromaticAberration}
             min={0}
             max={15}
             step={0.5}
@@ -127,7 +128,7 @@ export function EffectsOikosPanel() {
           />
           <ParameterSlider
             label="Pixelation"
-            value={effects.pixelation}
+            value={effectsParams.pixelation}
             min={1}
             max={16}
             step={1}
@@ -136,7 +137,7 @@ export function EffectsOikosPanel() {
           />
           <ParameterSlider
             label="Wave Distortion"
-            value={effects.waveDistortion}
+            value={effectsParams.waveDistortion}
             min={0}
             max={1}
             step={0.05}
@@ -148,14 +149,14 @@ export function EffectsOikosPanel() {
 
       {/* Layer 4: Screen Overlays */}
       <div style={styles.layerSection}>
-        <h4 style={styles.layerTitle}>📺 Layer 4: Screen Overlays (Top)</h4>
+        <h4 style={styles.layerTitle}>Layer 4: Screen Overlays (Top)</h4>
         <p style={styles.layerDescription}>
           Final overlay effects rendered on top of everything - vignette, then scanlines last
         </p>
         <div style={styles.section}>
           <ParameterSlider
             label="Vignette"
-            value={effects.vignette}
+            value={effectsParams.vignette}
             min={0}
             max={1}
             step={0.05}
@@ -164,7 +165,7 @@ export function EffectsOikosPanel() {
           />
           <ParameterSlider
             label="Scanlines"
-            value={effects.scanlines}
+            value={effectsParams.scanlines}
             min={0}
             max={1}
             step={0.05}
@@ -176,7 +177,7 @@ export function EffectsOikosPanel() {
 
       <div style={styles.infoBox}>
         <p style={styles.infoText}>
-          💡 <strong>Rendering Order:</strong> Effects are applied from Layer 1 → Layer 4.
+          <strong>Rendering Order:</strong> Effects are applied from Layer 1 → Layer 4.
           <br/>
           Screen Overlays (Layer 4) are always rendered last, with Scanlines as the final top layer.
         </p>
@@ -189,92 +190,92 @@ const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
-    padding: '16px',
+    gap: spacing.xxl,
+    padding: spacing.lg,
   } as React.CSSProperties,
   title: {
+    ...createHeaderStyle('h1'),
     margin: 0,
-    fontSize: '20px',
-    color: '#ffffff',
+    color: colors.text.primary,
   } as React.CSSProperties,
   description: {
     margin: 0,
-    fontSize: '14px',
-    color: '#888',
+    ...typography.h3,
+    color: colors.text.tertiary,
   } as React.CSSProperties,
   presetsSection: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: spacing.md,
   } as React.CSSProperties,
   sectionTitle: {
     margin: 0,
-    fontSize: '14px',
-    color: '#aaa',
+    ...typography.h3,
+    color: colors.text.secondary,
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   presetButton: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '4px',
-    padding: '12px 8px',
-    backgroundColor: '#1a1b2e',
-    border: '1px solid #2a2b3a',
-    borderRadius: '8px',
+    gap: spacing.xs,
+    padding: `${spacing.md} ${spacing.sm}`,
+    backgroundColor: colors.bg.tertiary,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.lg,
     cursor: 'pointer',
-    transition: 'all 0.2s',
-    color: '#fff',
+    transition: effects.transition.normal,
+    color: colors.text.primary,
   } as React.CSSProperties,
   presetIcon: {
     fontSize: '24px',
   } as React.CSSProperties,
   presetName: {
-    fontSize: '11px',
+    ...typography.caption,
     textAlign: 'center',
   } as React.CSSProperties,
   section: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: spacing.md,
   } as React.CSSProperties,
   layerSection: {
-    marginBottom: '24px',
-    padding: '16px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '8px',
-    border: '1px solid #2a2b3a',
+    marginBottom: spacing.xxl,
+    padding: spacing.lg,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.lg,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   layerTitle: {
-    margin: '0 0 6px 0',
+    margin: `0 0 ${spacing.sm} 0`,
     fontSize: '15px',
-    color: '#9d7dd4',
+    color: colors.accent.light,
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
   } as React.CSSProperties,
   layerDescription: {
-    margin: '0 0 16px 0',
-    fontSize: '11px',
-    color: '#7d7d8d',
+    margin: `0 0 ${spacing.lg} 0`,
+    ...typography.caption,
+    color: colors.text.muted,
     lineHeight: '1.4',
   } as React.CSSProperties,
   infoBox: {
-    padding: '12px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '6px',
+    padding: spacing.md,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
     border: '1px solid #3d2d5d',
-    marginTop: '8px',
+    marginTop: spacing.sm,
   } as React.CSSProperties,
   infoText: {
-    fontSize: '11px',
-    color: '#a0a0b0',
+    ...typography.caption,
+    color: colors.text.secondary,
     lineHeight: '1.6',
     margin: 0,
   } as React.CSSProperties,

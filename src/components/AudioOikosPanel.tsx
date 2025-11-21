@@ -10,6 +10,7 @@ import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulation
 import { ParameterSlider } from './ParameterSlider';
 import { AUDIO_MAPPING_PRESETS } from '../audio/presets';
 import type { CurveType } from '../types/musicMappings';
+import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function AudioOikosPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -150,14 +151,14 @@ export function AudioOikosPanel() {
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>🎵 Audio Oikos</h3>
+      <h3 style={styles.title}>Audio Oikos</h3>
       <p style={styles.subtitle}>
         Music-reactive visualization — Music acts as stigmergic perturbation
       </p>
 
       {/* Audio Source Section */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>🎧 Audio Source</h4>
+        <h4 style={styles.sectionTitle}>Audio Source</h4>
 
         <div style={styles.sourceButtons}>
           <button
@@ -167,7 +168,7 @@ export function AudioOikosPanel() {
               ...(inputMode === 'file' ? styles.sourceButtonActive : {}),
             }}
           >
-            📁 Load File
+            Load File
           </button>
 
           <button
@@ -177,7 +178,7 @@ export function AudioOikosPanel() {
               ...(inputMode === 'microphone' ? styles.sourceButtonActive : {}),
             }}
           >
-            🎤 Microphone
+            Microphone
           </button>
         </div>
 
@@ -191,9 +192,6 @@ export function AudioOikosPanel() {
 
         {audioFileName && (
           <div style={styles.fileName}>
-            <span style={styles.fileIcon}>
-              {inputMode === 'microphone' ? '🎤' : '🎵'}
-            </span>
             {audioFileName}
           </div>
         )}
@@ -232,7 +230,7 @@ export function AudioOikosPanel() {
       {/* Music Reactivity Toggle */}
       <div style={styles.section}>
         <div style={styles.toggleRow}>
-          <h4 style={styles.sectionTitle}>🎚️ Music Reactivity</h4>
+          <h4 style={styles.sectionTitle}>Music Reactivity</h4>
           <button
             onClick={toggleMusic}
             style={{
@@ -258,7 +256,7 @@ export function AudioOikosPanel() {
         <>
           <div style={styles.section}>
             <div style={styles.toggleRow}>
-              <h4 style={styles.sectionTitle}>🎛️ Auto-Harmonizer</h4>
+              <h4 style={styles.sectionTitle}>Auto-Harmonizer</h4>
               <button
                 onClick={toggleAdaptiveNormalization}
                 style={{
@@ -277,14 +275,14 @@ export function AudioOikosPanel() {
             </p>
 
             <p style={styles.autoHarmonizerHint}>
-              💡 Auto-Harmonizer learns your music's actual range (e.g., 1500-3000 Hz instead of 0-8000 Hz)
+              Auto-Harmonizer learns your music's actual range (e.g., 1500-3000 Hz instead of 0-8000 Hz)
               and normalizes features to maximize visual contrast. Especially effective for quiet or narrow-range music!
             </p>
 
             {/* Advanced Configuration (only when enabled) */}
             {adaptiveNormalizationEnabled && (
               <div style={styles.advancedConfig}>
-                <h5 style={styles.advancedTitle}>⚙️ Advanced Configuration</h5>
+                <h5 style={styles.advancedTitle}>Advanced Configuration</h5>
 
                 <ParameterSlider
                   label="Window Size (seconds)"
@@ -317,7 +315,7 @@ export function AudioOikosPanel() {
                 />
 
                 <p style={styles.advancedHint}>
-                  🔧 These settings control how the Auto-Harmonizer learns and adapts to your music.
+                  These settings control how the Auto-Harmonizer learns and adapts to your music.
                   Default values work well for most music, but feel free to experiment!
                 </p>
               </div>
@@ -333,7 +331,7 @@ export function AudioOikosPanel() {
         <>
           <div style={styles.section}>
             <div style={styles.toggleRow}>
-              <h4 style={styles.sectionTitle}>🧬 Dynamic Role Mapping</h4>
+              <h4 style={styles.sectionTitle}>Dynamic Role Mapping</h4>
               <button
                 onClick={() => {
                   const newEnabled = !mappings.roleMapping.enabled;
@@ -357,15 +355,15 @@ export function AudioOikosPanel() {
             </p>
 
             <p style={styles.autoHarmonizerHint}>
-              💡 Role Mapping assigns ecosystem roles to agents based on real-time audio:
+              Role Mapping assigns ecosystem roles to agents based on real-time audio:
               <br />
-              🏗️ Builder (bass) • 🌾 Harvester (mid) • 🔥 Consumer (arousal) • 🍄 Decomposer (dissonance) • 🔭 Scout (treble)
+              Builder (bass) • Harvester (mid) • Consumer (arousal) • Decomposer (dissonance) • Scout (treble)
             </p>
 
             {/* Role Mapping Configuration (only when enabled) */}
             {mappings.roleMapping.enabled && (
               <div style={styles.advancedConfig}>
-                <h5 style={styles.advancedTitle}>⚙️ Role Assignment Thresholds</h5>
+                <h5 style={styles.advancedTitle}>Role Assignment Thresholds</h5>
 
                 <ParameterSlider
                   label="Min Role Duration (frames)"
@@ -380,7 +378,7 @@ export function AudioOikosPanel() {
                 />
 
                 <div style={styles.roleThresholdGroup}>
-                  <h6 style={styles.roleThresholdTitle}>🏗️ Builder (Bass Energy)</h6>
+                  <h6 style={styles.roleThresholdTitle}>Builder (Bass Energy)</h6>
                   <ParameterSlider
                     label="Threshold"
                     value={mappings.roleMapping.builderThreshold.bassEnergy}
@@ -398,7 +396,7 @@ export function AudioOikosPanel() {
                 </div>
 
                 <div style={styles.roleThresholdGroup}>
-                  <h6 style={styles.roleThresholdTitle}>🌾 Harvester (Mid Energy)</h6>
+                  <h6 style={styles.roleThresholdTitle}>Harvester (Mid Energy)</h6>
                   <ParameterSlider
                     label="Threshold"
                     value={mappings.roleMapping.harvesterThreshold.midEnergy}
@@ -416,7 +414,7 @@ export function AudioOikosPanel() {
                 </div>
 
                 <div style={styles.roleThresholdGroup}>
-                  <h6 style={styles.roleThresholdTitle}>🔥 Consumer (Arousal Level)</h6>
+                  <h6 style={styles.roleThresholdTitle}>Consumer (Arousal Level)</h6>
                   <ParameterSlider
                     label="Threshold"
                     value={mappings.roleMapping.consumerThreshold.arousalLevel}
@@ -434,7 +432,7 @@ export function AudioOikosPanel() {
                 </div>
 
                 <div style={styles.roleThresholdGroup}>
-                  <h6 style={styles.roleThresholdTitle}>🍄 Decomposer (Dissonance)</h6>
+                  <h6 style={styles.roleThresholdTitle}>Decomposer (Dissonance)</h6>
                   <ParameterSlider
                     label="Threshold"
                     value={mappings.roleMapping.decomposerThreshold.dissonance}
@@ -452,7 +450,7 @@ export function AudioOikosPanel() {
                 </div>
 
                 <div style={styles.roleThresholdGroup}>
-                  <h6 style={styles.roleThresholdTitle}>🔭 Scout (High Energy)</h6>
+                  <h6 style={styles.roleThresholdTitle}>Scout (High Energy)</h6>
                   <ParameterSlider
                     label="Threshold"
                     value={mappings.roleMapping.scoutThreshold.highEnergy}
@@ -470,7 +468,7 @@ export function AudioOikosPanel() {
                 </div>
 
                 <p style={styles.advancedHint}>
-                  🎯 Lower thresholds = more agents in role. Higher = only strongest signals trigger role.
+                  Lower thresholds = more agents in role. Higher = only strongest signals trigger role.
                   Each role has unique behavior: speed, deposit rate, sensor range modifications.
                 </p>
               </div>
@@ -485,7 +483,7 @@ export function AudioOikosPanel() {
       {musicEnabled && (
         <>
           <div style={styles.section}>
-            <h4 style={styles.sectionTitle}>📊 Live Analysis</h4>
+            <h4 style={styles.sectionTitle}>Live Analysis</h4>
             {renderAnalysis()}
           </div>
 
@@ -495,7 +493,7 @@ export function AudioOikosPanel() {
 
       {/* Presets */}
       <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>📦 Mapping Presets</h4>
+        <h4 style={styles.sectionTitle}>Mapping Presets</h4>
         <p style={styles.presetDescription}>
           Quick configurations for different music genres
         </p>
@@ -520,7 +518,7 @@ export function AudioOikosPanel() {
       {/* Key Mapping Controls */}
       {musicEnabled && (
         <div style={styles.section}>
-          <h4 style={styles.sectionTitle}>🎛️ Key Mappings</h4>
+          <h4 style={styles.sectionTitle}>Key Mappings</h4>
 
           {/* Global */}
           <div style={styles.mappingGroup}>
@@ -665,79 +663,74 @@ export function AudioOikosPanel() {
 
 const styles = {
   panel: {
-    padding: '16px',
-    backgroundColor: '#13141f',
-    borderRadius: '6px',
-    border: '1px solid #2a2b3a',
+    padding: spacing.lg,
+    backgroundColor: colors.bg.secondary,
+    borderRadius: effects.borderRadius.md,
+    border: `1px solid ${colors.border.primary}`,
     maxHeight: '80vh',
     overflowY: 'auto' as const,
   } as React.CSSProperties,
 
   title: {
-    fontSize: '16px',
-    color: '#e0e0e0',
-    marginBottom: '4px',
-    fontWeight: 600,
+    ...createHeaderStyle('h2'),
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
 
   subtitle: {
-    fontSize: '11px',
-    color: '#a0a0b0',
-    marginBottom: '16px',
+    ...createSubtitleStyle(),
+    marginBottom: spacing.lg,
     lineHeight: 1.4,
   } as React.CSSProperties,
 
   section: {
-    marginBottom: '16px',
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
 
   sectionTitle: {
-    fontSize: '13px',
-    color: '#e0e0e0',
-    marginBottom: '8px',
-    fontWeight: 600,
+    ...createHeaderStyle('h3'),
+    marginBottom: spacing.sm,
   } as React.CSSProperties,
 
   divider: {
     height: '1px',
-    backgroundColor: '#2a2b3a',
-    marginBottom: '16px',
+    backgroundColor: colors.border.primary,
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
 
   // Audio Source
   sourceButtons: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gap: '8px',
-    marginBottom: '12px',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   } as React.CSSProperties,
 
   sourceButton: {
     padding: '10px',
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '6px',
-    color: '#e0e0e0',
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
+    color: colors.text.primary,
     fontSize: '12px',
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
 
   sourceButtonActive: {
-    backgroundColor: '#7d5dbd',
-    borderColor: '#9d7ddd',
+    backgroundColor: colors.accent.primary,
+    borderColor: colors.accent.light,
   } as React.CSSProperties,
 
   fileName: {
-    fontSize: '11px',
-    color: '#a0a0b0',
-    padding: '8px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '4px',
-    marginBottom: '12px',
+    ...typography.caption,
+    color: colors.text.secondary,
+    padding: spacing.sm,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.sm,
+    marginBottom: spacing.md,
     display: 'flex',
     alignItems: 'center',
-    gap: '6px',
+    gap: spacing.sm,
   } as React.CSSProperties,
 
   fileIcon: {
@@ -747,37 +740,37 @@ const styles = {
   playbackControls: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
 
   controlButton: {
-    padding: '8px 16px',
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '4px',
-    color: '#e0e0e0',
+    padding: `${spacing.sm} ${spacing.lg}`,
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.sm,
+    color: colors.text.primary,
     fontSize: '14px',
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
   } as React.CSSProperties,
 
   loopButton: {
-    padding: '8px 16px',
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '4px',
-    color: '#a0a0b0',
+    padding: `${spacing.sm} ${spacing.lg}`,
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.sm,
+    color: colors.text.secondary,
     fontSize: '12px',
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     marginLeft: 'auto',
   } as React.CSSProperties,
 
   loopButtonActive: {
     backgroundColor: '#7d5dbd22',
-    borderColor: '#7d5dbd',
-    color: '#7d5dbd',
+    borderColor: colors.accent.primary,
+    color: colors.accent.primary,
   } as React.CSSProperties,
 
   // Music Reactivity Toggle
@@ -785,57 +778,57 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: '8px',
+    marginBottom: spacing.sm,
   } as React.CSSProperties,
 
   toggleButton: {
-    padding: '6px 16px',
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '4px',
-    color: '#e0e0e0',
-    fontSize: '11px',
+    padding: `6px ${spacing.lg}`,
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.sm,
+    color: colors.text.primary,
+    ...typography.caption,
     fontWeight: 600,
     cursor: 'pointer',
-    transition: 'all 0.2s',
+    transition: effects.transition.normal,
     minWidth: '60px',
   } as React.CSSProperties,
 
   toggleButtonActive: {
     backgroundColor: '#4ecdc4',
     borderColor: '#6eddcc',
-    color: '#0a0a15',
+    color: colors.bg.subtle,
   } as React.CSSProperties,
 
   toggleDescription: {
     fontSize: '10px',
-    color: '#a0a0b0',
+    color: colors.text.secondary,
     lineHeight: 1.4,
   } as React.CSSProperties,
 
   autoHarmonizerHint: {
     fontSize: '9px',
-    color: '#7a7a8a',
+    color: colors.text.muted,
     lineHeight: 1.5,
-    marginTop: '8px',
-    padding: '8px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '4px',
-    borderLeft: '2px solid #7d5dbd',
+    marginTop: spacing.sm,
+    padding: spacing.sm,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.sm,
+    borderLeft: `2px solid ${colors.accent.primary}`,
   } as React.CSSProperties,
 
   // Advanced Auto-Harmonizer Config
   advancedConfig: {
-    marginTop: '12px',
-    padding: '12px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '6px',
-    border: '1px solid #2a2b3a',
+    marginTop: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
+    border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
 
   advancedTitle: {
-    fontSize: '11px',
-    color: '#a0a0b0',
+    ...typography.caption,
+    color: colors.text.secondary,
     marginBottom: '10px',
     fontWeight: 600,
     margin: '0 0 10px 0',
@@ -843,7 +836,7 @@ const styles = {
 
   advancedHint: {
     fontSize: '9px',
-    color: '#7a7a8a',
+    color: colors.text.muted,
     lineHeight: 1.4,
     marginTop: '10px',
     fontStyle: 'italic' as const,
@@ -851,58 +844,58 @@ const styles = {
 
   // Role Threshold Groups
   roleThresholdGroup: {
-    marginTop: '12px',
-    marginBottom: '12px',
-    paddingTop: '8px',
-    borderTop: '1px solid #2a2b3a',
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
+    paddingTop: spacing.sm,
+    borderTop: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
 
   roleThresholdTitle: {
-    fontSize: '11px',
-    color: '#e0e0e0',
-    marginBottom: '6px',
+    ...typography.caption,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
     fontWeight: 600,
-    margin: '0 0 6px 0',
+    margin: `0 0 ${spacing.sm} 0`,
   } as React.CSSProperties,
 
   // Live Analysis
   analysisRow: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '8px',
-    marginBottom: '12px',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   } as React.CSSProperties,
 
   analysisLabel: {
     fontSize: '10px',
-    color: '#a0a0b0',
+    color: colors.text.secondary,
     textAlign: 'center' as const,
   } as React.CSSProperties,
 
   frequencyBars: {
     display: 'flex',
     flexDirection: 'column' as const,
-    gap: '8px',
-    marginBottom: '12px',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   } as React.CSSProperties,
 
   barContainer: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
 
   barLabel: {
     fontSize: '10px',
-    color: '#a0a0b0',
+    color: colors.text.secondary,
     width: '40px',
   } as React.CSSProperties,
 
   barTrack: {
     flex: 1,
     height: '12px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '6px',
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.md,
     overflow: 'hidden',
   } as React.CSSProperties,
 
@@ -912,13 +905,13 @@ const styles = {
   } as React.CSSProperties,
 
   beatIndicator: {
-    fontSize: '11px',
+    ...typography.caption,
     color: '#4ecdc4',
     fontWeight: 600,
     textAlign: 'center' as const,
     padding: '6px',
-    backgroundColor: '#0a0a15',
-    borderRadius: '4px',
+    backgroundColor: colors.bg.subtle,
+    borderRadius: effects.borderRadius.sm,
   } as React.CSSProperties,
 
   beatPulse: {
@@ -927,17 +920,17 @@ const styles = {
   } as React.CSSProperties,
 
   analysisPlaceholder: {
-    fontSize: '11px',
-    color: '#6a6a7a',
+    ...typography.caption,
+    color: colors.text.tertiary,
     fontStyle: 'italic' as const,
     textAlign: 'center' as const,
-    padding: '16px',
+    padding: spacing.lg,
   } as React.CSSProperties,
 
   // Presets
   presetDescription: {
     fontSize: '10px',
-    color: '#a0a0b0',
+    color: colors.text.secondary,
     marginBottom: '10px',
     lineHeight: 1.4,
   } as React.CSSProperties,
@@ -945,7 +938,7 @@ const styles = {
   presetGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))',
-    gap: '8px',
+    gap: spacing.sm,
   } as React.CSSProperties,
 
   presetButton: {
@@ -953,24 +946,24 @@ const styles = {
     flexDirection: 'column' as const,
     alignItems: 'center',
     padding: '10px 8px',
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '6px',
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.md,
     cursor: 'pointer',
-    transition: 'all 0.2s',
-    fontSize: '11px',
-    color: '#e0e0e0',
+    transition: effects.transition.normal,
+    ...typography.caption,
+    color: colors.text.primary,
     minHeight: '60px',
   } as React.CSSProperties,
 
   presetButtonActive: {
-    backgroundColor: '#7d5dbd',
-    borderColor: '#9d7ddd',
+    backgroundColor: colors.accent.primary,
+    borderColor: colors.accent.light,
   } as React.CSSProperties,
 
   presetIcon: {
     fontSize: '20px',
-    marginBottom: '4px',
+    marginBottom: spacing.xs,
   } as React.CSSProperties,
 
   presetName: {
@@ -980,23 +973,23 @@ const styles = {
 
   // Mapping Controls
   mappingGroup: {
-    marginBottom: '16px',
+    marginBottom: spacing.lg,
   } as React.CSSProperties,
 
   groupTitle: {
     fontSize: '12px',
-    color: '#e0e0e0',
-    marginBottom: '8px',
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
     fontWeight: 600,
   } as React.CSSProperties,
 
   checkboxLabel: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    fontSize: '11px',
-    color: '#e0e0e0',
-    marginBottom: '8px',
+    gap: spacing.sm,
+    ...typography.caption,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
     cursor: 'pointer',
   } as React.CSSProperties,
 
@@ -1004,24 +997,24 @@ const styles = {
   curveSelector: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
-    marginTop: '8px',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
   } as React.CSSProperties,
 
   curveLabel: {
     fontSize: '10px',
-    color: '#a0a0b0',
+    color: colors.text.secondary,
     minWidth: '80px',
   } as React.CSSProperties,
 
   curveDropdown: {
     flex: 1,
-    padding: '6px 8px',
-    backgroundColor: '#0a0a15',
-    border: '1px solid #2a2b3a',
-    borderRadius: '4px',
-    color: '#e0e0e0',
-    fontSize: '11px',
+    padding: `6px ${spacing.sm}`,
+    backgroundColor: colors.bg.subtle,
+    border: `1px solid ${colors.border.primary}`,
+    borderRadius: effects.borderRadius.sm,
+    color: colors.text.primary,
+    ...typography.caption,
     cursor: 'pointer',
     outline: 'none',
   } as React.CSSProperties,
