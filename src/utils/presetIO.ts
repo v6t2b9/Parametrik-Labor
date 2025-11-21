@@ -34,15 +34,23 @@ export function importPresetFromJSON(
   file: File
 ): Promise<{ preset: Preset; error?: string }> {
   return new Promise((resolve) => {
+    console.log('[PresetImport] Starting import of file:', file.name);
     const reader = new FileReader();
 
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
+        console.log('[PresetImport] File content loaded, length:', content?.length);
+
         const preset = JSON.parse(content) as Preset;
+        console.log('[PresetImport] JSON parsed successfully:', {
+          name: preset.name,
+          hasParameters: !!preset.parameters,
+        });
 
         // Validierung: Überprüfe ob die wichtigsten Felder vorhanden sind
         if (!preset.parameters) {
+          console.error('[PresetImport] Validation failed: parameters missing');
           resolve({
             preset: preset,
             error: 'Ungültiges Preset-Format: "parameters" fehlt',
@@ -52,7 +60,13 @@ export function importPresetFromJSON(
 
         // Weitere Validierung der Struktur
         const params = preset.parameters;
+        console.log('[PresetImport] Checking parameter structure:', {
+          hasUniversal: !!params.universal,
+          hasVisualization: !!params.visualization,
+        });
+
         if (!params.universal || !params.visualization) {
+          console.error('[PresetImport] Validation failed: missing parameter groups');
           resolve({
             preset: preset,
             error: 'Ungültiges Preset-Format: Fehlende Parameter-Gruppen',
@@ -60,8 +74,10 @@ export function importPresetFromJSON(
           return;
         }
 
+        console.log('[PresetImport] Validation successful, import complete');
         resolve({ preset });
       } catch (error) {
+        console.error('[PresetImport] Parse error:', error);
         resolve({
           preset: { name: '', icon: '', description: '', parameters: {} as AllParameters },
           error: `Fehler beim Parsen der JSON-Datei: ${error}`,
@@ -70,6 +86,7 @@ export function importPresetFromJSON(
     };
 
     reader.onerror = () => {
+      console.error('[PresetImport] File read error');
       resolve({
         preset: { name: '', icon: '', description: '', parameters: {} as AllParameters },
         error: 'Fehler beim Lesen der Datei',
