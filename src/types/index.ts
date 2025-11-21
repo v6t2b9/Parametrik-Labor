@@ -226,6 +226,11 @@ export interface EffectsParams {
   feedbackRotation: number;  // -5 to 5 degrees: Rotation per frame (0 = no rotation)
   feedbackOffsetX: number;   // -10 to 10 pixels: Horizontal offset per frame
   feedbackOffsetY: number;   // -10 to 10 pixels: Vertical offset per frame
+
+  // Kaleidoscope Effect (Radial Mirroring)
+  kaleidoscopeSegments: number;  // 0, 2-12: Number of mirror segments (0 = off, 6 = snowflake, 8 = mandala)
+  kaleidoscopeRotation: number;  // 0-360 degrees: Rotation offset of the kaleidoscope pattern
+  kaleidoscopeZoom: number;      // 0.5-2.0: Zoom level (1.0 = normal, <1 = zoom out, >1 = zoom in)
 }
 
 export type QualityPreset = 'low' | 'medium' | 'high' | 'ultra';

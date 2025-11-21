@@ -98,6 +98,9 @@ export const defaultParameters: AllParameters = {
     feedbackRotation: 0,
     feedbackOffsetX: 0,
     feedbackOffsetY: 0,
+    kaleidoscopeSegments: 0,
+    kaleidoscopeRotation: 0,
+    kaleidoscopeZoom: 1.0,
   },
   performance: defaultPerformanceParams,
   // Quantum-inspired stigmergy model params

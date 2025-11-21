@@ -320,6 +320,42 @@ export function VisualsOikosPanel() {
           )}
         </div>
 
+        {/* Kaleidoscope (Radial Mirroring) */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Kaleidoscope (Radial Mirroring)</h5>
+          <ParameterSlider
+            label="Segments"
+            value={effectsParams.kaleidoscopeSegments}
+            min={0}
+            max={12}
+            step={1}
+            onChange={(value) => updateEffectsParams({ kaleidoscopeSegments: value })}
+            description="Number of mirror segments (0 = off, 4 = cross, 6 = snowflake, 8 = mandala, 12 = complex)"
+          />
+          {effectsParams.kaleidoscopeSegments >= 2 && (
+            <>
+              <ParameterSlider
+                label="Rotation"
+                value={effectsParams.kaleidoscopeRotation}
+                min={0}
+                max={360}
+                step={1}
+                onChange={(value) => updateEffectsParams({ kaleidoscopeRotation: value })}
+                description="Rotation offset in degrees - rotates the entire kaleidoscope pattern"
+              />
+              <ParameterSlider
+                label="Zoom"
+                value={effectsParams.kaleidoscopeZoom}
+                min={0.5}
+                max={2.0}
+                step={0.05}
+                onChange={(value) => updateEffectsParams({ kaleidoscopeZoom: value })}
+                description="Zoom level (1.0 = normal, <1 = zoom out reveals more, >1 = zoom in for detail)"
+              />
+            </>
+          )}
+        </div>
+
         {/* Psychedelic / Distortion */}
         <div style={styles.subsection}>
           <h5 style={styles.subsectionTitle}>Psychedelic / Distortion</h5>
@@ -484,6 +520,9 @@ export function VisualsOikosPanel() {
           <li><strong>Feedback 0.90-0.95</strong> + small <strong>Rotation</strong> (0.2-1°) = spinning spirals</li>
           <li><strong>Feedback 0.85+</strong> + <strong>Zoom 1.002</strong> = infinite zoom tunnel</li>
           <li><strong>Feedback 0.92+</strong> + <strong>Offset X/Y</strong> = drifting echoes</li>
+          <li><strong>Kaleidoscope 6 segments</strong> = snowflake patterns, <strong>8 segments</strong> = mandala</li>
+          <li><strong>Kaleidoscope + Feedback</strong> = infinite recursive mandalas (psychedelic!)</li>
+          <li><strong>Kaleidoscope + Hue Cycling</strong> = rainbow mandalas with color shifts</li>
         </ul>
       </div>
     </div>

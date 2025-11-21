@@ -449,6 +449,60 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
+    // === 2.5. Kaleidoscope Effect (Radial Mirroring) ===
+    // Creates symmetrical mandala patterns by mirroring the grid in radial segments
+    if (effects.kaleidoscopeSegments >= 2) {
+      // Create temp canvas to save current grid content
+      const tempCanvas = canvasPool.acquire(gridPixelWidth, gridPixelHeight);
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx && tempCanvas.width === gridPixelWidth && tempCanvas.height === gridPixelHeight) {
+        // Capture current grid content (without offset)
+        tempCtx.drawImage(canvas, offsetX, offsetY, gridPixelWidth, gridPixelHeight, 0, 0, gridPixelWidth, gridPixelHeight);
+
+        // Clear grid area
+        ctx.clearRect(0, 0, gridPixelWidth, gridPixelHeight);
+
+        // Calculate center point and segment angle
+        const centerX = gridPixelWidth / 2;
+        const centerY = gridPixelHeight / 2;
+        const segmentAngle = (2 * Math.PI) / effects.kaleidoscopeSegments;
+
+        // Apply kaleidoscope rotation and zoom
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate((effects.kaleidoscopeRotation * Math.PI) / 180);
+        ctx.scale(effects.kaleidoscopeZoom, effects.kaleidoscopeZoom);
+        ctx.translate(-centerX, -centerY);
+
+        // Draw each kaleidoscope segment
+        for (let i = 0; i < effects.kaleidoscopeSegments; i++) {
+          ctx.save();
+
+          // Rotate to segment position
+          ctx.translate(centerX, centerY);
+          ctx.rotate(i * segmentAngle);
+          ctx.translate(-centerX, -centerY);
+
+          // Draw original wedge
+          ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, gridPixelHeight);
+
+          // Mirror the wedge for classic kaleidoscope effect
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.scale(-1, 1); // Horizontal flip
+          ctx.translate(-centerX, -centerY);
+          ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, gridPixelHeight);
+          ctx.restore();
+
+          ctx.restore();
+        }
+
+        ctx.restore();
+        canvasPool.release(tempCanvas);
+      }
+    }
+
     // Note: Motion Blur and CSS Filters will be applied after we restore the context
     // This is needed so they can work on the full canvas including letterbox bars
 
