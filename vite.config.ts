@@ -14,40 +14,81 @@ export default defineConfig(() => {
       react(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'gif.worker.js'],
         manifest: {
           name: 'Parametric Explorer',
-          short_name: 'ParamExplorer',
-          description: 'Interactive parametric visualization and exploration tool',
+          short_name: 'Parametric',
+          description: 'Interactive parametric visualization and exploration tool with advanced export capabilities',
           theme_color: '#000000',
           background_color: '#000000',
           display: 'standalone',
+          display_override: ['standalone', 'fullscreen'],
+          orientation: 'any',
           scope: base,
           start_url: base,
+          categories: ['graphics', 'utilities', 'entertainment'],
           icons: [
             {
               src: 'pwa-192x192.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'any'
+              purpose: 'any maskable'
             },
             {
               src: 'pwa-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any'
+              purpose: 'any maskable'
             },
             {
-              src: 'pwa-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable'
+              src: 'apple-touch-icon.png',
+              sizes: '180x180',
+              type: 'image/png'
             }
-          ]
+          ],
+          screenshots: [
+            {
+              src: 'pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              form_factor: 'narrow'
+            },
+            {
+              src: 'pwa-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              form_factor: 'wide'
+            }
+          ],
+          shortcuts: [
+            {
+              name: 'New Visualization',
+              short_name: 'New',
+              description: 'Start a new parametric visualization',
+              url: base,
+              icons: [
+                {
+                  src: 'pwa-192x192.png',
+                  sizes: '192x192'
+                }
+              ]
+            }
+          ],
+          share_target: {
+            action: base,
+            method: 'GET',
+            enctype: 'application/x-www-form-urlencoded',
+            params: {
+              title: 'title',
+              text: 'text',
+              url: 'url'
+            }
+          }
         },
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,jpg,jpeg}'],
           navigateFallback: null, // Disable for better self-hosting compatibility
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB for large assets
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -62,12 +103,25 @@ export default defineConfig(() => {
                   statuses: [0, 200]
                 }
               }
+            },
+            {
+              // Cache canvas recordings and exports
+              urlPattern: /\.(mp4|webm|gif)$/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'media-cache',
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 60 * 60 * 24 * 7 // 1 week
+                }
+              }
             }
           ]
         },
         devOptions: {
           enabled: true, // Enable PWA in dev mode for testing
-          type: 'module'
+          type: 'module',
+          navigateFallback: 'index.html'
         }
       })
     ],
