@@ -6,7 +6,6 @@ import { ResonanceOikosPanel } from './ResonanceOikosPanel';
 import { AudioOikosPanel } from './AudioOikosPanel';
 import { VisualsOikosPanel } from './VisualsOikosPanel';
 import { PerformanceOikosPanel } from './PerformanceOikosPanel';
-import { EcosystemOikosPanel } from './EcosystemOikosPanel';
 import { PresetGallery } from './PresetGallery';
 import type { SpeciesScope, OikosTab } from '../types';
 import { colors, spacing, typography, effects } from '../design-system';
@@ -36,7 +35,6 @@ const SPECIES_TABS: SpeciesTabDef[] = [
 
 const OIKOS_TABS: OikosTabDef[] = [
   { id: 'presets', label: 'Presets', icon: '🎯' },
-  { id: 'ecosystem', label: 'Ecosystem', icon: '🌿' },
   { id: 'physical', label: 'Physikalisch', icon: '🌊' },
   { id: 'semiotic', label: 'Semiotisch', icon: '👁️' },
   { id: 'resonance', label: 'Resonanz', icon: '🔗' },
@@ -64,7 +62,7 @@ export function MatrixControlCenter() {
   // For species-specific tabs, filter out presets and global tabs
   const availableOikosTabs = ui.activeSpeciesScope === 'universal'
     ? OIKOS_TABS
-    : OIKOS_TABS.filter(t => !['presets', 'ecosystem', 'visuals', 'performance'].includes(t.id));
+    : OIKOS_TABS.filter(t => !['presets', 'visuals', 'performance'].includes(t.id));
 
   return (
     <div style={styles.container}>
@@ -83,7 +81,7 @@ export function MatrixControlCenter() {
               onClick={() => {
                 setActiveSpeciesScope(tab.id);
                 // Switch to appropriate tab if current is not available
-                if (tab.id !== 'universal' && ['presets', 'ecosystem', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
+                if (tab.id !== 'universal' && ['presets', 'visuals', 'performance'].includes(ui.activeOikosTab)) {
                   setActiveOikosTab('physical');
                 }
               }}
@@ -138,7 +136,6 @@ export function MatrixControlCenter() {
       {/* Scrollable Content Area */}
       <div style={styles.content}>
         {ui.activeOikosTab === 'presets' && <PresetGallery />}
-        {ui.activeOikosTab === 'ecosystem' && <EcosystemOikosPanel />}
         {ui.activeOikosTab === 'physical' && <PhysicalOikosPanel />}
         {ui.activeOikosTab === 'semiotic' && <SemioticOikosPanel />}
         {ui.activeOikosTab === 'resonance' && <ResonanceOikosPanel />}
