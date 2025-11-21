@@ -179,8 +179,9 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
           // For Live Photo, also download the keyframe
           if (videoFormat === 'live-photo' && keyframeBlob) {
+            const savedKeyframeBlob = keyframeBlob; // Capture in closure to avoid null issues
             setTimeout(() => {
-              const imgUrl = URL.createObjectURL(keyframeBlob);
+              const imgUrl = URL.createObjectURL(savedKeyframeBlob);
               const imgLink = document.createElement('a');
               imgLink.href = imgUrl;
               imgLink.download = `parametric-livephoto-${timestamp}-keyframe.jpg`;
