@@ -8,6 +8,85 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Professional Export Quality Controls** 📤
+  - **3 Quality Presets** for video and GIF exports:
+    - **Standard** (8 Mbps video / Quality 10 GIF): Good balance for social media
+    - **High** (12 Mbps video / Quality 5 GIF): Recommended default, excellent quality
+    - **Very High** (18 Mbps video / Quality 2 GIF + dithering): Maximum quality for archival
+  - **Variable Frame Rates**: 30 FPS (smaller files) or 60 FPS (smoother motion)
+  - **Dynamic Quality Parameters**: Bitrate and encoding settings adapt to selected preset
+  - UI controls in ControlBar with clear quality/performance descriptions
+
+- **Multiple Export Formats** 🎬
+  - **WebM (VP9)**: Universal browser support, excellent compression (previously only format)
+  - **MP4 (H.264)**: iOS-compatible, native video format with H.264/AVC1 codec
+  - **iOS Video**: MP4 + keyframe JPG with Web Share API integration for Live Photos workflow
+  - **GIF**: Universal compatibility with optional Floyd-Steinberg dithering for Very High quality
+  - Smart codec fallback: H.264 → AVC1 → VP9 for maximum compatibility
+  - Format comparison table in documentation for choosing best export option
+
+- **Web Share API Integration** 📱
+  - Native iOS/Android share sheets for iOS Video format
+  - One-tap "Save to Photos" workflow for mobile devices
+  - Automatic keyframe capture (JPEG at quality 0.95) for iOS Video exports
+  - Direct sharing to Messages, Instagram, and other native apps
+  - Graceful fallback to standard download when sharing unavailable
+
+- **Enhanced GIF Encoding** 🎨
+  - Floyd-Steinberg dithering for Very High quality preset
+  - Quality range: 2-10 (previously fixed at 10)
+  - Configurable dithering algorithms: FloydSteinberg, FalseFloydSteinberg, Stucki, Atkinson
+  - Real-time processing feedback with percentage indicator
+  - Updated TypeScript definitions for gif.js with dithering support
+
+- **iOS-Optimized PWA** 🍎
+  - **Fullscreen Standalone Mode**: No Safari UI when launched from home screen
+  - **Black-Translucent Status Bar**: Seamless integration with iOS status bar
+  - **Safe Area Support**: viewport-fit=cover for notch/Dynamic Island compatibility
+  - **Native Splash Screen**: Apple touch startup image on app launch
+  - **iOS-Specific Meta Tags**:
+    - apple-mobile-web-app-capable
+    - apple-mobile-web-app-status-bar-style
+    - apple-mobile-web-app-title
+    - Apple touch icons (180x180)
+    - Mask icon for Safari pinned tabs
+  - **Web Share API**: Direct export to iOS Photos app
+  - Installation guide for Safari users in README
+
+- **Android-Optimized PWA** 🤖
+  - **Custom Install Prompt Component** (InstallPrompt.tsx):
+    - BeforeInstallPrompt event handler
+    - Custom branded install banner with app icon
+    - Appears after 3 seconds if not already installed
+    - Dismissible with 7-day cooldown (localStorage)
+    - Slide-up animation for smooth presentation
+  - **Maskable/Adaptive Icons**: Proper icon support for Android home screens
+  - **App Detection**: Checks for standalone mode, window.navigator.standalone, android-app:// referrer
+  - **Installation Tracking**: Listens for 'appinstalled' event
+  - **Smart Dismissal**: Remembers user preference, resets after 1 week
+  - Integrated into App.tsx for automatic display
+
+- **Comprehensive PWA Manifest** 📋
+  - Enhanced with iOS/Android-specific features
+  - **Display Modes**: standalone, fullscreen with display_override
+  - **Orientation**: any (supports all device orientations)
+  - **Screenshots**: Narrow and wide form factors for app stores
+  - **Shortcuts**: "New Visualization" quick action from home screen icon
+  - **Share Target**: Enables receiving shares from other apps
+  - **Categories**: graphics, utilities, entertainment
+  - **Language/Direction**: en-US, left-to-right
+  - Configurable base path for self-hosting deployments
+
+- **Offline-First Architecture** 📴
+  - **Workbox Service Worker** with intelligent caching strategies:
+    - CacheFirst for Google Fonts (1 year expiration)
+    - NetworkFirst for media exports (1 week expiration)
+  - **Large Asset Support**: 5MB cache limit for video/GIF files
+  - **Auto-Update**: Background service worker updates
+  - **Dev Mode Support**: PWA enabled in development for testing
+  - **Glob Patterns**: Comprehensive asset caching (JS, CSS, HTML, images, fonts)
+  - Works completely offline after first visit
+
 - **Species Interaction Matrix (3×3)** 🧬
   - Two-tier control system for fine-grained species interaction dynamics
   - **Universal Baseline Settings** (global multipliers):
@@ -105,6 +184,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - PWA enabled in development mode for testing
 
 ### Changed
+- **Export System Overhaul** 🔄
+  - Video bitrate increased from fixed 5 Mbps to 8-18 Mbps (configurable)
+  - GIF quality improved from fixed Quality 10 to Quality 2-10 (configurable)
+  - Frame rate changed from fixed 30 FPS to configurable 30/60 FPS
+  - Export UI redesigned with quality preset dropdowns and FPS selector
+  - Recording workflow updated to support multiple formats and quality levels
+  - Status messages enhanced to show format-specific processing steps
+
+- **Documentation Enhancements** 📚
+  - **README.md** completely restructured:
+    - Export & Sharing section rewritten with quality controls, format comparison table, iOS integration guide
+    - PWA section expanded with platform-specific features (iOS/Android/Desktop)
+    - Installation instructions dramatically expanded with step-by-step guides per platform
+    - Technology Stack updated with MediaRecorder API, Web Share API, gif.js details
+    - New "Tips for Best Results" section with use-case recommendations
+  - **CHANGELOG.md** updated with comprehensive export quality and PWA improvements
+  - Format comparison table added for choosing optimal export settings
+  - Platform-specific PWA benefits documented (offline-first, native sharing, app shortcuts)
+
+- **PWA Functionality Enhanced** 🚀
+  - index.html updated with comprehensive iOS/Android/general PWA meta tags
+  - vite.config.ts enhanced with detailed PWA manifest configuration
+  - Service worker caching strategies optimized for media exports
+  - Manifest now includes screenshots, shortcuts, share target capabilities
+  - Base path configuration improved for flexible self-hosting deployments
+
+- **TypeScript Definitions Updated** 📝
+  - gif.js type definitions extended to support dithering algorithm strings
+  - Added support for: FloydSteinberg, FalseFloydSteinberg, Stucki, Atkinson
+  - Changed dither parameter from boolean-only to union type
+
 - Updated README.md with PWA features, Audio Oikos system, and installation instructions
 - Updated project structure documentation to include audio/ directory
 - Enhanced Technology Stack section with Web Audio API mention

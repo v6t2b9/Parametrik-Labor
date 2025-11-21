@@ -61,17 +61,40 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ✅ **Multi-Scale Temporal Structure** - Micro (100ms), Meso (500ms), Macro (4s) time windows
 ✅ **5 Audio Presets** - Default, Bass-Heavy, Ambient, Chaotic, Minimal
 
-#### Export & Sharing
-✅ **GIF Loop Export** - 2-second looping GIFs with automatic fade-in/fade-out transitions
-✅ **Video Export** - WebM (high quality) or GIF format with configurable duration (3s/8s/12s)
-✅ **Screenshot Capture** - One-click PNG export of current canvas state
+#### Export & Sharing 📤
+✅ **Professional Quality Controls** - 3 quality presets (Standard, High, Very High)
+  - **Standard:** 8 Mbps video / Quality 10 GIF - Good balance
+  - **High:** 12 Mbps video / Quality 5 GIF - Recommended (default)
+  - **Very High:** 18 Mbps video / Quality 2 GIF + Floyd-Steinberg dithering - Maximum quality
+✅ **Variable Frame Rates** - 30 FPS (smaller files) or 60 FPS (smoother, larger files)
+✅ **Multiple Export Formats:**
+  - **WebM (VP9):** Universal browser support, excellent compression
+  - **MP4 (H.264):** iOS-compatible, native video format
+  - **iOS Video:** MP4 + keyframe JPG with Web Share API integration
+  - **GIF:** Universal support with optional dithering for quality
+✅ **iOS/Android Integration** - Native share sheets for direct-to-Photos export
+✅ **Screenshot Capture** - High-quality PNG export with current canvas state
 ✅ **Smart Recording Workflow** - Automatic capture with real-time progress indicators
 
-#### Progressive Web App (PWA)
-✅ **Installable App** - Install on desktop and mobile devices
-✅ **Offline Support** - Works without internet after first load
-✅ **Auto-Updates** - Service worker keeps app up-to-date
-✅ **Native-Like Experience** - Standalone window, app icons, splash screen
+#### Progressive Web App (PWA) 📱
+✅ **Cross-Platform Installation** - Optimized for iOS, Android, and Desktop
+✅ **iOS-Optimized:**
+  - Fullscreen standalone mode without Safari UI
+  - Black-translucent status bar
+  - Notch/Dynamic Island safe area support
+  - Native splash screen on launch
+✅ **Android-Optimized:**
+  - Custom install prompt (appears after 3 seconds)
+  - BeforeInstallPrompt handler
+  - Maskable/adaptive icons
+  - Dismissible with 7-day cooldown
+✅ **Offline-First Architecture** - Works completely offline after first visit
+  - Workbox-powered service worker
+  - Intelligent caching strategies
+  - 5MB cache limit for large assets
+  - Background updates
+✅ **Web Share API Integration** - iOS/Android native share sheets for exports
+✅ **App Shortcuts** - Quick access to new visualizations from home screen
 ✅ **Self-Hosting Ready** - Configurable base path for flexible deployment
 
 #### UX & Interface
@@ -168,9 +191,10 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 - **Build Tool:** Vite
 - **Rendering:** Canvas 2D API + WebGL (hybrid approach)
 - **Audio:** Web Audio API (AnalyserNode, FFT), AudioContext
-- **Export:** gif.js (GIF encoding), MediaRecorder API (WebM)
-- **Performance:** Object pooling, WebGL shaders, requestAnimationFrame
-- **Deployment:** Vercel
+- **Export:** gif.js (GIF encoding with dithering), MediaRecorder API (WebM/MP4/H.264), Web Share API
+- **PWA:** vite-plugin-pwa, Workbox service worker, Web App Manifest
+- **Performance:** Object pooling, WebGL shaders, requestAnimationFrame, aggressive caching
+- **Deployment:** Vercel, self-hosting ready
 - **License:** AGPL v3 (Strong Copyleft)
 
 ---
@@ -211,31 +235,52 @@ Based on **Supplement B: Computational Model Protocol** from the quantum biosemi
 
 ### Installing as PWA
 
-The app can be installed as a Progressive Web App for a native-like experience:
+The app is a full-featured Progressive Web App optimized for all platforms:
 
-**Desktop (Chrome/Edge/Brave):**
-1. Visit the live demo or your deployed instance
-2. Look for the install icon (⊕) in the address bar
-3. Click "Install" to add to your desktop
-4. Launch from your app menu or desktop
+#### **iOS Installation (Safari)**
+1. Open the app in **Safari** (required for PWA features)
+2. Tap the **Share button** (box with arrow)
+3. Scroll down and select **"Add to Home Screen"**
+4. Tap **"Add"** in the top right
 
-**Mobile (iOS Safari):**
-1. Open the app in Safari
-2. Tap the Share button
-3. Select "Add to Home Screen"
-4. Tap "Add"
+**iOS Features:**
+- ✅ Fullscreen mode (no Safari UI)
+- ✅ Black translucent status bar
+- ✅ Notch/Dynamic Island support
+- ✅ Native splash screen
+- ✅ Web Share API for exports
 
-**Mobile (Android Chrome):**
-1. Open the app in Chrome
-2. Tap the three dots menu
-3. Select "Install app" or "Add to Home Screen"
+#### **Android Installation (Chrome)**
+1. Open the app in **Chrome**
+2. **Custom install banner** appears after 3 seconds
+3. Tap **"Install"** on the banner
+4. Or: Menu (⋮) → **"Install app"** / **"Add to Home Screen"**
 
-**Benefits:**
-- Standalone window without browser UI
-- Offline access after first load
-- Faster loading with cached resources
-- App icon in your launcher/dock
-- Automatic updates in background
+**Android Features:**
+- ✅ BeforeInstallPrompt integration
+- ✅ Maskable/adaptive icons
+- ✅ Custom install UI
+- ✅ Web Share API for exports
+- ✅ App shortcuts from icon
+
+#### **Desktop Installation (Chrome/Edge/Brave)**
+1. Visit the app in Chrome, Edge, or Brave
+2. Look for **install icon (⊕)** in address bar
+3. Click **"Install"**
+4. Launch from app menu or desktop
+
+**Desktop Features:**
+- ✅ Standalone window
+- ✅ Desktop app icon
+- ✅ Taskbar/dock integration
+
+#### **PWA Benefits:**
+- 📴 **Works offline** - Full functionality without internet
+- ⚡ **Instant loading** - Cached resources load immediately
+- 🔄 **Auto-updates** - Service worker updates in background
+- 📤 **Native sharing** - iOS/Android share sheets for exports
+- 💾 **Persistent state** - Preferences saved locally
+- 🚀 **App-like experience** - No browser UI clutter
 
 ### Basic Workflow
 
@@ -250,26 +295,77 @@ The app can be installed as a Progressive Web App for a native-like experience:
 
 ### Export & Capture
 
-**Screenshot:**
-- Click `📸 Screenshot` to capture current frame as PNG
+#### Quality Settings
 
-**GIF Loop (Recommended for social media):**
+Before exporting, configure quality and performance:
+
+**Quality Presets:**
+- **Standard** (8 Mbps video / Quality 10 GIF) - Good balance for social media
+- **High** (12 Mbps video / Quality 5 GIF) - Recommended default, excellent quality
+- **Very High** (18 Mbps video / Quality 2 GIF + dithering) - Maximum quality for archival
+
+**Frame Rate:**
+- **30 FPS** - Smaller files, smooth playback (recommended for most uses)
+- **60 FPS** - Ultra-smooth motion, larger files (best for fast animations)
+
+#### Export Formats
+
+**📸 Screenshot:**
+- Click `📸 Screenshot` to capture current frame as high-quality PNG
+- Perfect for sharing single frames or posters
+
+**🎬 Video Export:**
+1. Select `🎬 Video` from export mode
+2. Choose your format:
+   - **WebM (VP9)** - Best compression, universal browser support, recommended for web
+   - **MP4 (H.264)** - iOS-compatible, native video format, great for mobile
+   - **iOS Video** - MP4 + keyframe JPG with native iOS sharing (see below)
+   - **GIF** - Universal compatibility, larger files, optional dithering for quality
+3. Select quality preset: `Standard`, `High`, or `Very High`
+4. Select frame rate: `30 FPS` or `60 FPS`
+5. Select duration: `3s`, `8s`, or `12s`
+6. Click `🎥 Record [FORMAT] ([DURATION]s)`
+7. Wait for automatic capture → processing → download/share
+
+**🔁 GIF Loop (Social Media Optimized):**
 1. Select `🔁 GIF Loop (2s with fade)` from export mode
-2. Click `🎥 Record GIF Loop (2s)`
-3. Wait for automatic capture (60 frames) → rendering → download
+2. Configure quality preset (High recommended for social media)
+3. Click `🎥 Record GIF Loop (2s)`
 4. Result: Seamlessly looping 2-second GIF with fade transitions
 
-**Video Export:**
-1. Select `🎬 Video` from export mode
-2. Choose format: `WebM (Best Quality)` or `GIF (Universal)`
-3. Select duration: `3s`, `8s`, or `12s`
-4. Click `🎥 Record [FORMAT] ([DURATION]s)`
-5. Wait for automatic capture → processing (GIF only) → download
+#### iOS Integration
+
+When using **iOS Video** format on iOS devices:
+1. After recording completes, native **Share Sheet** appears automatically
+2. Tap **"Save to Photos"** to save MP4 + keyframe to Camera Roll
+3. Use with **intoLive** app (free) to create Live Photos for animated wallpapers
+4. Or share directly to Messages, Instagram, etc.
+
+**Why iOS Video?** Browsers can't create true Live Photos due to Apple's proprietary format, but this workflow provides the best mobile experience with one-tap sharing.
+
+#### Format Comparison
+
+| Format | Quality | File Size | Compatibility | Best For |
+|--------|---------|-----------|---------------|----------|
+| **WebM (VP9)** | Excellent | Small | Modern browsers | Web sharing, embedding |
+| **MP4 (H.264)** | Excellent | Medium | Universal | Mobile, iOS, general use |
+| **iOS Video** | Excellent | Medium | iOS/Android native | Live Photos workflow, wallpapers |
+| **GIF** | Good-Excellent* | Large | Universal | Social media, legacy support |
+
+*With Very High quality + dithering
+
+#### Tips for Best Results
+
+- **Social Media:** Use High quality GIF Loop or WebM at 30 FPS
+- **iOS Wallpapers:** Use iOS Video format with Very High quality at 60 FPS
+- **Archival:** Use Very High quality WebM or MP4 at 60 FPS
+- **File Size Matters:** Use Standard quality at 30 FPS, WebM format
+- **Maximum Quality:** Use Very High preset with 60 FPS, enable dithering for GIF
 
 **Status Indicators:**
 - `🔴 Capturing... X/Y` - Frames being captured
-- `⏳ Processing GIF... X%` - GIF encoding in progress
-- Download starts automatically when complete
+- `⏳ Processing GIF... X%` - GIF encoding in progress (can take time for Very High quality)
+- Download/share starts automatically when complete
 
 ### Desktop Layout
 
