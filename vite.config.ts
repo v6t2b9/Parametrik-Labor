@@ -27,6 +27,9 @@ export default defineConfig(() => {
           scope: base,
           start_url: base,
           categories: ['graphics', 'utilities', 'entertainment'],
+          prefer_related_applications: false,
+          dir: 'ltr',
+          lang: 'en-US',
           icons: [
             {
               src: 'pwa-192x192.png',
