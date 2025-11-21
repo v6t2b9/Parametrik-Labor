@@ -77,10 +77,11 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const renderRef = useRef<(() => void) | null>(null);
 
   const tick = useSimulationStore((state) => state.tick);
-  const trails = useSimulationStore((state) => state.trails);
-  const agents = useSimulationStore((state) => state.agents);
-  const running = useSimulationStore((state) => state.running);
+  // Read trails and agents directly from engine instead of store to avoid massive state updates
   const engine = useSimulationStore((state) => state.engine);
+  const trails = engine.getTrails();
+  const agents = engine.getAgents();
+  const running = useSimulationStore((state) => state.running);
   const parameters = useSimulationStore((state) => state.parameters);
   const visualization = useSimulationStore((state) => state.parameters.visualization);
   const effects = useSimulationStore((state) => state.parameters.effects);

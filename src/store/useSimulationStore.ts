@@ -699,10 +699,9 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
       engine.update();
 
+      // Only update frameCount - trails and agents are read directly from engine for performance
       set({
         frameCount: engine.getFrameCount(),
-        agents: engine.getAgents(),
-        trails: engine.getTrails(),
       });
     },
 
