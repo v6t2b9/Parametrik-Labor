@@ -50,6 +50,7 @@ class CanvasPool {
 export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const motionBlurCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const feedbackCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
   // Responsive canvas size (based on window size in fullscreen and aspect ratio)
@@ -208,6 +209,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     motionBlurCanvasRef.current.width = canvasWidth;
     motionBlurCanvasRef.current.height = canvasHeight;
 
+    // Feedback canvas - stores previous frame for echo effect
+    if (!feedbackCanvasRef.current) {
+      feedbackCanvasRef.current = document.createElement('canvas');
+    }
+    feedbackCanvasRef.current.width = canvasWidth;
+    feedbackCanvasRef.current.height = canvasHeight;
+
     // Scanline pattern (cached for performance)
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
@@ -259,6 +267,40 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // === 0. Fill entire canvas with background (letterbox/pillarbox bars) ===
     ctx.fillStyle = `rgb(${currentVisualization.colorBg.r}, ${currentVisualization.colorBg.g}, ${currentVisualization.colorBg.b})`;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    // === 0.5. Feedback/Echo Effect (Recursive Rendering) ===
+    // Apply BEFORE trails are rendered, creating infinite recursive trails
+    if (effects.feedbackAmount > 0 && feedbackCanvasRef.current) {
+      const fbCanvas = feedbackCanvasRef.current;
+      const fbCtx = fbCanvas.getContext('2d');
+
+      if (fbCtx && fbCanvas.width === canvasWidth && fbCanvas.height === canvasHeight) {
+        // Check if feedback canvas has content (not first frame)
+        const imageData = fbCtx.getImageData(0, 0, 1, 1);
+        const hasContent = imageData.data[3] > 0; // Check alpha channel
+
+        if (hasContent) {
+          // Calculate center point for zoom and rotation
+          const centerX = canvasWidth / 2;
+          const centerY = canvasHeight / 2;
+
+          // Apply transformations for feedback effect
+          ctx.save();
+          ctx.globalAlpha = effects.feedbackAmount;
+
+          // Translate to center, apply transformations, translate back
+          ctx.translate(centerX, centerY);
+          ctx.scale(effects.feedbackZoom, effects.feedbackZoom);
+          ctx.rotate((effects.feedbackRotation * Math.PI) / 180); // Convert degrees to radians
+          ctx.translate(-centerX + effects.feedbackOffsetX, -centerY + effects.feedbackOffsetY);
+
+          // Draw previous frame with transformations
+          ctx.drawImage(fbCanvas, 0, 0, canvasWidth, canvasHeight);
+
+          ctx.restore();
+        }
+      }
+    }
 
     // Save context state before applying offset
     ctx.save();
@@ -403,6 +445,60 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
           canvasPool.release(smallCanvas);
         }
 
+        canvasPool.release(tempCanvas);
+      }
+    }
+
+    // === 2.5. Kaleidoscope Effect (Radial Mirroring) ===
+    // Creates symmetrical mandala patterns by mirroring the grid in radial segments
+    if (effects.kaleidoscopeSegments >= 2) {
+      // Create temp canvas to save current grid content
+      const tempCanvas = canvasPool.acquire(gridPixelWidth, gridPixelHeight);
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx && tempCanvas.width === gridPixelWidth && tempCanvas.height === gridPixelHeight) {
+        // Capture current grid content (without offset)
+        tempCtx.drawImage(canvas, offsetX, offsetY, gridPixelWidth, gridPixelHeight, 0, 0, gridPixelWidth, gridPixelHeight);
+
+        // Clear grid area
+        ctx.clearRect(0, 0, gridPixelWidth, gridPixelHeight);
+
+        // Calculate center point and segment angle
+        const centerX = gridPixelWidth / 2;
+        const centerY = gridPixelHeight / 2;
+        const segmentAngle = (2 * Math.PI) / effects.kaleidoscopeSegments;
+
+        // Apply kaleidoscope rotation and zoom
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate((effects.kaleidoscopeRotation * Math.PI) / 180);
+        ctx.scale(effects.kaleidoscopeZoom, effects.kaleidoscopeZoom);
+        ctx.translate(-centerX, -centerY);
+
+        // Draw each kaleidoscope segment
+        for (let i = 0; i < effects.kaleidoscopeSegments; i++) {
+          ctx.save();
+
+          // Rotate to segment position
+          ctx.translate(centerX, centerY);
+          ctx.rotate(i * segmentAngle);
+          ctx.translate(-centerX, -centerY);
+
+          // Draw original wedge
+          ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, gridPixelHeight);
+
+          // Mirror the wedge for classic kaleidoscope effect
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.scale(-1, 1); // Horizontal flip
+          ctx.translate(-centerX, -centerY);
+          ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, gridPixelHeight);
+          ctx.restore();
+
+          ctx.restore();
+        }
+
+        ctx.restore();
         canvasPool.release(tempCanvas);
       }
     }
@@ -577,6 +673,59 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
+    // === 15.5. Radial Blur (Tunnel/Explosion Effect) ===
+    // Creates motion blur radiating from a center point (outward = explosion, inward = tunnel)
+    if (effects.radialBlurStrength > 0) {
+      const tempCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx && tempCanvas.width === canvasWidth && tempCanvas.height === canvasHeight) {
+        // Save current canvas
+        tempCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        tempCtx.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
+
+        // Calculate center point in pixels
+        const centerX = canvasWidth * effects.radialBlurCenterX;
+        const centerY = canvasHeight * effects.radialBlurCenterY;
+
+        // Clear main canvas (we'll draw accumulated samples)
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        // Multi-sample radial blur
+        const samples = Math.floor(effects.radialBlurQuality);
+        const maxOffset = effects.radialBlurStrength * 50; // Max 50px offset at strength 1.0
+
+        for (let i = 0; i < samples; i++) {
+          // Calculate offset for this sample (linear distribution)
+          const t = i / (samples - 1); // 0 to 1
+          const offset = t * maxOffset;
+
+          // Calculate alpha for this sample (distribute evenly)
+          ctx.globalAlpha = 1.0 / samples;
+
+          // Apply radial offset from center
+          ctx.save();
+          ctx.translate(centerX, centerY);
+
+          // Scale outward from center (creates the radial blur effect)
+          const scale = 1 + (offset / Math.max(canvasWidth, canvasHeight));
+          ctx.scale(scale, scale);
+
+          ctx.translate(-centerX, -centerY);
+
+          // Draw sample
+          ctx.drawImage(tempCanvas, 0, 0, canvasWidth, canvasHeight);
+
+          ctx.restore();
+        }
+
+        // Reset alpha
+        ctx.globalAlpha = 1.0;
+
+        canvasPool.release(tempCanvas);
+      }
+    }
+
     // === 16. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
     // Apply filters individually to ensure they are not overridden
     const filters: string[] = [];
@@ -605,8 +754,96 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       canvasPool.release(tempCanvas);
     }
 
-    // === 15. Bloom Effect ===
-    if (effects.bloom > 0) {
+    // === 17. Bloom Effect ===
+    // Choose between Simple Bloom (legacy) and Better Bloom (multi-pass Gaussian)
+    const useBetterBloom = effects.bloomIntensity > 0;
+
+    if (useBetterBloom) {
+      // === 17a. Better Bloom (Multi-Pass Gaussian) ===
+      // Professional quality bloom with threshold extraction and multi-pass blur
+      const bloomDownscale = 4; // Downscale factor (4 = 1/4 size)
+      const bloomWidth = Math.floor(canvasWidth / bloomDownscale);
+      const bloomHeight = Math.floor(canvasHeight / bloomDownscale);
+
+      // Step 1: Extract bright pixels to temp canvas
+      const brightCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
+      const brightCtx = brightCanvas.getContext('2d');
+
+      if (brightCtx && brightCanvas.width === canvasWidth && brightCanvas.height === canvasHeight) {
+        // Copy canvas
+        brightCtx.drawImage(canvas, 0, 0);
+
+        // Extract bright pixels (threshold)
+        if (effects.bloomThreshold > 0) {
+          const imageData = brightCtx.getImageData(0, 0, canvasWidth, canvasHeight);
+          const data = imageData.data;
+          const threshold = effects.bloomThreshold * 255;
+
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+
+            // Calculate brightness (perceived luminance)
+            const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            // If below threshold, set to black
+            if (brightness < threshold) {
+              data[i] = 0;
+              data[i + 1] = 0;
+              data[i + 2] = 0;
+            }
+          }
+
+          brightCtx.putImageData(imageData, 0, 0);
+        }
+
+        // Step 2: Downscale to bloom canvas
+        const bloomCanvas = canvasPool.acquire(bloomWidth, bloomHeight);
+        const bloomCtx = bloomCanvas.getContext('2d');
+
+        if (bloomCtx && bloomCanvas.width === bloomWidth && bloomCanvas.height === bloomHeight) {
+          bloomCtx.imageSmoothingEnabled = true;
+          bloomCtx.imageSmoothingQuality = 'high';
+          bloomCtx.drawImage(brightCanvas, 0, 0, bloomWidth, bloomHeight);
+
+          // Step 3: Multi-pass Gaussian blur
+          const blurPasses = Math.floor(effects.bloomRadius);
+          for (let pass = 0; pass < blurPasses; pass++) {
+            const tempBloom = canvasPool.acquire(bloomWidth, bloomHeight);
+            const tempBloomCtx = tempBloom.getContext('2d');
+
+            if (tempBloomCtx) {
+              // Apply blur (each pass = 2px blur, accumulates)
+              tempBloomCtx.filter = 'blur(2px)';
+              tempBloomCtx.drawImage(bloomCanvas, 0, 0);
+              tempBloomCtx.filter = 'none';
+
+              // Copy back
+              bloomCtx.clearRect(0, 0, bloomWidth, bloomHeight);
+              bloomCtx.drawImage(tempBloom, 0, 0);
+            }
+
+            canvasPool.release(tempBloom);
+          }
+
+          // Step 4: Upscale bloom and blend with main canvas
+          ctx.globalCompositeOperation = 'lighter';
+          ctx.globalAlpha = effects.bloomIntensity;
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(bloomCanvas, 0, 0, canvasWidth, canvasHeight);
+          ctx.globalAlpha = 1;
+          ctx.globalCompositeOperation = 'source-over';
+
+          canvasPool.release(bloomCanvas);
+        }
+
+        canvasPool.release(brightCanvas);
+      }
+    } else if (effects.bloom > 0) {
+      // === 17b. Simple Bloom (Legacy) ===
+      // Kept for backward compatibility and performance
       ctx.globalCompositeOperation = 'lighter';
       ctx.globalAlpha = effects.bloom;
       ctx.filter = `blur(${Math.max(8, effects.blur + 8)}px) brightness(1.5)`;
@@ -653,6 +890,18 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Release all pooled canvases
     canvasPool.releaseAll();
+
+    // === FINAL: Copy current frame to feedback canvas for next iteration ===
+    if (effects.feedbackAmount > 0 && feedbackCanvasRef.current) {
+      const fbCanvas = feedbackCanvasRef.current;
+      const fbCtx = fbCanvas.getContext('2d');
+
+      if (fbCtx && fbCanvas.width === canvasWidth && fbCanvas.height === canvasHeight) {
+        // Clear and copy entire canvas (including letterbox bars)
+        fbCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        fbCtx.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
+      }
+    }
   }, [canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine, parameters]);
   // Note: parameters is now included in deps to ensure visualization/effects updates are reflected immediately
 

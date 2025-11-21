@@ -196,14 +196,50 @@ export function VisualsOikosPanel() {
             description="Gaussian blur radius (px) - creates softer, dreamier visuals"
           />
           <ParameterSlider
-            label="Bloom"
+            label="Bloom (Simple)"
             value={effectsParams.bloom}
             min={0}
             max={1}
             step={0.05}
             onChange={(value) => updateEffectsParams({ bloom: value })}
-            description="Additive glow strength - adds ethereal luminous halos"
+            description="Simple additive glow (legacy mode) - fast but basic. Use Better Bloom for professional quality."
           />
+        </div>
+
+        {/* Better Bloom (Professional) */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Better Bloom (Professional Multi-Pass)</h5>
+          <ParameterSlider
+            label="Bloom Intensity"
+            value={effectsParams.bloomIntensity}
+            min={0}
+            max={2}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ bloomIntensity: value })}
+            description="Bloom strength (0 = off, 1 = normal, 2 = extreme) - professional quality glow"
+          />
+          {effectsParams.bloomIntensity > 0 && (
+            <>
+              <ParameterSlider
+                label="Bloom Threshold"
+                value={effectsParams.bloomThreshold}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(value) => updateEffectsParams({ bloomThreshold: value })}
+                description="Brightness threshold (0 = all pixels glow, 0.7 = only bright pixels glow)"
+              />
+              <ParameterSlider
+                label="Bloom Radius"
+                value={effectsParams.bloomRadius}
+                min={1}
+                max={10}
+                step={1}
+                onChange={(value) => updateEffectsParams({ bloomRadius: value })}
+                description="Glow spread/softness (1 = tight, 4 = balanced, 10 = very wide & soft)"
+              />
+            </>
+          )}
         </div>
 
         {/* Color Grading */}
@@ -264,6 +300,141 @@ export function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ vignette: value })}
             description="Edge darkening - focuses attention on the center of the canvas"
           />
+        </div>
+
+        {/* Feedback / Echo (Recursive Rendering) */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Feedback / Echo (Recursive Rendering)</h5>
+          <ParameterSlider
+            label="Feedback Amount"
+            value={effectsParams.feedbackAmount}
+            min={0}
+            max={0.98}
+            step={0.01}
+            onChange={(value) => updateEffectsParams({ feedbackAmount: value })}
+            description="Frame persistence for echo effect (0 = off, 0.85+ = infinite trails, 0.95 = psychedelic spirals)"
+          />
+          {effectsParams.feedbackAmount > 0 && (
+            <>
+              <ParameterSlider
+                label="Zoom"
+                value={effectsParams.feedbackZoom}
+                min={0.95}
+                max={1.05}
+                step={0.001}
+                onChange={(value) => updateEffectsParams({ feedbackZoom: value })}
+                description="Zoom in/out each frame (1.0 = none, >1 = zoom in, <1 = zoom out) - creates spirals"
+              />
+              <ParameterSlider
+                label="Rotation"
+                value={effectsParams.feedbackRotation}
+                min={-5}
+                max={5}
+                step={0.1}
+                onChange={(value) => updateEffectsParams({ feedbackRotation: value })}
+                description="Rotation per frame in degrees (0 = none) - creates spinning spirals"
+              />
+              <ParameterSlider
+                label="Offset X"
+                value={effectsParams.feedbackOffsetX}
+                min={-10}
+                max={10}
+                step={0.5}
+                onChange={(value) => updateEffectsParams({ feedbackOffsetX: value })}
+                description="Horizontal shift per frame in pixels - creates horizontal drift"
+              />
+              <ParameterSlider
+                label="Offset Y"
+                value={effectsParams.feedbackOffsetY}
+                min={-10}
+                max={10}
+                step={0.5}
+                onChange={(value) => updateEffectsParams({ feedbackOffsetY: value })}
+                description="Vertical shift per frame in pixels - creates vertical drift"
+              />
+            </>
+          )}
+        </div>
+
+        {/* Kaleidoscope (Radial Mirroring) */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Kaleidoscope (Radial Mirroring)</h5>
+          <ParameterSlider
+            label="Segments"
+            value={effectsParams.kaleidoscopeSegments}
+            min={0}
+            max={12}
+            step={1}
+            onChange={(value) => updateEffectsParams({ kaleidoscopeSegments: value })}
+            description="Number of mirror segments (0 = off, 4 = cross, 6 = snowflake, 8 = mandala, 12 = complex)"
+          />
+          {effectsParams.kaleidoscopeSegments >= 2 && (
+            <>
+              <ParameterSlider
+                label="Rotation"
+                value={effectsParams.kaleidoscopeRotation}
+                min={0}
+                max={360}
+                step={1}
+                onChange={(value) => updateEffectsParams({ kaleidoscopeRotation: value })}
+                description="Rotation offset in degrees - rotates the entire kaleidoscope pattern"
+              />
+              <ParameterSlider
+                label="Zoom"
+                value={effectsParams.kaleidoscopeZoom}
+                min={0.5}
+                max={2.0}
+                step={0.05}
+                onChange={(value) => updateEffectsParams({ kaleidoscopeZoom: value })}
+                description="Zoom level (1.0 = normal, <1 = zoom out reveals more, >1 = zoom in for detail)"
+              />
+            </>
+          )}
+        </div>
+
+        {/* Radial Blur (Tunnel/Explosion) */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Radial Blur (Tunnel/Explosion)</h5>
+          <ParameterSlider
+            label="Strength"
+            value={effectsParams.radialBlurStrength}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ radialBlurStrength: value })}
+            description="Blur intensity (0 = off, 0.3 = subtle motion, 0.7+ = extreme tunnel/explosion effect)"
+          />
+          {effectsParams.radialBlurStrength > 0 && (
+            <>
+              <ParameterSlider
+                label="Center X"
+                value={effectsParams.radialBlurCenterX}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(value) => updateEffectsParams({ radialBlurCenterX: value })}
+                description="Horizontal center position (0 = left, 0.5 = middle, 1 = right)"
+              />
+              <ParameterSlider
+                label="Center Y"
+                value={effectsParams.radialBlurCenterY}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(value) => updateEffectsParams({ radialBlurCenterY: value })}
+                description="Vertical center position (0 = top, 0.5 = middle, 1 = bottom)"
+              />
+              <ParameterSlider
+                label="Quality"
+                value={effectsParams.radialBlurQuality}
+                min={2}
+                max={10}
+                step={1}
+                onChange={(value) => updateEffectsParams({ radialBlurQuality: value })}
+                description="Number of samples (2 = fast/rough, 6 = balanced, 10 = smooth/slow)"
+              />
+            </>
+          )}
         </div>
 
         {/* Psychedelic / Distortion */}
@@ -427,6 +598,18 @@ export function VisualsOikosPanel() {
           <li><strong>Screen</strong> + medium Trail Intensity = organic luminous flows</li>
           <li>Combine <strong>Motion Blur</strong> with low <strong>Trail Intensity</strong> for fluid trails</li>
           <li>Use <strong>Chromatic Aberration</strong> + <strong>Scanlines</strong> for authentic CRT look</li>
+          <li><strong>Feedback 0.90-0.95</strong> + small <strong>Rotation</strong> (0.2-1°) = spinning spirals</li>
+          <li><strong>Feedback 0.85+</strong> + <strong>Zoom 1.002</strong> = infinite zoom tunnel</li>
+          <li><strong>Feedback 0.92+</strong> + <strong>Offset X/Y</strong> = drifting echoes</li>
+          <li><strong>Kaleidoscope 6 segments</strong> = snowflake patterns, <strong>8 segments</strong> = mandala</li>
+          <li><strong>Kaleidoscope + Feedback</strong> = infinite recursive mandalas (psychedelic!)</li>
+          <li><strong>Kaleidoscope + Hue Cycling</strong> = rainbow mandalas with color shifts</li>
+          <li><strong>Radial Blur 0.3-0.5</strong> = subtle motion, <strong>0.7+</strong> = extreme tunnel effect</li>
+          <li><strong>Radial Blur + Feedback</strong> = explosive recursive spirals from center</li>
+          <li><strong>Radial Blur off-center</strong> (Center X/Y ≠ 0.5) = asymmetric motion blur</li>
+          <li><strong>Better Bloom Threshold 0.7</strong> = only bright areas glow (film-like), <strong>0.3</strong> = more glow</li>
+          <li><strong>Better Bloom Radius 4-6</strong> = balanced cinematic glow, <strong>8-10</strong> = very soft & wide</li>
+          <li><strong>Better Bloom + High Brightness</strong> = AAA game quality glow on bright trails</li>
         </ul>
       </div>
     </div>
