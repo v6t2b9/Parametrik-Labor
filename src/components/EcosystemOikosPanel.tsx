@@ -201,7 +201,7 @@ export function EcosystemOikosPanel() {
 
       {/* Species Info */}
       <div style={styles.speciesBox}>
-        <div style={{ marginBottom: spacing.sm, fontWeight: 'bold', ...typography.h3 }}>
+        <div style={{ ...typography.h3, marginBottom: spacing.sm, fontWeight: 'bold' }}>
           Species Roles:
         </div>
         <div style={styles.speciesText}>
@@ -256,15 +256,15 @@ const styles = {
     border: 'none',
     borderRadius: effects.borderRadius.lg,
     cursor: 'pointer',
-    fontWeight: 'bold',
     ...typography.h3,
+    fontWeight: 'bold',
   } as React.CSSProperties,
   toggleButton: {
     padding: `${spacing.md} ${spacing.xxl}`,
     borderRadius: effects.borderRadius.lg,
     cursor: 'pointer',
-    fontWeight: 'bold',
     ...typography.h3,
+    fontWeight: 'bold',
     width: '100%',
   } as React.CSSProperties,
   activeNote: {

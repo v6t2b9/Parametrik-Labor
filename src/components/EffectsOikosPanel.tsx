@@ -1,7 +1,7 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { effectsPresets } from '../presets/tabPresets';
-import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { colors, spacing, typography, effects, createHeaderStyle } from '../design-system';
 
 export function EffectsOikosPanel() {
   const effectsParams = useSimulationStore((state) => state.parameters.effects);
