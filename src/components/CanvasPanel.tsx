@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, useMemo } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { WebGLTrailRenderer } from './WebGLTrailRenderer';
 import { applyHueCycling } from '../utils/colorUtils';
@@ -73,6 +73,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const fpsHistoryRef = useRef<number[]>([]);
   const frameCounterRef = useRef<number>(0);
 
+  // Use refs for callbacks to avoid recreating animation loop
+  const renderRef = useRef<(() => void) | null>(null);
+
   const tick = useSimulationStore((state) => state.tick);
   const trails = useSimulationStore((state) => state.trails);
   const agents = useSimulationStore((state) => state.agents);
@@ -90,11 +93,14 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const ecosystemMode = parameters.ecosystemMode || false;
   const isEcosystemEngine = engine instanceof MusicReactiveEcosystemEngine;
 
+  // Memoize grid dimensions calculation (only recalculate when aspect ratio changes)
+  const gridDimensions = useMemo(() => calculateGridDimensions(aspectRatio), [aspectRatio]);
+
   // Responsive canvas sizing based on fullscreen mode and aspect ratio
   useEffect(() => {
     const updateCanvasSize = () => {
-      // Calculate grid dimensions from aspect ratio
-      const { width: gridWidth, height: gridHeight } = calculateGridDimensions(aspectRatio);
+      // Use memoized grid dimensions
+      const { width: gridWidth, height: gridHeight } = gridDimensions;
       const [ratioW, ratioH] = getAspectRatioMultipliers(aspectRatio);
 
       if (isFullscreen) {
@@ -185,13 +191,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       window.addEventListener('resize', updateCanvasSize);
       return () => window.removeEventListener('resize', updateCanvasSize);
     }
-  }, [isFullscreen, aspectRatio]); // Removed engine dependency to prevent unnecessary updates
+  }, [isFullscreen, aspectRatio, gridDimensions]); // Removed engine dependency to prevent unnecessary updates
 
   // Initialize/update WebGL renderer, motion blur canvas, and scanline pattern when canvas size changes
   useEffect(() => {
     // WebGL renderer - recreate when canvas size changes
-    // Calculate grid dimensions from aspect ratio
-    const { width: gridWidth, height: gridHeight } = calculateGridDimensions(aspectRatio);
+    // Use memoized grid dimensions
+    const { width: gridWidth, height: gridHeight } = gridDimensions;
     const gridPixelWidth = Math.floor(gridWidth * scale);
     const gridPixelHeight = Math.floor(gridHeight * scale);
     if (webglRendererRef.current) {
@@ -254,8 +260,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     ctx.save();
     ctx.translate(offsetX, offsetY);
 
-    // Calculate grid dimensions from aspect ratio
-    const { width: gridWidth, height: gridHeight } = calculateGridDimensions(aspectRatio);
+    // Use memoized grid dimensions
+    const { width: gridWidth, height: gridHeight } = gridDimensions;
     const gridPixelWidth = Math.floor(gridWidth * scale);
     const gridPixelHeight = Math.floor(gridHeight * scale);
 
@@ -641,7 +647,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Release all pooled canvases
     canvasPool.releaseAll();
-  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scale, offsetX, offsetY, aspectRatio, engine, ecosystemMode, isEcosystemEngine]);
+  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine]);
+
+  // Update ref to latest render function
+  useEffect(() => {
+    renderRef.current = render;
+  }, [render]);
 
   // Animation loop with playback speed control
   useEffect(() => {
@@ -658,7 +669,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
       // Measure render time
       const renderStartTime = performance.now();
-      render();
+      if (renderRef.current) {
+        renderRef.current();
+      }
       const renderEndTime = performance.now();
       const renderTime = renderEndTime - renderStartTime;
 
@@ -724,7 +737,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         clearTimeout(timeoutId);
       }
       // Render one frame when paused
-      render();
+      if (renderRef.current) {
+        renderRef.current();
+      }
     }
 
     return () => {
@@ -735,12 +750,14 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         clearTimeout(timeoutId);
       }
     };
-  }, [running, tick, render, updatePerformanceMetrics, performAutoOptimization, playbackSpeed]);
+  }, [running, tick, updatePerformanceMetrics, performAutoOptimization, playbackSpeed]);
 
   // Initial render
   useEffect(() => {
-    render();
-  }, [render]);
+    if (renderRef.current) {
+      renderRef.current();
+    }
+  }, []); // Empty deps - only run once on mount
 
   const containerStyle: React.CSSProperties = {
     ...styles.container,
