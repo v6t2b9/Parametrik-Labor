@@ -101,6 +101,10 @@ export const defaultParameters: AllParameters = {
     kaleidoscopeSegments: 0,
     kaleidoscopeRotation: 0,
     kaleidoscopeZoom: 1.0,
+    radialBlurStrength: 0,
+    radialBlurCenterX: 0.5,
+    radialBlurCenterY: 0.5,
+    radialBlurQuality: 6,
   },
   performance: defaultPerformanceParams,
   // Quantum-inspired stigmergy model params

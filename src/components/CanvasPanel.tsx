@@ -673,6 +673,59 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
+    // === 15.5. Radial Blur (Tunnel/Explosion Effect) ===
+    // Creates motion blur radiating from a center point (outward = explosion, inward = tunnel)
+    if (effects.radialBlurStrength > 0) {
+      const tempCanvas = canvasPool.acquire(canvasWidth, canvasHeight);
+      const tempCtx = tempCanvas.getContext('2d');
+
+      if (tempCtx && tempCanvas.width === canvasWidth && tempCanvas.height === canvasHeight) {
+        // Save current canvas
+        tempCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        tempCtx.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
+
+        // Calculate center point in pixels
+        const centerX = canvasWidth * effects.radialBlurCenterX;
+        const centerY = canvasHeight * effects.radialBlurCenterY;
+
+        // Clear main canvas (we'll draw accumulated samples)
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        // Multi-sample radial blur
+        const samples = Math.floor(effects.radialBlurQuality);
+        const maxOffset = effects.radialBlurStrength * 50; // Max 50px offset at strength 1.0
+
+        for (let i = 0; i < samples; i++) {
+          // Calculate offset for this sample (linear distribution)
+          const t = i / (samples - 1); // 0 to 1
+          const offset = t * maxOffset;
+
+          // Calculate alpha for this sample (distribute evenly)
+          ctx.globalAlpha = 1.0 / samples;
+
+          // Apply radial offset from center
+          ctx.save();
+          ctx.translate(centerX, centerY);
+
+          // Scale outward from center (creates the radial blur effect)
+          const scale = 1 + (offset / Math.max(canvasWidth, canvasHeight));
+          ctx.scale(scale, scale);
+
+          ctx.translate(-centerX, -centerY);
+
+          // Draw sample
+          ctx.drawImage(tempCanvas, 0, 0, canvasWidth, canvasHeight);
+
+          ctx.restore();
+        }
+
+        // Reset alpha
+        ctx.globalAlpha = 1.0;
+
+        canvasPool.release(tempCanvas);
+      }
+    }
+
     // === 16. CSS Filters: Blur, Saturation, Contrast, Hue Shift ===
     // Apply filters individually to ensure they are not overridden
     const filters: string[] = [];

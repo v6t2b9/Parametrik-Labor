@@ -356,6 +356,51 @@ export function VisualsOikosPanel() {
           )}
         </div>
 
+        {/* Radial Blur (Tunnel/Explosion) */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Radial Blur (Tunnel/Explosion)</h5>
+          <ParameterSlider
+            label="Strength"
+            value={effectsParams.radialBlurStrength}
+            min={0}
+            max={1}
+            step={0.05}
+            onChange={(value) => updateEffectsParams({ radialBlurStrength: value })}
+            description="Blur intensity (0 = off, 0.3 = subtle motion, 0.7+ = extreme tunnel/explosion effect)"
+          />
+          {effectsParams.radialBlurStrength > 0 && (
+            <>
+              <ParameterSlider
+                label="Center X"
+                value={effectsParams.radialBlurCenterX}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(value) => updateEffectsParams({ radialBlurCenterX: value })}
+                description="Horizontal center position (0 = left, 0.5 = middle, 1 = right)"
+              />
+              <ParameterSlider
+                label="Center Y"
+                value={effectsParams.radialBlurCenterY}
+                min={0}
+                max={1}
+                step={0.05}
+                onChange={(value) => updateEffectsParams({ radialBlurCenterY: value })}
+                description="Vertical center position (0 = top, 0.5 = middle, 1 = bottom)"
+              />
+              <ParameterSlider
+                label="Quality"
+                value={effectsParams.radialBlurQuality}
+                min={2}
+                max={10}
+                step={1}
+                onChange={(value) => updateEffectsParams({ radialBlurQuality: value })}
+                description="Number of samples (2 = fast/rough, 6 = balanced, 10 = smooth/slow)"
+              />
+            </>
+          )}
+        </div>
+
         {/* Psychedelic / Distortion */}
         <div style={styles.subsection}>
           <h5 style={styles.subsectionTitle}>Psychedelic / Distortion</h5>
@@ -523,6 +568,9 @@ export function VisualsOikosPanel() {
           <li><strong>Kaleidoscope 6 segments</strong> = snowflake patterns, <strong>8 segments</strong> = mandala</li>
           <li><strong>Kaleidoscope + Feedback</strong> = infinite recursive mandalas (psychedelic!)</li>
           <li><strong>Kaleidoscope + Hue Cycling</strong> = rainbow mandalas with color shifts</li>
+          <li><strong>Radial Blur 0.3-0.5</strong> = subtle motion, <strong>0.7+</strong> = extreme tunnel effect</li>
+          <li><strong>Radial Blur + Feedback</strong> = explosive recursive spirals from center</li>
+          <li><strong>Radial Blur off-center</strong> (Center X/Y ≠ 0.5) = asymmetric motion blur</li>
         </ul>
       </div>
     </div>

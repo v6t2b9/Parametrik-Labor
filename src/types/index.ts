@@ -231,6 +231,12 @@ export interface EffectsParams {
   kaleidoscopeSegments: number;  // 0, 2-12: Number of mirror segments (0 = off, 6 = snowflake, 8 = mandala)
   kaleidoscopeRotation: number;  // 0-360 degrees: Rotation offset of the kaleidoscope pattern
   kaleidoscopeZoom: number;      // 0.5-2.0: Zoom level (1.0 = normal, <1 = zoom out, >1 = zoom in)
+
+  // Radial Blur Effect (Tunnel/Explosion)
+  radialBlurStrength: number;    // 0-1: Blur strength (0 = off, 0.5 = medium, 1 = extreme)
+  radialBlurCenterX: number;     // 0-1: X position of center (0.5 = middle)
+  radialBlurCenterY: number;     // 0-1: Y position of center (0.5 = middle)
+  radialBlurQuality: number;     // 2-10: Number of samples (higher = smoother but slower, 4-6 recommended)
 }
 
 export type QualityPreset = 'low' | 'medium' | 'high' | 'ultra';
