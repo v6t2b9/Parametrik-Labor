@@ -8,7 +8,7 @@ declare module 'gif.js.optimized' {
     background?: string;
     transparent?: string | null;
     repeat?: number;
-    dither?: boolean;
+    dither?: boolean | 'FloydSteinberg' | 'FalseFloydSteinberg' | 'Stucki' | 'Atkinson';
   }
 
   interface AddFrameOptions {
