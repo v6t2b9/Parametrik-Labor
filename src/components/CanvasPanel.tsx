@@ -54,7 +54,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // Responsive canvas size (based on window size in fullscreen and aspect ratio)
   const [canvasWidth, setCanvasWidth] = useState(DEFAULT_CANVAS_SIZE);
   const [canvasHeight, setCanvasHeight] = useState(DEFAULT_CANVAS_SIZE);
-  const [scale, setScale] = useState(DEFAULT_CANVAS_SIZE / GRID_SIZE);
+  const [scale, setScale] = useState(2); // Initial scale, will be updated by useEffect
   const [offsetX, setOffsetX] = useState(0);
   const [offsetY, setOffsetY] = useState(0);
 
