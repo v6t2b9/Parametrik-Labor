@@ -37,12 +37,17 @@ export function PresetGallery() {
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log('[PresetGallery] No file selected');
+      return;
+    }
 
+    console.log('[PresetGallery] Starting import of file:', file.name);
     const result = await importPresetFromFile(file);
+    console.log('[PresetGallery] Import result:', result);
 
     if (result.success) {
-      setImportStatus({ type: 'success', message: 'Preset loaded' });
+      setImportStatus({ type: 'success', message: 'Preset successfully loaded!' });
     } else {
       setImportStatus({ type: 'error', message: result.error || 'Load failed' });
     }
@@ -130,6 +135,7 @@ const styles = {
     border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   toolbar: {
+    position: 'relative',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',

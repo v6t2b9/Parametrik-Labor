@@ -703,18 +703,25 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     },
 
     importPresetFromFile: async (file: File) => {
+      console.log('[Store] importPresetFromFile called with:', file.name);
       const { preset, error } = await importPresetFromJSON(file);
 
+      console.log('[Store] Import result:', { hasPreset: !!preset, hasError: !!error });
+
       if (error) {
+        console.error('[Store] Import failed with error:', error);
         return { success: false, error };
       }
 
       if (preset && preset.parameters) {
+        console.log('[Store] Loading preset parameters...');
         const { loadPreset } = get();
         loadPreset(preset.parameters);
+        console.log('[Store] Preset loaded successfully');
         return { success: true };
       }
 
+      console.error('[Store] Invalid preset format: preset or parameters missing');
       return { success: false, error: 'Ungültiges Preset-Format' };
     },
   };
