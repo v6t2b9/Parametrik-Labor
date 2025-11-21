@@ -10,7 +10,15 @@ interface ControlBarProps {
 }
 
 export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
-  const { running, toggleRunning, reset, frameCount, parameters, updateGlobalTemporalParams, performanceMetrics, ui, setAspectRatio } = useSimulationStore();
+  const running = useSimulationStore((state) => state.running);
+  const toggleRunning = useSimulationStore((state) => state.toggleRunning);
+  const reset = useSimulationStore((state) => state.reset);
+  const frameCount = useSimulationStore((state) => state.frameCount);
+  const parameters = useSimulationStore((state) => state.parameters);
+  const updateGlobalTemporalParams = useSimulationStore((state) => state.updateGlobalTemporalParams);
+  const performanceMetrics = useSimulationStore((state) => state.performanceMetrics);
+  const ui = useSimulationStore((state) => state.ui);
+  const setAspectRatio = useSimulationStore((state) => state.setAspectRatio);
   const { musicEnabled, inputMode, togglePlay } = useAudioStore();
 
   // Combined toggle that syncs audio and simulation when music is enabled

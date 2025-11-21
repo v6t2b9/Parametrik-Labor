@@ -36,7 +36,9 @@ export function AudioOikosPanel() {
   } = useAudioStore();
 
   // Audio mappings from SimulationStore (species-aware)
-  const { ui, parameters, updateAudioParams } = useSimulationStore();
+  const ui = useSimulationStore((state) => state.ui);
+  const parameters = useSimulationStore((state) => state.parameters);
+  const updateAudioParams = useSimulationStore((state) => state.updateAudioParams);
 
   // Get current mappings based on active species scope
   const mappings = ui.activeSpeciesScope === 'universal'

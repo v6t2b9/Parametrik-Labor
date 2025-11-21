@@ -4,7 +4,11 @@ import type { QualityPreset } from '../types/index.js';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function PerformanceOikosPanel() {
-  const { parameters, performanceMetrics, updatePerformanceParams, applyQualityPreset, reset } = useSimulationStore();
+  const parameters = useSimulationStore((state) => state.parameters);
+  const performanceMetrics = useSimulationStore((state) => state.performanceMetrics);
+  const updatePerformanceParams = useSimulationStore((state) => state.updatePerformanceParams);
+  const applyQualityPreset = useSimulationStore((state) => state.applyQualityPreset);
+  const reset = useSimulationStore((state) => state.reset);
   const { performance } = parameters;
 
   const qualityPresets: { value: QualityPreset; label: string; description: string; icon: string }[] = [

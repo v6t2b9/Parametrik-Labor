@@ -9,7 +9,8 @@ import type { EcologyConfig } from '../types/ecosystem';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function EcosystemOikosPanel() {
-  const { parameters, setParameters } = useSimulationStore();
+  const parameters = useSimulationStore((state) => state.parameters);
+  const setParameters = useSimulationStore((state) => state.setParameters);
   const ecosystemMode = parameters.ecosystemMode || false;
   const ecosystem = parameters.ecosystem;
 

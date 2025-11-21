@@ -5,8 +5,10 @@ import { visualPresets, effectsPresets } from '../presets/tabPresets';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function VisualsOikosPanel() {
-  const { parameters, updateVisualizationParams, updateEffectsParams } = useSimulationStore();
-  const { visualization, effects } = parameters;
+  const visualization = useSimulationStore((state) => state.parameters.visualization);
+  const effects = useSimulationStore((state) => state.parameters.effects);
+  const updateVisualizationParams = useSimulationStore((state) => state.updateVisualizationParams);
+  const updateEffectsParams = useSimulationStore((state) => state.updateEffectsParams);
 
   return (
     <div style={styles.panel}>

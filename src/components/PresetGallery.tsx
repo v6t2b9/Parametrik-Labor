@@ -24,7 +24,9 @@ const presetCategories = {
 };
 
 export function PresetGallery() {
-  const { loadPreset, exportCurrentPreset, importPresetFromFile } = useSimulationStore();
+  const loadPreset = useSimulationStore((state) => state.loadPreset);
+  const exportCurrentPreset = useSimulationStore((state) => state.exportCurrentPreset);
+  const importPresetFromFile = useSimulationStore((state) => state.importPresetFromFile);
   const [presetName, setPresetName] = useState('my-preset');
   const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
