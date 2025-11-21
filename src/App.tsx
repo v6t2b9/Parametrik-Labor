@@ -3,6 +3,7 @@ import { CanvasPanel } from './components/CanvasPanel';
 import { ControlBar } from './components/ControlBar';
 import { MatrixControlCenter } from './components/MatrixControlCenter';
 import { AudioSimulationBridge } from './components/AudioSimulationBridge';
+import { InstallPrompt } from './components/InstallPrompt';
 import { useSimulationStore } from './store/useSimulationStore';
 import { useAudioStore } from './store/useAudioStore';
 import { colors, spacing, typography, effects } from './design-system';
@@ -150,6 +151,9 @@ function App() {
     <>
       {/* Audio-Simulation Bridge (invisible component) */}
       <AudioSimulationBridge />
+
+      {/* Install Prompt for Android/Desktop PWA */}
+      <InstallPrompt />
 
       {/* Fullscreen Container */}
       <div
