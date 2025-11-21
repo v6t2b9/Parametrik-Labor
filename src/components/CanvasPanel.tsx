@@ -77,10 +77,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const renderRef = useRef<(() => void) | null>(null);
 
   const tick = useSimulationStore((state) => state.tick);
-  // Read trails and agents directly from engine instead of store to avoid massive state updates
   const engine = useSimulationStore((state) => state.engine);
-  const trails = engine.getTrails();
-  const agents = engine.getAgents();
   const running = useSimulationStore((state) => state.running);
   const parameters = useSimulationStore((state) => state.parameters);
   const visualization = useSimulationStore((state) => state.parameters.visualization);
@@ -249,6 +246,10 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     if (!ctx) return;
 
     const canvasPool = canvasPoolRef.current;
+
+    // Read trails and agents directly from engine (avoids creating new references)
+    const trails = engine.getTrails();
+    const agents = engine.getAgents();
 
     // Apply hue cycling if enabled (using performance.now() for smooth animation)
     const currentVisualization = applyHueCycling(visualization, performance.now());
@@ -648,7 +649,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Release all pooled canvases
     canvasPool.releaseAll();
-  }, [trails, agents, visualization, effects, canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine]);
+  }, [visualization, effects, canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine]);
 
   // Update ref to latest render function
   useEffect(() => {
