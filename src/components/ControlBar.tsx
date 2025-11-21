@@ -37,7 +37,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   // Video recording state
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [videoFormat, setVideoFormat] = useState<'webm' | 'gif' | 'mp4' | 'live-photo'>('webm');
+  const [videoFormat, setVideoFormat] = useState<'webm' | 'gif' | 'mp4' | 'ios-video'>('webm');
   const [videoDuration, setVideoDuration] = useState<3 | 8 | 12>(3);
   const [videoQuality, setVideoQuality] = useState<'standard' | 'high' | 'very-high'>('high');
   const [videoFPS, setVideoFPS] = useState<30 | 60>(30);
@@ -50,7 +50,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
   // Get quality parameters based on preset and format
   function getQualityParams() {
-    if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'live-photo') {
+    if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'ios-video') {
       // WebM/MP4 bitrate settings (same for both)
       const bitrateMap = {
         'standard': 8000000,   // 8 Mbps
@@ -94,8 +94,8 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     const maxFrames = videoDuration * videoFPS; // Use selected FPS
     const frameDelay = Math.round(1000 / videoFPS); // ms per frame
 
-    if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'live-photo') {
-      // Video recording with MediaRecorder (WebM, MP4, or Live Photo)
+    if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'ios-video') {
+      // Video recording with MediaRecorder (WebM, MP4, or iOS Video)
       try {
         const qualityParams = getQualityParams() as { bitrate: number };
         const stream = canvas.captureStream(videoFPS);
@@ -104,7 +104,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         let fileExtension: string;
         let mimeType: string;
 
-        if (videoFormat === 'mp4' || videoFormat === 'live-photo') {
+        if (videoFormat === 'mp4' || videoFormat === 'ios-video') {
           // Try MP4 with H.264 (best for iOS)
           const mp4Codecs = [
             'video/mp4;codecs=h264',
@@ -146,9 +146,9 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           mimeType = 'video/webm';
         }
 
-        // For Live Photo, capture a keyframe image at the start
+        // For iOS Video, capture a keyframe image at the start
         let keyframeBlob: Blob | null = null;
-        if (videoFormat === 'live-photo') {
+        if (videoFormat === 'ios-video') {
           canvas.toBlob((blob) => {
             keyframeBlob = blob;
           }, 'image/jpeg', 0.95);
@@ -164,27 +164,63 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           }
         };
 
-        mediaRecorder.onstop = () => {
+        mediaRecorder.onstop = async () => {
           const blob = new Blob(recordedChunksRef.current, { type: mimeType });
           const timestamp = Date.now();
 
-          // Download video
+          // Check if Web Share API is available (iOS Safari supports this)
+          const canShare = typeof navigator.share !== 'undefined' && videoFormat === 'ios-video';
+
+          if (canShare) {
+            try {
+              // Create files array for sharing
+              const files: File[] = [];
+
+              // Add video file
+              files.push(new File([blob], `parametric-video-${timestamp}.${fileExtension}`, { type: mimeType }));
+
+              // Add keyframe if available
+              if (keyframeBlob) {
+                files.push(new File([keyframeBlob], `parametric-keyframe-${timestamp}.jpg`, { type: 'image/jpeg' }));
+              }
+
+              // Check if files can be shared
+              if (typeof navigator.canShare !== 'undefined' && navigator.canShare({ files })) {
+                await navigator.share({
+                  files,
+                  title: 'Parametric Animation',
+                  text: 'Save to Photos or use with intoLive app for Live Photo'
+                });
+
+                // Cleanup after successful share
+                recordedChunksRef.current = [];
+                setIsRecording(false);
+                setIsProcessing(false);
+                return;
+              }
+            } catch (error) {
+              // User cancelled share or error occurred, fall through to download
+              console.log('Share cancelled or failed, falling back to download:', error);
+            }
+          }
+
+          // Fallback: Download files directly
           const videoUrl = URL.createObjectURL(blob);
           const videoLink = document.createElement('a');
           videoLink.href = videoUrl;
-          videoLink.download = `parametric-${videoFormat === 'live-photo' ? 'livephoto' : 'video'}-${timestamp}.${fileExtension}`;
+          videoLink.download = `parametric-${videoFormat === 'ios-video' ? 'ios-video' : 'video'}-${timestamp}.${fileExtension}`;
           videoLink.style.display = 'none';
           document.body.appendChild(videoLink);
           videoLink.click();
 
-          // For Live Photo, also download the keyframe
-          if (videoFormat === 'live-photo' && keyframeBlob) {
+          // For iOS Video, also download the keyframe
+          if (videoFormat === 'ios-video' && keyframeBlob) {
             const savedKeyframeBlob = keyframeBlob; // Capture in closure to avoid null issues
             setTimeout(() => {
               const imgUrl = URL.createObjectURL(savedKeyframeBlob);
               const imgLink = document.createElement('a');
               imgLink.href = imgUrl;
-              imgLink.download = `parametric-livephoto-${timestamp}-keyframe.jpg`;
+              imgLink.download = `parametric-ios-video-${timestamp}-keyframe.jpg`;
               imgLink.style.display = 'none';
               document.body.appendChild(imgLink);
               imgLink.click();
@@ -310,7 +346,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     }
 
     if (isRecording) {
-      if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'live-photo') {
+      if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'ios-video') {
         return `Recording... ${videoDuration}s`;
       } else {
         const maxFrames = videoDuration * videoFPS;
@@ -376,19 +412,19 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
               <label style={styles.videoLabel}>Format:</label>
               <select
                 value={videoFormat}
-                onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif' | 'mp4' | 'live-photo')}
+                onChange={(e) => setVideoFormat(e.target.value as 'webm' | 'gif' | 'mp4' | 'ios-video')}
                 disabled={isRecording || isProcessing}
                 style={styles.videoSelect}
                 title={
                   videoFormat === 'webm' ? 'WebM video format (VP9, universal browser support)' :
                   videoFormat === 'mp4' ? 'MP4 video format (H.264, iOS compatible)' :
-                  videoFormat === 'live-photo' ? 'MP4 video + keyframe JPG for iOS Live Photos/Wallpapers' :
+                  videoFormat === 'ios-video' ? 'MP4 + keyframe JPG, optimized for iOS wallpapers (uses Share API on iOS)' :
                   'GIF format (universal support)'
                 }
               >
                 <option value="webm">WebM</option>
-                <option value="mp4">MP4 (iOS)</option>
-                <option value="live-photo">Live Photo</option>
+                <option value="mp4">MP4</option>
+                <option value="ios-video">iOS Video</option>
                 <option value="gif">GIF</option>
               </select>
             </div>
@@ -445,7 +481,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             </button>
             {(isRecording || isProcessing) && (
               <div style={styles.videoProgress}>
-                {isRecording && (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'live-photo') && <span>Recording: {videoDuration}s</span>}
+                {isRecording && (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'ios-video') && <span>Recording: {videoDuration}s</span>}
                 {isRecording && videoFormat === 'gif' && <span>Frames: {recordedFrameCount}/{videoDuration * videoFPS}</span>}
                 {isProcessing && <span>Processing: {processingProgress}%</span>}
               </div>
