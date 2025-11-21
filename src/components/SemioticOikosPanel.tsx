@@ -5,7 +5,9 @@ import type { AgentType } from '../types';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function SemioticOikosPanel() {
-  const { parameters, updateSemioticParams, ui } = useSimulationStore();
+  const parameters = useSimulationStore((state) => state.parameters);
+  const updateSemioticParams = useSimulationStore((state) => state.updateSemioticParams);
+  const ui = useSimulationStore((state) => state.ui);
 
   // Get current values based on active scope
   const currentValues = ui.activeSpeciesScope === 'universal'

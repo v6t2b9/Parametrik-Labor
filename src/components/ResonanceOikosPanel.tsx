@@ -4,7 +4,9 @@ import type { AgentType } from '../types';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function ResonanceOikosPanel() {
-  const { parameters, updateResonanceParams, ui } = useSimulationStore();
+  const parameters = useSimulationStore((state) => state.parameters);
+  const updateResonanceParams = useSimulationStore((state) => state.updateResonanceParams);
+  const ui = useSimulationStore((state) => state.ui);
 
   const currentValues = ui.activeSpeciesScope === 'universal'
     ? parameters.universal.resonance

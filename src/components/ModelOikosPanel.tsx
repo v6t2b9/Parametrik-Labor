@@ -9,7 +9,8 @@ import type { StigmergyModel } from '../types/index';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
 export function ModelOikosPanel() {
-  const { parameters, updateModelParams } = useSimulationStore();
+  const parameters = useSimulationStore((state) => state.parameters);
+  const updateModelParams = useSimulationStore((state) => state.updateModelParams);
   const { model, m2, m3 } = parameters.modelParams;
 
   const handleModelChange = (newModel: StigmergyModel) => {

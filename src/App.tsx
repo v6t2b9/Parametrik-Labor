@@ -12,7 +12,9 @@ function App() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [canvasHeight, setCanvasHeight] = useState(800); // Track canvas height for sticky offset
   const fullscreenContainerRef = useRef<HTMLDivElement>(null);
-  const { ui, toggleControlPanel, toggleRunning } = useSimulationStore();
+  const ui = useSimulationStore((state) => state.ui);
+  const toggleControlPanel = useSimulationStore((state) => state.toggleControlPanel);
+  const toggleRunning = useSimulationStore((state) => state.toggleRunning);
   const { musicEnabled, inputMode, togglePlay } = useAudioStore();
 
   // Fullscreen handlers

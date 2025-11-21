@@ -42,7 +42,9 @@ const OIKOS_TABS: OikosTabDef[] = [
 ];
 
 export function MatrixControlCenter() {
-  const { ui, setActiveSpeciesScope, setActiveOikosTab } = useSimulationStore();
+  const ui = useSimulationStore((state) => state.ui);
+  const setActiveSpeciesScope = useSimulationStore((state) => state.setActiveSpeciesScope);
+  const setActiveOikosTab = useSimulationStore((state) => state.setActiveOikosTab);
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
 
   // Listen to window resize
