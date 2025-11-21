@@ -272,6 +272,43 @@ export function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ hueShift: value })}
             description="Hue rotation in degrees (0-360) - cycles through the color spectrum"
           />
+
+          {/* Color LUT / Film Grading */}
+          <div style={{ marginTop: '12px' }}>
+            <label style={{ fontSize: '12px', color: '#888', display: 'block', marginBottom: '4px' }}>
+              Film Grading (LUT)
+            </label>
+            <select
+              value={effectsParams.colorLUT}
+              onChange={(e) => updateEffectsParams({ colorLUT: e.target.value as typeof effectsParams.colorLUT })}
+              style={{
+                width: '100%',
+                padding: '6px',
+                backgroundColor: '#1a1a1a',
+                color: '#fff',
+                border: '1px solid #333',
+                borderRadius: '4px',
+                fontSize: '12px',
+              }}
+            >
+              <option value="none">None</option>
+              <option value="teal-orange">Teal & Orange (Blockbuster)</option>
+              <option value="bleach-bypass">Bleach Bypass (Gritty)</option>
+              <option value="warm-vintage">Warm Vintage (Golden Hour)</option>
+              <option value="cool-cyberpunk">Cool Cyberpunk (Neon)</option>
+            </select>
+          </div>
+          {effectsParams.colorLUT !== 'none' && (
+            <ParameterSlider
+              label="LUT Intensity"
+              value={effectsParams.colorLUTIntensity}
+              min={0}
+              max={1}
+              step={0.05}
+              onChange={(value) => updateEffectsParams({ colorLUTIntensity: value })}
+              description="Film grading strength (0 = off, 1 = full effect)"
+            />
+          )}
         </div>
 
         {/* Motion & Trails */}
@@ -300,6 +337,46 @@ export function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ vignette: value })}
             description="Edge darkening - focuses attention on the center of the canvas"
           />
+        </div>
+
+        {/* Mirror / Symmetry */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Mirror / Symmetry</h5>
+          <div style={{ marginBottom: '12px' }}>
+            <label style={{ fontSize: '12px', color: '#888', display: 'block', marginBottom: '4px' }}>
+              Mirror Mode
+            </label>
+            <select
+              value={effectsParams.mirrorMode}
+              onChange={(e) => updateEffectsParams({ mirrorMode: e.target.value as typeof effectsParams.mirrorMode })}
+              style={{
+                width: '100%',
+                padding: '6px',
+                backgroundColor: '#1a1a1a',
+                color: '#fff',
+                border: '1px solid #333',
+                borderRadius: '4px',
+                fontSize: '12px',
+              }}
+            >
+              <option value="none">None</option>
+              <option value="horizontal">Horizontal (Left ↔ Right)</option>
+              <option value="vertical">Vertical (Top ↔ Bottom)</option>
+              <option value="both">Both Axes (4-way)</option>
+              <option value="quad">Quad (Center 4-way)</option>
+            </select>
+          </div>
+          {effectsParams.mirrorMode !== 'none' && effectsParams.mirrorMode !== 'quad' && (
+            <ParameterSlider
+              label="Mirror Position"
+              value={effectsParams.mirrorPosition}
+              min={0}
+              max={1}
+              step={0.05}
+              onChange={(value) => updateEffectsParams({ mirrorPosition: value })}
+              description="Mirror axis position (0 = edge, 0.5 = center, 1 = opposite edge)"
+            />
+          )}
         </div>
 
         {/* Feedback / Echo (Recursive Rendering) */}
@@ -654,6 +731,14 @@ export function VisualsOikosPanel() {
           <li><strong>Displacement 30+</strong> + <strong>Scale 0.5</strong> = large liquid waves (psychedelic)</li>
           <li><strong>Displacement</strong> + slowly animate <strong>Time</strong> (0 → 1) = flowing distortion</li>
           <li><strong>Displacement + Kaleidoscope</strong> = warped mandalas with organic edges</li>
+          <li><strong>Teal & Orange LUT</strong> = Hollywood blockbuster look (action movies)</li>
+          <li><strong>Bleach Bypass LUT</strong> = desaturated, gritty (war/thriller films)</li>
+          <li><strong>Warm Vintage LUT</strong> = golden hour nostalgia (Wes Anderson style)</li>
+          <li><strong>Cool Cyberpunk LUT</strong> = neon cyan/magenta/purple (Blade Runner 2049)</li>
+          <li><strong>Mirror Horizontal 0.5</strong> = perfect left-right symmetry (Rorschach test)</li>
+          <li><strong>Mirror Vertical 0.3-0.7</strong> = off-center landscape reflections</li>
+          <li><strong>Mirror Quad</strong> = instant 4-way symmetry (snowflakes, mandalas)</li>
+          <li><strong>Mirror + Kaleidoscope</strong> = complex geometric patterns (combine both!)</li>
         </ul>
       </div>
     </div>

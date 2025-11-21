@@ -112,6 +112,10 @@ export const defaultParameters: AllParameters = {
     displacementScale: 1.5,
     displacementTime: 0,
     displacementAngle: 0,
+    colorLUT: 'none',
+    colorLUTIntensity: 1.0,
+    mirrorMode: 'none',
+    mirrorPosition: 0.5,
   },
   performance: defaultPerformanceParams,
   // Quantum-inspired stigmergy model params
