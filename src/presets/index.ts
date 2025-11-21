@@ -93,6 +93,11 @@ export const defaultParameters: AllParameters = {
     waveDistortion: 0,
     scanlines: 0,
     pixelation: 1,
+    feedbackAmount: 0,
+    feedbackZoom: 1.0,
+    feedbackRotation: 0,
+    feedbackOffsetX: 0,
+    feedbackOffsetY: 0,
   },
   performance: defaultPerformanceParams,
   // Quantum-inspired stigmergy model params

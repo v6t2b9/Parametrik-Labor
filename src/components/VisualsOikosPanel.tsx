@@ -266,6 +266,60 @@ export function VisualsOikosPanel() {
           />
         </div>
 
+        {/* Feedback / Echo (Recursive Rendering) */}
+        <div style={styles.subsection}>
+          <h5 style={styles.subsectionTitle}>Feedback / Echo (Recursive Rendering)</h5>
+          <ParameterSlider
+            label="Feedback Amount"
+            value={effectsParams.feedbackAmount}
+            min={0}
+            max={0.98}
+            step={0.01}
+            onChange={(value) => updateEffectsParams({ feedbackAmount: value })}
+            description="Frame persistence for echo effect (0 = off, 0.85+ = infinite trails, 0.95 = psychedelic spirals)"
+          />
+          {effectsParams.feedbackAmount > 0 && (
+            <>
+              <ParameterSlider
+                label="Zoom"
+                value={effectsParams.feedbackZoom}
+                min={0.95}
+                max={1.05}
+                step={0.001}
+                onChange={(value) => updateEffectsParams({ feedbackZoom: value })}
+                description="Zoom in/out each frame (1.0 = none, >1 = zoom in, <1 = zoom out) - creates spirals"
+              />
+              <ParameterSlider
+                label="Rotation"
+                value={effectsParams.feedbackRotation}
+                min={-5}
+                max={5}
+                step={0.1}
+                onChange={(value) => updateEffectsParams({ feedbackRotation: value })}
+                description="Rotation per frame in degrees (0 = none) - creates spinning spirals"
+              />
+              <ParameterSlider
+                label="Offset X"
+                value={effectsParams.feedbackOffsetX}
+                min={-10}
+                max={10}
+                step={0.5}
+                onChange={(value) => updateEffectsParams({ feedbackOffsetX: value })}
+                description="Horizontal shift per frame in pixels - creates horizontal drift"
+              />
+              <ParameterSlider
+                label="Offset Y"
+                value={effectsParams.feedbackOffsetY}
+                min={-10}
+                max={10}
+                step={0.5}
+                onChange={(value) => updateEffectsParams({ feedbackOffsetY: value })}
+                description="Vertical shift per frame in pixels - creates vertical drift"
+              />
+            </>
+          )}
+        </div>
+
         {/* Psychedelic / Distortion */}
         <div style={styles.subsection}>
           <h5 style={styles.subsectionTitle}>Psychedelic / Distortion</h5>
@@ -427,6 +481,9 @@ export function VisualsOikosPanel() {
           <li><strong>Screen</strong> + medium Trail Intensity = organic luminous flows</li>
           <li>Combine <strong>Motion Blur</strong> with low <strong>Trail Intensity</strong> for fluid trails</li>
           <li>Use <strong>Chromatic Aberration</strong> + <strong>Scanlines</strong> for authentic CRT look</li>
+          <li><strong>Feedback 0.90-0.95</strong> + small <strong>Rotation</strong> (0.2-1°) = spinning spirals</li>
+          <li><strong>Feedback 0.85+</strong> + <strong>Zoom 1.002</strong> = infinite zoom tunnel</li>
+          <li><strong>Feedback 0.92+</strong> + <strong>Offset X/Y</strong> = drifting echoes</li>
         </ul>
       </div>
     </div>

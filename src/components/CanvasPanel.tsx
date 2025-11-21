@@ -50,6 +50,7 @@ class CanvasPool {
 export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const motionBlurCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const feedbackCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
   // Responsive canvas size (based on window size in fullscreen and aspect ratio)
@@ -208,6 +209,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     motionBlurCanvasRef.current.width = canvasWidth;
     motionBlurCanvasRef.current.height = canvasHeight;
 
+    // Feedback canvas - stores previous frame for echo effect
+    if (!feedbackCanvasRef.current) {
+      feedbackCanvasRef.current = document.createElement('canvas');
+    }
+    feedbackCanvasRef.current.width = canvasWidth;
+    feedbackCanvasRef.current.height = canvasHeight;
+
     // Scanline pattern (cached for performance)
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
@@ -259,6 +267,40 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // === 0. Fill entire canvas with background (letterbox/pillarbox bars) ===
     ctx.fillStyle = `rgb(${currentVisualization.colorBg.r}, ${currentVisualization.colorBg.g}, ${currentVisualization.colorBg.b})`;
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    // === 0.5. Feedback/Echo Effect (Recursive Rendering) ===
+    // Apply BEFORE trails are rendered, creating infinite recursive trails
+    if (effects.feedbackAmount > 0 && feedbackCanvasRef.current) {
+      const fbCanvas = feedbackCanvasRef.current;
+      const fbCtx = fbCanvas.getContext('2d');
+
+      if (fbCtx && fbCanvas.width === canvasWidth && fbCanvas.height === canvasHeight) {
+        // Check if feedback canvas has content (not first frame)
+        const imageData = fbCtx.getImageData(0, 0, 1, 1);
+        const hasContent = imageData.data[3] > 0; // Check alpha channel
+
+        if (hasContent) {
+          // Calculate center point for zoom and rotation
+          const centerX = canvasWidth / 2;
+          const centerY = canvasHeight / 2;
+
+          // Apply transformations for feedback effect
+          ctx.save();
+          ctx.globalAlpha = effects.feedbackAmount;
+
+          // Translate to center, apply transformations, translate back
+          ctx.translate(centerX, centerY);
+          ctx.scale(effects.feedbackZoom, effects.feedbackZoom);
+          ctx.rotate((effects.feedbackRotation * Math.PI) / 180); // Convert degrees to radians
+          ctx.translate(-centerX + effects.feedbackOffsetX, -centerY + effects.feedbackOffsetY);
+
+          // Draw previous frame with transformations
+          ctx.drawImage(fbCanvas, 0, 0, canvasWidth, canvasHeight);
+
+          ctx.restore();
+        }
+      }
+    }
 
     // Save context state before applying offset
     ctx.save();
@@ -653,6 +695,18 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
     // Release all pooled canvases
     canvasPool.releaseAll();
+
+    // === FINAL: Copy current frame to feedback canvas for next iteration ===
+    if (effects.feedbackAmount > 0 && feedbackCanvasRef.current) {
+      const fbCanvas = feedbackCanvasRef.current;
+      const fbCtx = fbCanvas.getContext('2d');
+
+      if (fbCtx && fbCanvas.width === canvasWidth && fbCanvas.height === canvasHeight) {
+        // Clear and copy entire canvas (including letterbox bars)
+        fbCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+        fbCtx.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
+      }
+    }
   }, [canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine, parameters]);
   // Note: parameters is now included in deps to ensure visualization/effects updates are reflected immediately
 

@@ -219,6 +219,13 @@ export interface EffectsParams {
   // Retro/Lo-Fi
   scanlines: number;         // 0-1: CRT scanline effect strength
   pixelation: number;        // 1-16: Pixelation/downsampling factor (1 = none)
+
+  // Feedback/Echo Effect (Recursive Rendering)
+  feedbackAmount: number;    // 0-0.98: Frame persistence for echo effect (0 = off, 0.95 = strong trails)
+  feedbackZoom: number;      // 0.95-1.05: Zoom in/out each frame (1.0 = no zoom, >1 = zoom in, <1 = zoom out)
+  feedbackRotation: number;  // -5 to 5 degrees: Rotation per frame (0 = no rotation)
+  feedbackOffsetX: number;   // -10 to 10 pixels: Horizontal offset per frame
+  feedbackOffsetY: number;   // -10 to 10 pixels: Vertical offset per frame
 }
 
 export type QualityPreset = 'low' | 'medium' | 'high' | 'ultra';

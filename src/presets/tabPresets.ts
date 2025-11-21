@@ -518,6 +518,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,
       scanlines: 0,
       pixelation: 1,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
   {
@@ -536,6 +541,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,
       scanlines: 0,
       pixelation: 1,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
   {
@@ -554,6 +564,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,
       scanlines: 0,
       pixelation: 1,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
   {
@@ -572,6 +587,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,
       scanlines: 0,
       pixelation: 1,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
   {
@@ -590,6 +610,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,  // Removed for performance
       scanlines: 0,
       pixelation: 1,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
   {
@@ -608,6 +633,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,  // Removed for performance
       scanlines: 0.8,
       pixelation: 1,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
   {
@@ -626,6 +656,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,  // Removed for performance
       scanlines: 0,
       pixelation: 1,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
   {
@@ -644,6 +679,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,
       scanlines: 0,
       pixelation: 1,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
   {
@@ -662,6 +702,11 @@ export const effectsPresets: EffectsPreset[] = [
       waveDistortion: 0,
       scanlines: 0,
       pixelation: 8,
+      feedbackAmount: 0,
+      feedbackZoom: 1.0,
+      feedbackRotation: 0,
+      feedbackOffsetX: 0,
+      feedbackOffsetY: 0,
     },
   },
 ];
