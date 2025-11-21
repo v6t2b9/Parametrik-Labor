@@ -3,7 +3,6 @@ import { useSimulationStore } from '../store/useSimulationStore';
 import { PhysicalOikosPanel } from './PhysicalOikosPanel';
 import { SemioticOikosPanel } from './SemioticOikosPanel';
 import { ResonanceOikosPanel } from './ResonanceOikosPanel';
-import { AudioOikosPanel } from './AudioOikosPanel';
 import { VisualsOikosPanel } from './VisualsOikosPanel';
 import { PerformanceOikosPanel } from './PerformanceOikosPanel';
 import { PresetGallery } from './PresetGallery';
@@ -38,7 +37,6 @@ const OIKOS_TABS: OikosTabDef[] = [
   { id: 'physical', label: 'Physikalisch', icon: '🌊' },
   { id: 'semiotic', label: 'Semiotisch', icon: '👁️' },
   { id: 'resonance', label: 'Resonanz', icon: '🔗' },
-  { id: 'audio', label: 'Audio', icon: '🎵' },
   { id: 'visuals', label: 'Visuals', icon: '🎨' },
   { id: 'performance', label: 'Performance', icon: '⚡' },
 ];
@@ -139,7 +137,6 @@ export function MatrixControlCenter() {
         {ui.activeOikosTab === 'physical' && <PhysicalOikosPanel />}
         {ui.activeOikosTab === 'semiotic' && <SemioticOikosPanel />}
         {ui.activeOikosTab === 'resonance' && <ResonanceOikosPanel />}
-        {ui.activeOikosTab === 'audio' && <AudioOikosPanel />}
         {ui.activeOikosTab === 'visuals' && <VisualsOikosPanel />}
         {ui.activeOikosTab === 'performance' && <PerformanceOikosPanel />}
       </div>
