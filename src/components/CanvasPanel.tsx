@@ -7,7 +7,6 @@ import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEn
 import { SPECIES_COLORS } from '../types/ecosystem';
 
 const DEFAULT_CANVAS_SIZE = 800;
-const GRID_SIZE = 400;
 
 interface CanvasPanelProps {
   isFullscreen?: boolean;
@@ -93,6 +92,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // Responsive canvas sizing based on fullscreen mode and aspect ratio
   useEffect(() => {
     const updateCanvasSize = () => {
+      // Get grid dimensions from engine
+      const gridWidth = engine.getGridWidth ? engine.getGridWidth() : 400;
+      const gridHeight = engine.getGridHeight ? engine.getGridHeight() : 400;
       const [ratioW, ratioH] = getAspectRatioMultipliers(aspectRatio);
 
       if (isFullscreen) {
@@ -131,20 +133,20 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         }
 
         // Ensure minimum size
-        const minSize = GRID_SIZE;
+        const minSize = Math.min(gridWidth, gridHeight);
         finalWidth = Math.max(minSize, Math.floor(finalWidth));
         finalHeight = Math.max(minSize, Math.floor(finalHeight));
 
         setCanvasWidth(finalWidth);
         setCanvasHeight(finalHeight);
 
-        // Calculate uniform scale and offsets for centered square grid (no distortion)
-        const uniformScale = Math.min(finalWidth, finalHeight) / GRID_SIZE;
-        const gridWidth = GRID_SIZE * uniformScale;
-        const gridHeight = GRID_SIZE * uniformScale;
+        // Calculate scale based on grid dimensions (no letterbox)
+        const scaleX = finalWidth / gridWidth;
+        const scaleY = finalHeight / gridHeight;
+        const uniformScale = Math.min(scaleX, scaleY);
         setScale(uniformScale);
-        setOffsetX((finalWidth - gridWidth) / 2);
-        setOffsetY((finalHeight - gridHeight) / 2);
+        setOffsetX(0);
+        setOffsetY(0);
       } else {
         // Normal mode: calculate canvas size based on aspect ratio
         const baseSize = DEFAULT_CANVAS_SIZE;
@@ -167,13 +169,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         setCanvasWidth(Math.floor(width));
         setCanvasHeight(Math.floor(height));
 
-        // Calculate uniform scale and offsets for centered square grid (no distortion)
-        const uniformScale = Math.min(width, height) / GRID_SIZE;
-        const gridWidth = GRID_SIZE * uniformScale;
-        const gridHeight = GRID_SIZE * uniformScale;
+        // Calculate scale based on grid dimensions (no letterbox)
+        const scaleX = width / gridWidth;
+        const scaleY = height / gridHeight;
+        const uniformScale = Math.min(scaleX, scaleY);
         setScale(uniformScale);
-        setOffsetX((width - gridWidth) / 2);
-        setOffsetY((height - gridHeight) / 2);
+        setOffsetX(0);
+        setOffsetY(0);
       }
     };
 
@@ -183,17 +185,20 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       window.addEventListener('resize', updateCanvasSize);
       return () => window.removeEventListener('resize', updateCanvasSize);
     }
-  }, [isFullscreen, aspectRatio]);
+  }, [isFullscreen, aspectRatio, engine]);
 
   // Initialize/update WebGL renderer, motion blur canvas, and scanline pattern when canvas size changes
   useEffect(() => {
     // WebGL renderer - recreate when canvas size changes
-    // Use square grid size for correct rendering without distortion
-    const gridPixelSize = Math.floor(GRID_SIZE * scale);
+    // Get grid dimensions from engine
+    const gridWidth = engine.getGridWidth ? engine.getGridWidth() : 400;
+    const gridHeight = engine.getGridHeight ? engine.getGridHeight() : 400;
+    const gridPixelWidth = Math.floor(gridWidth * scale);
+    const gridPixelHeight = Math.floor(gridHeight * scale);
     if (webglRendererRef.current) {
       webglRendererRef.current.destroy();
     }
-    webglRendererRef.current = new WebGLTrailRenderer(gridPixelSize, gridPixelSize, GRID_SIZE);
+    webglRendererRef.current = new WebGLTrailRenderer(gridPixelWidth, gridPixelHeight, gridWidth, gridHeight);
 
     // Motion blur canvas - resize when canvas size changes
     if (!motionBlurCanvasRef.current) {
@@ -250,8 +255,11 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     ctx.save();
     ctx.translate(offsetX, offsetY);
 
-    // Calculate grid pixel size
-    const gridPixelSize = Math.floor(GRID_SIZE * scale);
+    // Get grid dimensions from engine
+    const gridWidth = engine.getGridWidth ? engine.getGridWidth() : 400;
+    const gridHeight = engine.getGridHeight ? engine.getGridHeight() : 400;
+    const gridPixelWidth = Math.floor(gridWidth * scale);
+    const gridPixelHeight = Math.floor(gridHeight * scale);
 
     // === 1. Render base trails ===
     // Hybrid approach: WebGL for trails (fast, smooth lavalamp effects)
@@ -265,14 +273,14 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     } else {
       // CPU rendering (slower but visually accurate)
       ctx.fillStyle = `rgb(${currentVisualization.colorBg.r}, ${currentVisualization.colorBg.g}, ${currentVisualization.colorBg.b})`;
-      ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);
+      ctx.fillRect(0, 0, gridPixelWidth, gridPixelHeight);
 
-      const imageData = ctx.createImageData(gridPixelSize, gridPixelSize);
+      const imageData = ctx.createImageData(gridPixelWidth, gridPixelHeight);
       const data = imageData.data;
 
-      for (let y = 0; y < GRID_SIZE; y++) {
-        for (let x = 0; x < GRID_SIZE; x++) {
-          const idx = y * GRID_SIZE + x;
+      for (let y = 0; y < gridHeight; y++) {
+        for (let x = 0; x < gridWidth; x++) {
+          const idx = y * gridWidth + x;
 
           const redVal = trails.red[idx];
           const greenVal = trails.green[idx];
@@ -283,7 +291,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
             for (let dx = 0; dx < scale; dx++) {
               const canvasX = x * scale + dx;
               const canvasY = y * scale + dy;
-              const pixelIdx = (canvasY * gridPixelSize + canvasX) * 4;
+              const pixelIdx = (canvasY * gridPixelWidth + canvasX) * 4;
 
               // Initialize with background
               data[pixelIdx] = currentVisualization.colorBg.r;
@@ -359,16 +367,16 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // === 2. Pixelation (Lo-Fi Effect) - OPTIMIZED with object pooling ===
     if (effects.pixelation > 1) {
       const pixelSize = Math.floor(effects.pixelation);
-      const smallWidth = Math.floor(gridPixelSize / pixelSize);
-      const smallHeight = Math.floor(gridPixelSize / pixelSize);
+      const smallWidth = Math.floor(gridPixelWidth / pixelSize);
+      const smallHeight = Math.floor(gridPixelHeight / pixelSize);
 
       // Create a temporary canvas to capture current grid content
-      const tempCanvas = canvasPool.acquire(gridPixelSize, gridPixelSize);
+      const tempCanvas = canvasPool.acquire(gridPixelWidth, gridPixelHeight);
       const tempCtx = tempCanvas.getContext('2d');
 
       if (tempCtx) {
         // Capture current grid content (context is already translated)
-        tempCtx.drawImage(canvas, offsetX, offsetY, gridPixelSize, gridPixelSize, 0, 0, gridPixelSize, gridPixelSize);
+        tempCtx.drawImage(canvas, offsetX, offsetY, gridPixelWidth, gridPixelHeight, 0, 0, gridPixelWidth, gridPixelHeight);
 
         // Create downsampled version
         const smallCanvas = canvasPool.acquire(smallWidth, smallHeight);
@@ -380,8 +388,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
           // Upsample back to grid
           ctx.imageSmoothingEnabled = false;
-          ctx.clearRect(0, 0, gridPixelSize, gridPixelSize);
-          ctx.drawImage(smallCanvas, 0, 0, gridPixelSize, gridPixelSize);
+          ctx.clearRect(0, 0, gridPixelWidth, gridPixelHeight);
+          ctx.drawImage(smallCanvas, 0, 0, gridPixelWidth, gridPixelHeight);
           ctx.imageSmoothingEnabled = true;
 
           canvasPool.release(smallCanvas);
@@ -482,18 +490,18 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // === 9. Vignette (Screen Overlay) ===
     // Applied AFTER agents for correct layering - darkens edges
     if (effects.vignette > 0) {
-      const centerX = gridPixelSize / 2;
-      const centerY = gridPixelSize / 2;
-      const maxRadius = Math.max(gridPixelSize, gridPixelSize) * 0.7;
+      const centerX = gridPixelWidth / 2;
+      const centerY = gridPixelHeight / 2;
+      const maxRadius = Math.max(gridPixelWidth, gridPixelHeight) * 0.7;
       const gradient = ctx.createRadialGradient(
-        centerX, centerY, Math.min(gridPixelSize, gridPixelSize) * 0.3,
+        centerX, centerY, Math.min(gridPixelWidth, gridPixelHeight) * 0.3,
         centerX, centerY, maxRadius
       );
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
       gradient.addColorStop(1, `rgba(0, 0, 0, ${effects.vignette})`);
 
       ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);
+      ctx.fillRect(0, 0, gridPixelWidth, gridPixelHeight);
     }
 
     // === 10. Scanlines (Top Screen Overlay - CRT Effect) ===
@@ -502,7 +510,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       ctx.globalCompositeOperation = 'multiply';
       ctx.globalAlpha = effects.scanlines;
       ctx.fillStyle = scanlinePatternRef.current;
-      ctx.fillRect(0, 0, gridPixelSize, gridPixelSize);
+      ctx.fillRect(0, 0, gridPixelWidth, gridPixelHeight);
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
     }

@@ -21,6 +21,7 @@ import type { MusicMappingParameters } from '../types/musicMappings';
 import { defaultParameters } from '../presets';
 import { MusicReactiveEngine } from '../engine/MusicReactiveEngine';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
+import { calculateGridDimensions } from '../engine/SimulationEngine';
 import { exportPresetAsJSON, importPresetFromJSON } from '../utils/presetIO';
 
 // Helper: Merge universal + species overrides
@@ -174,16 +175,16 @@ interface SimulationStore {
 const GRID_SIZE = 400;
 
 // Helper: Create the appropriate engine based on ecosystem mode
-function createEngine(params: AllParameters, gridSize: number = GRID_SIZE): MusicReactiveEngine | MusicReactiveEcosystemEngine {
+function createEngine(params: AllParameters, gridWidth: number = GRID_SIZE, gridHeight: number = GRID_SIZE): MusicReactiveEngine | MusicReactiveEcosystemEngine {
   const ecosystemMode = params.ecosystemMode || false;
 
   if (ecosystemMode) {
-    const ecosystemEngine = new MusicReactiveEcosystemEngine(gridSize);
+    const ecosystemEngine = new MusicReactiveEcosystemEngine(gridWidth, gridHeight);
     ecosystemEngine.setParameters(params);
     ecosystemEngine.initializeEcosystem(params);
     return ecosystemEngine;
   } else {
-    const engine = new MusicReactiveEngine(gridSize);
+    const engine = new MusicReactiveEngine(gridWidth, gridHeight);
     engine.setParameters(params);
     engine.initializeAgents(params.globalTemporal.agentCount);
     return engine;
@@ -676,8 +677,17 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     },
 
     setAspectRatio: (ratio) => {
+      const { parameters } = get();
+      const { width, height } = calculateGridDimensions(ratio);
+
+      // Recreate engine with new grid dimensions
+      const newEngine = createEngine(parameters, width, height);
+
       set((state) => ({
         ui: { ...state.ui, aspectRatio: ratio },
+        engine: newEngine,
+        agents: newEngine.getAgents(),
+        trails: newEngine.getTrails(),
       }));
     },
 

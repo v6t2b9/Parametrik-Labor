@@ -15,8 +15,8 @@ export class MusicReactiveEcosystemEngine extends EcosystemEngine {
   private musicEnabled: boolean = false;
   private currentMusicAnalysis: MusicAnalysis | null = null;
 
-  constructor(gridSize: number = 400) {
-    super(gridSize);
+  constructor(gridWidth: number = 400, gridHeight: number = 400) {
+    super(gridWidth, gridHeight);
     this.audioEcologyMapper = new AudioEcologyMapper(DEFAULT_ECOLOGY_CONFIG.audioEcology);
   }
 

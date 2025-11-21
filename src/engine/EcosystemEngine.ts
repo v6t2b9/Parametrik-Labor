@@ -50,9 +50,9 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
   // Performance tracking
   private crystalFormationCounter = 0;
 
-  constructor(gridSize: number = 400) {
-    super(gridSize);
-    this.crystalGrid = new CrystalGrid(gridSize);
+  constructor(gridWidth: number = 400, gridHeight: number = 400) {
+    super(gridWidth, gridHeight);
+    this.crystalGrid = new CrystalGrid(Math.max(gridWidth, gridHeight)); // Use max dimension for now
     this.ecologyConfig = DEFAULT_ECOLOGY_CONFIG;
   }
 
@@ -66,7 +66,8 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
     this.setParameters(params);
 
     const { initialPopulation } = this.ecologyConfig.population;
-    const gridSize = this.getGridSize();
+    const gridWidth = this.getGridWidth();
+    const gridHeight = this.getGridHeight();
 
     // Create initial population
     const species: SpeciesType[] = ['builder', 'harvester', 'consumer', 'decomposer', 'scout'];
@@ -74,7 +75,7 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
     for (const speciesType of species) {
       const count = initialPopulation[speciesType];
       for (let i = 0; i < count; i++) {
-        const agent = this.createAgent(speciesType, gridSize);
+        const agent = this.createAgent(speciesType, gridWidth, gridHeight);
         this.ecosystemAgents.push(agent);
       }
     }
@@ -85,7 +86,7 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
   /**
    * Create a new ecosystem agent
    */
-  private createAgent(species: SpeciesType, gridSize: number): EcosystemAgent {
+  private createAgent(species: SpeciesType, gridWidth: number, gridHeight: number): EcosystemAgent {
     const config = getSpeciesConfig(species);
 
     // Map species to pheromone type for trail compatibility
@@ -98,8 +99,8 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
     };
 
     return {
-      x: Math.random() * gridSize,
-      y: Math.random() * gridSize,
+      x: Math.random() * gridWidth,
+      y: Math.random() * gridHeight,
       angle: Math.random() * Math.PI * 2,
       rhythmPhase: Math.random() * Math.PI * 2,
       type: speciesTypeMap[species], // Assign pheromone type
@@ -274,7 +275,8 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
     }
 
     // Move toward higher pheromone concentrations
-    const gridSize = this.getGridSize();
+    const gridWidth = this.getGridWidth();
+    const gridHeight = this.getGridHeight();
     const trails = this.getTrails();
 
     // Sample food pheromone gradient
@@ -286,9 +288,9 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
     for (const angle of angles) {
       const x = agent.x + Math.cos(angle) * sampleDist;
       const y = agent.y + Math.sin(angle) * sampleDist;
-      const wx = ((x % gridSize) + gridSize) % gridSize;
-      const wy = ((y % gridSize) + gridSize) % gridSize;
-      const idx = Math.floor(wy) * gridSize + Math.floor(wx);
+      const wx = ((x % gridWidth) + gridWidth) % gridWidth;
+      const wy = ((y % gridHeight) + gridHeight) % gridHeight;
+      const idx = Math.floor(wy) * gridWidth + Math.floor(wx);
 
       // Check food pheromone (green channel for now, will map properly later)
       const value = trails.green[idx] || 0;
@@ -423,15 +425,16 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
    */
   private formCrystalsFromPheromones(): void {
     const trails = this.getTrails();
-    const gridSize = this.getGridSize();
+    const gridWidth = this.getGridWidth();
+    const gridHeight = this.getGridHeight();
     const threshold = this.ecologyConfig.crystalFormationThreshold;
 
     // Sample grid at regular intervals to avoid performance issues
     const step = 10;
 
-    for (let y = 0; y < gridSize; y += step) {
-      for (let x = 0; x < gridSize; x += step) {
-        const idx = y * gridSize + x;
+    for (let y = 0; y < gridHeight; y += step) {
+      for (let x = 0; x < gridWidth; x += step) {
+        const idx = y * gridWidth + x;
 
         // Check each pheromone type
         const types: { type: CrystalType; value: number; species: SpeciesType }[] = [
@@ -488,10 +491,11 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
    */
   private reproduce(agent: EcosystemAgent): void {
     const config = getSpeciesConfig(agent.species);
-    const gridSize = this.getGridSize();
+    const gridWidth = this.getGridWidth();
+    const gridHeight = this.getGridHeight();
 
     // Create offspring near parent
-    const offspring = this.createAgent(agent.species, gridSize);
+    const offspring = this.createAgent(agent.species, gridWidth, gridHeight);
     offspring.x = agent.x + (Math.random() - 0.5) * 20;
     offspring.y = agent.y + (Math.random() - 0.5) * 20;
     offspring.angle = agent.angle + (Math.random() - 0.5) * Math.PI;
@@ -574,11 +578,12 @@ export class EcosystemEngine extends QuantumStigmergyEngine {
    * Wrap agent position around edges
    */
   private wrapAgentPosition(agent: EcosystemAgent): void {
-    const gridSize = this.getGridSize();
-    if (agent.x < 0) agent.x += gridSize;
-    if (agent.x >= gridSize) agent.x -= gridSize;
-    if (agent.y < 0) agent.y += gridSize;
-    if (agent.y >= gridSize) agent.y -= gridSize;
+    const gridWidth = this.getGridWidth();
+    const gridHeight = this.getGridHeight();
+    if (agent.x < 0) agent.x += gridWidth;
+    if (agent.x >= gridWidth) agent.x -= gridWidth;
+    if (agent.y < 0) agent.y += gridHeight;
+    if (agent.y >= gridHeight) agent.y -= gridHeight;
   }
 
   // ============================================================================
