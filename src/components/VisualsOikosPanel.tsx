@@ -449,6 +449,46 @@ export function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ chromaticAberration: value })}
             description="RGB channel offset (px) - creates retro glitch or CRT-style effects"
           />
+          <ParameterSlider
+            label="Displacement Strength"
+            value={effectsParams.displacementStrength}
+            min={0}
+            max={50}
+            step={1}
+            onChange={(value) => updateEffectsParams({ displacementStrength: value })}
+            description="Organic distortion intensity (0 = off, 20 = medium wavy, 50 = extreme liquid)"
+          />
+          {effectsParams.displacementStrength > 0 && (
+            <>
+              <ParameterSlider
+                label="Pattern Scale"
+                value={effectsParams.displacementScale}
+                min={0.5}
+                max={5}
+                step={0.1}
+                onChange={(value) => updateEffectsParams({ displacementScale: value })}
+                description="Noise pattern size (0.5 = large waves, 2 = medium, 5 = fine ripples)"
+              />
+              <ParameterSlider
+                label="Animation Phase"
+                value={effectsParams.displacementTime}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(value) => updateEffectsParams({ displacementTime: value })}
+                description="Animate the distortion (0 = frozen, slowly increase for flowing motion)"
+              />
+              <ParameterSlider
+                label="Direction Angle"
+                value={effectsParams.displacementAngle}
+                min={0}
+                max={360}
+                step={5}
+                onChange={(value) => updateEffectsParams({ displacementAngle: value })}
+                description="Distortion direction (0° = right, 90° = down, 180° = left, 270° = up)"
+              />
+            </>
+          )}
         </div>
 
         {/* Retro / Lo-Fi */}
@@ -610,6 +650,10 @@ export function VisualsOikosPanel() {
           <li><strong>Better Bloom Threshold 0.7</strong> = only bright areas glow (film-like), <strong>0.3</strong> = more glow</li>
           <li><strong>Better Bloom Radius 4-6</strong> = balanced cinematic glow, <strong>8-10</strong> = very soft & wide</li>
           <li><strong>Better Bloom + High Brightness</strong> = AAA game quality glow on bright trails</li>
+          <li><strong>Displacement 10-20</strong> + <strong>Scale 1-2</strong> = organic water/heat haze distortion</li>
+          <li><strong>Displacement 30+</strong> + <strong>Scale 0.5</strong> = large liquid waves (psychedelic)</li>
+          <li><strong>Displacement</strong> + slowly animate <strong>Time</strong> (0 → 1) = flowing distortion</li>
+          <li><strong>Displacement + Kaleidoscope</strong> = warped mandalas with organic edges</li>
         </ul>
       </div>
     </div>

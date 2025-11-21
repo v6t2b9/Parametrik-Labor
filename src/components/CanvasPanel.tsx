@@ -591,6 +591,71 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
+    // === 8.5. Displacement Map (Organic Distortion) ===
+    if (effects.displacementStrength > 0) {
+      // Simple 2D noise function (simplified Perlin-like)
+      const noise = (x: number, y: number): number => {
+        // Combine multiple sine waves for organic noise pattern
+        const s1 = Math.sin(x * 0.1 + y * 0.1) * 0.5;
+        const s2 = Math.sin(x * 0.3 - y * 0.2) * 0.3;
+        const s3 = Math.sin(x * 0.05 + y * 0.15) * 0.2;
+        return (s1 + s2 + s3); // Range: approximately -1 to 1
+      };
+
+      // Get current canvas data
+      const sourceCanvas = canvasPoolRef.current.acquire(gridPixelWidth, gridPixelHeight);
+      const sourceCtx = sourceCanvas.getContext('2d', { willReadFrequently: true })!;
+      sourceCtx.drawImage(canvas!, 0, 0);
+
+      const sourceData = sourceCtx.getImageData(0, 0, gridPixelWidth, gridPixelHeight);
+      const destData = ctx.createImageData(gridPixelWidth, gridPixelHeight);
+      const src = sourceData.data;
+      const dest = destData.data;
+
+      const scale = effects.displacementScale;
+      const strength = effects.displacementStrength;
+      const time = effects.displacementTime;
+      const angleRad = (effects.displacementAngle * Math.PI) / 180;
+      const dirX = Math.cos(angleRad);
+      const dirY = Math.sin(angleRad);
+
+      // Displacement pass
+      for (let y = 0; y < gridPixelHeight; y++) {
+        for (let x = 0; x < gridPixelWidth; x++) {
+          // Calculate noise value at this position (with animation)
+          const noiseValue = noise(
+            (x * scale) + (time * 100),
+            (y * scale) + (time * 100)
+          );
+
+          // Calculate displacement offset (with directional bias)
+          const offsetX = noiseValue * strength * dirX;
+          const offsetY = noiseValue * strength * dirY;
+
+          // Sample from source position (with wrapping for seamless edges)
+          const srcX = Math.floor(x + offsetX);
+          const srcY = Math.floor(y + offsetY);
+
+          // Clamp to canvas bounds
+          const sampledX = Math.max(0, Math.min(gridPixelWidth - 1, srcX));
+          const sampledY = Math.max(0, Math.min(gridPixelHeight - 1, srcY));
+
+          const destIdx = (y * gridPixelWidth + x) * 4;
+          const srcIdx = (sampledY * gridPixelWidth + sampledX) * 4;
+
+          // Copy RGBA
+          dest[destIdx] = src[srcIdx];
+          dest[destIdx + 1] = src[srcIdx + 1];
+          dest[destIdx + 2] = src[srcIdx + 2];
+          dest[destIdx + 3] = src[srcIdx + 3];
+        }
+      }
+
+      // Write displaced image back
+      ctx.putImageData(destData, 0, 0);
+      canvasPoolRef.current.release(sourceCanvas);
+    }
+
     // === 9. Vignette (Screen Overlay) ===
     // Applied AFTER agents for correct layering - darkens edges
     if (effects.vignette > 0) {
