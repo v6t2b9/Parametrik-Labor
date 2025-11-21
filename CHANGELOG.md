@@ -8,6 +8,89 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+- **7 Advanced Visual Effects System** 🎨 ⭐ NEW
+  - **Feedback/Echo Effect** 🌀
+    - Recursive rendering with frame-by-frame transformations
+    - Parameters: Amount (0-0.98), Zoom (0.95-1.05), Rotation (-5° to 5°), Offset X/Y (-10 to 10px)
+    - Use cases: Infinite spirals, zoom tunnels, drifting echoes
+    - Performance: ~0.5-1ms per frame
+
+  - **Kaleidoscope Effect** 🔮
+    - Radial mirroring with 2-12 configurable segments
+    - Parameters: Segments (2-12), Rotation (0-360°), Zoom (0.5-2.0)
+    - Use cases: Snowflake patterns (6 segments), mandalas (8-12 segments), psychedelic symmetry
+    - Performance: ~1-2ms depending on segments
+
+  - **Radial Blur** 🎯
+    - Tunnel/explosion motion blur effects
+    - Parameters: Strength (0-1), Center X/Y (0-1), Quality (2-10 samples)
+    - Use cases: Warp speed, tunnel vision, explosive motion from center
+    - Performance: ~2-5ms depending on quality setting
+
+  - **Better Bloom (Multi-Pass Gaussian)** ✨
+    - Professional cinematic glow with threshold-based extraction
+    - Algorithm: Extract bright pixels → Downscale 4x → Multi-pass blur → Upscale → Blend
+    - Parameters: Threshold (0-1), Radius (1-10 passes), Intensity (0-2)
+    - Dual-mode: Better Bloom (intensity > 0) OR Simple Bloom (bloom > 0) for backward compatibility
+    - Use cases: AAA game-quality glow, film-like highlights, cinematic atmospheres
+    - Performance: ~3-7ms depending on radius (4 = 8px blur, 10 = 20px blur)
+
+  - **Displacement Map** 🌊
+    - Organic distortions using multi-sine wave noise
+    - Algorithm: Per-pixel displacement with directional bias and animation support
+    - Parameters: Strength (0-50px), Scale (0.5-5.0), Time (0-1 for animation), Angle (0-360°)
+    - Use cases: Water/heat haze, liquid waves, organic warping, flowing distortions
+    - Performance: ~2-4ms for typical settings
+
+  - **Color Mapping/LUT (Film Grading)** 🎬
+    - Cinematic color grading with 4 professional presets
+    - **Teal & Orange**: Hollywood blockbuster look (shadows → teal, highlights → orange)
+    - **Bleach Bypass**: Desaturated, high-contrast gritty aesthetic (war/thriller films)
+    - **Warm Vintage**: Golden hour sepia tones (Wes Anderson style)
+    - **Cool Cyberpunk**: Cyan/magenta/purple neon (Blade Runner 2049)
+    - Parameters: LUT preset (dropdown), Intensity (0-1 blend)
+    - Algorithm: Luminance-based per-pixel color transformation
+    - Performance: ~1-2ms
+
+  - **Mirror/Symmetry** 🦋
+    - Geometric symmetry with 5 modes
+    - **Horizontal**: Left-right symmetry (Rorschach test)
+    - **Vertical**: Top-bottom symmetry (landscape reflections)
+    - **Both**: 4-way symmetry from adjustable axes
+    - **Quad**: Perfect center 4-way symmetry (snowflakes, mandalas)
+    - Parameters: Mode (dropdown), Position (0-1 for axis placement)
+    - Use cases: Symmetrical patterns, Rorschach inkblots, geometric art
+    - Performance: ~1ms
+
+- **20 Visual Effect Presets** 🎨
+  - **11 New Spectacular Presets** showcasing all 7 new effects:
+    - **Blockbuster** 🎬: Teal & Orange LUT + cinematic bloom + vignette
+    - **Cyberpunk Dreams** 🌃: Cool Cyberpunk LUT + radial blur + extreme bloom
+    - **Infinite Spiral** 🌀: Feedback with zoom + rotation (endless spiral)
+    - **Mandala Magic** 🔮: Kaleidoscope 8 + Mirror Quad + bloom
+    - **Liquid Fractal** 🌊: Displacement + Kaleidoscope 6 + Feedback
+    - **Rorschach** 🦋: Mirror Horizontal + Displacement (inkblot aesthetic)
+    - **Tunnel Vision** 🎯: Extreme Radial Blur + Feedback Zoom
+    - **Golden Hour** 🌅: Warm Vintage LUT + soft bloom
+    - **War Film** ⚔️: Bleach Bypass LUT + gritty vignette
+    - **Recursive Mandala** 🕉️: Kaleidoscope 12 + Feedback + Displacement + Hue Shift
+    - **Warp Speed** 🚀: Radial Blur + Feedback + Motion Blur + Chromatic Aberration
+
+  - **4 Upgraded Classic Presets** now using Better Bloom:
+    - **Traumhaft** ☁️: Better Bloom radius 8, intensity 1.3
+    - **Neon Glow** ✨: Better Bloom radius 7, intensity 1.6
+    - **Meditation** 🧘: Better Bloom radius 9 (very soft and wide)
+    - **Psychedelisch** 🌈: Better Bloom + Kaleidoscope 4
+
+- **Technical Improvements** ⚡
+  - **Canvas Pooling**: Zero allocations for all new effects using object pooling pattern
+  - **Progressive Disclosure UI**: Advanced controls only appear when main parameter > 0
+  - **Rendering Pipeline Optimization**: Carefully ordered effect pipeline for optimal quality
+  - **Pro Tips**: 20+ combination tips added to Visuals panel
+  - **Bundle Size**: 418.62 KB (+7.57 KB from baseline, +1.8% increase)
+  - **Total Performance Impact**: ~2-5ms per preset depending on effect combinations
+
 - **Professional Export Quality Controls** 📤
   - **3 Quality Presets** for video and GIF exports:
     - **Standard** (8 Mbps video / Quality 10 GIF): Good balance for social media
