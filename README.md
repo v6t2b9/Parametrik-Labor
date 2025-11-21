@@ -6,20 +6,7 @@
 
 ---
 
-## 🚀 Quick Start
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-**Live Demo:** [https://parametrik-labor.vercel.app](https://parametric-space-explorer.vercel.app/)
+## 🚀 Live Demo: [https://parametrik-labor.vercel.app](https://parametric-space-explorer.vercel.app/)
 
 ---
 
@@ -36,7 +23,6 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ✅ **Species Interaction Matrix (3×3)** - Two-tier control system:
   - **Universal Baseline Settings** - Global multipliers for attraction (same-species) and repulsion (cross-species)
   - **Interaction Matrix** - Fine-grained per-species-pair tuning (-2.0 to +2.0)
-✅ **Quantum Mechanics** - Superposition states, phase-dependent trails, interference patterns
 ✅ **51+ Presets** - 8 global + 43 dimension-specific curated configurations
 ✅ **Auto-Optimizer** - Adaptive performance scaling (30-120 FPS targets)
 
@@ -46,20 +32,6 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 ✅ **4 Blend Modes** - Additive, Average, Multiply, Screen
 ✅ **11+ Post-Processing Effects** - Motion blur, bloom, chromatic aberration, vignette, scanlines, pixelation
 ✅ **High-DPI Support** - Sharp rendering on retina displays (up to 2x devicePixelRatio)
-
-#### Audio Reactivity 🎵
-✅ **Audio Oikos Modulation System** - Real-time music analysis with 7+ spectral features
-✅ **Auto-Harmonizer (Adaptive Normalization)** - Learns each song's unique range for maximum visual contrast
-  - Advanced configuration: Window size (3-30s), Smoothing factor (0.1-10%), Exaggeration (0.5-2.0)
-  - Maximizes dynamics for quiet/narrow-range music
-✅ **Dynamic Role Mapping System** 🧬 - Audio-driven ecosystem roles
-  - 5 functional roles: Builder (bass), Harvester (mid), Consumer (arousal), Decomposer (dissonance), Scout (treble)
-  - Configurable thresholds & hysteresis (minimum duration)
-  - Role-specific behavior modifiers (speed, deposit, sensor range)
-✅ **Interference Patterns** - Consonance → synchronized waves, Dissonance → chaotic turbulence
-✅ **Beat Pulse Modulation** - Explosive impulse responses on beats (6x deposit flash)
-✅ **Multi-Scale Temporal Structure** - Micro (100ms), Meso (500ms), Macro (4s) time windows
-✅ **5 Audio Presets** - Default, Bass-Heavy, Ambient, Chaotic, Minimal
 
 #### Export & Sharing 📤
 ✅ **Professional Quality Controls** - 3 quality presets (Standard, High, Very High)
@@ -110,27 +82,6 @@ An interactive web-based simulation exploring **quantum-inspired stigmergy model
 
 ---
 
-## 🧬 Quantum-Inspired Stigmergy Models
-
-### M1: Classical Stigmergy (Baseline)
-Standard pheromone-based navigation. Agents sense → turn → move → deposit trails.
-**Parameters:** 7 (sensor angle/distance, turn speed, deposit, decay, etc.)
-**Predictions:** Symmetric (A→B ≈ B→A), Additive trails, Context-independent
-
-### M2: Context-Switching
-Classical + explore/exploit behavioral modes based on local pheromone density.
-**Parameters:** 10 (7 base + 3 context)
-**Predictions:** Slight asymmetry, Some saturation, Mode-dependent behavior
-
-### M3: Quantum-Inspired ⚛️
-Superposition states + phase-dependent trails + amplitude coupling + interference.
-**Parameters:** 11 (7 base + 4 quantum)
-**Predictions:** Order effects (A→B ≠ B→A), Destructive/constructive interference, Context-dependence
-
-**Scientific Validation:** Tests against empirical benchmarks (bee learning d=0.40, plant VOC d=-0.50, ant foraging). Uses AIC/BIC model comparison. Pre-registered falsification criteria (Supplement B: Computational Model Protocol).
-
----
-
 ## 📂 Project Structure
 
 ```
@@ -168,29 +119,12 @@ Parametrik-Labor/
 
 ---
 
-## 🔬 Research Context
-
-Based on **Supplement B: Computational Model Protocol** from the quantum biosemiotics research program. Part of a multi-phase validation strategy:
-
-- **Phase 1** (Complete): Scoping review of empirical benchmarks
-- **Phase 2** (Current): Computational model validation ← **This project**
-- **Phase 3** (Planned): Biological experiments with pre-specified effect sizes
-
-**Falsification Criteria:** M3 is NOT supported if:
-1. ΔAIC(M3 vs M2) < 10 in ≥2/3 test cases
-2. M3 requires >15 parameters (excessive flexibility)
-3. M3 fails cross-validation (overfits)
-4. M3 predictions deviate >50% from empirical benchmarks
-
----
-
 ## 💻 Technology Stack
 
 - **Frontend:** React 19 + TypeScript
 - **State Management:** Zustand
 - **Build Tool:** Vite
 - **Rendering:** Canvas 2D API + WebGL (hybrid approach)
-- **Audio:** Web Audio API (AnalyserNode, FFT), AudioContext
 - **Export:** gif.js (GIF encoding with dithering), MediaRecorder API (WebM/MP4/H.264), Web Share API
 - **PWA:** vite-plugin-pwa, Workbox service worker, Web App Manifest
 - **Performance:** Object pooling, WebGL shaders, requestAnimationFrame, aggressive caching
@@ -285,10 +219,9 @@ The app is a full-featured Progressive Web App optimized for all platforms:
 ### Basic Workflow
 
 1. **Select Model:** Go to 🧬 Model Oikos tab
-2. **Choose M1/M2/M3:** Click model button to switch
-3. **Adjust Parameters:** Tune quantum parameters (phase rotation, amplitude coupling, etc.)
-4. **Load Presets:** Try "Plasma Dream", "Neon Jungle", "Digital Rain", etc.
-5. **Observe Behaviors:**
+2. **Adjust Parameters:** Tune quantum parameters (phase rotation, amplitude coupling, etc.)
+3. **Load Presets:** Try "Plasma Dream", "Neon Jungle", "Digital Rain", etc.
+4. **Observe Behaviors:**
    - M1: Stable trails, simple patterns
    - M2: Dynamic explore/exploit switching
    - M3: Complex interference, order-dependent patterns, trail aging
