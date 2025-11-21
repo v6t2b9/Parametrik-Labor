@@ -226,13 +226,13 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     toggleRunning: () => set((state) => ({ running: !state.running })),
 
     reset: () => {
-      const { engine, parameters } = get();
-      engine.setParameters(parameters);
-      engine.reset();
+      const { engine: currentEngine, parameters } = get();
+      currentEngine.setParameters(parameters);
+      currentEngine.reset();
       set({
         frameCount: 0,
-        agents: engine.getAgents(),
-        trails: engine.getTrails(),
+        agents: currentEngine.getAgents(),
+        trails: currentEngine.getTrails(),
         running: false,
       });
     },
@@ -298,23 +298,23 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         });
       } else {
         // Same mode - just update parameters
-        const { engine } = get();
-        engine.setParameters(newParams);
+        const { engine: currentEngine } = get();
+        currentEngine.setParameters(newParams);
 
         set({ parameters: newParams });
       }
     },
 
     loadPreset: (params: AllParameters) => {
-      const { engine } = get();
-      engine.setParameters(params);
-      engine.reset();
+      const { engine: currentEngine } = get();
+      currentEngine.setParameters(params);
+      currentEngine.reset();
 
       set({
         parameters: params,
         frameCount: 0,
-        agents: engine.getAgents(),
-        trails: engine.getTrails(),
+        agents: currentEngine.getAgents(),
+        trails: currentEngine.getTrails(),
       });
     },
 
@@ -496,9 +496,9 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
       // If agent count changed, reinitialize
       if (params.agentCount !== undefined) {
-        const { engine } = get();
-        engine.initializeAgents(params.agentCount);
-        set({ agents: engine.getAgents() });
+        const { engine: currentEngine } = get();
+        currentEngine.initializeAgents(params.agentCount);
+        set({ agents: currentEngine.getAgents() });
       }
     },
 
@@ -540,15 +540,15 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       };
 
       // Update engine and reinitialize agents (model change requires reset)
-      const { engine } = get();
-      engine.setParameters(newParams);
-      engine.initializeAgents(newParams.globalTemporal.agentCount);
+      const { engine: currentEngine } = get();
+      currentEngine.setParameters(newParams);
+      currentEngine.initializeAgents(newParams.globalTemporal.agentCount);
 
       set({
         parameters: newParams,
         frameCount: 0,
-        agents: engine.getAgents(),
-        trails: engine.getTrails(),
+        agents: currentEngine.getAgents(),
+        trails: currentEngine.getTrails(),
       });
     },
 
@@ -693,15 +693,15 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     // Simulation tick
     tick: () => {
-      const { engine, running } = get();
+      const { engine: currentEngine, running } = get();
 
       if (!running) return;
 
-      engine.update();
+      currentEngine.update();
 
       // Only update frameCount - trails and agents are read directly from engine for performance
       set({
-        frameCount: engine.getFrameCount(),
+        frameCount: currentEngine.getFrameCount(),
       });
     },
 
