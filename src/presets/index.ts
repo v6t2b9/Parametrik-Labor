@@ -115,7 +115,22 @@ export const defaultParameters: AllParameters = {
   ecosystem: DEFAULT_ECOLOGY_CONFIG,
 };
 
-// Legacy format converter for old presets
+/**
+ * LEGACY COMPATIBILITY
+ *
+ * This function converts old preset format to the new AllParameters structure.
+ * The old format had a flatter structure without the universal/species/globalTemporal split.
+ *
+ * @deprecated This is maintained for backwards compatibility only. New presets should use AllParameters directly.
+ *
+ * TODO: Phase out legacy format in v2.0.0
+ * - Remove this converter
+ * - Update all presets to use AllParameters directly
+ * - Add migration guide for custom presets
+ *
+ * @param legacy - Old preset format (any type for compatibility)
+ * @returns AllParameters - New standardized preset format
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function convertLegacyPreset(legacy: any): AllParameters {
   return {
@@ -625,7 +640,14 @@ const retroArcadePreset: Preset = {
   },
 };
 
-// All new showpiece presets
+/**
+ * LEGACY PRESETS
+ *
+ * These presets use the old format and are converted at runtime.
+ * They are kept here for backwards compatibility.
+ *
+ * @deprecated Use AllParameters format directly for new presets
+ */
 const legacyPresets = [
   plasmaDreamPreset,
   neonJunglePreset,
@@ -637,7 +659,10 @@ const legacyPresets = [
   retroArcadePreset,
 ];
 
-// Export all presets (converted to new format)
+/**
+ * Built-in presets converted to the new AllParameters format.
+ * Legacy presets are converted at runtime using convertLegacyPreset().
+ */
 export const builtInPresets: Preset[] = legacyPresets.map(preset => ({
   ...preset,
   parameters: convertLegacyPreset(preset.parameters),
