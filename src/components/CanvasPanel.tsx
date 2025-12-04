@@ -23,6 +23,7 @@ function getAspectRatioMultipliers(ratio: string): [number, number] {
 class CanvasPool {
   private pool: HTMLCanvasElement[] = [];
   private inUse = new Set<HTMLCanvasElement>();
+  private readonly MAX_POOL_SIZE = 20; // Limit to prevent memory leak
 
   acquire(width: number, height: number): HTMLCanvasElement {
     let canvas = this.pool.find(c => !this.inUse.has(c) && c.width === width && c.height === height);
@@ -32,6 +33,9 @@ class CanvasPool {
       canvas.width = width;
       canvas.height = height;
       this.pool.push(canvas);
+
+      // Cleanup old canvases if pool grows too large
+      this.cleanupOldCanvases();
     }
 
     this.inUse.add(canvas);
@@ -43,6 +47,41 @@ class CanvasPool {
   }
 
   releaseAll(): void {
+    this.inUse.clear();
+  }
+
+  // Remove oldest unused canvases when pool exceeds limit
+  private cleanupOldCanvases(): void {
+    if (this.pool.length <= this.MAX_POOL_SIZE) return;
+
+    const unusedCanvases = this.pool.filter(c => !this.inUse.has(c));
+    const toRemove = this.pool.length - this.MAX_POOL_SIZE;
+
+    if (toRemove > 0 && unusedCanvases.length > 0) {
+      // Remove oldest unused canvases
+      const removed = unusedCanvases.slice(0, toRemove);
+      removed.forEach(canvas => {
+        // Clear canvas to free memory
+        canvas.width = 0;
+        canvas.height = 0;
+      });
+
+      // Remove from pool
+      this.pool = this.pool.filter(c => !removed.includes(c));
+
+      if (toRemove > 0) {
+        console.log(`[CanvasPool] Cleaned up ${removed.length} old canvases (pool size: ${this.pool.length})`);
+      }
+    }
+  }
+
+  // Destroy all canvases and clear pool
+  destroy(): void {
+    this.pool.forEach(canvas => {
+      canvas.width = 0;
+      canvas.height = 0;
+    });
+    this.pool = [];
     this.inUse.clear();
   }
 }
@@ -205,6 +244,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // Motion blur canvas - resize when canvas size changes
     if (!motionBlurCanvasRef.current) {
       motionBlurCanvasRef.current = document.createElement('canvas');
+    } else if (motionBlurCanvasRef.current.width !== canvasWidth || motionBlurCanvasRef.current.height !== canvasHeight) {
+      // Clear old canvas data before resizing to free memory
+      const ctx = motionBlurCanvasRef.current.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, motionBlurCanvasRef.current.width, motionBlurCanvasRef.current.height);
+      }
     }
     motionBlurCanvasRef.current.width = canvasWidth;
     motionBlurCanvasRef.current.height = canvasHeight;
@@ -212,6 +257,12 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // Feedback canvas - stores previous frame for echo effect
     if (!feedbackCanvasRef.current) {
       feedbackCanvasRef.current = document.createElement('canvas');
+    } else if (feedbackCanvasRef.current.width !== canvasWidth || feedbackCanvasRef.current.height !== canvasHeight) {
+      // Clear old canvas data before resizing to free memory
+      const ctx = feedbackCanvasRef.current.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, feedbackCanvasRef.current.width, feedbackCanvasRef.current.height);
+      }
     }
     feedbackCanvasRef.current.width = canvasWidth;
     feedbackCanvasRef.current.height = canvasHeight;
@@ -235,10 +286,27 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     }
 
     return () => {
-      // Cleanup
+      // Cleanup WebGL renderer
       if (webglRendererRef.current) {
         webglRendererRef.current.destroy();
         webglRendererRef.current = null;
+      }
+
+      // Cleanup canvas pool
+      if (canvasPoolRef.current) {
+        canvasPoolRef.current.destroy();
+      }
+
+      // Cleanup motion blur and feedback canvases
+      if (motionBlurCanvasRef.current) {
+        motionBlurCanvasRef.current.width = 0;
+        motionBlurCanvasRef.current.height = 0;
+        motionBlurCanvasRef.current = null;
+      }
+      if (feedbackCanvasRef.current) {
+        feedbackCanvasRef.current.width = 0;
+        feedbackCanvasRef.current.height = 0;
+        feedbackCanvasRef.current = null;
       }
     };
   }, [canvasWidth, canvasHeight, scale, aspectRatio]);
