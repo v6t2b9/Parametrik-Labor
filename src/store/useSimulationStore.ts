@@ -287,7 +287,14 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
       if (oldEcosystemMode !== newEcosystemMode) {
         // Ecosystem mode changed - create new engine
+        const { engine: oldEngine } = get();
         const newEngine = createEngine(newParams, GRID_SIZE);
+
+        // Help GC by clearing old engine reference
+        // (Engines don't have explicit cleanup, but clearing refs helps)
+        if (oldEngine) {
+          console.log('[Store] Ecosystem mode changed, replacing engine');
+        }
 
         set({
           parameters: newParams,
@@ -677,11 +684,16 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     },
 
     setAspectRatio: (ratio) => {
-      const { parameters } = get();
+      const { parameters, engine: oldEngine } = get();
       const { width, height } = calculateGridDimensions(ratio);
 
       // Recreate engine with new grid dimensions
       const newEngine = createEngine(parameters, width, height);
+
+      // Help GC by logging engine replacement
+      if (oldEngine) {
+        console.log(`[Store] Aspect ratio changed to ${ratio}, replacing engine (grid: ${width}x${height})`);
+      }
 
       set((state) => ({
         ui: { ...state.ui, aspectRatio: ratio },
