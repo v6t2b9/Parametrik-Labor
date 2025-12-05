@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import type { RGBColor } from '../types';
 
 interface ColorPickerProps {
@@ -25,7 +25,8 @@ function hexToRgb(hex: string): RGBColor | null {
   } : null;
 }
 
-export function ColorPicker({ label, color, onChange }: ColorPickerProps) {
+// OPTIMIZED: React.memo with custom comparison for RGB color changes
+const ColorPickerComponent = ({ label, color, onChange }: ColorPickerProps) => {
   const [hexValue, setHexValue] = useState(rgbToHex(color.r, color.g, color.b));
 
   // Update hex when RGB changes externally
@@ -150,7 +151,20 @@ export function ColorPicker({ label, color, onChange }: ColorPickerProps) {
       </div>
     </div>
   );
+};
+
+// Custom comparison: only re-render if label or RGB values change
+function areEqual(prevProps: ColorPickerProps, nextProps: ColorPickerProps) {
+  return (
+    prevProps.label === nextProps.label &&
+    prevProps.color.r === nextProps.color.r &&
+    prevProps.color.g === nextProps.color.g &&
+    prevProps.color.b === nextProps.color.b
+    // onChange intentionally not compared
+  );
 }
+
+export const ColorPicker = memo(ColorPickerComponent, areEqual);
 
 const styles = {
   container: {
