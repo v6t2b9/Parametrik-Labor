@@ -181,15 +181,6 @@ export function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ blur: value })}
             description="Gaussian blur radius (px) - creates softer, dreamier visuals"
           />
-          <ParameterSlider
-            label="Bloom (Simple)"
-            value={effectsParams.bloom}
-            min={0}
-            max={1}
-            step={0.05}
-            onChange={(value) => updateEffectsParams({ bloom: value })}
-            description="Simple additive glow (legacy mode) - fast but basic. Use Better Bloom for professional quality."
-          />
         </div>
 
         {/* Better Bloom (Professional) */}
@@ -258,43 +249,6 @@ export function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ hueShift: value })}
             description="Hue rotation in degrees (0-360) - cycles through the color spectrum"
           />
-
-          {/* Color LUT / Film Grading */}
-          <div style={{ marginTop: '12px' }}>
-            <label style={{ fontSize: '12px', color: '#888', display: 'block', marginBottom: '4px' }}>
-              Film Grading (LUT)
-            </label>
-            <select
-              value={effectsParams.colorLUT}
-              onChange={(e) => updateEffectsParams({ colorLUT: e.target.value as typeof effectsParams.colorLUT })}
-              style={{
-                width: '100%',
-                padding: '6px',
-                backgroundColor: '#1a1a1a',
-                color: '#fff',
-                border: '1px solid #333',
-                borderRadius: '4px',
-                fontSize: '12px',
-              }}
-            >
-              <option value="none">None</option>
-              <option value="teal-orange">Teal & Orange (Blockbuster)</option>
-              <option value="bleach-bypass">Bleach Bypass (Gritty)</option>
-              <option value="warm-vintage">Warm Vintage (Golden Hour)</option>
-              <option value="cool-cyberpunk">Cool Cyberpunk (Neon)</option>
-            </select>
-          </div>
-          {effectsParams.colorLUT !== 'none' && (
-            <ParameterSlider
-              label="LUT Intensity"
-              value={effectsParams.colorLUTIntensity}
-              min={0}
-              max={1}
-              step={0.05}
-              onChange={(value) => updateEffectsParams({ colorLUTIntensity: value })}
-              description="Film grading strength (0 = off, 1 = full effect)"
-            />
-          )}
         </div>
 
         {/* Motion & Trails */}
@@ -422,14 +376,88 @@ export function VisualsOikosPanel() {
         {/* Kaleidoscope (Radial Mirroring) */}
         <div style={styles.subsection}>
           <h5 style={styles.subsectionTitle}>Kaleidoscope (Radial Mirroring)</h5>
+
+          {/* Quick Presets for Mandala Effects */}
+          <div style={{ marginBottom: '16px' }}>
+            <label style={styles.paramLabel}>Quick Presets</label>
+            <div style={{...styles.toggleGroup, gridTemplateColumns: 'repeat(3, 1fr)'}}>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 0 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 0 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 0 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="No kaleidoscope effect"
+              >
+                Off
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 4 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 4 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 4 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="4-way cross pattern"
+              >
+                4 ✚
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 6 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 6 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 6 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="6-way snowflake pattern"
+              >
+                6 ❄️
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 8 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 8 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 8 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="8-way mandala pattern"
+              >
+                8 🔮
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 12 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 12 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 12 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="12-way complex mandala"
+              >
+                12 🕉️
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 3 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 3 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 3 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="3-way triangle pattern"
+              >
+                3 △
+              </button>
+            </div>
+          </div>
+
           <ParameterSlider
-            label="Segments"
+            label="Segments (Fine Control)"
             value={effectsParams.kaleidoscopeSegments}
             min={0}
             max={12}
             step={1}
             onChange={(value) => updateEffectsParams({ kaleidoscopeSegments: value })}
-            description="Number of mirror segments (0 = off, 4 = cross, 6 = snowflake, 8 = mandala, 12 = complex)"
+            description="Precise segment count (0 = off, 2-12 = radial mirror segments)"
           />
           {effectsParams.kaleidoscopeSegments >= 2 && (
             <>
@@ -512,46 +540,6 @@ export function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ chromaticAberration: value })}
             description="RGB channel offset (px) - creates retro glitch or CRT-style effects"
           />
-          <ParameterSlider
-            label="Displacement Strength"
-            value={effectsParams.displacementStrength}
-            min={0}
-            max={50}
-            step={1}
-            onChange={(value) => updateEffectsParams({ displacementStrength: value })}
-            description="Organic distortion intensity (0 = off, 20 = medium wavy, 50 = extreme liquid)"
-          />
-          {effectsParams.displacementStrength > 0 && (
-            <>
-              <ParameterSlider
-                label="Pattern Scale"
-                value={effectsParams.displacementScale}
-                min={0.5}
-                max={5}
-                step={0.1}
-                onChange={(value) => updateEffectsParams({ displacementScale: value })}
-                description="Noise pattern size (0.5 = large waves, 2 = medium, 5 = fine ripples)"
-              />
-              <ParameterSlider
-                label="Animation Phase"
-                value={effectsParams.displacementTime}
-                min={0}
-                max={1}
-                step={0.01}
-                onChange={(value) => updateEffectsParams({ displacementTime: value })}
-                description="Animate the distortion (0 = frozen, slowly increase for flowing motion)"
-              />
-              <ParameterSlider
-                label="Direction Angle"
-                value={effectsParams.displacementAngle}
-                min={0}
-                max={360}
-                step={5}
-                onChange={(value) => updateEffectsParams({ displacementAngle: value })}
-                description="Distortion direction (0° = right, 90° = down, 180° = left, 270° = up)"
-              />
-            </>
-          )}
         </div>
 
         {/* Retro / Lo-Fi */}
@@ -713,14 +701,6 @@ export function VisualsOikosPanel() {
           <li><strong>Better Bloom Threshold 0.7</strong> = only bright areas glow (film-like), <strong>0.3</strong> = more glow</li>
           <li><strong>Better Bloom Radius 4-6</strong> = balanced cinematic glow, <strong>8-10</strong> = very soft & wide</li>
           <li><strong>Better Bloom + High Brightness</strong> = AAA game quality glow on bright trails</li>
-          <li><strong>Displacement 10-20</strong> + <strong>Scale 1-2</strong> = organic water/heat haze distortion</li>
-          <li><strong>Displacement 30+</strong> + <strong>Scale 0.5</strong> = large liquid waves (psychedelic)</li>
-          <li><strong>Displacement</strong> + slowly animate <strong>Time</strong> (0 → 1) = flowing distortion</li>
-          <li><strong>Displacement + Kaleidoscope</strong> = warped mandalas with organic edges</li>
-          <li><strong>Teal & Orange LUT</strong> = Hollywood blockbuster look (action movies)</li>
-          <li><strong>Bleach Bypass LUT</strong> = desaturated, gritty (war/thriller films)</li>
-          <li><strong>Warm Vintage LUT</strong> = golden hour nostalgia (Wes Anderson style)</li>
-          <li><strong>Cool Cyberpunk LUT</strong> = neon cyan/magenta/purple (Blade Runner 2049)</li>
           <li><strong>Mirror Horizontal 0.5</strong> = perfect left-right symmetry (Rorschach test)</li>
           <li><strong>Mirror Vertical 0.3-0.7</strong> = off-center landscape reflections</li>
           <li><strong>Mirror Quad</strong> = instant 4-way symmetry (snowflakes, mandalas)</li>

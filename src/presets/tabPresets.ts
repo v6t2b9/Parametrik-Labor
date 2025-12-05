@@ -257,45 +257,45 @@ export interface PhysicsPreset {
 
 export const physicsPresets: PhysicsPreset[] = [
   {
-    name: 'Flüssig',
+    name: 'Fluid',
     icon: '💧',
-    description: 'Hohe Diffusion, mittlerer Zerfall',
+    description: 'High diffusion, medium decay',
     params: {
       decayRate: 0.92,
-      diffusionFreq: 1,  // VIEL Diffusion (jedes Frame)
+      diffusionFreq: 2,  // High Diffusion (every 2nd frame - performance optimized)
       fadeStrength: 0.12,
       trailSaturation: 220,
     },
   },
   {
-    name: 'Kristallin',
+    name: 'Crystalline',
     icon: '💎',
-    description: 'Minimal Diffusion, hohe Persistenz',
+    description: 'Minimal diffusion, high persistence',
     params: {
       decayRate: 0.98,
-      diffusionFreq: 8,  // WENIG Diffusion (jedes 8. Frame)
+      diffusionFreq: 8,  // LOW Diffusion (every 8th frame)
       fadeStrength: 0.08,
       trailSaturation: 255,
     },
   },
   {
-    name: 'Gasförmig',
+    name: 'Gaseous',
     icon: '💨',
-    description: 'Sehr hohe Diffusion, schneller Zerfall',
+    description: 'Very high diffusion, fast decay',
     params: {
       decayRate: 0.88,
-      diffusionFreq: 1,  // VIEL Diffusion (jedes Frame)
+      diffusionFreq: 2,  // HIGH Diffusion (every 2nd frame - optimized from 1)
       fadeStrength: 0.25,
       trailSaturation: 150,
     },
   },
   {
-    name: 'Klebrig',
+    name: 'Sticky',
     icon: '🍯',
-    description: 'Hohe Persistenz, niedrige Diffusion',
+    description: 'High persistence, low diffusion',
     params: {
       decayRate: 0.99,
-      diffusionFreq: 5,  // WENIG Diffusion (jedes 5. Frame)
+      diffusionFreq: 5,  // LOW Diffusion (every 5th frame)
       fadeStrength: 0.06,
       trailSaturation: 255,
     },
@@ -303,21 +303,21 @@ export const physicsPresets: PhysicsPreset[] = [
   {
     name: 'Turbulent',
     icon: '🌀',
-    description: 'Extreme Diffusion, starker Zerfall',
+    description: 'Extreme diffusion, strong decay',
     params: {
       decayRate: 0.90,
-      diffusionFreq: 2,  // SEHR VIEL Diffusion (jedes 2. Frame)
+      diffusionFreq: 2,  // HIGH Diffusion (every 2nd frame)
       fadeStrength: 0.20,
       trailSaturation: 180,
     },
   },
   {
-    name: 'Stabil',
+    name: 'Stable',
     icon: '🔒',
-    description: 'Ausgeglichene Persistenz und Diffusion',
+    description: 'Balanced persistence and diffusion',
     params: {
       decayRate: 0.97,
-      diffusionFreq: 3,  // MITTLERE Diffusion (jedes 3. Frame)
+      diffusionFreq: 3,  // MEDIUM Diffusion (every 3rd frame)
       fadeStrength: 0.15,
       trailSaturation: 255,
     },
@@ -337,9 +337,9 @@ export interface SpeciesPreset {
 
 export const speciesPresets: SpeciesPreset[] = [
   {
-    name: 'Jäger',
+    name: 'Hunters',
     icon: '🦅',
-    description: 'Große Reichweite, schnelle Reaktion',
+    description: 'Long range, fast reaction',
     params: {
       sensorDist: 60,
       sensorAngle: 0.5,
@@ -348,9 +348,9 @@ export const speciesPresets: SpeciesPreset[] = [
     },
   },
   {
-    name: 'Sammler',
+    name: 'Gatherers',
     icon: '🐜',
-    description: 'Kurze Reichweite, hohe Deposition',
+    description: 'Short range, high deposition',
     params: {
       sensorDist: 8,
       sensorAngle: 0.3,
@@ -361,7 +361,7 @@ export const speciesPresets: SpeciesPreset[] = [
   {
     name: 'Scouts',
     icon: '🦋',
-    description: 'Extreme Reichweite, weites Sichtfeld',
+    description: 'Extreme range, wide field of view',
     params: {
       sensorDist: 75,
       sensorAngle: 1.8,
@@ -372,7 +372,7 @@ export const speciesPresets: SpeciesPreset[] = [
   {
     name: 'Tanks',
     icon: '🐢',
-    description: 'Minimal Reichweite, sehr hohe Deposition',
+    description: 'Minimal range, very high deposition',
     params: {
       sensorDist: 5,
       sensorAngle: 0.15,
@@ -383,7 +383,7 @@ export const speciesPresets: SpeciesPreset[] = [
   {
     name: 'Balanced',
     icon: '⚖️',
-    description: 'Ausgewogene Parameter',
+    description: 'Balanced parameters',
     params: {
       sensorDist: 25,
       sensorAngle: 0.6,
@@ -392,9 +392,9 @@ export const speciesPresets: SpeciesPreset[] = [
     },
   },
   {
-    name: 'Chaotisch',
+    name: 'Chaotic',
     icon: '🦀',
-    description: 'Enges Sichtfeld, extreme Wendigkeit',
+    description: 'Narrow view, extreme agility',
     params: {
       sensorDist: 12,
       sensorAngle: 0.2,
@@ -417,9 +417,9 @@ export interface TemporalPreset {
 
 export const temporalPresets: TemporalPreset[] = [
   {
-    name: 'Blitz',
+    name: 'Lightning',
     icon: '⚡',
-    description: 'Extrem schnell, starker Chaos',
+    description: 'Extremely fast, strong chaos',
     params: {
       speed: 5.5,
       agentCount: 2000,
@@ -431,7 +431,7 @@ export const temporalPresets: TemporalPreset[] = [
   {
     name: 'Marathon',
     icon: '🏃',
-    description: 'Mittlere Geschwindigkeit, viele Agents',
+    description: 'Medium speed, many agents',
     params: {
       speed: 1.5,
       agentCount: 2400,
@@ -441,9 +441,9 @@ export const temporalPresets: TemporalPreset[] = [
     },
   },
   {
-    name: 'Pulsierend',
+    name: 'Pulsating',
     icon: '💓',
-    description: 'Regelmäßige starke Störungen',
+    description: 'Regular strong disruptions',
     params: {
       speed: 1.2,
       agentCount: 2000,
@@ -453,9 +453,9 @@ export const temporalPresets: TemporalPreset[] = [
     },
   },
   {
-    name: 'Eingefroren',
+    name: 'Frozen',
     icon: '❄️',
-    description: 'Minimal langsam, kein Chaos',
+    description: 'Minimal slow, no chaos',
     params: {
       speed: 0.15,
       agentCount: 2000,
@@ -465,9 +465,9 @@ export const temporalPresets: TemporalPreset[] = [
     },
   },
   {
-    name: 'Mega-Dichte',
+    name: 'Mega-Dense',
     icon: '🏙️',
-    description: 'Maximum Agents für dichte Strukturen',
+    description: 'Maximum agents for dense structures',
     params: {
       speed: 1.0,
       agentCount: 2400,
@@ -479,7 +479,7 @@ export const temporalPresets: TemporalPreset[] = [
   {
     name: 'Minimal',
     icon: '🌱',
-    description: 'Sehr wenige Agents, langsam',
+    description: 'Very few agents, slow',
     params: {
       speed: 0.6,
       agentCount: 150,
