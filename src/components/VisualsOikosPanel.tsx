@@ -376,14 +376,88 @@ export function VisualsOikosPanel() {
         {/* Kaleidoscope (Radial Mirroring) */}
         <div style={styles.subsection}>
           <h5 style={styles.subsectionTitle}>Kaleidoscope (Radial Mirroring)</h5>
+
+          {/* Quick Presets for Mandala Effects */}
+          <div style={{ marginBottom: '16px' }}>
+            <label style={styles.paramLabel}>Quick Presets</label>
+            <div style={{...styles.toggleGroup, gridTemplateColumns: 'repeat(3, 1fr)'}}>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 0 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 0 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 0 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="No kaleidoscope effect"
+              >
+                Off
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 4 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 4 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 4 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="4-way cross pattern"
+              >
+                4 ✚
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 6 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 6 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 6 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="6-way snowflake pattern"
+              >
+                6 ❄️
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 8 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 8 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 8 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="8-way mandala pattern"
+              >
+                8 🔮
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 12 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 12 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 12 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="12-way complex mandala"
+              >
+                12 🕉️
+              </button>
+              <button
+                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 3 })}
+                style={{
+                  ...styles.toggleButton,
+                  backgroundColor: effectsParams.kaleidoscopeSegments === 3 ? '#7d5dbd' : '#1a1a2d',
+                  borderColor: effectsParams.kaleidoscopeSegments === 3 ? '#9d7dd4' : '#2a2b3a',
+                }}
+                title="3-way triangle pattern"
+              >
+                3 △
+              </button>
+            </div>
+          </div>
+
           <ParameterSlider
-            label="Segments"
+            label="Segments (Fine Control)"
             value={effectsParams.kaleidoscopeSegments}
             min={0}
             max={12}
             step={1}
             onChange={(value) => updateEffectsParams({ kaleidoscopeSegments: value })}
-            description="Number of mirror segments (0 = off, 4 = cross, 6 = snowflake, 8 = mandala, 12 = complex)"
+            description="Precise segment count (0 = off, 2-12 = radial mirror segments)"
           />
           {effectsParams.kaleidoscopeSegments >= 2 && (
             <>
