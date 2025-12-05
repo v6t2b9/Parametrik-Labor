@@ -108,6 +108,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // Scanline pattern cache
   const scanlinePatternRef = useRef<CanvasPattern | null>(null);
 
+  // Vignette gradient cache (avoid recreating every frame)
+  const vignetteGradientRef = useRef<{ gradient: CanvasGradient; width: number; height: number } | null>(null);
+
   // FPS tracking with circular buffer (OPTIMIZED: avoids Array.shift() O(n) operation)
   const lastFrameTimeRef = useRef<number>(performance.now());
   const fpsHistoryRef = useRef<number[]>(new Array(60).fill(0));
@@ -758,86 +761,39 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
-    // === 8.5. Displacement Map (Organic Distortion) ===
-    if (effects.displacementStrength > 0) {
-      // Simple 2D noise function (simplified Perlin-like)
-      const noise = (x: number, y: number): number => {
-        // Combine multiple sine waves for organic noise pattern
-        const s1 = Math.sin(x * 0.1 + y * 0.1) * 0.5;
-        const s2 = Math.sin(x * 0.3 - y * 0.2) * 0.3;
-        const s3 = Math.sin(x * 0.05 + y * 0.15) * 0.2;
-        return (s1 + s2 + s3); // Range: approximately -1 to 1
-      };
+    // === 8.5. Displacement Map - REMOVED FOR PERFORMANCE ===
+    // This effect used getImageData() + nested pixel loop = 10-30ms overhead per frame
+    // Alternative: Use CSS filter: url(#displacement) with SVG filter for hardware acceleration
+    // For now, removed to prioritize stable 60fps performance
 
-      // Get current canvas data
-      const sourceCanvas = canvasPoolRef.current.acquire(gridPixelWidth, gridPixelHeight);
-      const sourceCtx = sourceCanvas.getContext('2d', { willReadFrequently: true })!;
-      sourceCtx.drawImage(canvas!, 0, 0);
-
-      const sourceData = sourceCtx.getImageData(0, 0, gridPixelWidth, gridPixelHeight);
-      const destData = ctx.createImageData(gridPixelWidth, gridPixelHeight);
-      const src = sourceData.data;
-      const dest = destData.data;
-
-      const scale = effects.displacementScale;
-      const strength = effects.displacementStrength;
-      const time = effects.displacementTime;
-      const angleRad = (effects.displacementAngle * Math.PI) / 180;
-      const dirX = Math.cos(angleRad);
-      const dirY = Math.sin(angleRad);
-
-      // Displacement pass
-      for (let y = 0; y < gridPixelHeight; y++) {
-        for (let x = 0; x < gridPixelWidth; x++) {
-          // Calculate noise value at this position (with animation)
-          const noiseValue = noise(
-            (x * scale) + (time * 100),
-            (y * scale) + (time * 100)
-          );
-
-          // Calculate displacement offset (with directional bias)
-          const offsetX = noiseValue * strength * dirX;
-          const offsetY = noiseValue * strength * dirY;
-
-          // Sample from source position (with wrapping for seamless edges)
-          const srcX = Math.floor(x + offsetX);
-          const srcY = Math.floor(y + offsetY);
-
-          // Clamp to canvas bounds
-          const sampledX = Math.max(0, Math.min(gridPixelWidth - 1, srcX));
-          const sampledY = Math.max(0, Math.min(gridPixelHeight - 1, srcY));
-
-          const destIdx = (y * gridPixelWidth + x) * 4;
-          const srcIdx = (sampledY * gridPixelWidth + sampledX) * 4;
-
-          // Copy RGBA
-          dest[destIdx] = src[srcIdx];
-          dest[destIdx + 1] = src[srcIdx + 1];
-          dest[destIdx + 2] = src[srcIdx + 2];
-          dest[destIdx + 3] = src[srcIdx + 3];
-        }
-      }
-
-      // Write displaced image back
-      ctx.putImageData(destData, 0, 0);
-      canvasPoolRef.current.release(sourceCanvas);
-    }
-
-    // === 9. Vignette (Screen Overlay) ===
+    // === 9. Vignette (Screen Overlay) - OPTIMIZED with cached gradient ===
     // Applied AFTER agents for correct layering - darkens edges
     if (effects.vignette > 0) {
-      const centerX = gridPixelWidth / 2;
-      const centerY = gridPixelHeight / 2;
-      const maxRadius = Math.max(gridPixelWidth, gridPixelHeight) * 0.7;
-      const gradient = ctx.createRadialGradient(
-        centerX, centerY, Math.min(gridPixelWidth, gridPixelHeight) * 0.3,
-        centerX, centerY, maxRadius
-      );
-      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
-      gradient.addColorStop(1, `rgba(0, 0, 0, ${effects.vignette})`);
+      // Use cached gradient if dimensions match, otherwise create new one
+      const vignetteCache = vignetteGradientRef.current;
+      let gradient: CanvasGradient;
 
+      if (!vignetteCache || vignetteCache.width !== gridPixelWidth || vignetteCache.height !== gridPixelHeight) {
+        const centerX = gridPixelWidth / 2;
+        const centerY = gridPixelHeight / 2;
+        const maxRadius = Math.max(gridPixelWidth, gridPixelHeight) * 0.7;
+        gradient = ctx.createRadialGradient(
+          centerX, centerY, Math.min(gridPixelWidth, gridPixelHeight) * 0.3,
+          centerX, centerY, maxRadius
+        );
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 1)'); // Max opacity, will be controlled by globalAlpha
+
+        // Cache for future frames
+        vignetteGradientRef.current = { gradient, width: gridPixelWidth, height: gridPixelHeight };
+      } else {
+        gradient = vignetteCache.gradient;
+      }
+
+      ctx.globalAlpha = effects.vignette;
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, gridPixelWidth, gridPixelHeight);
+      ctx.globalAlpha = 1;
     }
 
     // === 10. Scanlines (Top Screen Overlay - CRT Effect) ===
@@ -986,97 +942,15 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       canvasPool.release(tempCanvas);
     }
 
-    // === 16.5. Color Mapping/LUT (Film Grading) ===
-    // Apply cinematic color grading using Look-Up Tables
-    if (effects.colorLUT !== 'none' && effects.colorLUTIntensity > 0) {
-      const imageData = ctx.getImageData(0, 0, canvasWidth, canvasHeight);
-      const data = imageData.data;
-
-      // LUT functions for different film grading presets
-      const applyLUT = (r: number, g: number, b: number): [number, number, number] => {
-        const intensity = effects.colorLUTIntensity;
-
-        if (effects.colorLUT === 'teal-orange') {
-          // Teal & Orange (Hollywood blockbuster look)
-          // Push shadows to teal, highlights to orange
-          const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-          const isHighlight = luminance > 128;
-
-          if (isHighlight) {
-            // Orange highlights
-            const newR = r + (30 * intensity);
-            const newG = g + (10 * intensity);
-            const newB = b - (20 * intensity);
-            return [newR, newG, newB];
-          } else {
-            // Teal shadows
-            const newR = r - (20 * intensity);
-            const newG = g + (10 * intensity);
-            const newB = b + (30 * intensity);
-            return [newR, newG, newB];
-          }
-        } else if (effects.colorLUT === 'bleach-bypass') {
-          // Bleach Bypass (desaturated, high contrast)
-          const avg = (r + g + b) / 3;
-          const newR = r + (avg - r) * 0.3 * intensity;
-          const newG = g + (avg - g) * 0.3 * intensity;
-          const newB = b + (avg - b) * 0.3 * intensity;
-          // Boost contrast
-          const contrast = 1 + (0.5 * intensity);
-          return [
-            ((newR - 128) * contrast + 128),
-            ((newG - 128) * contrast + 128),
-            ((newB - 128) * contrast + 128),
-          ];
-        } else if (effects.colorLUT === 'warm-vintage') {
-          // Warm Vintage (golden hour, sepia tones)
-          const newR = r + (40 * intensity);
-          const newG = g + (15 * intensity);
-          const newB = b - (30 * intensity);
-          return [newR, newG, newB];
-        } else if (effects.colorLUT === 'cool-cyberpunk') {
-          // Cool Cyberpunk (cyan/magenta/purple)
-          const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-          const isDark = luminance < 100;
-
-          if (isDark) {
-            // Purple/blue shadows
-            const newR = r + (20 * intensity);
-            const newG = g - (10 * intensity);
-            const newB = b + (50 * intensity);
-            return [newR, newG, newB];
-          } else {
-            // Cyan/magenta highlights
-            const newR = r + (30 * intensity);
-            const newG = g + (20 * intensity);
-            const newB = b + (40 * intensity);
-            return [newR, newG, newB];
-          }
-        }
-
-        return [r, g, b];
-      };
-
-      // Apply LUT to each pixel
-      for (let i = 0; i < data.length; i += 4) {
-        const [newR, newG, newB] = applyLUT(data[i], data[i + 1], data[i + 2]);
-
-        // Lerp between original and LUT based on intensity
-        data[i] = Math.max(0, Math.min(255, newR));
-        data[i + 1] = Math.max(0, Math.min(255, newG));
-        data[i + 2] = Math.max(0, Math.min(255, newB));
-      }
-
-      ctx.putImageData(imageData, 0, 0);
-    }
+    // === 16.5. Color Mapping/LUT - REMOVED FOR PERFORMANCE ===
+    // This effect used getImageData() + pixel loop = 5-10ms overhead per frame
+    // Alternative: Use hue-rotate() + sepia() + saturate() CSS filters for similar effects
+    // For now, removed to prioritize stable 60fps performance
 
     // === 17. Bloom Effect ===
-    // Choose between Simple Bloom (legacy) and Better Bloom (multi-pass Gaussian)
-    const useBetterBloom = effects.bloomIntensity > 0;
-
-    if (useBetterBloom) {
-      // === 17a. Better Bloom (Multi-Pass Gaussian) ===
-      // Professional quality bloom with threshold extraction and multi-pass blur
+    // Multi-pass Gaussian Bloom (optimized with CSS filters for threshold)
+    if (effects.bloomIntensity > 0) {
+      // Professional quality bloom with GPU-accelerated threshold extraction and multi-pass blur
       const bloomDownscale = 4; // Downscale factor (4 = 1/4 size)
       const bloomWidth = Math.floor(canvasWidth / bloomDownscale);
       const bloomHeight = Math.floor(canvasHeight / bloomDownscale);
@@ -1086,32 +960,18 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       const brightCtx = brightCanvas.getContext('2d');
 
       if (brightCtx && brightCanvas.width === canvasWidth && brightCanvas.height === canvasHeight) {
-        // Copy canvas
-        brightCtx.drawImage(canvas, 0, 0);
-
-        // Extract bright pixels (threshold)
+        // Extract bright pixels (threshold) using CSS brightness filter
+        // OPTIMIZED: GPU-accelerated filter instead of slow getImageData() pixel loop
         if (effects.bloomThreshold > 0) {
-          const imageData = brightCtx.getImageData(0, 0, canvasWidth, canvasHeight);
-          const data = imageData.data;
-          const threshold = effects.bloomThreshold * 255;
-
-          for (let i = 0; i < data.length; i += 4) {
-            const r = data[i];
-            const g = data[i + 1];
-            const b = data[i + 2];
-
-            // Calculate brightness (perceived luminance)
-            const brightness = 0.299 * r + 0.587 * g + 0.114 * b;
-
-            // If below threshold, set to black
-            if (brightness < threshold) {
-              data[i] = 0;
-              data[i + 1] = 0;
-              data[i + 2] = 0;
-            }
-          }
-
-          brightCtx.putImageData(imageData, 0, 0);
+          // Use brightness + contrast to extract bright pixels
+          const brightnessBoost = 1 + effects.bloomThreshold;
+          const contrastBoost = 1 + effects.bloomThreshold * 2;
+          brightCtx.filter = `brightness(${brightnessBoost}) contrast(${contrastBoost})`;
+          brightCtx.drawImage(canvas, 0, 0);
+          brightCtx.filter = 'none';
+        } else {
+          // No threshold - just copy
+          brightCtx.drawImage(canvas, 0, 0);
         }
 
         // Step 2: Downscale to bloom canvas
@@ -1157,17 +1017,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
 
         canvasPool.release(brightCanvas);
       }
-    } else if (effects.bloom > 0) {
-      // === 17b. Simple Bloom (Legacy) ===
-      // Kept for backward compatibility and performance
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.globalAlpha = effects.bloom;
-      ctx.filter = `blur(${Math.max(8, effects.blur + 8)}px) brightness(1.5)`;
-      ctx.drawImage(canvas, 0, 0);
-      ctx.filter = 'none';
-      ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = 'source-over';
     }
+    // Legacy Simple Bloom removed - use bloomIntensity parameter instead of bloom
 
     // === 16. Chromatic Aberration - OPTIMIZED with object pooling ===
     if (effects.chromaticAberration > 0) {
