@@ -1,7 +1,14 @@
 import type { AllParameters } from '../types/index.js';
 import { DEFAULT_PRESET } from '../audio/presets';
 import { DEFAULT_ECOLOGY_CONFIG } from '../engine/SpeciesConfigs';
-import { defaultPerformanceParams } from './index.js';
+
+// Default Performance Parameters (defined locally to avoid circular dependency)
+const defaultPerformanceParams = {
+  autoOptimize: true,
+  targetFPS: 60,
+  qualityPreset: 'high' as const,
+  _currentOptLevel: 0,
+};
 
 /**
  * MASTER PRESETS
