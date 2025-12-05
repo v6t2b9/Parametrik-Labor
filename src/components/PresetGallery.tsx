@@ -1,10 +1,22 @@
 import { useSimulationStore } from '../store/useSimulationStore';
-import { builtInPresets } from '../presets';
+import { builtInPresets, masterPresets } from '../presets';
 import { useState, useRef } from 'react';
 import { colors, spacing, typography, effects, createHeaderStyle } from '../design-system';
 
+// Preset category type
+interface PresetCategory {
+  title: string;
+  description?: string;
+  presets: string[];
+}
+
 // Categorize presets by their pattern formation characteristics
-const presetCategories = {
+const presetCategories: Record<string, PresetCategory> = {
+  master: {
+    title: '🌟 Master Experiences (Complete Presets)',
+    description: 'Spectacular combinations of all parameters - perfect starting points!',
+    presets: ['Cosmic Meditation', 'Liquid Rainbow', 'Infinite Tunnel', 'Crystal Palace', 'Electric Storm', 'Deep Ocean', 'Sacred Geometry', 'Retro Arcade'],
+  },
   organic: {
     title: 'Organic & Flowing',
     presets: ['Plasma Dream', 'Aurora Sky', 'Lava Flow'],
@@ -103,24 +115,35 @@ export function PresetGallery() {
       </div>
 
       {Object.entries(presetCategories).map(([categoryKey, category]) => {
-        const categoryPresets = builtInPresets.filter(p => category.presets.includes(p.name));
+        // Master presets come from masterPresets array, others from builtInPresets
+        const categoryPresets = categoryKey === 'master'
+          ? masterPresets.filter(p => category.presets.includes(p.name))
+          : builtInPresets.filter(p => category.presets.includes(p.name));
 
         return (
           <div key={categoryKey} style={styles.category}>
             <h4 style={styles.categoryTitle}>{category.title}</h4>
+            {category.description && (
+              <p style={styles.categoryDescription}>{category.description}</p>
+            )}
             <div style={styles.grid}>
-              {categoryPresets.map((preset) => (
-                <div key={preset.name} style={styles.card}>
-                  <div style={styles.cardIcon}>{preset.icon}</div>
-                  <h5 style={styles.presetName}>{preset.name}</h5>
-                  <button
-                    onClick={() => loadPreset(preset.parameters)}
-                    style={styles.loadButton}
-                  >
-                    Load
-                  </button>
-                </div>
-              ))}
+              {categoryPresets.map((preset) => {
+                // Master presets use 'params', built-in presets use 'parameters'
+                const presetParams = 'params' in preset ? preset.params : preset.parameters;
+                return (
+                  <div key={preset.name} style={styles.card}>
+                    <div style={styles.cardIcon}>{preset.icon}</div>
+                    <h5 style={styles.presetName}>{preset.name}</h5>
+                    <p style={styles.presetDescription}>{preset.description}</p>
+                    <button
+                      onClick={() => loadPreset(presetParams)}
+                      style={styles.loadButton}
+                    >
+                      Load
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         );
@@ -203,7 +226,13 @@ const styles = {
   categoryTitle: {
     ...createHeaderStyle('h3'),
     color: colors.text.secondary,
+    marginBottom: spacing.sm,
+  } as React.CSSProperties,
+  categoryDescription: {
+    ...typography.caption,
+    color: colors.text.muted,
     marginBottom: spacing.lg,
+    fontStyle: 'italic',
   } as React.CSSProperties,
   grid: {
     display: 'grid',
@@ -229,6 +258,15 @@ const styles = {
     color: colors.text.primary,
     textAlign: 'center',
     margin: 0,
+    fontWeight: 600,
+  } as React.CSSProperties,
+  presetDescription: {
+    ...typography.caption,
+    color: colors.text.muted,
+    textAlign: 'center',
+    margin: `${spacing.xs} 0`,
+    fontSize: '10px',
+    lineHeight: '1.3',
   } as React.CSSProperties,
   loadButton: {
     width: '100%',

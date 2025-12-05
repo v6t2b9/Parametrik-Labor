@@ -2,6 +2,9 @@ import type { Preset, AllParameters } from '../types/index.js';
 import { DEFAULT_PRESET } from '../audio/presets';
 import { DEFAULT_ECOLOGY_CONFIG } from '../engine/SpeciesConfigs';
 
+// Re-export Master Presets for easy access
+export { masterPresets, type MasterPreset } from './masterPresets.js';
+
 // Default Performance Parameters
 export const defaultPerformanceParams = {
   autoOptimize: true,
