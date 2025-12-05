@@ -108,10 +108,13 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   // Scanline pattern cache
   const scanlinePatternRef = useRef<CanvasPattern | null>(null);
 
-  // FPS tracking
+  // FPS tracking with circular buffer (OPTIMIZED: avoids Array.shift() O(n) operation)
   const lastFrameTimeRef = useRef<number>(performance.now());
-  const fpsHistoryRef = useRef<number[]>([]);
+  const fpsHistoryRef = useRef<number[]>(new Array(60).fill(0));
+  const fpsHistoryIndexRef = useRef<number>(0);
+  const fpsHistoryCountRef = useRef<number>(0);
   const frameCounterRef = useRef<number>(0);
+  const metricsUpdateCounterRef = useRef<number>(0);
 
   // Use refs for callbacks to avoid recreating animation loop
   const renderRef = useRef<(() => void) | null>(null);
@@ -119,14 +122,18 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
   const tick = useSimulationStore((state) => state.tick);
   const engine = useSimulationStore((state) => state.engine);
   const running = useSimulationStore((state) => state.running);
-  const parameters = useSimulationStore((state) => state.parameters);
+
+  // OPTIMIZATION: Extract only needed parameters to avoid re-renders on unrelated parameter changes
+  const visualization = useSimulationStore((state) => state.parameters.visualization);
+  const effects = useSimulationStore((state) => state.parameters.effects);
+  const ecosystemMode = useSimulationStore((state) => state.parameters.ecosystemMode);
+
   const updatePerformanceMetrics = useSimulationStore((state) => state.updatePerformanceMetrics);
   const performAutoOptimization = useSimulationStore((state) => state.performAutoOptimization);
   const playbackSpeed = useSimulationStore((state) => state.ui.playbackSpeed);
   const aspectRatio = useSimulationStore((state) => state.ui.aspectRatio);
 
   // Check if ecosystem mode is active
-  const ecosystemMode = parameters.ecosystemMode || false;
   const isEcosystemEngine = engine instanceof MusicReactiveEcosystemEngine;
 
   // Memoize grid dimensions calculation (only recalculate when aspect ratio changes)
@@ -325,11 +332,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     const trails = engine.getTrails();
     const agents = engine.getAgents();
 
-    // Read visualization and effects from parameters (avoids creating new references on store updates)
-    const visualization = parameters.visualization;
-    const effects = parameters.effects;
-
     // Apply hue cycling if enabled (using performance.now() for smooth animation)
+    // visualization and effects are already extracted from store at component level
     const currentVisualization = applyHueCycling(visualization, performance.now());
 
     // === 0. Fill entire canvas with background (letterbox/pillarbox bars) ===
@@ -1214,8 +1218,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         fbCtx.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
       }
     }
-  }, [canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine, parameters]);
-  // Note: parameters is now included in deps to ensure visualization/effects updates are reflected immediately
+  }, [canvasWidth, canvasHeight, scale, offsetX, offsetY, gridDimensions, engine, ecosystemMode, isEcosystemEngine, visualization, effects]);
+  // OPTIMIZATION: Use specific visualization and effects instead of entire parameters object
 
   // Update ref to latest render function
   useEffect(() => {
@@ -1251,27 +1255,42 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       lastFrameTimeRef.current = frameEndTime;
       const currentFPS = deltaTime > 0 ? 1000 / deltaTime : 0;
 
-      // Update FPS history (rolling window of last 60 frames)
-      fpsHistoryRef.current.push(currentFPS);
-      if (fpsHistoryRef.current.length > 60) {
-        fpsHistoryRef.current.shift();
+      // Update FPS history using circular buffer (OPTIMIZED: O(1) instead of O(n))
+      const fpsHistory = fpsHistoryRef.current;
+      const currentIndex = fpsHistoryIndexRef.current;
+      fpsHistory[currentIndex] = currentFPS;
+      fpsHistoryIndexRef.current = (currentIndex + 1) % 60;
+      fpsHistoryCountRef.current = Math.min(fpsHistoryCountRef.current + 1, 60);
+
+      // Calculate average, min, max FPS (OPTIMIZED: manual loop instead of spread operator)
+      const count = fpsHistoryCountRef.current;
+      let sum = 0;
+      let min = Infinity;
+      let max = -Infinity;
+      for (let i = 0; i < count; i++) {
+        const fps = fpsHistory[i];
+        sum += fps;
+        if (fps < min) min = fps;
+        if (fps > max) max = fps;
       }
+      const avgFPS = sum / count;
+      const minFPS = min === Infinity ? 0 : min;
+      const maxFPS = max === -Infinity ? 0 : max;
 
-      // Calculate average, min, max FPS
-      const avgFPS = fpsHistoryRef.current.reduce((a, b) => a + b, 0) / fpsHistoryRef.current.length;
-      const minFPS = Math.min(...fpsHistoryRef.current);
-      const maxFPS = Math.max(...fpsHistoryRef.current);
-
-      // Update performance metrics
-      updatePerformanceMetrics({
-        currentFPS,
-        avgFPS,
-        minFPS,
-        maxFPS,
-        frameTime,
-        tickTime,
-        renderTime,
-      });
+      // Update performance metrics (OPTIMIZED: only every 6 frames = ~10x/sec instead of 60x/sec)
+      metricsUpdateCounterRef.current++;
+      if (metricsUpdateCounterRef.current >= 6) {
+        metricsUpdateCounterRef.current = 0;
+        updatePerformanceMetrics({
+          currentFPS,
+          avgFPS,
+          minFPS,
+          maxFPS,
+          frameTime,
+          tickTime,
+          renderTime,
+        });
+      }
 
       // Auto-optimization check (every 30 frames = ~0.5 seconds at 60fps)
       frameCounterRef.current++;
