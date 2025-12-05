@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { colors, spacing, typography, effects } from '../design-system';
 
 interface ParameterSliderProps {
@@ -12,29 +13,35 @@ interface ParameterSliderProps {
   disabled?: boolean; // Disable slider interaction
 }
 
-export function ParameterSlider({
-  label,
-  value,
-  min,
-  max,
-  step,
-  onChange,
-  description,
-  hasOverride = false,
-  disabled = false,
-}: ParameterSliderProps) {
+// OPTIMIZED: React.memo prevents re-renders when props haven't changed
+// Custom comparison ignores onChange function reference changes (shallow comparison for other props)
+const ParameterSliderComponent = (props: ParameterSliderProps) => {
+  const {
+    label,
+    value,
+    min,
+    max,
+    step,
+    onChange,
+    description,
+    hasOverride,
+    disabled,
+  } = props;
+
+  const hasOverrideValue = hasOverride ?? false;
+  const disabledValue = disabled ?? false;
   return (
-    <div style={{ ...styles.container, ...(disabled ? styles.containerDisabled : {}) }}>
+    <div style={{ ...styles.container, ...(disabledValue ? styles.containerDisabled : {}) }}>
       <div style={styles.labelRow}>
         <div style={styles.labelGroup}>
-          <label style={{ ...styles.label, ...(disabled ? styles.labelDisabled : {}) }}>{label}</label>
-          {hasOverride && (
+          <label style={{ ...styles.label, ...(disabledValue ? styles.labelDisabled : {}) }}>{label}</label>
+          {hasOverrideValue && (
             <span style={styles.overrideBadge} title="Species-specific override active">
               ●
             </span>
           )}
         </div>
-        <span style={{ ...styles.value, ...(disabled ? styles.valueDisabled : {}) }}>{value.toFixed(3)}</span>
+        <span style={{ ...styles.value, ...(disabledValue ? styles.valueDisabled : {}) }}>{value.toFixed(3)}</span>
       </div>
       <input
         type="range"
@@ -44,12 +51,30 @@ export function ParameterSlider({
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         style={styles.slider}
-        disabled={disabled}
+        disabled={disabledValue}
       />
-      {description && <p style={{ ...styles.description, ...(disabled ? styles.descriptionDisabled : {}) }}>{description}</p>}
+      {description && <p style={{ ...styles.description, ...(disabledValue ? styles.descriptionDisabled : {}) }}>{description}</p>}
     </div>
   );
+};
+
+// Custom comparison: only re-render if value/label/min/max/step/hasOverride/disabled change
+// Ignore onChange function reference changes (typical in React - callbacks change but logic doesn't)
+function areEqual(prevProps: ParameterSliderProps, nextProps: ParameterSliderProps) {
+  return (
+    prevProps.value === nextProps.value &&
+    prevProps.label === nextProps.label &&
+    prevProps.min === nextProps.min &&
+    prevProps.max === nextProps.max &&
+    prevProps.step === nextProps.step &&
+    prevProps.description === nextProps.description &&
+    prevProps.hasOverride === nextProps.hasOverride &&
+    prevProps.disabled === nextProps.disabled
+    // onChange intentionally not compared - function reference changes don't matter
+  );
 }
+
+export const ParameterSlider = memo(ParameterSliderComponent, areEqual);
 
 const styles = {
   container: {

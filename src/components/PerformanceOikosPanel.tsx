@@ -1,15 +1,18 @@
+import { memo } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { QualityPreset } from '../types/index.js';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
-export function PerformanceOikosPanel() {
-  const parameters = useSimulationStore((state) => state.parameters);
+// OPTIMIZED: React.memo prevents re-renders when performance metrics/params haven't changed
+const PerformanceOikosPanelComponent = () => {
+  // OPTIMIZATION: Shallow selectors - only subscribe to needed data
+  const performance = useSimulationStore((state) => state.parameters.performance);
+  const agentCount = useSimulationStore((state) => state.parameters.globalTemporal.agentCount);
   const performanceMetrics = useSimulationStore((state) => state.performanceMetrics);
   const updatePerformanceParams = useSimulationStore((state) => state.updatePerformanceParams);
   const applyQualityPreset = useSimulationStore((state) => state.applyQualityPreset);
   const reset = useSimulationStore((state) => state.reset);
-  const { performance } = parameters;
 
   const qualityPresets: { value: QualityPreset; label: string; description: string; icon: string }[] = [
     { value: 'low', label: 'Low', description: '~600 agents, minimal effects', icon: '⚡' },
@@ -57,7 +60,7 @@ export function PerformanceOikosPanel() {
           <div style={styles.statusBox}>
             <div style={styles.statusLabel}>Agents</div>
             <div style={styles.statusValue}>
-              {parameters.globalTemporal.agentCount}
+              {agentCount}
             </div>
           </div>
           <div style={styles.statusBox}>
@@ -153,7 +156,10 @@ export function PerformanceOikosPanel() {
       </div>
     </div>
   );
-}
+};
+
+// Export memoized component - prevents re-renders when performance params haven't changed
+export const PerformanceOikosPanel = memo(PerformanceOikosPanelComponent);
 
 const styles = {
   panel: {

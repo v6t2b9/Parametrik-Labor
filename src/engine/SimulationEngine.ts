@@ -97,13 +97,16 @@ export class SimulationEngine {
     this.initializeAgents(this.params.globalTemporal.agentCount);
   }
 
+  // OPTIMIZED: Main update loop - critical for performance
   public update(): void {
     // Use universal physical params for diffusion (could be species-specific in future)
     const universalPhysical = this.params.universal.physical;
 
-    // Update each agent (species-specific)
-    for (const agent of this.agents) {
-      this.updateAgent(agent);
+    // OPTIMIZATION: Traditional for-loop is faster than for-of for large arrays
+    // V8 optimizes traditional loops better (avoids iterator overhead)
+    const agentCount = this.agents.length;
+    for (let i = 0; i < agentCount; i++) {
+      this.updateAgent(this.agents[i]);
     }
 
     // Diffuse and decay trails
@@ -221,35 +224,52 @@ export class SimulationEngine {
     }
   }
 
+  // OPTIMIZED: Diffusion is the main performance bottleneck
+  // Improvements: Reduced modulo ops, manual summation, cached dimensions
   private diffuseAndDecay(): void {
     // Use universal physical params for trail dynamics
     const { physical } = this.params.universal;
     const { decayRate, fadeStrength } = physical;
 
+    // Cache dimensions for faster access (avoids property lookups)
+    const width = this.gridWidth;
+    const height = this.gridHeight;
+    const lastX = width - 1;
+    const lastY = height - 1;
+
     for (const channel of ['red', 'green', 'blue'] as AgentType[]) {
       const trails = this.trails[channel];
       const temp = this.tempTrails[channel];
 
-      for (let y = 0; y < this.gridHeight; y++) {
-        for (let x = 0; x < this.gridWidth; x++) {
-          const idx = y * this.gridWidth + x;
+      for (let y = 0; y < height; y++) {
+        // Pre-calculate row indices (eliminates modulo in inner loop)
+        const yPrev = y === 0 ? lastY : y - 1;
+        const yNext = y === lastY ? 0 : y + 1;
+        const yPrevRow = yPrev * width;
+        const yCurrRow = y * width;
+        const yNextRow = yNext * width;
 
-          // Get neighbors (8-connected: includes diagonals)
-          const neighbors = [
-            // 4-connected (cardinal directions)
-            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + x],
-            trails[((y + 1) % this.gridHeight) * this.gridWidth + x],
-            trails[y * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
-            trails[y * this.gridWidth + ((x + 1) % this.gridWidth)],
-            // 4 diagonals
-            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
-            trails[((y - 1 + this.gridHeight) % this.gridHeight) * this.gridWidth + ((x + 1) % this.gridWidth)],
-            trails[((y + 1) % this.gridHeight) * this.gridWidth + ((x - 1 + this.gridWidth) % this.gridWidth)],
-            trails[((y + 1) % this.gridHeight) * this.gridWidth + ((x + 1) % this.gridWidth)],
-          ];
+        for (let x = 0; x < width; x++) {
+          // Pre-calculate column indices (eliminates modulo)
+          const xPrev = x === 0 ? lastX : x - 1;
+          const xNext = x === lastX ? 0 : x + 1;
 
-          const sum = neighbors.reduce((a, b) => a + b, 0) + trails[idx];
-          const avg = sum / 9;
+          const idx = yCurrRow + x;
+
+          // Manual summation (faster than reduce() or array allocation)
+          // 8-connected neighbors + center
+          const sum =
+            trails[yPrevRow + xPrev] +  // top-left
+            trails[yPrevRow + x] +       // top
+            trails[yPrevRow + xNext] +   // top-right
+            trails[yCurrRow + xPrev] +   // left
+            trails[idx] +                 // center
+            trails[yCurrRow + xNext] +   // right
+            trails[yNextRow + xPrev] +   // bottom-left
+            trails[yNextRow + x] +       // bottom
+            trails[yNextRow + xNext];    // bottom-right
+
+          const avg = sum * 0.1111111; // Faster than division by 9
 
           // Apply decay
           let blurred = avg * decayRate;
@@ -259,11 +279,11 @@ export class SimulationEngine {
             blurred -= (blurred - 100) * fadeStrength;
           }
 
-          temp[idx] = Math.max(0, blurred);
+          temp[idx] = blurred; // Math.max(0, x) removed - blurred is never negative
         }
       }
 
-      // Swap buffers
+      // Swap buffers (pointer swap, not array copy)
       this.trails[channel] = temp;
       this.tempTrails[channel] = trails;
     }
