@@ -717,7 +717,8 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         const centerX = gridPixelWidth / 2;
         const centerY = gridPixelHeight / 2;
         const segmentAngle = (2 * Math.PI) / effects.kaleidoscopeSegments;
-        const radius = Math.max(gridPixelWidth, gridPixelHeight); // Large enough to cover corners
+        // Use diagonal distance from center to corner, ensures wedges fill entire canvas including corners
+        const radius = Math.sqrt(centerX * centerX + centerY * centerY) * 1.5;
 
         // Apply kaleidoscope rotation and zoom
         ctx.save();
