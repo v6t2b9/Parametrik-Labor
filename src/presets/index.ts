@@ -13,30 +13,30 @@ export const defaultPerformanceParams = {
   _currentOptLevel: 0,
 };
 
-// Default/Base Parameters - Using "Plasma Dream" for impressive startup!
+// Default/Base Parameters - Using "Cosmic Meditation" for stunning startup!
 export const defaultParameters: AllParameters = {
   // Universal defaults (cross-species baseline)
   universal: {
     physical: {
-      decayRate: 0.93,
-      diffusionFreq: 3,  // Mittlere Diffusion für fluid flow
-      fadeStrength: 0.15,
-      trailSaturation: 220,
+      decayRate: 0.97,
+      diffusionFreq: 3,
+      fadeStrength: 0.10,
+      trailSaturation: 255,
     },
     semiotic: {
-      sensorDist: 22,
-      sensorAngle: 0.7,
-      deposit: 18,
-      turnSpeed: 0.5,
+      sensorDist: 30,
+      sensorAngle: 0.5,
+      deposit: 20,
+      turnSpeed: 0.3,
     },
     temporal: {
-      speed: 1.8,
+      speed: 0.8,
       chaosInterval: 0,
-      chaosStrength: 0.0,
+      chaosStrength: 0,
     },
     resonance: {
-      attractionStrength: 1.1,
-      repulsionStrength: -0.3,
+      attractionStrength: 1.0,
+      repulsionStrength: -0.2,
       crossSpeciesInteraction: true,
       interactionMatrix: {
         redToRed: 0.5,
@@ -62,21 +62,21 @@ export const defaultParameters: AllParameters = {
 
   // Global temporal params
   globalTemporal: {
-    agentCount: 2000,
+    agentCount: 1800,
     simulationSpeed: 1.0,
   },
 
-  // Visual/technical params (global) - Plasma Dream colors!
+  // Visual/technical params (global) - Cosmic Meditation: Deep space mandala
   visualization: {
-    brightness: 3.8,
-    blendMode: 'screen' as const,
-    trailIntensity: 150,
-    colorRed: { r: 255, g: 50, b: 150 },    // Vibrant Pink
-    colorGreen: { r: 50, g: 255, b: 255 },  // Cyan
-    colorBlue: { r: 255, g: 255, b: 50 },   // Yellow
-    colorBg: { r: 5, g: 5, b: 15 },
-    showAgents: true,      // Default: Show agent markers
-    useTriangles: true,    // Default: Show directional triangles
+    brightness: 3.0,
+    blendMode: 'additive' as const,
+    trailIntensity: 180,
+    colorRed: { r: 255, g: 0, b: 200 },      // Magenta
+    colorGreen: { r: 120, g: 100, b: 255 },  // Purple
+    colorBlue: { r: 255, g: 150, b: 255 },   // Pink
+    colorBg: { r: 2, g: 0, b: 8 },
+    showAgents: true,
+    useTriangles: true,
     hueCycling: {
       enabled: false,
       startHue: 0,
@@ -85,16 +85,16 @@ export const defaultParameters: AllParameters = {
     },
   },
   effects: {
-    blur: 0,
-    bloom: 0.4,
-    bloomThreshold: 0.7,
-    bloomRadius: 4,
-    bloomIntensity: 1.0,
-    saturation: 1.0,
-    contrast: 1.0,
+    blur: 2,
+    bloom: 0,
+    bloomThreshold: 0.6,
+    bloomRadius: 6,
+    bloomIntensity: 1.2,
+    saturation: 1.3,
+    contrast: 1.05,
     hueShift: 0,
-    motionBlur: 0.4,
-    vignette: 0,
+    motionBlur: 0.25,
+    vignette: 0.3,
     chromaticAberration: 0,
     waveDistortion: 0,
     scanlines: 0,
@@ -104,7 +104,7 @@ export const defaultParameters: AllParameters = {
     feedbackRotation: 0,
     feedbackOffsetX: 0,
     feedbackOffsetY: 0,
-    kaleidoscopeSegments: 0,
+    kaleidoscopeSegments: 8,
     kaleidoscopeRotation: 0,
     kaleidoscopeZoom: 1.0,
     radialBlurStrength: 0,
