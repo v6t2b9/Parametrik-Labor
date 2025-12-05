@@ -97,13 +97,16 @@ export class SimulationEngine {
     this.initializeAgents(this.params.globalTemporal.agentCount);
   }
 
+  // OPTIMIZED: Main update loop - critical for performance
   public update(): void {
     // Use universal physical params for diffusion (could be species-specific in future)
     const universalPhysical = this.params.universal.physical;
 
-    // Update each agent (species-specific)
-    for (const agent of this.agents) {
-      this.updateAgent(agent);
+    // OPTIMIZATION: Traditional for-loop is faster than for-of for large arrays
+    // V8 optimizes traditional loops better (avoids iterator overhead)
+    const agentCount = this.agents.length;
+    for (let i = 0; i < agentCount; i++) {
+      this.updateAgent(this.agents[i]);
     }
 
     // Diffuse and decay trails
