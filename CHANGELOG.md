@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added 🎨
+
+- **8 Master Presets - Complete Experiences** 🌟
+  - Full-spectrum presets combining ALL parameters (physics, species, temporal, visuals, effects)
+  - Showcase the complete potential of the app with carefully crafted combinations
+  - **🌌 Cosmic Meditation**: Slow, hypnotic 8-way mandala with deep space colors and gentle bloom
+  - **🌈 Liquid Rainbow**: Fluid, colorful chaos with hue cycling and high diffusion
+  - **🌀 Infinite Tunnel**: Recursive feedback zoom with radial blur - warp speed effect
+  - **💎 Crystal Palace**: Crystalline trails with 12-way mandala and mirror symmetry
+  - **⚡ Electric Storm**: Chaotic energy with lightning-fast agents and chromatic aberration
+  - **🌊 Deep Ocean**: Fluid underwater motion with deep blues and gentle movement
+  - **🕉️ Sacred Geometry**: Recursive mandala with feedback rotation and rotating kaleidoscope
+  - **👾 Retro Arcade**: Pixelated retro gaming aesthetics with scanlines and vibrant colors
+  - New preset category in PresetGallery: "🌟 Master Experiences"
+  - Default startup preset changed to "Cosmic Meditation" for impressive first impression
+
+### Fixed 🔧
+
+- **Critical: Circular Dependency in Master Presets** (Commit 3aafcfd)
+  - Fixed white screen on startup caused by circular import
+  - masterPresets.ts was importing defaultPerformanceParams from index.ts
+  - index.ts was exporting masterPresets from masterPresets.ts
+  - Solution: Define defaultPerformanceParams locally in masterPresets.ts
+  - Impact: App now loads correctly with all Master Presets available
+
+- **Kaleidoscope Mandala Geometry** (Commit 7af5273)
+  - Fixed kaleidoscope effect to create proper star-shaped mandalas
+  - Previous implementation rotated entire image, clipping corners
+  - New implementation uses triangular wedge clipping with ctx.arc()
+  - Each segment shows only a pie-slice of original content
+  - Vertical flip (scale 1, -1) for radial mirror symmetry
+  - Result: Clean, symmetrical star patterns without corner artifacts
+
+- **Kaleidoscope Corner Coverage** (Commit 18a6727)
+  - Eliminated black corners in kaleidoscope mandalas
+  - Previous radius used max(width, height), which only covered center circle
+  - New radius uses diagonal distance: sqrt(centerX² + centerY²) × 1.5
+  - Wedges now extend beyond corners, filling entire canvas
+  - Result: Full-screen mandalas with complete corner-to-corner coverage
+
 ### Performance 🚀
 
 **MAJOR PERFORMANCE OVERHAUL** - Complete optimization of rendering pipeline and simulation engine
