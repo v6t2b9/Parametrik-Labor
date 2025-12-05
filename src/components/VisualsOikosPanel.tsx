@@ -110,43 +110,29 @@ export function VisualsOikosPanel() {
           </div>
         </div>
 
-        {/* Lab Mode / Lavalamp Mode Toggle */}
+        {/* Show Agents Checkbox */}
         <div style={styles.labModeSection}>
-          <label style={styles.paramLabel}>Visualization Mode</label>
-          <p style={styles.paramDescription}>
-            Switch between pure lavalamp aesthetics and scientific agent view
-          </p>
-          <div style={styles.toggleGroup}>
-            <button
-              onClick={() => updateVisualizationParams({ showAgents: false })}
-              style={{
-                ...styles.toggleButton,
-                backgroundColor: !visualization.showAgents ? '#7d5dbd' : '#1a1a2d',
-                borderColor: !visualization.showAgents ? '#9d7dd4' : '#2a2b3a',
-              }}
-              title="Pure trail visualization - meditative lavalamp experience"
-            >
-              Lavalamp Mode
-            </button>
-            <button
-              onClick={() => updateVisualizationParams({ showAgents: true })}
-              style={{
-                ...styles.toggleButton,
-                backgroundColor: visualization.showAgents ? '#7d5dbd' : '#1a1a2d',
-                borderColor: visualization.showAgents ? '#9d7dd4' : '#2a2b3a',
-              }}
-              title="Show agent markers - scientific analysis mode"
-            >
-              Lab Mode
-            </button>
+          <div style={styles.toggleContainer}>
+            <label style={styles.toggleLabel}>
+              <input
+                type="checkbox"
+                checked={visualization.showAgents}
+                onChange={(e) => updateVisualizationParams({ showAgents: e.target.checked })}
+                style={styles.checkbox}
+              />
+              <span>Show Agents</span>
+            </label>
           </div>
+          <p style={styles.paramDescription}>
+            Display agent markers on the canvas (dots or triangles showing position and direction)
+          </p>
 
-          {/* Agent Display Type (only visible in Lab Mode) */}
+          {/* Agent Display Type (only visible when agents are shown) */}
           {visualization.showAgents && (
             <div style={{ marginTop: '12px' }}>
-              <label style={styles.paramLabel}>Agent Display</label>
+              <label style={styles.paramLabel}>Agent Display Style</label>
               <p style={styles.paramDescription}>
-                How agents are visualized in Lab Mode
+                How agents are visualized on the canvas
               </p>
               <div style={styles.toggleGroup}>
                 <button

@@ -15,29 +15,33 @@ interface ParameterSliderProps {
 
 // OPTIMIZED: React.memo prevents re-renders when props haven't changed
 // Custom comparison ignores onChange function reference changes (shallow comparison for other props)
-const ParameterSliderComponent = ({
-  label,
-  value,
-  min,
-  max,
-  step,
-  onChange,
-  description,
-  hasOverride = false,
-  disabled = false,
-}: ParameterSliderProps) {
+const ParameterSliderComponent = (props: ParameterSliderProps) => {
+  const {
+    label,
+    value,
+    min,
+    max,
+    step,
+    onChange,
+    description,
+    hasOverride,
+    disabled,
+  } = props;
+
+  const hasOverrideValue = hasOverride ?? false;
+  const disabledValue = disabled ?? false;
   return (
-    <div style={{ ...styles.container, ...(disabled ? styles.containerDisabled : {}) }}>
+    <div style={{ ...styles.container, ...(disabledValue ? styles.containerDisabled : {}) }}>
       <div style={styles.labelRow}>
         <div style={styles.labelGroup}>
-          <label style={{ ...styles.label, ...(disabled ? styles.labelDisabled : {}) }}>{label}</label>
-          {hasOverride && (
+          <label style={{ ...styles.label, ...(disabledValue ? styles.labelDisabled : {}) }}>{label}</label>
+          {hasOverrideValue && (
             <span style={styles.overrideBadge} title="Species-specific override active">
               ●
             </span>
           )}
         </div>
-        <span style={{ ...styles.value, ...(disabled ? styles.valueDisabled : {}) }}>{value.toFixed(3)}</span>
+        <span style={{ ...styles.value, ...(disabledValue ? styles.valueDisabled : {}) }}>{value.toFixed(3)}</span>
       </div>
       <input
         type="range"
@@ -47,9 +51,9 @@ const ParameterSliderComponent = ({
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         style={styles.slider}
-        disabled={disabled}
+        disabled={disabledValue}
       />
-      {description && <p style={{ ...styles.description, ...(disabled ? styles.descriptionDisabled : {}) }}>{description}</p>}
+      {description && <p style={{ ...styles.description, ...(disabledValue ? styles.descriptionDisabled : {}) }}>{description}</p>}
     </div>
   );
 };

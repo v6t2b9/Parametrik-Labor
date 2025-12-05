@@ -524,6 +524,86 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
       }
     }
 
+    // === 2.25. Render agents (optional - Show Agents mode) ===
+    // Rendered BEFORE mirror/kaleidoscope effects so agents get mirrored too!
+    // Controlled via currentVisualization.showAgents and currentVisualization.useTriangles
+    if (currentVisualization.showAgents && currentVisualization.brightness > 0.5) {
+      // Check if we're in ecosystem mode and should render ecosystem-specific agents
+      if (isEcosystemEngine && ecosystemMode) {
+        // Render ecosystem agents with species colors
+        const ecosystemEngine = engine as MusicReactiveEcosystemEngine;
+        const ecosystemAgents = ecosystemEngine.getEcosystemAgents();
+
+        ecosystemAgents.forEach((agent) => {
+          const x = agent.x * scale;
+          const y = agent.y * scale;
+
+          // Get species color
+          const color = SPECIES_COLORS[agent.species];
+          // Energy-based alpha (dim when low energy)
+          const alpha = Math.max(0.3, agent.energy);
+          ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
+
+          if (currentVisualization.useTriangles) {
+            // Draw directional triangle
+            const size = 3;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(agent.angle);
+
+            ctx.beginPath();
+            ctx.moveTo(size, 0);           // tip (front)
+            ctx.lineTo(-size, -size/2);    // back-left
+            ctx.lineTo(-size, size/2);     // back-right
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+          } else {
+            // Draw simple dot
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      } else {
+        // Standard stigmergy agent rendering
+        agents.forEach((agent) => {
+          const x = agent.x * scale;
+          const y = agent.y * scale;
+
+          ctx.fillStyle =
+            agent.type === 'red'
+              ? `rgb(${currentVisualization.colorRed.r}, ${currentVisualization.colorRed.g}, ${currentVisualization.colorRed.b})`
+              : agent.type === 'green'
+              ? `rgb(${currentVisualization.colorGreen.r}, ${currentVisualization.colorGreen.g}, ${currentVisualization.colorGreen.b})`
+              : `rgb(${currentVisualization.colorBlue.r}, ${currentVisualization.colorBlue.g}, ${currentVisualization.colorBlue.b})`;
+
+          if (currentVisualization.useTriangles) {
+            // Draw directional triangle (points in movement direction)
+            const size = 3;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(agent.angle);
+
+            ctx.beginPath();
+            ctx.moveTo(size, 0);           // tip (front)
+            ctx.lineTo(-size, -size/2);    // back-left
+            ctx.lineTo(-size, size/2);     // back-right
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+          } else {
+            // Draw simple dot (no direction info)
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      }
+    }
+
     // === 2.3. Mirror/Symmetry Effect ===
     // Simple mirroring along horizontal, vertical, or both axes
     if (effects.mirrorMode !== 'none') {
@@ -681,85 +761,9 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
     // If needed, consider implementing with CSS transform or WebGL shader
     // Keeping the parameter for backward compatibility but not applying the effect
 
-    // === 8. Render agents (optional - Lab Mode) ===
-    // Rendered BEFORE screen overlays (vignette, scanlines) for correct layering
-    // Controlled via currentVisualization.showAgents and currentVisualization.useTriangles
-    if (currentVisualization.showAgents && currentVisualization.brightness > 0.5) {
-      // Check if we're in ecosystem mode and should render ecosystem-specific agents
-      if (isEcosystemEngine && ecosystemMode) {
-        // Render ecosystem agents with species colors
-        const ecosystemEngine = engine as MusicReactiveEcosystemEngine;
-        const ecosystemAgents = ecosystemEngine.getEcosystemAgents();
-
-        ecosystemAgents.forEach((agent) => {
-          const x = agent.x * scale;
-          const y = agent.y * scale;
-
-          // Get species color
-          const color = SPECIES_COLORS[agent.species];
-          // Energy-based alpha (dim when low energy)
-          const alpha = Math.max(0.3, agent.energy);
-          ctx.fillStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
-
-          if (currentVisualization.useTriangles) {
-            // Draw directional triangle
-            const size = 3;
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(agent.angle);
-
-            ctx.beginPath();
-            ctx.moveTo(size, 0);           // tip (front)
-            ctx.lineTo(-size, -size/2);    // back-left
-            ctx.lineTo(-size, size/2);     // back-right
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.restore();
-          } else {
-            // Draw simple dot
-            ctx.beginPath();
-            ctx.arc(x, y, 2, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        });
-      } else {
-        // Standard stigmergy agent rendering
-        agents.forEach((agent) => {
-          const x = agent.x * scale;
-          const y = agent.y * scale;
-
-          ctx.fillStyle =
-            agent.type === 'red'
-              ? `rgb(${currentVisualization.colorRed.r}, ${currentVisualization.colorRed.g}, ${currentVisualization.colorRed.b})`
-              : agent.type === 'green'
-              ? `rgb(${currentVisualization.colorGreen.r}, ${currentVisualization.colorGreen.g}, ${currentVisualization.colorGreen.b})`
-              : `rgb(${currentVisualization.colorBlue.r}, ${currentVisualization.colorBlue.g}, ${currentVisualization.colorBlue.b})`;
-
-          if (currentVisualization.useTriangles) {
-            // Draw directional triangle (points in movement direction)
-            const size = 3;
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(agent.angle);
-
-            ctx.beginPath();
-            ctx.moveTo(size, 0);           // tip (front)
-            ctx.lineTo(-size, -size/2);    // back-left
-            ctx.lineTo(-size, size/2);     // back-right
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.restore();
-          } else {
-            // Draw simple dot (no direction info)
-            ctx.beginPath();
-            ctx.arc(x, y, 2, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        });
-      }
-    }
+    // === 8. Agents now rendered earlier (before Mirror/Kaleidoscope) ===
+    // See section 2.25 above - agents are rendered before symmetry effects
+    // so they get mirrored/kaleidoscoped along with trails!
 
     // === 8.5. Displacement Map - REMOVED FOR PERFORMANCE ===
     // This effect used getImageData() + nested pixel loop = 10-30ms overhead per frame
