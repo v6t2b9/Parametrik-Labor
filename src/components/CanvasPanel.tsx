@@ -717,6 +717,7 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
         const centerX = gridPixelWidth / 2;
         const centerY = gridPixelHeight / 2;
         const segmentAngle = (2 * Math.PI) / effects.kaleidoscopeSegments;
+        const radius = Math.max(gridPixelWidth, gridPixelHeight); // Large enough to cover corners
 
         // Apply kaleidoscope rotation and zoom
         ctx.save();
@@ -734,17 +735,37 @@ export function CanvasPanel({ isFullscreen = false }: CanvasPanelProps = {}) {
           ctx.rotate(i * segmentAngle);
           ctx.translate(-centerX, -centerY);
 
+          // Create triangular wedge clip path (half segment for mirroring)
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY); // Center point
+          ctx.lineTo(centerX + radius, centerY); // Right edge
+          ctx.arc(centerX, centerY, radius, 0, segmentAngle / 2); // Arc to half-segment
+          ctx.lineTo(centerX, centerY); // Back to center
+          ctx.closePath();
+          ctx.clip();
+
           // Draw original wedge
           ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, gridPixelHeight);
+
+          ctx.restore();
 
           // Mirror the wedge for classic kaleidoscope effect
           ctx.save();
           ctx.translate(centerX, centerY);
-          ctx.scale(-1, 1); // Horizontal flip
+          ctx.rotate(i * segmentAngle);
+          ctx.scale(1, -1); // Vertical flip for radial symmetry
           ctx.translate(-centerX, -centerY);
-          ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, gridPixelHeight);
-          ctx.restore();
 
+          // Create mirrored wedge clip path
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(centerX + radius, centerY);
+          ctx.arc(centerX, centerY, radius, 0, segmentAngle / 2);
+          ctx.lineTo(centerX, centerY);
+          ctx.closePath();
+          ctx.clip();
+
+          ctx.drawImage(tempCanvas, 0, 0, gridPixelWidth, gridPixelHeight);
           ctx.restore();
         }
 
