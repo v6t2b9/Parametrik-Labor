@@ -19,7 +19,7 @@ export const defaultParameters: AllParameters = {
   universal: {
     physical: {
       decayRate: 0.97,
-      diffusionFreq: 3,      // Smooth trails
+      diffusionFreq: 2,      // Clean, crisp trails
       fadeStrength: 0.10,
       trailSaturation: 255,
     },
@@ -68,7 +68,7 @@ export const defaultParameters: AllParameters = {
 
   // Visual/technical params (global) - 12-way mandala with deep space colors
   visualization: {
-    brightness: 2.8,          // Balanced visibility
+    brightness: 2.2,          // Subtle, not overwhelming
     blendMode: 'additive' as const,
     trailIntensity: 210,      // Strong, lasting trails
     colorRed: { r: 255, g: 0, b: 200 },      // Magenta
@@ -88,12 +88,12 @@ export const defaultParameters: AllParameters = {
     blur: 0,
     bloom: 0,
     bloomThreshold: 0.7,
-    bloomRadius: 5,
-    bloomIntensity: 1.2,      // Subtle ethereal glow
+    bloomRadius: 4,
+    bloomIntensity: 1.0,      // Clean, minimal bloom
     saturation: 1.0,
     contrast: 1.0,
     hueShift: 0,
-    motionBlur: 0.2,          // Gentle fluid motion
+    motionBlur: 0,            // Sharp, crisp trails
     vignette: 0,
     chromaticAberration: 0,
     waveDistortion: 0,
