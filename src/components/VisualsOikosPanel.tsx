@@ -279,46 +279,6 @@ export function VisualsOikosPanel() {
           />
         </div>
 
-        {/* Mirror / Symmetry */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Mirror / Symmetry</h5>
-          <div style={{ marginBottom: '12px' }}>
-            <label style={{ fontSize: '12px', color: '#888', display: 'block', marginBottom: '4px' }}>
-              Mirror Mode
-            </label>
-            <select
-              value={effectsParams.mirrorMode}
-              onChange={(e) => updateEffectsParams({ mirrorMode: e.target.value as typeof effectsParams.mirrorMode })}
-              style={{
-                width: '100%',
-                padding: '6px',
-                backgroundColor: '#1a1a1a',
-                color: '#fff',
-                border: '1px solid #333',
-                borderRadius: '4px',
-                fontSize: '12px',
-              }}
-            >
-              <option value="none">None</option>
-              <option value="horizontal">Horizontal (Left ↔ Right)</option>
-              <option value="vertical">Vertical (Top ↔ Bottom)</option>
-              <option value="both">Both Axes (4-way)</option>
-              <option value="quad">Quad (Center 4-way)</option>
-            </select>
-          </div>
-          {effectsParams.mirrorMode !== 'none' && effectsParams.mirrorMode !== 'quad' && (
-            <ParameterSlider
-              label="Mirror Position"
-              value={effectsParams.mirrorPosition}
-              min={0}
-              max={1}
-              step={0.05}
-              onChange={(value) => updateEffectsParams({ mirrorPosition: value })}
-              description="Mirror axis position (0 = edge, 0.5 = center, 1 = opposite edge)"
-            />
-          )}
-        </div>
-
         {/* Feedback / Echo (Recursive Rendering) */}
         <div style={styles.subsection}>
           <h5 style={styles.subsectionTitle}>Feedback / Echo (Recursive Rendering)</h5>

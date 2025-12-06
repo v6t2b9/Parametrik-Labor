@@ -13,13 +13,13 @@ export const defaultPerformanceParams = {
   _currentOptLevel: 0,
 };
 
-// Default/Base Parameters - Using "Cosmic Meditation" for stunning startup!
+// Default/Base Parameters - Hypnotic 12-way mandala with deep relaxation!
 export const defaultParameters: AllParameters = {
   // Universal defaults (cross-species baseline)
   universal: {
     physical: {
       decayRate: 0.97,
-      diffusionFreq: 3,
+      diffusionFreq: 3,      // Smooth trails
       fadeStrength: 0.10,
       trailSaturation: 255,
     },
@@ -30,12 +30,12 @@ export const defaultParameters: AllParameters = {
       turnSpeed: 0.3,
     },
     temporal: {
-      speed: 0.8,
+      speed: 0.3,            // Slow, meditative movement
       chaosInterval: 0,
       chaosStrength: 0,
     },
     resonance: {
-      attractionStrength: 1.0,
+      attractionStrength: -0.4,  // Gentle repulsion creates organic spreading
       repulsionStrength: -0.2,
       crossSpeciesInteraction: true,
       interactionMatrix: {
@@ -62,19 +62,19 @@ export const defaultParameters: AllParameters = {
 
   // Global temporal params
   globalTemporal: {
-    agentCount: 1800,
-    simulationSpeed: 1.0,
+    agentCount: 3600,         // Dense, detailed patterns
+    simulationSpeed: 0.2,     // Very slow, contemplative
   },
 
-  // Visual/technical params (global) - Cosmic Meditation: Deep space mandala
+  // Visual/technical params (global) - 12-way mandala with deep space colors
   visualization: {
-    brightness: 3.0,
+    brightness: 2.8,          // Balanced visibility
     blendMode: 'additive' as const,
-    trailIntensity: 180,
+    trailIntensity: 210,      // Strong, lasting trails
     colorRed: { r: 255, g: 0, b: 200 },      // Magenta
     colorGreen: { r: 120, g: 100, b: 255 },  // Purple
     colorBlue: { r: 255, g: 150, b: 255 },   // Pink
-    colorBg: { r: 2, g: 0, b: 8 },
+    colorBg: { r: 2, g: 0, b: 8 },           // Deep space background
     showAgents: true,
     useTriangles: true,
     hueCycling: {
@@ -85,16 +85,16 @@ export const defaultParameters: AllParameters = {
     },
   },
   effects: {
-    blur: 2,
+    blur: 0,
     bloom: 0,
-    bloomThreshold: 0.6,
-    bloomRadius: 6,
-    bloomIntensity: 1.2,
-    saturation: 1.3,
-    contrast: 1.05,
+    bloomThreshold: 0.7,
+    bloomRadius: 5,
+    bloomIntensity: 1.2,      // Subtle ethereal glow
+    saturation: 1.0,
+    contrast: 1.0,
     hueShift: 0,
-    motionBlur: 0.25,
-    vignette: 0.3,
+    motionBlur: 0.2,          // Gentle fluid motion
+    vignette: 0,
     chromaticAberration: 0,
     waveDistortion: 0,
     scanlines: 0,
@@ -104,7 +104,7 @@ export const defaultParameters: AllParameters = {
     feedbackRotation: 0,
     feedbackOffsetX: 0,
     feedbackOffsetY: 0,
-    kaleidoscopeSegments: 8,
+    kaleidoscopeSegments: 12, // Complex sacred geometry
     kaleidoscopeRotation: 0,
     kaleidoscopeZoom: 1.0,
     radialBlurStrength: 0,
