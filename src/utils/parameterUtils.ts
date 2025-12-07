@@ -34,6 +34,10 @@ export function resolveSpeciesParams(
     resonance: {
       ...params.universal.resonance,
       ...(speciesOverride.resonance || {}),
+      // Deep copy interactionMatrix to prevent shared references
+      interactionMatrix: {
+        ...(speciesOverride.resonance?.interactionMatrix || params.universal.resonance.interactionMatrix),
+      },
     },
     audio: {
       ...params.universal.audio,

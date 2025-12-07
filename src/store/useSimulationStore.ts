@@ -212,6 +212,45 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     setParameters: (params: Partial<AllParameters>) => {
       const currentParams = get().parameters;
+
+      // Helper to deep merge resonance params including interactionMatrix
+      const mergeResonance = (current: any, update: any) => {
+        const merged = { ...current, ...update };
+        // Deep copy interactionMatrix if present
+        if (current.interactionMatrix || update?.interactionMatrix) {
+          merged.interactionMatrix = {
+            ...(current.interactionMatrix || {}),
+            ...(update?.interactionMatrix || {}),
+          };
+        }
+        return merged;
+      };
+
+      // Helper to deep merge visualization params including nested color objects
+      const mergeVisualization = (current: any, update: any) => {
+        const merged = { ...current, ...update };
+        // Deep copy color objects if present
+        if (update?.colorRed) merged.colorRed = { ...update.colorRed };
+        if (update?.colorGreen) merged.colorGreen = { ...update.colorGreen };
+        if (update?.colorBlue) merged.colorBlue = { ...update.colorBlue };
+        if (update?.colorBg) merged.colorBg = { ...update.colorBg };
+        if (update?.hueCycling) merged.hueCycling = { ...update.hueCycling };
+        return merged;
+      };
+
+      // Helper to deep merge model params including m2 and m3
+      const mergeModelParams = (current: any, update: any) => {
+        const merged = { ...current, ...update };
+        // Deep copy m2 and m3 if present
+        if (current.m2 || update?.m2) {
+          merged.m2 = { ...(current.m2 || {}), ...(update?.m2 || {}) };
+        }
+        if (current.m3 || update?.m3) {
+          merged.m3 = { ...(current.m3 || {}), ...(update?.m3 || {}) };
+        }
+        return merged;
+      };
+
       const newParams: AllParameters = {
         ...currentParams,
         ...params,
@@ -219,7 +258,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
           physical: { ...currentParams.universal.physical, ...(params.universal?.physical || {}) },
           semiotic: { ...currentParams.universal.semiotic, ...(params.universal?.semiotic || {}) },
           temporal: { ...currentParams.universal.temporal, ...(params.universal?.temporal || {}) },
-          resonance: { ...currentParams.universal.resonance, ...(params.universal?.resonance || {}) },
+          resonance: mergeResonance(currentParams.universal.resonance, params.universal?.resonance),
           audio: { ...currentParams.universal.audio, ...(params.universal?.audio || {}) },
         },
         species: {
@@ -227,29 +266,29 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
             physical: { ...currentParams.species.red.physical, ...(params.species?.red?.physical || {}) },
             semiotic: { ...currentParams.species.red.semiotic, ...(params.species?.red?.semiotic || {}) },
             temporal: { ...currentParams.species.red.temporal, ...(params.species?.red?.temporal || {}) },
-            resonance: { ...currentParams.species.red.resonance, ...(params.species?.red?.resonance || {}) },
+            resonance: mergeResonance(currentParams.species.red.resonance, params.species?.red?.resonance),
             audio: { ...currentParams.species.red.audio, ...(params.species?.red?.audio || {}) },
           },
           green: {
             physical: { ...currentParams.species.green.physical, ...(params.species?.green?.physical || {}) },
             semiotic: { ...currentParams.species.green.semiotic, ...(params.species?.green?.semiotic || {}) },
             temporal: { ...currentParams.species.green.temporal, ...(params.species?.green?.temporal || {}) },
-            resonance: { ...currentParams.species.green.resonance, ...(params.species?.green?.resonance || {}) },
+            resonance: mergeResonance(currentParams.species.green.resonance, params.species?.green?.resonance),
             audio: { ...currentParams.species.green.audio, ...(params.species?.green?.audio || {}) },
           },
           blue: {
             physical: { ...currentParams.species.blue.physical, ...(params.species?.blue?.physical || {}) },
             semiotic: { ...currentParams.species.blue.semiotic, ...(params.species?.blue?.semiotic || {}) },
             temporal: { ...currentParams.species.blue.temporal, ...(params.species?.blue?.temporal || {}) },
-            resonance: { ...currentParams.species.blue.resonance, ...(params.species?.blue?.resonance || {}) },
+            resonance: mergeResonance(currentParams.species.blue.resonance, params.species?.blue?.resonance),
             audio: { ...currentParams.species.blue.audio, ...(params.species?.blue?.audio || {}) },
           },
         },
         globalTemporal: { ...currentParams.globalTemporal, ...(params.globalTemporal || {}) },
-        visualization: { ...currentParams.visualization, ...(params.visualization || {}) },
+        visualization: mergeVisualization(currentParams.visualization, params.visualization),
         effects: { ...currentParams.effects, ...(params.effects || {}) },
         performance: { ...currentParams.performance, ...(params.performance || {}) },
-        modelParams: { ...currentParams.modelParams, ...(params.modelParams || {}) },
+        modelParams: mergeModelParams(currentParams.modelParams, params.modelParams),
         ecosystemMode: params.ecosystemMode !== undefined ? params.ecosystemMode : currentParams.ecosystemMode,
         ecosystem: params.ecosystem ? { ...currentParams.ecosystem, ...params.ecosystem } : currentParams.ecosystem,
       };
