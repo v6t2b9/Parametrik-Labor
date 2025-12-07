@@ -226,6 +226,31 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         return merged;
       };
 
+      // Helper to deep merge visualization params including nested color objects
+      const mergeVisualization = (current: any, update: any) => {
+        const merged = { ...current, ...update };
+        // Deep copy color objects if present
+        if (update?.colorRed) merged.colorRed = { ...update.colorRed };
+        if (update?.colorGreen) merged.colorGreen = { ...update.colorGreen };
+        if (update?.colorBlue) merged.colorBlue = { ...update.colorBlue };
+        if (update?.colorBg) merged.colorBg = { ...update.colorBg };
+        if (update?.hueCycling) merged.hueCycling = { ...update.hueCycling };
+        return merged;
+      };
+
+      // Helper to deep merge model params including m2 and m3
+      const mergeModelParams = (current: any, update: any) => {
+        const merged = { ...current, ...update };
+        // Deep copy m2 and m3 if present
+        if (current.m2 || update?.m2) {
+          merged.m2 = { ...(current.m2 || {}), ...(update?.m2 || {}) };
+        }
+        if (current.m3 || update?.m3) {
+          merged.m3 = { ...(current.m3 || {}), ...(update?.m3 || {}) };
+        }
+        return merged;
+      };
+
       const newParams: AllParameters = {
         ...currentParams,
         ...params,
@@ -260,10 +285,10 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
           },
         },
         globalTemporal: { ...currentParams.globalTemporal, ...(params.globalTemporal || {}) },
-        visualization: { ...currentParams.visualization, ...(params.visualization || {}) },
+        visualization: mergeVisualization(currentParams.visualization, params.visualization),
         effects: { ...currentParams.effects, ...(params.effects || {}) },
         performance: { ...currentParams.performance, ...(params.performance || {}) },
-        modelParams: { ...currentParams.modelParams, ...(params.modelParams || {}) },
+        modelParams: mergeModelParams(currentParams.modelParams, params.modelParams),
         ecosystemMode: params.ecosystemMode !== undefined ? params.ecosystemMode : currentParams.ecosystemMode,
         ecosystem: params.ecosystem ? { ...currentParams.ecosystem, ...params.ecosystem } : currentParams.ecosystem,
       };
