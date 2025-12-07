@@ -142,6 +142,44 @@ export const defaultParameters: AllParameters = {
 };
 
 /**
+ * Legacy Preset Format (Pre-v2.0)
+ *
+ * Old presets used a flatter structure without the universal/species/globalTemporal split.
+ * This interface documents the expected structure for validation.
+ */
+interface LegacyPreset {
+  physical: import('../types/index.js').PhysicalOikosParams;
+  semiotic: import('../types/index.js').SemioticOikosParams;
+  temporal: import('../types/index.js').TemporalOikosParams;
+  resonance?: Partial<import('../types/index.js').ResonanceOikosParams>;
+  visualization: Partial<import('../types/index.js').VisualizationParams>;
+  effects: Partial<import('../types/index.js').EffectsParams>;
+  performance: import('../types/index.js').PerformanceParams;
+  modelParams?: import('../types/index.js').ModelParams;
+  ecosystemMode?: boolean;
+  ecosystem?: import('../types/ecosystem.js').EcologyConfig;
+}
+
+/**
+ * Validates if an object matches the legacy preset structure
+ */
+function isValidLegacyPreset(obj: unknown): obj is LegacyPreset {
+  if (!obj || typeof obj !== 'object') return false;
+
+  const legacy = obj as Record<string, unknown>;
+
+  // Check required fields
+  return (
+    typeof legacy.physical === 'object' && legacy.physical !== null &&
+    typeof legacy.semiotic === 'object' && legacy.semiotic !== null &&
+    typeof legacy.temporal === 'object' && legacy.temporal !== null &&
+    typeof legacy.visualization === 'object' && legacy.visualization !== null &&
+    typeof legacy.effects === 'object' && legacy.effects !== null &&
+    typeof legacy.performance === 'object' && legacy.performance !== null
+  );
+}
+
+/**
  * LEGACY COMPATIBILITY
  *
  * This function converts old preset format to the new AllParameters structure.
@@ -154,11 +192,21 @@ export const defaultParameters: AllParameters = {
  * - Update all presets to use AllParameters directly
  * - Add migration guide for custom presets
  *
- * @param legacy - Old preset format (any type for compatibility)
+ * @param legacy - Old preset format
  * @returns AllParameters - New standardized preset format
+ * @throws Error if legacy preset structure is invalid
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function convertLegacyPreset(legacy: any): AllParameters {
+export function convertLegacyPreset(legacy: unknown): AllParameters {
+  if (!isValidLegacyPreset(legacy)) {
+    throw new Error(
+      'Invalid legacy preset structure. Missing required fields: physical, semiotic, temporal, visualization, effects, or performance.'
+    );
+  }
+  // Use defaults as base and merge legacy values on top
+  const defaultResonance = defaultParameters.universal.resonance;
+  const defaultVisualization = defaultParameters.visualization;
+  const defaultEffects = defaultParameters.effects;
+
   return {
     universal: {
       physical: legacy.physical,
@@ -169,18 +217,10 @@ export function convertLegacyPreset(legacy: any): AllParameters {
         chaosStrength: legacy.temporal.chaosStrength,
       },
       resonance: {
-        ...legacy.resonance,
-        interactionMatrix: legacy.resonance?.interactionMatrix || {
-          redToRed: 0.5,
-          redToGreen: 0.0,
-          redToBlue: 0.0,
-          greenToRed: 0.0,
-          greenToGreen: 0.5,
-          greenToBlue: 0.0,
-          blueToRed: 0.0,
-          blueToGreen: 0.0,
-          blueToBlue: 0.5,
-        },
+        attractionStrength: legacy.resonance?.attractionStrength ?? defaultResonance.attractionStrength,
+        repulsionStrength: legacy.resonance?.repulsionStrength ?? defaultResonance.repulsionStrength,
+        crossSpeciesInteraction: legacy.resonance?.crossSpeciesInteraction ?? defaultResonance.crossSpeciesInteraction,
+        interactionMatrix: legacy.resonance?.interactionMatrix || defaultResonance.interactionMatrix,
       },
       audio: DEFAULT_PRESET,
     },
@@ -194,22 +234,52 @@ export function convertLegacyPreset(legacy: any): AllParameters {
       simulationSpeed: legacy.temporal.simulationSpeed,
     },
     visualization: {
-      ...legacy.visualization,
-      blendMode: legacy.visualization.blendMode || 'additive',
-      trailIntensity: legacy.visualization.trailIntensity || 180,
-      showAgents: legacy.visualization.showAgents ?? true,   // Default: Show agents
-      useTriangles: legacy.visualization.useTriangles ?? true,  // Default: Directional triangles
-      hueCycling: legacy.visualization.hueCycling || {
-        enabled: false,
-        startHue: 0,
-        endHue: 360,
-        speed: 1.0,
-      },
+      brightness: legacy.visualization.brightness ?? defaultVisualization.brightness,
+      blendMode: legacy.visualization.blendMode || defaultVisualization.blendMode,
+      trailIntensity: legacy.visualization.trailIntensity ?? defaultVisualization.trailIntensity,
+      colorRed: legacy.visualization.colorRed || defaultVisualization.colorRed,
+      colorGreen: legacy.visualization.colorGreen || defaultVisualization.colorGreen,
+      colorBlue: legacy.visualization.colorBlue || defaultVisualization.colorBlue,
+      colorBg: legacy.visualization.colorBg || defaultVisualization.colorBg,
+      showAgents: legacy.visualization.showAgents ?? defaultVisualization.showAgents,
+      useTriangles: legacy.visualization.useTriangles ?? defaultVisualization.useTriangles,
+      hueCycling: legacy.visualization.hueCycling || defaultVisualization.hueCycling,
     },
     effects: {
-      ...legacy.effects,
-      scanlines: legacy.effects.scanlines || 0,
-      pixelation: legacy.effects.pixelation || 1,
+      blur: legacy.effects.blur ?? defaultEffects.blur,
+      bloom: legacy.effects.bloom ?? defaultEffects.bloom,
+      bloomThreshold: legacy.effects.bloomThreshold ?? defaultEffects.bloomThreshold,
+      bloomRadius: legacy.effects.bloomRadius ?? defaultEffects.bloomRadius,
+      bloomIntensity: legacy.effects.bloomIntensity ?? defaultEffects.bloomIntensity,
+      saturation: legacy.effects.saturation ?? defaultEffects.saturation,
+      contrast: legacy.effects.contrast ?? defaultEffects.contrast,
+      hueShift: legacy.effects.hueShift ?? defaultEffects.hueShift,
+      motionBlur: legacy.effects.motionBlur ?? defaultEffects.motionBlur,
+      vignette: legacy.effects.vignette ?? defaultEffects.vignette,
+      chromaticAberration: legacy.effects.chromaticAberration ?? defaultEffects.chromaticAberration,
+      waveDistortion: legacy.effects.waveDistortion ?? defaultEffects.waveDistortion,
+      scanlines: legacy.effects.scanlines ?? defaultEffects.scanlines,
+      pixelation: legacy.effects.pixelation ?? defaultEffects.pixelation,
+      feedbackAmount: legacy.effects.feedbackAmount ?? defaultEffects.feedbackAmount,
+      feedbackZoom: legacy.effects.feedbackZoom ?? defaultEffects.feedbackZoom,
+      feedbackRotation: legacy.effects.feedbackRotation ?? defaultEffects.feedbackRotation,
+      feedbackOffsetX: legacy.effects.feedbackOffsetX ?? defaultEffects.feedbackOffsetX,
+      feedbackOffsetY: legacy.effects.feedbackOffsetY ?? defaultEffects.feedbackOffsetY,
+      kaleidoscopeSegments: legacy.effects.kaleidoscopeSegments ?? defaultEffects.kaleidoscopeSegments,
+      kaleidoscopeRotation: legacy.effects.kaleidoscopeRotation ?? defaultEffects.kaleidoscopeRotation,
+      kaleidoscopeZoom: legacy.effects.kaleidoscopeZoom ?? defaultEffects.kaleidoscopeZoom,
+      radialBlurStrength: legacy.effects.radialBlurStrength ?? defaultEffects.radialBlurStrength,
+      radialBlurCenterX: legacy.effects.radialBlurCenterX ?? defaultEffects.radialBlurCenterX,
+      radialBlurCenterY: legacy.effects.radialBlurCenterY ?? defaultEffects.radialBlurCenterY,
+      radialBlurQuality: legacy.effects.radialBlurQuality ?? defaultEffects.radialBlurQuality,
+      displacementStrength: legacy.effects.displacementStrength ?? defaultEffects.displacementStrength,
+      displacementScale: legacy.effects.displacementScale ?? defaultEffects.displacementScale,
+      displacementTime: legacy.effects.displacementTime ?? defaultEffects.displacementTime,
+      displacementAngle: legacy.effects.displacementAngle ?? defaultEffects.displacementAngle,
+      colorLUT: legacy.effects.colorLUT || defaultEffects.colorLUT,
+      colorLUTIntensity: legacy.effects.colorLUTIntensity ?? defaultEffects.colorLUTIntensity,
+      mirrorMode: legacy.effects.mirrorMode || defaultEffects.mirrorMode,
+      mirrorPosition: legacy.effects.mirrorPosition ?? defaultEffects.mirrorPosition,
     },
     performance: legacy.performance,
     modelParams: legacy.modelParams || defaultParameters.modelParams,
