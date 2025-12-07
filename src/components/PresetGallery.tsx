@@ -1,6 +1,6 @@
 import { useSimulationStore } from '../store/useSimulationStore';
 import { builtInPresets, masterPresets } from '../presets';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import { colors, spacing, typography, effects, createHeaderStyle } from '../design-system';
 
 // Preset category type
@@ -35,7 +35,7 @@ const presetCategories: Record<string, PresetCategory> = {
   },
 };
 
-export function PresetGallery() {
+export const PresetGallery = memo(function PresetGallery() {
   const loadPreset = useSimulationStore((state) => state.loadPreset);
   const exportCurrentPreset = useSimulationStore((state) => state.exportCurrentPreset);
   const importPresetFromFile = useSimulationStore((state) => state.importPresetFromFile);
@@ -43,13 +43,13 @@ export function PresetGallery() {
   const [importStatus, setImportStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleExport = () => {
+  const handleExport = useCallback(() => {
     exportCurrentPreset(presetName);
     setImportStatus({ type: 'success', message: `Exported "${presetName}"` });
     setTimeout(() => setImportStatus(null), 2000);
-  };
+  }, [exportCurrentPreset, presetName]);
 
-  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImport = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       console.log('[PresetGallery] No file selected');
@@ -72,7 +72,7 @@ export function PresetGallery() {
     }
 
     setTimeout(() => setImportStatus(null), 3000);
-  };
+  }, [importPresetFromFile]);
 
   return (
     <div style={styles.container}>
@@ -150,7 +150,7 @@ export function PresetGallery() {
       })}
     </div>
   );
-}
+});
 
 const styles = {
   container: {

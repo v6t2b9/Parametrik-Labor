@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { ColorPicker } from './ColorPicker';
 import { visualPresets, effectsPresets } from '../presets/tabPresets';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
-export function VisualsOikosPanel() {
+export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
   const visualization = useSimulationStore((state) => state.parameters.visualization);
   const effectsParams = useSimulationStore((state) => state.parameters.effects);
   const updateVisualizationParams = useSimulationStore((state) => state.updateVisualizationParams);
@@ -689,7 +690,7 @@ export function VisualsOikosPanel() {
       </div>
     </div>
   );
-}
+});
 
 const styles = {
   panel: {

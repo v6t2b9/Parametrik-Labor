@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { PhysicalOikosPanel } from './PhysicalOikosPanel';
 import { SemioticOikosPanel } from './SemioticOikosPanel';
@@ -41,7 +41,7 @@ const OIKOS_TABS: OikosTabDef[] = [
   { id: 'performance', label: 'Performance', icon: '⚡' },
 ];
 
-export function MatrixControlCenter() {
+export const MatrixControlCenter = memo(function MatrixControlCenter() {
   const ui = useSimulationStore((state) => state.ui);
   const setActiveSpeciesScope = useSimulationStore((state) => state.setActiveSpeciesScope);
   const setActiveOikosTab = useSimulationStore((state) => state.setActiveOikosTab);
@@ -56,13 +56,20 @@ export function MatrixControlCenter() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const activeSpeciesTab = SPECIES_TABS.find(t => t.id === ui.activeSpeciesScope) || SPECIES_TABS[0];
+  const activeSpeciesTab = useMemo(
+    () => SPECIES_TABS.find(t => t.id === ui.activeSpeciesScope) || SPECIES_TABS[0],
+    [ui.activeSpeciesScope]
+  );
+
   const activeOikosTabId = ui.activeOikosTab === 'presets' ? 'presets' : ui.activeOikosTab;
 
   // For species-specific tabs, filter out presets and global tabs
-  const availableOikosTabs = ui.activeSpeciesScope === 'universal'
-    ? OIKOS_TABS
-    : OIKOS_TABS.filter(t => !['presets', 'visuals', 'performance'].includes(t.id));
+  const availableOikosTabs = useMemo(
+    () => ui.activeSpeciesScope === 'universal'
+      ? OIKOS_TABS
+      : OIKOS_TABS.filter(t => !['presets', 'visuals', 'performance'].includes(t.id)),
+    [ui.activeSpeciesScope]
+  );
 
   return (
     <div style={styles.container}>
@@ -144,7 +151,7 @@ export function MatrixControlCenter() {
       </div>
     </div>
   );
-}
+});
 
 const styles = {
   container: {

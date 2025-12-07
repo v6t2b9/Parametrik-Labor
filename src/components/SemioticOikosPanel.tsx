@@ -1,25 +1,29 @@
+import { useMemo, useCallback, memo } from 'react';
 import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { speciesPresets } from '../presets/tabPresets';
 import type { AgentType } from '../types';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
-export function SemioticOikosPanel() {
+export const SemioticOikosPanel = memo(function SemioticOikosPanel() {
   const parameters = useSimulationStore((state) => state.parameters);
   const updateSemioticParams = useSimulationStore((state) => state.updateSemioticParams);
   const ui = useSimulationStore((state) => state.ui);
 
   // Get current values based on active scope
-  const currentValues = ui.activeSpeciesScope === 'universal'
-    ? parameters.universal.semiotic
-    : resolveSpeciesParams(parameters, ui.activeSpeciesScope as AgentType).semiotic;
+  const currentValues = useMemo(
+    () => ui.activeSpeciesScope === 'universal'
+      ? parameters.universal.semiotic
+      : resolveSpeciesParams(parameters, ui.activeSpeciesScope as AgentType).semiotic,
+    [ui.activeSpeciesScope, parameters]
+  );
 
   // Check if current param has species override
-  const hasOverride = (param: keyof typeof currentValues) => {
+  const hasOverride = useCallback((param: keyof typeof currentValues) => {
     if (ui.activeSpeciesScope === 'universal') return false;
     const speciesOverride = parameters.species[ui.activeSpeciesScope as AgentType].semiotic;
     return speciesOverride !== undefined && param in speciesOverride;
-  };
+  }, [ui.activeSpeciesScope, parameters.species]);
 
   return (
     <div style={styles.panel}>
@@ -91,7 +95,7 @@ export function SemioticOikosPanel() {
       />
     </div>
   );
-}
+});
 
 const styles = {
   panel: {
