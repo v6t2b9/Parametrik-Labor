@@ -3,7 +3,7 @@
  * This component updates the MusicReactiveEngine with audio data every frame
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { useAudioStore } from '../store/useAudioStore';
 import { logger } from '../utils/logger';
@@ -36,20 +36,25 @@ export function AudioSimulationBridge() {
     }
   }, [engine, musicEnabled]);
 
+  // Track previous values to prevent unnecessary toggles
+  const prevSyncState = useRef<{ isPlaying: boolean; running: boolean } | null>(null);
+
   // Sync audio playback with simulation when music is enabled
   useEffect(() => {
     if (!musicEnabled || inputMode !== 'file') {
+      prevSyncState.current = null;
       return; // Only sync when music is enabled and using file input
     }
 
-    // Sync simulation to audio: if audio is playing, simulation should run
-    if (isPlaying && !running) {
-      toggleRunning();
-    } else if (!isPlaying && running) {
-      toggleRunning();
+    // Only toggle if state actually changed to prevent loops
+    const shouldRun = isPlaying;
+    if (prevSyncState.current === null || prevSyncState.current.running !== shouldRun) {
+      if (shouldRun !== running) {
+        toggleRunning();
+      }
+      prevSyncState.current = { isPlaying, running: shouldRun };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, musicEnabled, inputMode]); // Intentionally don't include running/toggleRunning to avoid infinite loops
+  }, [isPlaying, musicEnabled, inputMode, running, toggleRunning]);
 
   // Update audio analysis every animation frame
   useEffect(() => {

@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { AgentType } from '../types';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
-export function ResonanceOikosPanel() {
+export const ResonanceOikosPanel = memo(function ResonanceOikosPanel() {
   const parameters = useSimulationStore((state) => state.parameters);
   const updateResonanceParams = useSimulationStore((state) => state.updateResonanceParams);
   const ui = useSimulationStore((state) => state.ui);
@@ -255,7 +256,7 @@ export function ResonanceOikosPanel() {
       )}
     </div>
   );
-}
+});
 
 const styles = {
   panel: {

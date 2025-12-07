@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { physicsPresets } from '../presets/tabPresets';
 import type { AgentType } from '../types';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
-export function PhysicalOikosPanel() {
+export const PhysicalOikosPanel = memo(function PhysicalOikosPanel() {
   const parameters = useSimulationStore((state) => state.parameters);
   const updatePhysicalParams = useSimulationStore((state) => state.updatePhysicalParams);
   const ui = useSimulationStore((state) => state.ui);
@@ -91,7 +92,7 @@ export function PhysicalOikosPanel() {
       />
     </div>
   );
-}
+});
 
 const styles = {
   panel: {

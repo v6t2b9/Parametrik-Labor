@@ -1,10 +1,11 @@
+import { memo } from 'react';
 import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { speciesPresets } from '../presets/tabPresets';
 import type { AgentType } from '../types';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
-export function SemioticOikosPanel() {
+export const SemioticOikosPanel = memo(function SemioticOikosPanel() {
   const parameters = useSimulationStore((state) => state.parameters);
   const updateSemioticParams = useSimulationStore((state) => state.updateSemioticParams);
   const ui = useSimulationStore((state) => state.ui);
@@ -91,7 +92,7 @@ export function SemioticOikosPanel() {
       />
     </div>
   );
-}
+});
 
 const styles = {
   panel: {
