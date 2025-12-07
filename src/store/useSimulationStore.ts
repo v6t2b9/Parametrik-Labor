@@ -451,46 +451,51 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     // Context-aware updates (based on activeSpeciesScope)
     updatePhysicalParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalPhysicalParams(params);
       } else {
-        get().updateSpeciesPhysicalParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesPhysicalParams(scope, params);
       }
     },
 
     updateSemioticParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalSemioticParams(params);
       } else {
-        get().updateSpeciesSemioticParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesSemioticParams(scope, params);
       }
     },
 
     updateTemporalParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalTemporalParams(params);
       } else {
-        get().updateSpeciesTemporalParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesTemporalParams(scope, params);
       }
     },
 
     updateResonanceParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalResonanceParams(params);
       } else {
-        get().updateSpeciesResonanceParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesResonanceParams(scope, params);
       }
     },
 
     updateAudioParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalAudioParams(params);
       } else {
-        get().updateSpeciesAudioParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesAudioParams(scope, params);
       }
     },
 

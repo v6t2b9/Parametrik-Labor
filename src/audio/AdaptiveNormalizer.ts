@@ -79,7 +79,11 @@ export class AdaptiveNormalizer {
     this.initializeFeature(featureName);
 
     // Add to history
-    const history = this.history.get(featureName)!;
+    const history = this.history.get(featureName);
+    if (!history) {
+      throw new Error(`Feature ${featureName} not initialized`);
+    }
+
     history.push(rawValue);
 
     // Keep only windowSize recent values
@@ -108,7 +112,11 @@ export class AdaptiveNormalizer {
     const observedMax = sorted[maxIndex];
 
     // Smooth update (exponential moving average)
-    const currentRange = this.adaptiveRanges.get(featureName)!;
+    const currentRange = this.adaptiveRanges.get(featureName);
+    if (!currentRange) {
+      throw new Error(`Feature ${featureName} not initialized`);
+    }
+
     const alpha = this.smoothingFactor;
 
     currentRange.min = alpha * observedMin + (1 - alpha) * currentRange.min;
@@ -147,7 +155,10 @@ export class AdaptiveNormalizer {
     // Update history and ranges
     this.update(featureName, rawValue);
 
-    const range = this.adaptiveRanges.get(featureName)!;
+    const range = this.adaptiveRanges.get(featureName);
+    if (!range) {
+      throw new Error(`Feature ${featureName} not initialized`);
+    }
 
     // Adaptive normalization
     let normalized = (rawValue - range.min) / (range.max - range.min);
@@ -175,7 +186,10 @@ export class AdaptiveNormalizer {
     // Update history and ranges
     this.update(featureName, rawValue);
 
-    const range = this.adaptiveRanges.get(featureName)!;
+    const range = this.adaptiveRanges.get(featureName);
+    if (!range) {
+      throw new Error(`Feature ${featureName} not initialized`);
+    }
 
     // Adaptive normalization
     let normalized = (rawValue - range.min) / (range.max - range.min);

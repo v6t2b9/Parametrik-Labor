@@ -110,19 +110,20 @@ export class AudioAnalyzer {
     }
 
     // Create audio element for playback control
-    this.audioElement = new Audio();
-    this.audioElement.src = URL.createObjectURL(file);
-    this.audioElement.loop = false;
+    const audioElement = new Audio();
+    audioElement.src = URL.createObjectURL(file);
+    audioElement.loop = false;
+    this.audioElement = audioElement;
 
     // Wait for metadata to load
     await new Promise<void>((resolve, reject) => {
-      this.audioElement!.onloadedmetadata = () => resolve();
-      this.audioElement!.onerror = () =>
+      audioElement.onloadedmetadata = () => resolve();
+      audioElement.onerror = () =>
         reject(new Error('Failed to load audio file'));
     });
 
     // Connect audio element to analyzer
-    this.source = this.audioContext.createMediaElementSource(this.audioElement);
+    this.source = this.audioContext.createMediaElementSource(audioElement);
     this.source.connect(this.analyser);
     this.analyser.connect(this.audioContext.destination);
 

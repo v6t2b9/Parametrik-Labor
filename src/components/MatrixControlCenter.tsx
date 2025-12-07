@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { PhysicalOikosPanel } from './PhysicalOikosPanel';
 import { SemioticOikosPanel } from './SemioticOikosPanel';
@@ -48,13 +48,13 @@ export function MatrixControlCenter() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
 
   // Listen to window resize
-  useState(() => {
+  useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  });
+  }, []);
 
   const activeSpeciesTab = SPECIES_TABS.find(t => t.id === ui.activeSpeciesScope) || SPECIES_TABS[0];
   const activeOikosTabId = ui.activeOikosTab === 'presets' ? 'presets' : ui.activeOikosTab;
