@@ -12,6 +12,7 @@ import type {
   BehaviorModulation,
 } from '../types/musicMappings';
 import { applyCurve, clamp } from '../audio/utils';
+import { logger } from '../utils/logger.js';
 
 // Import from unified AudioOikosModulator
 import {
@@ -95,7 +96,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
     // Debug logging (first 100 frames only)
     if (this.musicEnabled && Math.random() < 0.01) {
-      console.log('[Music Reactive] Analysis:', {
+      logger.log('[Music Reactive] Analysis:', {
         beat: analysis.rhythm.beat,
         beatStrength: analysis.rhythm.beatStrength,
         bassEnergy: analysis.spectral.bassEnergy,
@@ -114,7 +115,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
         analysis.rhythm.beatStrength,
         analysis.timestamp * 1000 // Convert to ms
       );
-      console.log('[Music Reactive] BEAT DETECTED! Strength:', analysis.rhythm.beatStrength);
+      logger.log('[Music Reactive] BEAT DETECTED! Strength:', analysis.rhythm.beatStrength);
     }
 
     if (this.useBeatPulse) {
@@ -201,7 +202,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
 
       // Debug log modulation values occasionally
       if (!debugLogged && Math.random() < 0.001) {
-        console.log('[Music Reactive] Modulation:', {
+        logger.log('[Music Reactive] Modulation:', {
           speedMult: modulation.moveSpeedMultiplier,
           depositMult: modulation.depositRateMultiplier,
           turnRandomness: modulation.turnRandomnessMultiplier,
@@ -556,7 +557,7 @@ export class MusicReactiveEngine extends QuantumStigmergyEngine {
       }
 
       // Log beat events for debugging
-      console.log('[Music Reactive] BEAT! Impulse:', impulseStrength, 'Energy:', energyLevel);
+      logger.log('[Music Reactive] BEAT! Impulse:', impulseStrength, 'Energy:', energyLevel);
     }
 
     // BASS ENERGY: Direct velocity push (continuous while bass is present)

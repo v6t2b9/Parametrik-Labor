@@ -2,6 +2,7 @@ import { useSimulationStore } from '../store/useSimulationStore';
 import { builtInPresets, masterPresets } from '../presets';
 import { useState, useRef } from 'react';
 import { colors, spacing, typography, effects, createHeaderStyle } from '../design-system';
+import { logger } from '../utils/logger';
 
 // Preset category type
 interface PresetCategory {
@@ -52,13 +53,13 @@ export function PresetGallery() {
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
-      console.log('[PresetGallery] No file selected');
+      logger.log('[PresetGallery] No file selected');
       return;
     }
 
-    console.log('[PresetGallery] Starting import of file:', file.name);
+    logger.log('[PresetGallery] Starting import of file:', file.name);
     const result = await importPresetFromFile(file);
-    console.log('[PresetGallery] Import result:', result);
+    logger.log('[PresetGallery] Import result:', result);
 
     if (result.success) {
       setImportStatus({ type: 'success', message: 'Preset successfully loaded!' });

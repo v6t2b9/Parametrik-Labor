@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import { colors, spacing, typography, effects } from '../design-system';
+import { logger } from '../utils/logger';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+// Extend Navigator interface for iOS Safari's non-standard 'standalone' property
+interface NavigatorWithStandalone extends Navigator {
+  standalone?: boolean;
 }
 
 export function InstallPrompt() {
@@ -13,7 +19,7 @@ export function InstallPrompt() {
   useEffect(() => {
     // Check if already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-      || (window.navigator as any).standalone
+      || (window.navigator as NavigatorWithStandalone).standalone
       || document.referrer.includes('android-app://');
 
     if (isStandalone) {
@@ -42,7 +48,7 @@ export function InstallPrompt() {
 
     // Listen for successful installation
     window.addEventListener('appinstalled', () => {
-      console.log('PWA installed successfully');
+      logger.log('PWA installed successfully');
       setShowPrompt(false);
       setDeferredPrompt(null);
     });
@@ -61,7 +67,7 @@ export function InstallPrompt() {
     // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
 
-    console.log(`User response to install prompt: ${outcome}`);
+    logger.log(`User response to install prompt: ${outcome}`);
 
     // Clear the deferred prompt
     setDeferredPrompt(null);
@@ -69,7 +75,7 @@ export function InstallPrompt() {
 
     // Track analytics if needed
     if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
+      logger.log('User accepted the install prompt');
     }
   };
 

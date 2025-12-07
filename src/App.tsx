@@ -7,6 +7,7 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { useSimulationStore } from './store/useSimulationStore';
 import { useAudioStore } from './store/useAudioStore';
 import { colors, spacing, typography, effects } from './design-system';
+import { logger } from './utils/logger';
 
 function App() {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -37,7 +38,7 @@ function App() {
       }
       setIsFullscreen(true);
     } catch {
-      console.warn('Fullscreen API not available, using fallback');
+      logger.warn('Fullscreen API not available, using fallback');
       // Fallback: Just set fullscreen state for CSS-based fullscreen
       setIsFullscreen(true);
     }
@@ -55,7 +56,7 @@ function App() {
         await document.msExitFullscreen?.();
       }
     } catch (error) {
-      console.warn('Error exiting fullscreen:', error);
+      logger.warn('Error exiting fullscreen:', error);
     }
     setIsFullscreen(false);
   };

@@ -1,6 +1,22 @@
-import type { Preset, AllParameters } from '../types/index.js';
+import type { Preset, AllParameters, PhysicalOikosParams, SemioticOikosParams, ResonanceOikosParams, VisualizationParams, EffectsParams } from '../types/index.js';
 import { DEFAULT_PRESET } from '../audio/presets';
 import { DEFAULT_ECOLOGY_CONFIG } from '../engine/SpeciesConfigs';
+
+// Legacy preset format (pre-v2.0.0) for backward compatibility
+interface LegacyPresetFormat {
+  physical: PhysicalOikosParams;
+  semiotic: SemioticOikosParams;
+  temporal: {
+    speed: number;
+    chaosInterval: number;
+    chaosStrength: number;
+    agentCount: number;
+    simulationSpeed: number;
+  };
+  resonance?: Partial<ResonanceOikosParams>;
+  visualization: Partial<VisualizationParams>;
+  effects: Partial<EffectsParams>;
+}
 
 // Re-export Master Presets for easy access
 export { masterPresets, type MasterPreset } from './masterPresets.js';
@@ -154,11 +170,10 @@ export const defaultParameters: AllParameters = {
  * - Update all presets to use AllParameters directly
  * - Add migration guide for custom presets
  *
- * @param legacy - Old preset format (any type for compatibility)
+ * @param legacy - Old preset format (pre-v2.0.0)
  * @returns AllParameters - New standardized preset format
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function convertLegacyPreset(legacy: any): AllParameters {
+export function convertLegacyPreset(legacy: LegacyPresetFormat): AllParameters {
   return {
     universal: {
       physical: legacy.physical,

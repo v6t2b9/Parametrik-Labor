@@ -325,13 +325,13 @@ export interface Preset {
 
   /**
    * LEGACY COMPATIBILITY
-   * Accepts both AllParameters (new format) and any (old format).
+   * Accepts both AllParameters (new format) and unknown (old format).
    * Old format is converted using convertLegacyPreset() at runtime.
    *
    * @deprecated Use AllParameters directly for new presets
+   * TODO: Remove in v2.0.0 - All presets should use AllParameters
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  parameters: AllParameters | any;
+  parameters: AllParameters | unknown;
 }
 
 // Simulation State

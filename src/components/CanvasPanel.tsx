@@ -6,6 +6,7 @@ import { EcosystemRenderer } from '../engine/EcosystemRenderer';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
 import { SPECIES_COLORS } from '../types/ecosystem';
 import { calculateGridDimensions } from '../engine/SimulationEngine';
+import { logger } from '../utils/logger';
 
 const DEFAULT_CANVAS_SIZE = 800;
 
@@ -70,7 +71,7 @@ class CanvasPool {
       this.pool = this.pool.filter(c => !removed.includes(c));
 
       if (toRemove > 0) {
-        console.log(`[CanvasPool] Cleaned up ${removed.length} old canvases (pool size: ${this.pool.length})`);
+        logger.log(`[CanvasPool] Cleaned up ${removed.length} old canvases (pool size: ${this.pool.length})`);
       }
     }
   }

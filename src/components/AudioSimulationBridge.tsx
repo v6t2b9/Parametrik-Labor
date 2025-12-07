@@ -6,6 +6,7 @@
 import { useEffect } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { useAudioStore } from '../store/useAudioStore';
+import { logger } from '../utils/logger';
 
 export function AudioSimulationBridge() {
   const engine = useSimulationStore((state) => state.engine);
@@ -65,7 +66,7 @@ export function AudioSimulationBridge() {
 
       // Debug: Log every 60 frames (once per second at 60fps)
       if (frameCount % 60 === 0) {
-        console.log('[AudioSimulationBridge] Running - musicEnabled:', musicEnabled, 'currentAnalysis:', !!currentAnalysis);
+        logger.log('[AudioSimulationBridge] Running - musicEnabled:', musicEnabled, 'currentAnalysis:', !!currentAnalysis);
       }
 
       // Sync current analysis to engine
@@ -74,7 +75,7 @@ export function AudioSimulationBridge() {
 
         // Debug first few frames
         if (frameCount < 5) {
-          console.log('[AudioSimulationBridge] Frame', frameCount, '- Sending analysis to engine:', {
+          logger.log('[AudioSimulationBridge] Frame', frameCount, '- Sending analysis to engine:', {
             beat: currentAnalysis.rhythm.beat,
             bassEnergy: currentAnalysis.spectral.bassEnergy,
             loudness: currentAnalysis.dynamics.loudness,
@@ -82,7 +83,7 @@ export function AudioSimulationBridge() {
         }
       } else {
         if (frameCount < 5) {
-          console.warn('[AudioSimulationBridge] No analysis or engine!', { engine: !!engine, analysis: !!currentAnalysis });
+          logger.warn('[AudioSimulationBridge] No analysis or engine!', { engine: !!engine, analysis: !!currentAnalysis });
         }
       }
 

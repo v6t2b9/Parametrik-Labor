@@ -5,6 +5,7 @@
  */
 
 import type { Trails, VisualizationParams } from '../types/index.js';
+import { logger } from '../utils/logger.js';
 
 export class WebGLTrailRenderer {
   private gl: WebGLRenderingContext | null = null;
@@ -56,7 +57,7 @@ export class WebGLTrailRenderer {
     });
 
     if (!gl) {
-      console.error('WebGL not supported');
+      logger.error('WebGL not supported');
       return;
     }
 
@@ -65,7 +66,7 @@ export class WebGLTrailRenderer {
     // Enable float texture extension (important for high-quality trail rendering)
     const floatExt = gl.getExtension('OES_texture_float');
     if (!floatExt) {
-      console.warn('OES_texture_float not supported - visual quality may be reduced');
+      logger.warn('OES_texture_float not supported - visual quality may be reduced');
     }
     // Enable linear filtering for float textures
     gl.getExtension('OES_texture_float_linear');
@@ -75,13 +76,13 @@ export class WebGLTrailRenderer {
     const fragmentShader = this.createShader(gl.FRAGMENT_SHADER, fragmentShaderSource);
 
     if (!vertexShader || !fragmentShader) {
-      console.error('Failed to create shaders');
+      logger.error('Failed to create shaders');
       return;
     }
 
     this.program = this.createProgram(vertexShader, fragmentShader);
     if (!this.program) {
-      console.error('Failed to create program');
+      logger.error('Failed to create program');
       return;
     }
 
@@ -134,7 +135,7 @@ export class WebGLTrailRenderer {
     gl.compileShader(shader);
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      console.error('Shader compilation error:', gl.getShaderInfoLog(shader));
+      logger.error('Shader compilation error:', gl.getShaderInfoLog(shader));
       gl.deleteShader(shader);
       return null;
     }
@@ -154,7 +155,7 @@ export class WebGLTrailRenderer {
     gl.linkProgram(program);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.error('Program linking error:', gl.getProgramInfoLog(program));
+      logger.error('Program linking error:', gl.getProgramInfoLog(program));
       gl.deleteProgram(program);
       return null;
     }

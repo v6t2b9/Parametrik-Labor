@@ -4,6 +4,7 @@ import { useAudioStore } from '../store/useAudioStore';
 import GIF from 'gif.js.optimized';
 import type { AspectRatio } from '../types';
 import { colors, spacing, typography, effects } from '../design-system';
+import { logger } from '../utils/logger';
 
 interface ControlBarProps {
   onFullscreenToggle?: () => void;
@@ -123,7 +124,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             mimeType = 'video/mp4';
           } else {
             // Fallback to WebM if MP4 not supported
-            console.warn('MP4 not supported, falling back to WebM');
+            logger.warn('MP4 not supported, falling back to WebM');
             options = {
               mimeType: 'video/webm;codecs=vp9',
               videoBitsPerSecond: qualityParams.bitrate,
@@ -200,7 +201,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
               }
             } catch (error) {
               // User cancelled share or error occurred, fall through to download
-              console.log('Share cancelled or failed, falling back to download:', error);
+              logger.log('Share cancelled or failed, falling back to download:', error);
             }
           }
 
@@ -251,13 +252,13 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           }
         }, duration);
       } catch (error) {
-        console.error('Video recording error:', error);
+        logger.error('Video recording error:', error);
         alert(`${videoFormat.toUpperCase()} recording failed. Try a different format.`);
         setIsRecording(false);
       }
     } else {
       // GIF recording with gif.js
-      console.log('Starting GIF video recording...');
+      logger.log('Starting GIF video recording...');
       try {
         const qualityParams = getQualityParams() as { quality: number; dithering: false | 'FloydSteinberg' };
         const gif = new GIF({
@@ -273,11 +274,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
         gif.on('progress', (progress: number) => {
           setProcessingProgress(Math.round(progress * 100));
-          console.log('GIF video encoding progress:', (progress * 100).toFixed(1) + '%');
+          logger.log('GIF video encoding progress:', (progress * 100).toFixed(1) + '%');
         });
 
         gif.on('finished', (blob: Blob) => {
-          console.log('GIF video rendering finished, blob size:', blob.size);
+          logger.log('GIF video rendering finished, blob size:', blob.size);
           if (!blob || blob.size === 0) {
             alert('GIF rendering failed: Empty file. Please try again.');
             setIsRecording(false);
@@ -310,7 +311,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         let capturedFrameCount = 0;
         recordingIntervalRef.current = window.setInterval(() => {
           if (capturedFrameCount >= maxFrames) {
-            console.log('All video frames captured, starting render...');
+            logger.log('All video frames captured, starting render...');
             // Auto-stop and start rendering
             if (recordingIntervalRef.current) {
               clearInterval(recordingIntervalRef.current);
@@ -328,11 +329,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           setRecordedFrameCount(capturedFrameCount);
 
           if (capturedFrameCount % videoFPS === 0) {
-            console.log(`Captured ${capturedFrameCount}/${maxFrames} video frames`);
+            logger.log(`Captured ${capturedFrameCount}/${maxFrames} video frames`);
           }
         }, frameDelay);
       } catch (error) {
-        console.error('GIF recording error:', error);
+        logger.error('GIF recording error:', error);
         alert('GIF recording failed. Please try again.');
         setIsRecording(false);
       }

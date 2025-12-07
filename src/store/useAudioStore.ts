@@ -11,6 +11,7 @@ import type {
   AudioInputMode,
 } from '../types/musicMappings';
 import { DEFAULT_PRESET, getPreset, AUDIO_MAPPING_PRESETS } from '../audio/presets';
+import { logger } from '../utils/logger';
 
 interface VideoExportOptions {
   duration?: number;
@@ -135,9 +136,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         isPlaying: false,
       });
 
-      console.log(`[Audio Oikos] Loaded file: ${file.name}`);
+      logger.log(`[Audio Oikos] Loaded file: ${file.name}`);
     } catch (error) {
-      console.error('[Audio Oikos] Failed to load audio file:', error);
+      logger.error('[Audio Oikos] Failed to load audio file:', error);
       throw error;
     }
   },
@@ -161,9 +162,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
         audioFileName: 'Microphone Input',
       });
 
-      console.log('[Audio Oikos] Microphone started');
+      logger.log('[Audio Oikos] Microphone started');
     } catch (error) {
-      console.error('[Audio Oikos] Failed to start microphone:', error);
+      logger.error('[Audio Oikos] Failed to start microphone:', error);
       throw error;
     }
   },
@@ -304,7 +305,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       currentPresetKey: presetKey,
     });
 
-    console.log(`[Audio Oikos] Loaded preset: ${AUDIO_MAPPING_PRESETS[presetKey].name}`);
+    logger.log(`[Audio Oikos] Loaded preset: ${AUDIO_MAPPING_PRESETS[presetKey].name}`);
   },
 
   // Reset mappings to default
@@ -327,7 +328,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
   // Export video (placeholder for now)
   exportVideo: async (_options: VideoExportOptions) => {
-    console.log('[Audio Oikos] Video export not yet implemented');
+    logger.log('[Audio Oikos] Video export not yet implemented');
     set({ isExporting: true, exportProgress: 0 });
 
     // Simulate progress

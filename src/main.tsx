@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary.tsx'
 import { registerSW } from 'virtual:pwa-register'
+import { logger } from './utils/logger'
 
 // Register service worker
 const updateSW = registerSW({
@@ -13,7 +14,7 @@ const updateSW = registerSW({
     }
   },
   onOfflineReady() {
-    console.log('App ready to work offline')
+    logger.log('App ready to work offline')
   },
 })
 
