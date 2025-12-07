@@ -324,14 +324,9 @@ export interface Preset {
   description: string;
 
   /**
-   * LEGACY COMPATIBILITY
-   * Accepts both AllParameters (new format) and unknown (old format).
-   * Old format is converted using convertLegacyPreset() at runtime.
-   *
-   * @deprecated Use AllParameters directly for new presets
-   * TODO: Remove in v2.0.0 - All presets should use AllParameters
+   * Preset parameters in AllParameters format (required as of v2.0.0)
    */
-  parameters: AllParameters | unknown;
+  parameters: AllParameters;
 }
 
 // Simulation State
