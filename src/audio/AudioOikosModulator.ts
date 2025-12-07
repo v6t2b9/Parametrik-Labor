@@ -53,7 +53,7 @@ export class AdaptiveNormalizer {
    * Reset history (e.g., when switching songs)
    */
   reset(): void {
-    this.history = [];
+    this.history.clear();
   }
 }
 

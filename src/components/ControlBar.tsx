@@ -114,11 +114,12 @@ export const ControlBar = memo(function ControlBar({ onFullscreenToggle }: Contr
           ];
 
           const supportedCodec = mp4Codecs.find(codec => MediaRecorder.isTypeSupported(codec));
+          const bitrate = 'bitrate' in qualityParams ? qualityParams.bitrate : 8000000;
 
           if (supportedCodec) {
             options = {
               mimeType: supportedCodec,
-              videoBitsPerSecond: qualityParams.bitrate,
+              videoBitsPerSecond: bitrate,
             };
             fileExtension = 'mp4';
             mimeType = 'video/mp4';
@@ -127,16 +128,17 @@ export const ControlBar = memo(function ControlBar({ onFullscreenToggle }: Contr
             debug.warn('Video', 'MP4 not supported, falling back to WebM');
             options = {
               mimeType: 'video/webm;codecs=vp9',
-              videoBitsPerSecond: qualityParams.bitrate,
+              videoBitsPerSecond: bitrate,
             };
             fileExtension = 'webm';
             mimeType = 'video/webm';
           }
         } else {
           // WebM with VP9
+          const bitrate = 'bitrate' in qualityParams ? qualityParams.bitrate : 8000000;
           options = {
             mimeType: 'video/webm;codecs=vp9',
-            videoBitsPerSecond: qualityParams.bitrate,
+            videoBitsPerSecond: bitrate,
           };
 
           // Fallback to vp8 if vp9 not supported

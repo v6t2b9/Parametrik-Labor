@@ -10,6 +10,7 @@ import type {
   PheromonePhases,
   AllParameters,
   AgentType,
+  ResolvedSpeciesParams,
 } from '../types/index.js';
 
 import {

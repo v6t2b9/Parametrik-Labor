@@ -41,6 +41,11 @@ export class MultiScaleModulator {
   private mesoHistory: CircularBuffer<number>;
   private macroHistory: CircularBuffer<number>;
 
+  // Buffer sizes (needed for setConfig and getReadiness)
+  private microSize: number;
+  private mesoSize: number;
+  private macroSize: number;
+
   constructor(config: MultiScaleConfig = {}) {
     this.microWindow = config.microWindow ?? 0.1;   // 100ms
     this.mesoWindow = config.mesoWindow ?? 0.5;     // 500ms
@@ -48,13 +53,13 @@ export class MultiScaleModulator {
     this.fps = config.fps ?? 60;
 
     // Calculate buffer sizes and initialize circular buffers
-    const microSize = Math.floor(this.microWindow * this.fps);  // ~6 frames
-    const mesoSize = Math.floor(this.mesoWindow * this.fps);    // ~30 frames
-    const macroSize = Math.floor(this.macroWindow * this.fps);  // ~240 frames
+    this.microSize = Math.floor(this.microWindow * this.fps);  // ~6 frames
+    this.mesoSize = Math.floor(this.mesoWindow * this.fps);    // ~30 frames
+    this.macroSize = Math.floor(this.macroWindow * this.fps);  // ~240 frames
 
-    this.microHistory = new CircularBuffer<number>(microSize);
-    this.mesoHistory = new CircularBuffer<number>(mesoSize);
-    this.macroHistory = new CircularBuffer<number>(macroSize);
+    this.microHistory = new CircularBuffer<number>(this.microSize);
+    this.mesoHistory = new CircularBuffer<number>(this.mesoSize);
+    this.macroHistory = new CircularBuffer<number>(this.macroSize);
   }
 
   /**
@@ -161,17 +166,22 @@ export class MultiScaleModulator {
    * Configure time windows
    */
   setConfig(config: Partial<MultiScaleConfig>): void {
+    let needsResize = false;
+
     if (config.microWindow !== undefined) {
       this.microWindow = config.microWindow;
       this.microSize = Math.floor(this.microWindow * this.fps);
+      needsResize = true;
     }
     if (config.mesoWindow !== undefined) {
       this.mesoWindow = config.mesoWindow;
       this.mesoSize = Math.floor(this.mesoWindow * this.fps);
+      needsResize = true;
     }
     if (config.macroWindow !== undefined) {
       this.macroWindow = config.macroWindow;
       this.macroSize = Math.floor(this.macroWindow * this.fps);
+      needsResize = true;
     }
     if (config.fps !== undefined) {
       this.fps = config.fps;
@@ -179,6 +189,14 @@ export class MultiScaleModulator {
       this.microSize = Math.floor(this.microWindow * this.fps);
       this.mesoSize = Math.floor(this.mesoWindow * this.fps);
       this.macroSize = Math.floor(this.macroWindow * this.fps);
+      needsResize = true;
+    }
+
+    // Recreate circular buffers with new sizes
+    if (needsResize) {
+      this.microHistory = new CircularBuffer<number>(this.microSize);
+      this.mesoHistory = new CircularBuffer<number>(this.mesoSize);
+      this.macroHistory = new CircularBuffer<number>(this.macroSize);
     }
   }
 
@@ -246,9 +264,9 @@ export class MultiScaleModulator {
    * Get readiness percentage (0-100)
    */
   getReadiness(): number {
-    const microReady = Math.min(1, this.microHistory.length / Math.min(10, this.microSize));
-    const mesoReady = Math.min(1, this.mesoHistory.length / Math.min(10, this.mesoSize));
-    const macroReady = Math.min(1, this.macroHistory.length / Math.min(10, this.macroSize));
+    const microReady = Math.min(1, this.microHistory.getSize() / Math.min(10, this.microSize));
+    const mesoReady = Math.min(1, this.mesoHistory.getSize() / Math.min(10, this.mesoSize));
+    const macroReady = Math.min(1, this.macroHistory.getSize() / Math.min(10, this.macroSize));
 
     return ((microReady + mesoReady + macroReady) / 3) * 100;
   }

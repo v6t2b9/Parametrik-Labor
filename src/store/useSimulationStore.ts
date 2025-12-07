@@ -7,7 +7,6 @@ import type {
   PerformanceMetrics,
   QualityPreset,
   AgentType,
-  ResolvedSpeciesParams,
   SpeciesScope,
   OikosTab,
   PhysicalOikosParams,
