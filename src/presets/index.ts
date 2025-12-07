@@ -142,6 +142,44 @@ export const defaultParameters: AllParameters = {
 };
 
 /**
+ * Legacy Preset Format (Pre-v2.0)
+ *
+ * Old presets used a flatter structure without the universal/species/globalTemporal split.
+ * This interface documents the expected structure for validation.
+ */
+interface LegacyPreset {
+  physical: import('../types/index.js').PhysicalOikosParams;
+  semiotic: import('../types/index.js').SemioticOikosParams;
+  temporal: import('../types/index.js').TemporalOikosParams;
+  resonance?: Partial<import('../types/index.js').ResonanceOikosParams>;
+  visualization: Partial<import('../types/index.js').VisualizationParams>;
+  effects: Partial<import('../types/index.js').EffectsParams>;
+  performance: import('../types/index.js').PerformanceParams;
+  modelParams?: import('../types/index.js').ModelParams;
+  ecosystemMode?: boolean;
+  ecosystem?: import('../types/ecosystem.js').EcologyConfig;
+}
+
+/**
+ * Validates if an object matches the legacy preset structure
+ */
+function isValidLegacyPreset(obj: unknown): obj is LegacyPreset {
+  if (!obj || typeof obj !== 'object') return false;
+
+  const legacy = obj as Record<string, unknown>;
+
+  // Check required fields
+  return (
+    typeof legacy.physical === 'object' && legacy.physical !== null &&
+    typeof legacy.semiotic === 'object' && legacy.semiotic !== null &&
+    typeof legacy.temporal === 'object' && legacy.temporal !== null &&
+    typeof legacy.visualization === 'object' && legacy.visualization !== null &&
+    typeof legacy.effects === 'object' && legacy.effects !== null &&
+    typeof legacy.performance === 'object' && legacy.performance !== null
+  );
+}
+
+/**
  * LEGACY COMPATIBILITY
  *
  * This function converts old preset format to the new AllParameters structure.
@@ -154,11 +192,16 @@ export const defaultParameters: AllParameters = {
  * - Update all presets to use AllParameters directly
  * - Add migration guide for custom presets
  *
- * @param legacy - Old preset format (any type for compatibility)
+ * @param legacy - Old preset format
  * @returns AllParameters - New standardized preset format
+ * @throws Error if legacy preset structure is invalid
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function convertLegacyPreset(legacy: any): AllParameters {
+export function convertLegacyPreset(legacy: unknown): AllParameters {
+  if (!isValidLegacyPreset(legacy)) {
+    throw new Error(
+      'Invalid legacy preset structure. Missing required fields: physical, semiotic, temporal, visualization, effects, or performance.'
+    );
+  }
   return {
     universal: {
       physical: legacy.physical,

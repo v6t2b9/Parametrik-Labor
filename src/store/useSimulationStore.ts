@@ -23,6 +23,7 @@ import { MusicReactiveEngine } from '../engine/MusicReactiveEngine';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
 import { calculateGridDimensions } from '../engine/SimulationEngine';
 import { exportPresetAsJSON, importPresetFromJSON } from '../utils/presetIO';
+import { debug } from '../utils/debug';
 
 // Helper: Merge universal + species overrides
 export function resolveSpeciesParams(
@@ -293,7 +294,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         // Help GC by clearing old engine reference
         // (Engines don't have explicit cleanup, but clearing refs helps)
         if (oldEngine) {
-          console.log('[Store] Ecosystem mode changed, replacing engine');
+          debug.log('Store', 'Ecosystem mode changed, replacing engine');
         }
 
         set({
@@ -583,7 +584,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         motionBlur: settings.motionBlur,
       });
 
-      console.log(`[Quality Preset] Applied "${preset}" preset:`, settings);
+      debug.log('Quality Preset', `Applied "${preset}" preset:`, settings);
     },
 
     performAutoOptimization: () => {
@@ -605,16 +606,16 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       // FPS too low - increase optimization (reduce quality)
       if (fpsRatio < 0.5 && newOptLevel < 10) {
         newOptLevel = Math.min(10, _currentOptLevel + 3);
-        console.log(`[Auto-Optimizer] FPS critical (${avgFPS.toFixed(1)}/${targetFPS}), jumping opt level: ${_currentOptLevel} → ${newOptLevel}`);
+        debug.log('Auto-Optimizer', `FPS critical (${avgFPS.toFixed(1)}/${targetFPS}), jumping opt level: ${_currentOptLevel} → ${newOptLevel}`);
       } else if (fpsRatio < 0.7 && newOptLevel < 10) {
         newOptLevel = Math.min(10, _currentOptLevel + 2);
-        console.log(`[Auto-Optimizer] FPS very low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
+        debug.log('Auto-Optimizer', `FPS very low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
       } else if (fpsRatio < 0.9 && newOptLevel < 10) {
         newOptLevel = Math.min(10, _currentOptLevel + 1);
-        console.log(`[Auto-Optimizer] FPS low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
+        debug.log('Auto-Optimizer', `FPS low (${avgFPS.toFixed(1)}/${targetFPS}), increasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
       } else if (fpsRatio > 1.2 && newOptLevel > 0) {
         newOptLevel = Math.max(0, _currentOptLevel - 1);
-        console.log(`[Auto-Optimizer] FPS good (${avgFPS.toFixed(1)}/${targetFPS}), decreasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
+        debug.log('Auto-Optimizer', `FPS good (${avgFPS.toFixed(1)}/${targetFPS}), decreasing opt level: ${_currentOptLevel} → ${newOptLevel}`);
       }
 
       // Apply optimization if level changed
@@ -692,7 +693,7 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
       // Help GC by logging engine replacement
       if (oldEngine) {
-        console.log(`[Store] Aspect ratio changed to ${ratio}, replacing engine (grid: ${width}x${height})`);
+        debug.log('Store', `Aspect ratio changed to ${ratio}, replacing engine (grid: ${width}x${height})`);
       }
 
       set((state) => ({
@@ -724,25 +725,25 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     },
 
     importPresetFromFile: async (file: File) => {
-      console.log('[Store] importPresetFromFile called with:', file.name);
+      debug.log('Store', 'importPresetFromFile called with:', file.name);
       const { preset, error } = await importPresetFromJSON(file);
 
-      console.log('[Store] Import result:', { hasPreset: !!preset, hasError: !!error });
+      debug.log('Store', 'Import result:', { hasPreset: !!preset, hasError: !!error });
 
       if (error) {
-        console.error('[Store] Import failed with error:', error);
+        debug.error('Store', 'Import failed with error:', error);
         return { success: false, error };
       }
 
       if (preset && preset.parameters) {
-        console.log('[Store] Loading preset parameters...');
+        debug.log('Store', 'Loading preset parameters...');
         const { loadPreset } = get();
         loadPreset(preset.parameters);
-        console.log('[Store] Preset loaded successfully');
+        debug.log('Store', 'Preset loaded successfully');
         return { success: true };
       }
 
-      console.error('[Store] Invalid preset format: preset or parameters missing');
+      debug.error('Store', 'Invalid preset format: preset or parameters missing');
       return { success: false, error: 'Ungültiges Preset-Format' };
     },
   };

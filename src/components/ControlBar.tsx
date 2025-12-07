@@ -4,6 +4,8 @@ import { useAudioStore } from '../store/useAudioStore';
 import GIF from 'gif.js.optimized';
 import type { AspectRatio } from '../types';
 import { colors, spacing, typography, effects } from '../design-system';
+import { debug } from '../utils/debug';
+import { VIDEO_QUALITY, SIMULATION } from '../utils/constants';
 
 interface ControlBarProps {
   onFullscreenToggle?: () => void;
@@ -53,17 +55,17 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'ios-video') {
       // WebM/MP4 bitrate settings (same for both)
       const bitrateMap = {
-        'standard': 8000000,   // 8 Mbps
-        'high': 12000000,      // 12 Mbps
-        'very-high': 18000000  // 18 Mbps
+        'standard': VIDEO_QUALITY.BITRATE.STANDARD,
+        'high': VIDEO_QUALITY.BITRATE.HIGH,
+        'very-high': VIDEO_QUALITY.BITRATE.VERY_HIGH,
       };
       return { bitrate: bitrateMap[videoQuality] };
     } else {
       // GIF quality settings
       const gifQualityMap = {
-        'standard': { quality: 10, dithering: false as const },
-        'high': { quality: 5, dithering: false as const },
-        'very-high': { quality: 2, dithering: 'FloydSteinberg' as const }
+        'standard': { quality: VIDEO_QUALITY.GIF_QUALITY.STANDARD, dithering: false as const },
+        'high': { quality: VIDEO_QUALITY.GIF_QUALITY.HIGH, dithering: false as const },
+        'very-high': { quality: VIDEO_QUALITY.GIF_QUALITY.VERY_HIGH, dithering: 'FloydSteinberg' as const }
       };
       return gifQualityMap[videoQuality];
     }
@@ -123,7 +125,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             mimeType = 'video/mp4';
           } else {
             // Fallback to WebM if MP4 not supported
-            console.warn('MP4 not supported, falling back to WebM');
+            debug.warn('Video', 'MP4 not supported, falling back to WebM');
             options = {
               mimeType: 'video/webm;codecs=vp9',
               videoBitsPerSecond: qualityParams.bitrate,
@@ -151,7 +153,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         if (videoFormat === 'ios-video') {
           canvas.toBlob((blob) => {
             keyframeBlob = blob;
-          }, 'image/jpeg', 0.95);
+          }, 'image/jpeg', VIDEO_QUALITY.KEYFRAME_QUALITY);
         }
 
         const mediaRecorder = new MediaRecorder(stream, options);
@@ -200,7 +202,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
               }
             } catch (error) {
               // User cancelled share or error occurred, fall through to download
-              console.log('Share cancelled or failed, falling back to download:', error);
+              debug.log('Video', 'Share cancelled or failed, falling back to download:', error);
             }
           }
 
@@ -225,21 +227,48 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
               document.body.appendChild(imgLink);
               imgLink.click();
 
+              // Cleanup with error handling to prevent memory leaks
               setTimeout(() => {
-                document.body.removeChild(imgLink);
-                URL.revokeObjectURL(imgUrl);
-              }, 100);
-            }, 200);
+                try {
+                  if (imgLink.parentNode) {
+                    document.body.removeChild(imgLink);
+                  }
+                  URL.revokeObjectURL(imgUrl);
+                } catch (error) {
+                  debug.error('Video', 'Failed to cleanup keyframe download:', error);
+                  // Still try to revoke URL even if DOM removal failed
+                  try {
+                    URL.revokeObjectURL(imgUrl);
+                  } catch (revokeError) {
+                    debug.error('Video', 'Failed to revoke keyframe URL:', revokeError);
+                  }
+                }
+              }, SIMULATION.CLEANUP_DELAY_MS);
+            }, SIMULATION.IOS_KEYFRAME_DELAY_MS);
           }
 
           // Delay cleanup to ensure download starts
           setTimeout(() => {
-            document.body.removeChild(videoLink);
-            URL.revokeObjectURL(videoUrl);
-            recordedChunksRef.current = [];
-            setIsRecording(false);
-            setIsProcessing(false);
-          }, 100);
+            try {
+              if (videoLink.parentNode) {
+                document.body.removeChild(videoLink);
+              }
+              URL.revokeObjectURL(videoUrl);
+            } catch (error) {
+              debug.error('Video', 'Failed to cleanup video download:', error);
+              // Still try to revoke URL even if DOM removal failed
+              try {
+                URL.revokeObjectURL(videoUrl);
+              } catch (revokeError) {
+                debug.error('Video', 'Failed to revoke video URL:', revokeError);
+              }
+            } finally {
+              // Always cleanup state, even if DOM operations failed
+              recordedChunksRef.current = [];
+              setIsRecording(false);
+              setIsProcessing(false);
+            }
+          }, SIMULATION.CLEANUP_DELAY_MS);
         };
 
         mediaRecorder.start();
@@ -251,13 +280,13 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           }
         }, duration);
       } catch (error) {
-        console.error('Video recording error:', error);
+        debug.error('Video', 'Video recording error:', error);
         alert(`${videoFormat.toUpperCase()} recording failed. Try a different format.`);
         setIsRecording(false);
       }
     } else {
       // GIF recording with gif.js
-      console.log('Starting GIF video recording...');
+      debug.log('Video', 'Starting GIF video recording...');
       try {
         const qualityParams = getQualityParams() as { quality: number; dithering: false | 'FloydSteinberg' };
         const gif = new GIF({
@@ -273,11 +302,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
 
         gif.on('progress', (progress: number) => {
           setProcessingProgress(Math.round(progress * 100));
-          console.log('GIF video encoding progress:', (progress * 100).toFixed(1) + '%');
+          debug.log('Video', 'GIF encoding progress:', (progress * 100).toFixed(1) + '%');
         });
 
         gif.on('finished', (blob: Blob) => {
-          console.log('GIF video rendering finished, blob size:', blob.size);
+          debug.log('Video', 'GIF rendering finished, blob size:', blob.size);
           if (!blob || blob.size === 0) {
             alert('GIF rendering failed: Empty file. Please try again.');
             setIsRecording(false);
@@ -310,7 +339,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
         let capturedFrameCount = 0;
         recordingIntervalRef.current = window.setInterval(() => {
           if (capturedFrameCount >= maxFrames) {
-            console.log('All video frames captured, starting render...');
+            debug.log('Video', 'All video frames captured, starting render...');
             // Auto-stop and start rendering
             if (recordingIntervalRef.current) {
               clearInterval(recordingIntervalRef.current);
@@ -328,11 +357,11 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           setRecordedFrameCount(capturedFrameCount);
 
           if (capturedFrameCount % videoFPS === 0) {
-            console.log(`Captured ${capturedFrameCount}/${maxFrames} video frames`);
+            debug.log('Video', `Captured ${capturedFrameCount}/${maxFrames} video frames`);
           }
         }, frameDelay);
       } catch (error) {
-        console.error('GIF recording error:', error);
+        debug.error('Video', 'GIF recording error:', error);
         alert('GIF recording failed. Please try again.');
         setIsRecording(false);
       }

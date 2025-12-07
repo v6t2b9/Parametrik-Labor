@@ -1,4 +1,38 @@
 import type { AllParameters, Preset } from '../types/index.js';
+import { debug } from './debug';
+import { SIMULATION } from './constants';
+
+/**
+ * Downloads a blob as a file with proper cleanup
+ * Handles all DOM operations and memory cleanup automatically
+ */
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+
+  // Cleanup with error handling to prevent memory leaks
+  setTimeout(() => {
+    try {
+      if (link.parentNode) {
+        document.body.removeChild(link);
+      }
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      debug.error('Download', 'Failed to cleanup download:', error);
+      // Still try to revoke URL even if DOM removal failed
+      try {
+        URL.revokeObjectURL(url);
+      } catch (revokeError) {
+        debug.error('Download', 'Failed to revoke URL:', revokeError);
+      }
+    }
+  }, SIMULATION.CLEANUP_DELAY_MS);
+}
 
 /**
  * Exportiert Parameter als JSON-Datei zum Download
@@ -16,15 +50,9 @@ export function exportPresetAsJSON(
 
   const jsonString = JSON.stringify(preset, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+  const filename = `${presetName.replace(/\s+/g, '-').toLowerCase()}.json`;
 
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${presetName.replace(/\s+/g, '-').toLowerCase()}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, filename);
 }
 
 /**
@@ -34,23 +62,23 @@ export function importPresetFromJSON(
   file: File
 ): Promise<{ preset: Preset; error?: string }> {
   return new Promise((resolve) => {
-    console.log('[PresetImport] Starting import of file:', file.name);
+    debug.log('PresetImport', 'Starting import of file:', file.name);
     const reader = new FileReader();
 
     reader.onload = (e) => {
       try {
         const content = e.target?.result as string;
-        console.log('[PresetImport] File content loaded, length:', content?.length);
+        debug.log('PresetImport', 'File content loaded, length:', content?.length);
 
         const preset = JSON.parse(content) as Preset;
-        console.log('[PresetImport] JSON parsed successfully:', {
+        debug.log('PresetImport', 'JSON parsed successfully:', {
           name: preset.name,
           hasParameters: !!preset.parameters,
         });
 
         // Validierung: Überprüfe ob die wichtigsten Felder vorhanden sind
         if (!preset.parameters) {
-          console.error('[PresetImport] Validation failed: parameters missing');
+          debug.error('PresetImport', 'Validation failed: parameters missing');
           resolve({
             preset: preset,
             error: 'Ungültiges Preset-Format: "parameters" fehlt',
@@ -60,13 +88,13 @@ export function importPresetFromJSON(
 
         // Weitere Validierung der Struktur
         const params = preset.parameters;
-        console.log('[PresetImport] Checking parameter structure:', {
+        debug.log('PresetImport', 'Checking parameter structure:', {
           hasUniversal: !!params.universal,
           hasVisualization: !!params.visualization,
         });
 
         if (!params.universal || !params.visualization) {
-          console.error('[PresetImport] Validation failed: missing parameter groups');
+          debug.error('PresetImport', 'Validation failed: missing parameter groups');
           resolve({
             preset: preset,
             error: 'Ungültiges Preset-Format: Fehlende Parameter-Gruppen',
@@ -74,10 +102,10 @@ export function importPresetFromJSON(
           return;
         }
 
-        console.log('[PresetImport] Validation successful, import complete');
+        debug.log('PresetImport', 'Validation successful, import complete');
         resolve({ preset });
       } catch (error) {
-        console.error('[PresetImport] Parse error:', error);
+        debug.error('PresetImport', 'Parse error:', error);
         resolve({
           preset: { name: '', icon: '', description: '', parameters: {} as AllParameters },
           error: `Fehler beim Parsen der JSON-Datei: ${error}`,
@@ -86,7 +114,7 @@ export function importPresetFromJSON(
     };
 
     reader.onerror = () => {
-      console.error('[PresetImport] File read error');
+      debug.error('PresetImport', 'File read error');
       resolve({
         preset: { name: '', icon: '', description: '', parameters: {} as AllParameters },
         error: 'Fehler beim Lesen der Datei',
@@ -103,15 +131,8 @@ export function importPresetFromJSON(
 export function exportPresetsAsJSON(presets: Preset[], filename: string = 'presets'): void {
   const jsonString = JSON.stringify(presets, null, 2);
   const blob = new Blob([jsonString], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
 
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${filename}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  downloadBlob(blob, `${filename}.json`);
 }
 
 /**
@@ -129,7 +150,7 @@ export async function copyPresetToClipboard(parameters: AllParameters): Promise<
     await navigator.clipboard.writeText(jsonString);
     return true;
   } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
+    debug.error('Clipboard', 'Failed to copy to clipboard:', error);
     return false;
   }
 }
