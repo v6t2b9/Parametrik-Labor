@@ -17,7 +17,12 @@ const updateSW = registerSW({
   },
 })
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found. Make sure index.html contains a div with id="root"');
+}
+
+createRoot(rootElement).render(
   <StrictMode>
     <ErrorBoundary>
       <App />

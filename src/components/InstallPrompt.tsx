@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { colors, spacing, typography, effects } from '../design-system';
+import { INSTALL_PROMPT } from '../utils/uiConstants';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -9,6 +10,7 @@ interface BeforeInstallPromptEvent extends Event {
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  const showPromptTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Check if already installed
@@ -20,6 +22,12 @@ export function InstallPrompt() {
       return; // Already installed, don't show prompt
     }
 
+    // Check if user dismissed within the last 7 days
+    const dismissedUntil = localStorage.getItem('pwa-install-dismissed-until');
+    if (dismissedUntil && Date.now() < parseInt(dismissedUntil, 10)) {
+      return; // Still within dismissal period
+    }
+
     // Listen for beforeinstallprompt event (Android)
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
@@ -29,26 +37,27 @@ export function InstallPrompt() {
       setDeferredPrompt(installEvent);
 
       // Show our custom install prompt after a short delay
-      setTimeout(() => {
-        // Check if user hasn't dismissed the prompt before
-        const dismissed = localStorage.getItem('pwa-install-dismissed');
-        if (!dismissed) {
-          setShowPrompt(true);
-        }
-      }, 3000); // Show after 3 seconds
+      showPromptTimeoutRef.current = window.setTimeout(() => {
+        setShowPrompt(true);
+      }, INSTALL_PROMPT.SHOW_DELAY);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
     // Listen for successful installation
-    window.addEventListener('appinstalled', () => {
+    const handleAppInstalled = () => {
       console.log('PWA installed successfully');
       setShowPrompt(false);
       setDeferredPrompt(null);
-    });
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+      if (showPromptTimeoutRef.current !== null) {
+        window.clearTimeout(showPromptTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -75,13 +84,9 @@ export function InstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    // Remember dismissal for this session
-    localStorage.setItem('pwa-install-dismissed', 'true');
-
-    // Clear dismissal after 7 days
-    setTimeout(() => {
-      localStorage.removeItem('pwa-install-dismissed');
-    }, 7 * 24 * 60 * 60 * 1000);
+    // Remember dismissal for configured duration
+    const dismissedUntil = Date.now() + INSTALL_PROMPT.DISMISSAL_DURATION;
+    localStorage.setItem('pwa-install-dismissed-until', dismissedUntil.toString());
   };
 
   if (!showPrompt || !deferredPrompt) {

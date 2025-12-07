@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo, useCallback, memo } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { useAudioStore } from '../store/useAudioStore';
 import GIF from 'gif.js.optimized';
@@ -11,7 +11,7 @@ interface ControlBarProps {
   onFullscreenToggle?: () => void;
 }
 
-export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
+export const ControlBar = memo(function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const running = useSimulationStore((state) => state.running);
   const toggleRunning = useSimulationStore((state) => state.toggleRunning);
   const reset = useSimulationStore((state) => state.reset);
@@ -24,14 +24,14 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const { musicEnabled, inputMode, togglePlay } = useAudioStore();
 
   // Combined toggle that syncs audio and simulation when music is enabled
-  const handlePlayPause = () => {
+  const handlePlayPause = useCallback(() => {
     toggleRunning();
 
     // Also toggle audio playback if music is enabled and using file input
     if (musicEnabled && inputMode === 'file') {
       togglePlay();
     }
-  };
+  }, [toggleRunning, musicEnabled, inputMode, togglePlay]);
 
   // Video panel state
   const [showVideoPanel, setShowVideoPanel] = useState(false);
@@ -51,7 +51,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
   const recordingIntervalRef = useRef<number | null>(null);
 
   // Get quality parameters based on preset and format
-  function getQualityParams() {
+  const qualityParams = useMemo(() => {
     if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'ios-video') {
       // WebM/MP4 bitrate settings (same for both)
       const bitrateMap = {
@@ -69,7 +69,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       };
       return gifQualityMap[videoQuality];
     }
-  }
+  }, [videoFormat, videoQuality]);
 
   function takeScreenshot() {
     const canvas = document.querySelector('canvas');
@@ -99,7 +99,6 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
     if (videoFormat === 'webm' || videoFormat === 'mp4' || videoFormat === 'ios-video') {
       // Video recording with MediaRecorder (WebM, MP4, or iOS Video)
       try {
-        const qualityParams = getQualityParams() as { bitrate: number };
         const stream = canvas.captureStream(videoFPS);
 
         let options: MediaRecorderOptions;
@@ -115,11 +114,12 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
           ];
 
           const supportedCodec = mp4Codecs.find(codec => MediaRecorder.isTypeSupported(codec));
+          const bitrate = 'bitrate' in qualityParams ? qualityParams.bitrate : 8000000;
 
           if (supportedCodec) {
             options = {
               mimeType: supportedCodec,
-              videoBitsPerSecond: qualityParams.bitrate,
+              videoBitsPerSecond: bitrate,
             };
             fileExtension = 'mp4';
             mimeType = 'video/mp4';
@@ -128,16 +128,17 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
             debug.warn('Video', 'MP4 not supported, falling back to WebM');
             options = {
               mimeType: 'video/webm;codecs=vp9',
-              videoBitsPerSecond: qualityParams.bitrate,
+              videoBitsPerSecond: bitrate,
             };
             fileExtension = 'webm';
             mimeType = 'video/webm';
           }
         } else {
           // WebM with VP9
+          const bitrate = 'bitrate' in qualityParams ? qualityParams.bitrate : 8000000;
           options = {
             mimeType: 'video/webm;codecs=vp9',
-            videoBitsPerSecond: qualityParams.bitrate,
+            videoBitsPerSecond: bitrate,
           };
 
           // Fallback to vp8 if vp9 not supported
@@ -288,11 +289,10 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       // GIF recording with gif.js
       debug.log('Video', 'Starting GIF video recording...');
       try {
-        const qualityParams = getQualityParams() as { quality: number; dithering: false | 'FloydSteinberg' };
         const gif = new GIF({
           workers: 2,
-          quality: qualityParams.quality,
-          dither: qualityParams.dithering,
+          quality: (qualityParams as { quality: number; dithering: false | 'FloydSteinberg' }).quality,
+          dither: (qualityParams as { quality: number; dithering: false | 'FloydSteinberg' }).dithering,
           width: canvas.width,
           height: canvas.height,
           workerScript: '/gif.worker.js',
@@ -583,7 +583,7 @@ export function ControlBar({ onFullscreenToggle }: ControlBarProps) {
       </div>
     </div>
   );
-}
+});
 
 const styles = {
   container: {

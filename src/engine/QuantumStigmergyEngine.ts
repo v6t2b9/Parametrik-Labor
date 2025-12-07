@@ -24,38 +24,9 @@ import {
   cexp,
 } from './ComplexMath.js';
 
+import { resolveSpeciesParams } from '../utils/parameterUtils.js';
+
 const GRID_SIZE = 400;
-
-// Helper: Merge universal + species overrides
-function resolveSpeciesParams(
-  params: AllParameters,
-  species: AgentType
-): ResolvedSpeciesParams {
-  const speciesOverride = params.species[species];
-
-  return {
-    physical: {
-      ...params.universal.physical,
-      ...(speciesOverride.physical || {}),
-    },
-    semiotic: {
-      ...params.universal.semiotic,
-      ...(speciesOverride.semiotic || {}),
-    },
-    temporal: {
-      ...params.universal.temporal,
-      ...(speciesOverride.temporal || {}),
-    },
-    resonance: {
-      ...params.universal.resonance,
-      ...(speciesOverride.resonance || {}),
-    },
-    audio: {
-      ...params.universal.audio,
-      ...(speciesOverride.audio || {}),
-    },
-  };
-}
 
 export class QuantumStigmergyEngine {
   private agents: Agent[] = [];
@@ -66,7 +37,8 @@ export class QuantumStigmergyEngine {
   protected gridWidth: number;
   protected gridHeight: number;
   private frameCount: number = 0;
-  private params: AllParameters;
+  // IMPORTANT: params must be set via setParameters() before calling initializeAgents() or step()
+  private params!: AllParameters;
 
   constructor(gridWidth: number = GRID_SIZE, gridHeight: number = GRID_SIZE) {
     this.gridWidth = gridWidth;
@@ -75,7 +47,6 @@ export class QuantumStigmergyEngine {
     this.phases = this.createPhases();
     this.tempTrails = this.createTrails();
     this.tempPhases = this.createPhases();
-    this.params = {} as AllParameters;
   }
 
   private createTrails(): Trails {
@@ -101,6 +72,10 @@ export class QuantumStigmergyEngine {
   }
 
   public initializeAgents(count: number): void {
+    if (!this.params) {
+      throw new Error('Parameters must be set via setParameters() before calling initializeAgents()');
+    }
+
     this.agents = [];
     const types: AgentType[] = ['red', 'green', 'blue'];
     const model = this.params.modelParams.model;

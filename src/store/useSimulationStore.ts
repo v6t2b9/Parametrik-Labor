@@ -7,7 +7,6 @@ import type {
   PerformanceMetrics,
   QualityPreset,
   AgentType,
-  ResolvedSpeciesParams,
   SpeciesScope,
   OikosTab,
   PhysicalOikosParams,
@@ -23,38 +22,11 @@ import { MusicReactiveEngine } from '../engine/MusicReactiveEngine';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
 import { calculateGridDimensions } from '../engine/SimulationEngine';
 import { exportPresetAsJSON, importPresetFromJSON } from '../utils/presetIO';
+import { resolveSpeciesParams } from '../utils/parameterUtils';
 import { debug } from '../utils/debug';
 
-// Helper: Merge universal + species overrides
-export function resolveSpeciesParams(
-  params: AllParameters,
-  species: AgentType
-): ResolvedSpeciesParams {
-  const speciesOverride = params.species[species];
-
-  return {
-    physical: {
-      ...params.universal.physical,
-      ...(speciesOverride.physical || {}),
-    },
-    semiotic: {
-      ...params.universal.semiotic,
-      ...(speciesOverride.semiotic || {}),
-    },
-    temporal: {
-      ...params.universal.temporal,
-      ...(speciesOverride.temporal || {}),
-    },
-    resonance: {
-      ...params.universal.resonance,
-      ...(speciesOverride.resonance || {}),
-    },
-    audio: {
-      ...params.universal.audio,
-      ...(speciesOverride.audio || {}),
-    },
-  };
-}
+// Re-export for backward compatibility
+export { resolveSpeciesParams };
 
 // Quality preset configurations
 function getQualitySettings(preset: QualityPreset) {
@@ -451,46 +423,51 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     // Context-aware updates (based on activeSpeciesScope)
     updatePhysicalParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalPhysicalParams(params);
       } else {
-        get().updateSpeciesPhysicalParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesPhysicalParams(scope, params);
       }
     },
 
     updateSemioticParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalSemioticParams(params);
       } else {
-        get().updateSpeciesSemioticParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesSemioticParams(scope, params);
       }
     },
 
     updateTemporalParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalTemporalParams(params);
       } else {
-        get().updateSpeciesTemporalParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesTemporalParams(scope, params);
       }
     },
 
     updateResonanceParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalResonanceParams(params);
       } else {
-        get().updateSpeciesResonanceParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesResonanceParams(scope, params);
       }
     },
 
     updateAudioParams: (params) => {
       const { ui } = get();
-      if (ui.activeSpeciesScope === 'universal') {
+      const scope = ui.activeSpeciesScope;
+      if (scope === 'universal') {
         get().updateUniversalAudioParams(params);
       } else {
-        get().updateSpeciesAudioParams(ui.activeSpeciesScope as AgentType, params);
+        get().updateSpeciesAudioParams(scope, params);
       }
     },
 

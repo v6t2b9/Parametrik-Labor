@@ -5,16 +5,18 @@
  * for maximum visual responsiveness to music in Parametrik-Labor
  */
 
+import { CircularBuffer } from '../utils/CircularBuffer';
+
 // ============================================================================
 // I. ADAPTIVE NORMALIZER
 // ============================================================================
 
 export class AdaptiveNormalizer {
-  private history: number[] = [];
-  private windowSize: number;
+  private history: CircularBuffer<number>;
 
   constructor(windowSizeSeconds: number = 1.0, fps: number = 60) {
-    this.windowSize = Math.floor(windowSizeSeconds * fps);
+    const windowSize = Math.floor(windowSizeSeconds * fps);
+    this.history = new CircularBuffer<number>(windowSize);
   }
 
   /**
@@ -23,14 +25,12 @@ export class AdaptiveNormalizer {
    */
   normalize(value: number): number {
     this.history.push(value);
-    if (this.history.length > this.windowSize) {
-      this.history.shift();
-    }
 
-    if (this.history.length < 2) return 0.5;
+    if (this.history.getSize() < 2) return 0.5;
 
-    const localMin = Math.min(...this.history);
-    const localMax = Math.max(...this.history);
+    const historyArray = this.history.toArray();
+    const localMin = Math.min(...historyArray);
+    const localMax = Math.max(...historyArray);
     const range = localMax - localMin;
 
     // Prevent division by zero
@@ -53,7 +53,7 @@ export class AdaptiveNormalizer {
    * Reset history (e.g., when switching songs)
    */
   reset(): void {
-    this.history = [];
+    this.history.clear();
   }
 }
 
@@ -221,18 +221,18 @@ export interface MultiScaleOutput {
 }
 
 export class MultiScaleModulator {
-  private microHistory: number[] = [];
-  private mesoHistory: number[] = [];
-  private macroHistory: number[] = [];
-
-  private microWindow: number;
-  private mesoWindow: number;
-  private macroWindow: number;
+  private microHistory: CircularBuffer<number>;
+  private mesoHistory: CircularBuffer<number>;
+  private macroHistory: CircularBuffer<number>;
 
   constructor(fps: number = 60) {
-    this.microWindow = Math.floor(0.1 * fps);  // 100ms
-    this.mesoWindow = Math.floor(0.5 * fps);   // 500ms
-    this.macroWindow = Math.floor(4.0 * fps);  // 4 seconds
+    const microWindow = Math.floor(0.1 * fps);  // 100ms
+    const mesoWindow = Math.floor(0.5 * fps);   // 500ms
+    const macroWindow = Math.floor(4.0 * fps);  // 4 seconds
+
+    this.microHistory = new CircularBuffer<number>(microWindow);
+    this.mesoHistory = new CircularBuffer<number>(mesoWindow);
+    this.macroHistory = new CircularBuffer<number>(macroWindow);
   }
 
   /**
@@ -243,10 +243,10 @@ export class MultiScaleModulator {
     mesoFeature: number,   // e.g., beatStrength
     macroFeature: number   // e.g., spectralCentroid
   ): MultiScaleOutput {
-    // Update histories
-    this.updateHistory(this.microHistory, microFeature, this.microWindow);
-    this.updateHistory(this.mesoHistory, mesoFeature, this.mesoWindow);
-    this.updateHistory(this.macroHistory, macroFeature, this.macroWindow);
+    // Update histories (O(1) operations)
+    this.microHistory.push(microFeature);
+    this.mesoHistory.push(mesoFeature);
+    this.macroHistory.push(macroFeature);
 
     return {
       micro: this.normalizeHistory(this.microHistory),
@@ -255,23 +255,13 @@ export class MultiScaleModulator {
     };
   }
 
-  private updateHistory(
-    history: number[],
-    value: number,
-    maxSize: number
-  ): void {
-    history.push(value);
-    while (history.length > maxSize) {
-      history.shift();
-    }
-  }
+  private normalizeHistory(history: CircularBuffer<number>): number {
+    if (history.isEmpty()) return 0.5;
 
-  private normalizeHistory(history: number[]): number {
-    if (history.length === 0) return 0.5;
-
-    const min = Math.min(...history);
-    const max = Math.max(...history);
-    const current = history[history.length - 1];
+    const historyArray = history.toArray();
+    const min = Math.min(...historyArray);
+    const max = Math.max(...historyArray);
+    const current = history.getNewest() ?? 0.5;
     const range = max - min;
 
     return range < 0.001 ? 0.5 : (current - min) / range;
@@ -281,9 +271,9 @@ export class MultiScaleModulator {
    * Reset all histories
    */
   reset(): void {
-    this.microHistory = [];
-    this.mesoHistory = [];
-    this.macroHistory = [];
+    this.microHistory.clear();
+    this.mesoHistory.clear();
+    this.macroHistory.clear();
   }
 }
 
@@ -693,8 +683,7 @@ export class RhythmicParameterModulator {
 
   // Tempo tracking
   private currentBPM: number = 120;
-  private bpmHistory: number[] = [];
-  private bpmHistorySize: number = 8;
+  private bpmHistory: CircularBuffer<number>;
 
   constructor(
     oscillatorBankConfig: OscillatorBankConfig,
@@ -702,6 +691,7 @@ export class RhythmicParameterModulator {
   ) {
     this.oscillatorBank = new OscillatorBank(oscillatorBankConfig);
     this.config = modulationConfig;
+    this.bpmHistory = new CircularBuffer<number>(8); // Keep last 8 BPM values
   }
 
   /**
@@ -746,12 +736,10 @@ export class RhythmicParameterModulator {
    */
   private updateTempo(newBPM: number): void {
     this.bpmHistory.push(newBPM);
-    if (this.bpmHistory.length > this.bpmHistorySize) {
-      this.bpmHistory.shift();
-    }
 
     // Calculate average BPM
-    const avgBPM = this.bpmHistory.reduce((sum, bpm) => sum + bpm, 0) / this.bpmHistory.length;
+    const historyArray = this.bpmHistory.toArray();
+    const avgBPM = historyArray.reduce((sum, bpm) => sum + bpm, 0) / historyArray.length;
 
     // Only update if significantly different (avoid jitter)
     if (Math.abs(avgBPM - this.currentBPM) > 2) {

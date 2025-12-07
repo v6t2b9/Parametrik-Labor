@@ -1,22 +1,26 @@
+import { useMemo, useCallback, memo } from 'react';
 import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { AgentType } from '../types';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
-export function ResonanceOikosPanel() {
+export const ResonanceOikosPanel = memo(function ResonanceOikosPanel() {
   const parameters = useSimulationStore((state) => state.parameters);
   const updateResonanceParams = useSimulationStore((state) => state.updateResonanceParams);
   const ui = useSimulationStore((state) => state.ui);
 
-  const currentValues = ui.activeSpeciesScope === 'universal'
-    ? parameters.universal.resonance
-    : resolveSpeciesParams(parameters, ui.activeSpeciesScope as AgentType).resonance;
+  const currentValues = useMemo(
+    () => ui.activeSpeciesScope === 'universal'
+      ? parameters.universal.resonance
+      : resolveSpeciesParams(parameters, ui.activeSpeciesScope as AgentType).resonance,
+    [ui.activeSpeciesScope, parameters]
+  );
 
-  const hasOverride = (param: keyof typeof currentValues) => {
+  const hasOverride = useCallback((param: keyof typeof currentValues) => {
     if (ui.activeSpeciesScope === 'universal') return false;
     const speciesOverride = parameters.species[ui.activeSpeciesScope as AgentType].resonance;
     return speciesOverride !== undefined && param in speciesOverride;
-  };
+  }, [ui.activeSpeciesScope, parameters.species]);
 
   return (
     <div style={styles.panel}>
@@ -255,7 +259,7 @@ export function ResonanceOikosPanel() {
       )}
     </div>
   );
-}
+});
 
 const styles = {
   panel: {

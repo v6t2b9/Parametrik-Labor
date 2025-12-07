@@ -12,6 +12,8 @@
  * Result: Maximum contrast = Maximum visual variation
  */
 
+import { CircularBuffer } from '../utils/CircularBuffer';
+
 export interface AdaptiveNormalizerConfig {
   windowSize?: number;        // Number of samples to keep (default: 600 = 10s at 60fps)
   smoothingFactor?: number;   // How quickly to adapt (0.001-0.1, default: 0.02)
@@ -45,8 +47,8 @@ export class AdaptiveNormalizer {
   private percentileRange: [number, number];
   private exaggeration: number;
 
-  // History buffers for each feature
-  private history: Map<string, number[]> = new Map();
+  // History buffers for each feature (using CircularBuffer for O(1) operations)
+  private history: Map<string, CircularBuffer<number>> = new Map();
 
   // Learned min/max for each feature
   private adaptiveRanges: Map<string, AdaptiveRange> = new Map();
@@ -66,7 +68,7 @@ export class AdaptiveNormalizer {
    */
   private initializeFeature(featureName: string): void {
     if (!this.history.has(featureName)) {
-      this.history.set(featureName, []);
+      this.history.set(featureName, new CircularBuffer<number>(this.windowSize));
       this.adaptiveRanges.set(featureName, { min: 0, max: 1 });
       this.buckets.set(featureName, { low: 0, mid: 0, high: 0 });
     }
@@ -78,17 +80,16 @@ export class AdaptiveNormalizer {
   private update(featureName: string, rawValue: number): void {
     this.initializeFeature(featureName);
 
-    // Add to history
-    const history = this.history.get(featureName)!;
-    history.push(rawValue);
-
-    // Keep only windowSize recent values
-    if (history.length > this.windowSize) {
-      history.shift();
+    // Add to history (CircularBuffer automatically handles overflow)
+    const history = this.history.get(featureName);
+    if (!history) {
+      throw new Error(`Feature ${featureName} not initialized`);
     }
 
+    history.push(rawValue);
+
     // Update adaptive range (need minimum samples)
-    if (history.length >= 10) {
+    if (history.getSize() >= 10) {
       this.updateAdaptiveRange(featureName, history);
       this.updateBuckets(featureName, history);
     }
@@ -97,8 +98,8 @@ export class AdaptiveNormalizer {
   /**
    * Calculate adaptive min/max using percentiles to ignore outliers
    */
-  private updateAdaptiveRange(featureName: string, history: number[]): void {
-    const sorted = [...history].sort((a, b) => a - b);
+  private updateAdaptiveRange(featureName: string, history: CircularBuffer<number>): void {
+    const sorted = history.toArray().sort((a, b) => a - b);
     const [lowPercentile, highPercentile] = this.percentileRange;
 
     const minIndex = Math.floor((lowPercentile / 100) * sorted.length);
@@ -108,7 +109,11 @@ export class AdaptiveNormalizer {
     const observedMax = sorted[maxIndex];
 
     // Smooth update (exponential moving average)
-    const currentRange = this.adaptiveRanges.get(featureName)!;
+    const currentRange = this.adaptiveRanges.get(featureName);
+    if (!currentRange) {
+      throw new Error(`Feature ${featureName} not initialized`);
+    }
+
     const alpha = this.smoothingFactor;
 
     currentRange.min = alpha * observedMin + (1 - alpha) * currentRange.min;
@@ -123,8 +128,8 @@ export class AdaptiveNormalizer {
   /**
    * Calculate bucket thresholds (Low/Mid/High classification)
    */
-  private updateBuckets(featureName: string, history: number[]): void {
-    const sorted = [...history].sort((a, b) => a - b);
+  private updateBuckets(featureName: string, history: CircularBuffer<number>): void {
+    const sorted = history.toArray().sort((a, b) => a - b);
 
     const lowThresholdIndex = Math.floor(sorted.length * 0.33);
     const highThresholdIndex = Math.floor(sorted.length * 0.67);
@@ -147,7 +152,10 @@ export class AdaptiveNormalizer {
     // Update history and ranges
     this.update(featureName, rawValue);
 
-    const range = this.adaptiveRanges.get(featureName)!;
+    const range = this.adaptiveRanges.get(featureName);
+    if (!range) {
+      throw new Error(`Feature ${featureName} not initialized`);
+    }
 
     // Adaptive normalization
     let normalized = (rawValue - range.min) / (range.max - range.min);
@@ -175,7 +183,10 @@ export class AdaptiveNormalizer {
     // Update history and ranges
     this.update(featureName, rawValue);
 
-    const range = this.adaptiveRanges.get(featureName)!;
+    const range = this.adaptiveRanges.get(featureName);
+    if (!range) {
+      throw new Error(`Feature ${featureName} not initialized`);
+    }
 
     // Adaptive normalization
     let normalized = (rawValue - range.min) / (range.max - range.min);
@@ -253,15 +264,16 @@ export class AdaptiveNormalizer {
    */
   public getStats(featureName: string): FeatureStats | null {
     const history = this.history.get(featureName);
-    if (!history || history.length === 0) return null;
+    if (!history || history.isEmpty()) return null;
 
     const range = this.adaptiveRanges.get(featureName) || { min: 0, max: 1 };
     const buckets = this.buckets.get(featureName) || { low: 0, mid: 0, high: 0 };
+    const historyArray = history.toArray();
 
     return {
-      sampleCount: history.length,
-      currentMin: Math.min(...history),
-      currentMax: Math.max(...history),
+      sampleCount: history.getSize(),
+      currentMin: Math.min(...historyArray),
+      currentMax: Math.max(...historyArray),
       adaptiveMin: range.min,
       adaptiveMax: range.max,
       buckets,
@@ -280,7 +292,7 @@ export class AdaptiveNormalizer {
    */
   public isReady(featureName: string): boolean {
     const history = this.history.get(featureName);
-    return history ? history.length >= 10 : false;
+    return history ? history.getSize() >= 10 : false;
   }
 
   /**
