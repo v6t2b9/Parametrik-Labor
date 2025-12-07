@@ -1,18 +1,21 @@
 /**
  * AudioOikosPanel - Music-reactive visualization controls
- * Phase 1: Audio source, live analysis, presets, and key mappings
- * Now supports species-specific audio mappings!
+ * Refactored with reusable UI components for better maintainability
  */
 
-import { useRef, type ChangeEvent } from 'react';
+import { useRef, memo, type ChangeEvent } from 'react';
 import { useAudioStore } from '../store/useAudioStore';
 import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { AUDIO_MAPPING_PRESETS } from '../audio/presets';
-import type { CurveType } from '../types/musicMappings';
-import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { colors, spacing, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { Section, Subsection } from './ui/Section';
+import { ToggleSection } from './ui/ToggleSection';
+import { CurveSelector } from './ui/CurveSelector';
+import { PresetGrid, type Preset } from './ui/PresetGrid';
+import { Divider } from './ui/Divider';
 
-export function AudioOikosPanel() {
+export const AudioOikosPanel = memo(function AudioOikosPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Audio playback controls from AudioStore
@@ -66,11 +69,13 @@ export function AudioOikosPanel() {
     }
   };
 
-  // Load audio preset into current species scope
-  const loadPreset = (presetKey: keyof typeof AUDIO_MAPPING_PRESETS) => {
-    const preset = AUDIO_MAPPING_PRESETS[presetKey];
-    updateAudioParams(preset.params);
-  };
+  // Convert AUDIO_MAPPING_PRESETS to PresetGrid format
+  const audioPresets: Preset<typeof mappings>[] = Object.entries(AUDIO_MAPPING_PRESETS).map(([, preset]) => ({
+    name: preset.name,
+    icon: preset.icon,
+    description: preset.description,
+    params: preset.params,
+  }));
 
   // Render analysis display
   const renderAnalysis = () => {
@@ -154,14 +159,10 @@ export function AudioOikosPanel() {
   return (
     <div style={styles.panel}>
       <h3 style={styles.title}>Audio</h3>
-      <p style={styles.subtitle}>
-        Music-reactive visualization controls
-      </p>
+      <p style={styles.subtitle}>Music-reactive visualization controls</p>
 
       {/* Audio Source Section */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Audio Source</h4>
-
+      <Section title="Audio Source">
         <div style={styles.sourceButtons}>
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -192,11 +193,7 @@ export function AudioOikosPanel() {
           style={{ display: 'none' }}
         />
 
-        {audioFileName && (
-          <div style={styles.fileName}>
-            {audioFileName}
-          </div>
-        )}
+        {audioFileName && <div style={styles.fileName}>{audioFileName}</div>}
 
         {/* Playback Controls (File mode only) */}
         {inputMode === 'file' && (
@@ -205,11 +202,17 @@ export function AudioOikosPanel() {
               onClick={togglePlay}
               style={styles.controlButton}
               disabled={!audioFileName}
+              aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? '⏸' : '▶'}
             </button>
 
-            <button onClick={stop} style={styles.controlButton} disabled={!audioFileName}>
+            <button
+              onClick={stop}
+              style={styles.controlButton}
+              disabled={!audioFileName}
+              aria-label="Stop"
+            >
               ⏹
             </button>
 
@@ -220,67 +223,44 @@ export function AudioOikosPanel() {
                 ...(loop ? styles.loopButtonActive : {}),
               }}
               disabled={!audioFileName}
+              aria-pressed={loop}
             >
               🔁 {loop ? 'Loop: ON' : 'Loop: OFF'}
             </button>
           </div>
         )}
-      </div>
+      </Section>
 
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Music Reactivity Toggle */}
-      <div style={styles.section}>
-        <div style={styles.toggleRow}>
-          <h4 style={styles.sectionTitle}>Music Reactivity</h4>
-          <button
-            onClick={toggleMusic}
-            style={{
-              ...styles.toggleButton,
-              ...(musicEnabled ? styles.toggleButtonActive : {}),
-            }}
-          >
-            {musicEnabled ? 'ON' : 'OFF'}
-          </button>
-        </div>
-
-        <p style={styles.toggleDescription}>
-          {musicEnabled
+      <ToggleSection
+        title="Music Reactivity"
+        enabled={musicEnabled}
+        onToggle={toggleMusic}
+        description={
+          musicEnabled
             ? 'Music is modulating agent behavior in real-time'
-            : 'Enable to let music control the simulation'}
-        </p>
-      </div>
+            : 'Enable to let music control the simulation'
+        }
+      />
 
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Auto-Harmonizer (Adaptive Normalization) */}
       {musicEnabled && (
         <>
-          <div style={styles.section}>
-            <div style={styles.toggleRow}>
-              <h4 style={styles.sectionTitle}>Auto-Harmonizer</h4>
-              <button
-                onClick={toggleAdaptiveNormalization}
-                style={{
-                  ...styles.toggleButton,
-                  ...(adaptiveNormalizationEnabled ? styles.toggleButtonActive : {}),
-                }}
-              >
-                {adaptiveNormalizationEnabled ? 'ON' : 'OFF'}
-              </button>
-            </div>
-
-            <p style={styles.toggleDescription}>
-              {adaptiveNormalizationEnabled
+          <ToggleSection
+            title="Auto-Harmonizer"
+            enabled={adaptiveNormalizationEnabled}
+            onToggle={toggleAdaptiveNormalization}
+            description={
+              adaptiveNormalizationEnabled
                 ? 'Learning musical range to maximize contrast (0-1 normalization)'
-                : 'Enable adaptive normalization for stronger visual response'}
-            </p>
-
-            <p style={styles.autoHarmonizerHint}>
-              Auto-Harmonizer learns your music's actual range (e.g., 1500-3000 Hz instead of 0-8000 Hz)
-              and normalizes features to maximize visual contrast. Especially effective for quiet or narrow-range music!
-            </p>
-
+                : 'Enable adaptive normalization for stronger visual response'
+            }
+            hint="Auto-Harmonizer learns your music's actual range (e.g., 1500-3000 Hz instead of 0-8000 Hz) and normalizes features to maximize visual contrast. Especially effective for quiet or narrow-range music!"
+          >
             {/* Advanced Configuration (only when enabled) */}
             {adaptiveNormalizationEnabled && (
               <div style={styles.advancedConfig}>
@@ -288,7 +268,7 @@ export function AudioOikosPanel() {
 
                 <ParameterSlider
                   label="Window Size (seconds)"
-                  value={adaptiveNormalizerConfig.windowSize! / 60} // Convert to seconds
+                  value={adaptiveNormalizerConfig.windowSize! / 60}
                   min={3}
                   max={30}
                   step={1}
@@ -298,7 +278,7 @@ export function AudioOikosPanel() {
 
                 <ParameterSlider
                   label="Smoothing Factor"
-                  value={adaptiveNormalizerConfig.smoothingFactor! * 100} // Convert to percentage
+                  value={adaptiveNormalizerConfig.smoothingFactor! * 100}
                   min={0.1}
                   max={10}
                   step={0.1}
@@ -322,46 +302,31 @@ export function AudioOikosPanel() {
                 </p>
               </div>
             )}
-          </div>
+          </ToggleSection>
 
-          <div style={styles.divider} />
+          <Divider />
         </>
       )}
 
       {/* Dynamic Role Mapping */}
       {musicEnabled && (
         <>
-          <div style={styles.section}>
-            <div style={styles.toggleRow}>
-              <h4 style={styles.sectionTitle}>Dynamic Role Mapping</h4>
-              <button
-                onClick={() => {
-                  const newEnabled = !mappings.roleMapping.enabled;
-                  updateAudioParams({
-                    roleMapping: { ...mappings.roleMapping, enabled: newEnabled }
-                  });
-                }}
-                style={{
-                  ...styles.toggleButton,
-                  ...(mappings.roleMapping.enabled ? styles.toggleButtonActive : {}),
-                }}
-              >
-                {mappings.roleMapping.enabled ? 'ON' : 'OFF'}
-              </button>
-            </div>
-
-            <p style={styles.toggleDescription}>
-              {mappings.roleMapping.enabled
+          <ToggleSection
+            title="Dynamic Role Mapping"
+            enabled={mappings.roleMapping.enabled}
+            onToggle={() => {
+              const newEnabled = !mappings.roleMapping.enabled;
+              updateAudioParams({
+                roleMapping: { ...mappings.roleMapping, enabled: newEnabled }
+              });
+            }}
+            description={
+              mappings.roleMapping.enabled
                 ? 'Agents dynamically assume functional roles based on audio features'
-                : 'Enable to let agents switch roles (builder, harvester, consumer, decomposer, scout)'}
-            </p>
-
-            <p style={styles.autoHarmonizerHint}>
-              Role Mapping assigns ecosystem roles to agents based on real-time audio:
-              <br />
-              Builder (bass) • Harvester (mid) • Consumer (arousal) • Decomposer (dissonance) • Scout (treble)
-            </p>
-
+                : 'Enable to let agents switch roles (builder, harvester, consumer, decomposer, scout)'
+            }
+            hint="Role Mapping assigns ecosystem roles to agents based on real-time audio: Builder (bass) • Harvester (mid) • Consumer (arousal) • Decomposer (dissonance) • Scout (treble)"
+          >
             {/* Role Mapping Configuration (only when enabled) */}
             {mappings.roleMapping.enabled && (
               <div style={styles.advancedConfig}>
@@ -475,53 +440,37 @@ export function AudioOikosPanel() {
                 </p>
               </div>
             )}
-          </div>
+          </ToggleSection>
 
-          <div style={styles.divider} />
+          <Divider />
         </>
       )}
 
       {/* Live Analysis */}
       {musicEnabled && (
         <>
-          <div style={styles.section}>
-            <h4 style={styles.sectionTitle}>Live Analysis</h4>
+          <Section title="Live Analysis">
             {renderAnalysis()}
-          </div>
+          </Section>
 
-          <div style={styles.divider} />
+          <Divider />
         </>
       )}
 
       {/* Presets */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Presets</h4>
+      <PresetGrid
+        presets={audioPresets}
+        onSelect={updateAudioParams}
+        title="Presets"
+      />
 
-        <div style={styles.presetGrid}>
-          {Object.entries(AUDIO_MAPPING_PRESETS).map(([key, preset]) => (
-            <button
-              key={key}
-              onClick={() => loadPreset(key as keyof typeof AUDIO_MAPPING_PRESETS)}
-              style={styles.presetButton}
-              title={preset.description}
-            >
-              <span style={styles.presetIcon}>{preset.icon}</span>
-              <span style={styles.presetName}>{preset.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Key Mapping Controls */}
       {musicEnabled && (
-        <div style={styles.section}>
-          <h4 style={styles.sectionTitle}>Key Mappings</h4>
-
+        <Section title="Key Mappings">
           {/* Global */}
-          <div style={styles.mappingGroup}>
-            <h5 style={styles.groupTitle}>Global</h5>
+          <Subsection title="Global">
             <ParameterSlider
               label="Master Influence"
               value={mappings.globalMusicInfluence}
@@ -531,11 +480,10 @@ export function AudioOikosPanel() {
               onChange={(value) => updateAudioParams({ globalMusicInfluence: value })}
               description="Global multiplier for all audio effects"
             />
-          </div>
+          </Subsection>
 
           {/* Tempo */}
-          <div style={styles.mappingGroup}>
-            <h5 style={styles.groupTitle}>Tempo → Movement</h5>
+          <Subsection title="Tempo → Movement">
             <ParameterSlider
               label="Tempo → Speed"
               value={mappings.tempo.tempoToSpeedSensitivity}
@@ -548,26 +496,16 @@ export function AudioOikosPanel() {
               description="How strongly BPM affects agent speed"
             />
 
-            <div style={styles.curveSelector}>
-              <label style={styles.curveLabel}>Curve Type:</label>
-              <select
-                value={mappings.tempo.tempoToSpeedCurve}
-                onChange={(e) =>
-                  updateAudioParams({ tempo: { ...mappings.tempo, tempoToSpeedCurve: e.target.value as CurveType } })
-                }
-                style={styles.curveDropdown}
-              >
-                <option value="linear">Linear</option>
-                <option value="exponential">Exponential</option>
-                <option value="logarithmic">Logarithmic</option>
-                <option value="sigmoid">Sigmoid</option>
-              </select>
-            </div>
-          </div>
+            <CurveSelector
+              value={mappings.tempo.tempoToSpeedCurve}
+              onChange={(curve) =>
+                updateAudioParams({ tempo: { ...mappings.tempo, tempoToSpeedCurve: curve } })
+              }
+            />
+          </Subsection>
 
           {/* Spectral - Bass */}
-          <div style={styles.mappingGroup}>
-            <h5 style={styles.groupTitle}>Bass Impact</h5>
+          <Subsection title="Bass Impact">
             <ParameterSlider
               label="Bass → Speed"
               value={mappings.spectral.bassToSpeedSensitivity}
@@ -591,11 +529,10 @@ export function AudioOikosPanel() {
               }
               description="Bass increases trail deposition"
             />
-          </div>
+          </Subsection>
 
           {/* Harmony */}
-          <div style={styles.mappingGroup}>
-            <h5 style={styles.groupTitle}>Harmony → Behavior</h5>
+          <Subsection title="Harmony → Behavior">
             <ParameterSlider
               label="Tension → Randomness"
               value={mappings.harmony.tensionToRandomnessSensitivity}
@@ -608,27 +545,16 @@ export function AudioOikosPanel() {
               description="Dissonance increases erratic movement"
             />
 
-            <div style={styles.curveSelector}>
-              <label style={styles.curveLabel}>Curve Type:</label>
-              <select
-                value={mappings.harmony.tensionToRandomnessCurve}
-                onChange={(e) =>
-                  updateAudioParams({ harmony: { ...mappings.harmony, tensionToRandomnessCurve: e.target.value as CurveType } })
-                }
-                style={styles.curveDropdown}
-              >
-                <option value="linear">Linear</option>
-                <option value="exponential">Exponential</option>
-                <option value="logarithmic">Logarithmic</option>
-                <option value="sigmoid">Sigmoid</option>
-              </select>
-            </div>
-          </div>
+            <CurveSelector
+              value={mappings.harmony.tensionToRandomnessCurve}
+              onChange={(curve) =>
+                updateAudioParams({ harmony: { ...mappings.harmony, tensionToRandomnessCurve: curve } })
+              }
+            />
+          </Subsection>
 
           {/* Rhythm */}
-          <div style={styles.mappingGroup}>
-            <h5 style={styles.groupTitle}>Rhythm → Impulses</h5>
-
+          <Subsection title="Rhythm → Impulses">
             <label style={styles.checkboxLabel}>
               <input
                 type="checkbox"
@@ -636,6 +562,7 @@ export function AudioOikosPanel() {
                 onChange={(e) =>
                   updateAudioParams({ rhythm: { ...mappings.rhythm, beatEnabled: e.target.checked } })
                 }
+                style={styles.checkbox}
               />
               <span>Enable Beat Detection</span>
             </label>
@@ -653,12 +580,12 @@ export function AudioOikosPanel() {
                 description="Speed boost on detected beats"
               />
             )}
-          </div>
-        </div>
+          </Subsection>
+        </Section>
       )}
     </div>
   );
-}
+});
 
 const styles = {
   panel: {
@@ -679,21 +606,6 @@ const styles = {
     ...createSubtitleStyle(),
     marginBottom: spacing.lg,
     lineHeight: 1.4,
-  } as React.CSSProperties,
-
-  section: {
-    marginBottom: spacing.lg,
-  } as React.CSSProperties,
-
-  sectionTitle: {
-    ...createHeaderStyle('h3'),
-    marginBottom: spacing.sm,
-  } as React.CSSProperties,
-
-  divider: {
-    height: '1px',
-    backgroundColor: colors.border.primary,
-    marginBottom: spacing.lg,
   } as React.CSSProperties,
 
   // Audio Source
@@ -721,19 +633,12 @@ const styles = {
   } as React.CSSProperties,
 
   fileName: {
-    ...typography.caption,
+    fontSize: '11px',
     color: colors.text.secondary,
     padding: spacing.sm,
     backgroundColor: colors.bg.subtle,
     borderRadius: effects.borderRadius.sm,
     marginBottom: spacing.md,
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.sm,
-  } as React.CSSProperties,
-
-  fileIcon: {
-    fontSize: '14px',
   } as React.CSSProperties,
 
   playbackControls: {
@@ -772,50 +677,6 @@ const styles = {
     color: colors.accent.primary,
   } as React.CSSProperties,
 
-  // Music Reactivity Toggle
-  toggleRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing.sm,
-  } as React.CSSProperties,
-
-  toggleButton: {
-    padding: `6px ${spacing.lg}`,
-    backgroundColor: colors.bg.subtle,
-    border: `1px solid ${colors.border.primary}`,
-    borderRadius: effects.borderRadius.sm,
-    color: colors.text.primary,
-    ...typography.caption,
-    fontWeight: 600,
-    cursor: 'pointer',
-    transition: effects.transition.normal,
-    minWidth: '60px',
-  } as React.CSSProperties,
-
-  toggleButtonActive: {
-    backgroundColor: '#4ecdc4',
-    borderColor: '#6eddcc',
-    color: colors.bg.subtle,
-  } as React.CSSProperties,
-
-  toggleDescription: {
-    fontSize: '10px',
-    color: colors.text.secondary,
-    lineHeight: 1.4,
-  } as React.CSSProperties,
-
-  autoHarmonizerHint: {
-    fontSize: '9px',
-    color: colors.text.muted,
-    lineHeight: 1.5,
-    marginTop: spacing.sm,
-    padding: spacing.sm,
-    backgroundColor: colors.bg.subtle,
-    borderRadius: effects.borderRadius.sm,
-    borderLeft: `2px solid ${colors.accent.primary}`,
-  } as React.CSSProperties,
-
   // Advanced Auto-Harmonizer Config
   advancedConfig: {
     marginTop: spacing.md,
@@ -826,18 +687,18 @@ const styles = {
   } as React.CSSProperties,
 
   advancedTitle: {
-    ...typography.caption,
+    fontSize: '12px',
     color: colors.text.secondary,
-    marginBottom: '10px',
+    marginBottom: spacing.sm,
     fontWeight: 600,
-    margin: '0 0 10px 0',
+    margin: `0 0 ${spacing.sm} 0`,
   } as React.CSSProperties,
 
   advancedHint: {
     fontSize: '9px',
     color: colors.text.muted,
     lineHeight: 1.4,
-    marginTop: '10px',
+    marginTop: spacing.sm,
     fontStyle: 'italic' as const,
   } as React.CSSProperties,
 
@@ -850,7 +711,7 @@ const styles = {
   } as React.CSSProperties,
 
   roleThresholdTitle: {
-    ...typography.caption,
+    fontSize: '11px',
     color: colors.text.primary,
     marginBottom: spacing.sm,
     fontWeight: 600,
@@ -904,7 +765,7 @@ const styles = {
   } as React.CSSProperties,
 
   beatIndicator: {
-    ...typography.caption,
+    fontSize: '11px',
     color: '#4ecdc4',
     fontWeight: 600,
     textAlign: 'center' as const,
@@ -919,95 +780,28 @@ const styles = {
   } as React.CSSProperties,
 
   analysisPlaceholder: {
-    ...typography.caption,
+    fontSize: '11px',
     color: colors.text.tertiary,
     fontStyle: 'italic' as const,
     textAlign: 'center' as const,
     padding: spacing.lg,
   } as React.CSSProperties,
 
-  // Presets
-  presetGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(70px, 1fr))',
-    gap: spacing.sm,
-  } as React.CSSProperties,
-
-  presetButton: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: `${spacing.sm} ${spacing.sm}`,
-    backgroundColor: colors.bg.subtle,
-    border: `1px solid ${colors.border.primary}`,
-    borderRadius: effects.borderRadius.md,
-    cursor: 'pointer',
-    transition: effects.transition.normal,
-    ...typography.caption,
-    color: colors.text.primary,
-    minHeight: '60px',
-  } as React.CSSProperties,
-
-  presetButtonActive: {
-    backgroundColor: colors.accent.primary,
-    borderColor: colors.accent.light,
-  } as React.CSSProperties,
-
-  presetIcon: {
-    fontSize: '20px',
-    marginBottom: spacing.xs,
-  } as React.CSSProperties,
-
-  presetName: {
-    fontSize: '9px',
-    textAlign: 'center' as const,
-  } as React.CSSProperties,
-
-  // Mapping Controls
-  mappingGroup: {
-    marginBottom: spacing.lg,
-  } as React.CSSProperties,
-
-  groupTitle: {
-    fontSize: '12px',
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-    fontWeight: 600,
-  } as React.CSSProperties,
-
+  // Checkbox
   checkboxLabel: {
     display: 'flex',
     alignItems: 'center',
     gap: spacing.sm,
-    ...typography.caption,
+    fontSize: '12px',
     color: colors.text.primary,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
     cursor: 'pointer',
   } as React.CSSProperties,
 
-  // Curve Selector
-  curveSelector: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  } as React.CSSProperties,
-
-  curveLabel: {
-    fontSize: '10px',
-    color: colors.text.secondary,
-    minWidth: '80px',
-  } as React.CSSProperties,
-
-  curveDropdown: {
-    flex: 1,
-    padding: `6px ${spacing.sm}`,
-    backgroundColor: colors.bg.subtle,
-    border: `1px solid ${colors.border.primary}`,
-    borderRadius: effects.borderRadius.sm,
-    color: colors.text.primary,
-    ...typography.caption,
+  checkbox: {
+    width: '18px',
+    height: '18px',
     cursor: 'pointer',
-    outline: 'none',
+    accentColor: colors.accent.primary,
   } as React.CSSProperties,
 };
