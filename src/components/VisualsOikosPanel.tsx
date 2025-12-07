@@ -575,9 +575,14 @@ export function VisualsOikosPanel() {
           <label style={styles.toggleLabel}>
             <input
               type="checkbox"
-              checked={visualization.hueCycling.enabled}
+              checked={visualization.hueCycling?.enabled ?? false}
               onChange={(e) => updateVisualizationParams({
-                hueCycling: { ...visualization.hueCycling, enabled: e.target.checked }
+                hueCycling: {
+                  enabled: e.target.checked,
+                  startHue: visualization.hueCycling?.startHue ?? 0,
+                  endHue: visualization.hueCycling?.endHue ?? 360,
+                  speed: visualization.hueCycling?.speed ?? 1.0,
+                }
               })}
               style={styles.checkbox}
             />
@@ -586,40 +591,55 @@ export function VisualsOikosPanel() {
         </div>
 
         {/* Hue Cycling Controls (only shown when enabled) */}
-        {visualization.hueCycling.enabled && (
+        {visualization.hueCycling?.enabled && (
           <div style={styles.hueCyclingControls}>
             <ParameterSlider
               label="Start Hue"
-              value={visualization.hueCycling.startHue}
+              value={visualization.hueCycling.startHue ?? 0}
               min={0}
               max={360}
               step={1}
               onChange={(value) => updateVisualizationParams({
-                hueCycling: { ...visualization.hueCycling, startHue: value }
+                hueCycling: {
+                  enabled: visualization.hueCycling?.enabled ?? false,
+                  startHue: value,
+                  endHue: visualization.hueCycling?.endHue ?? 360,
+                  speed: visualization.hueCycling?.speed ?? 1.0,
+                }
               })}
               description="Starting hue (0-360° on color wheel)"
             />
 
             <ParameterSlider
               label="End Hue"
-              value={visualization.hueCycling.endHue}
+              value={visualization.hueCycling.endHue ?? 360}
               min={0}
               max={360}
               step={1}
               onChange={(value) => updateVisualizationParams({
-                hueCycling: { ...visualization.hueCycling, endHue: value }
+                hueCycling: {
+                  enabled: visualization.hueCycling?.enabled ?? false,
+                  startHue: visualization.hueCycling?.startHue ?? 0,
+                  endHue: value,
+                  speed: visualization.hueCycling?.speed ?? 1.0,
+                }
               })}
               description="Ending hue (0-360° on color wheel)"
             />
 
             <ParameterSlider
               label="Cycle Speed"
-              value={visualization.hueCycling.speed}
+              value={visualization.hueCycling.speed ?? 1.0}
               min={0.1}
               max={10.0}
               step={0.1}
               onChange={(value) => updateVisualizationParams({
-                hueCycling: { ...visualization.hueCycling, speed: value }
+                hueCycling: {
+                  enabled: visualization.hueCycling?.enabled ?? false,
+                  startHue: visualization.hueCycling?.startHue ?? 0,
+                  endHue: visualization.hueCycling?.endHue ?? 360,
+                  speed: value,
+                }
               })}
               description="Transition speed (lower = slower, smoother)"
             />
