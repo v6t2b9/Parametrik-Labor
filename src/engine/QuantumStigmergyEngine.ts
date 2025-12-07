@@ -10,7 +10,6 @@ import type {
   PheromonePhases,
   AllParameters,
   AgentType,
-  ResolvedSpeciesParams,
 } from '../types/index.js';
 
 import {
@@ -24,38 +23,9 @@ import {
   cexp,
 } from './ComplexMath.js';
 
+import { resolveSpeciesParams } from '../utils/parameterUtils.js';
+
 const GRID_SIZE = 400;
-
-// Helper: Merge universal + species overrides
-function resolveSpeciesParams(
-  params: AllParameters,
-  species: AgentType
-): ResolvedSpeciesParams {
-  const speciesOverride = params.species[species];
-
-  return {
-    physical: {
-      ...params.universal.physical,
-      ...(speciesOverride.physical || {}),
-    },
-    semiotic: {
-      ...params.universal.semiotic,
-      ...(speciesOverride.semiotic || {}),
-    },
-    temporal: {
-      ...params.universal.temporal,
-      ...(speciesOverride.temporal || {}),
-    },
-    resonance: {
-      ...params.universal.resonance,
-      ...(speciesOverride.resonance || {}),
-    },
-    audio: {
-      ...params.universal.audio,
-      ...(speciesOverride.audio || {}),
-    },
-  };
-}
 
 export class QuantumStigmergyEngine {
   private agents: Agent[] = [];

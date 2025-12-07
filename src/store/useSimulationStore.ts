@@ -23,38 +23,11 @@ import { MusicReactiveEngine } from '../engine/MusicReactiveEngine';
 import { MusicReactiveEcosystemEngine } from '../engine/MusicReactiveEcosystemEngine';
 import { calculateGridDimensions } from '../engine/SimulationEngine';
 import { exportPresetAsJSON, importPresetFromJSON } from '../utils/presetIO';
+import { resolveSpeciesParams } from '../utils/parameterUtils';
 import { debug } from '../utils/debug';
 
-// Helper: Merge universal + species overrides
-export function resolveSpeciesParams(
-  params: AllParameters,
-  species: AgentType
-): ResolvedSpeciesParams {
-  const speciesOverride = params.species[species];
-
-  return {
-    physical: {
-      ...params.universal.physical,
-      ...(speciesOverride.physical || {}),
-    },
-    semiotic: {
-      ...params.universal.semiotic,
-      ...(speciesOverride.semiotic || {}),
-    },
-    temporal: {
-      ...params.universal.temporal,
-      ...(speciesOverride.temporal || {}),
-    },
-    resonance: {
-      ...params.universal.resonance,
-      ...(speciesOverride.resonance || {}),
-    },
-    audio: {
-      ...params.universal.audio,
-      ...(speciesOverride.audio || {}),
-    },
-  };
-}
+// Re-export for backward compatibility
+export { resolveSpeciesParams };
 
 // Quality preset configurations
 function getQualitySettings(preset: QualityPreset) {

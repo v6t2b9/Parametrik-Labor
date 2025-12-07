@@ -8,9 +8,7 @@ import { PerformanceOikosPanel } from './PerformanceOikosPanel';
 import { PresetGallery } from './PresetGallery';
 import type { SpeciesScope, OikosTab } from '../types';
 import { colors, spacing, typography, effects } from '../design-system';
-
-// Mobile breakpoint
-const MOBILE_BREAKPOINT = 768;
+import { BREAKPOINTS } from '../utils/uiConstants';
 
 interface SpeciesTabDef {
   id: SpeciesScope;
@@ -45,12 +43,12 @@ export const MatrixControlCenter = memo(function MatrixControlCenter() {
   const ui = useSimulationStore((state) => state.ui);
   const setActiveSpeciesScope = useSimulationStore((state) => state.setActiveSpeciesScope);
   const setActiveOikosTab = useSimulationStore((state) => state.setActiveOikosTab);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_BREAKPOINT);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < BREAKPOINTS.MOBILE);
 
   // Listen to window resize
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+      setIsMobile(window.innerWidth < BREAKPOINTS.MOBILE);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);

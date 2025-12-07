@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { colors, spacing, typography, effects } from '../design-system';
+import { INSTALL_PROMPT } from '../utils/uiConstants';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -38,7 +39,7 @@ export function InstallPrompt() {
       // Show our custom install prompt after a short delay
       showPromptTimeoutRef.current = window.setTimeout(() => {
         setShowPrompt(true);
-      }, 3000); // Show after 3 seconds
+      }, INSTALL_PROMPT.SHOW_DELAY);
     };
 
     // Listen for successful installation
@@ -83,9 +84,9 @@ export function InstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    // Remember dismissal for 7 days
-    const sevenDaysFromNow = Date.now() + (7 * 24 * 60 * 60 * 1000);
-    localStorage.setItem('pwa-install-dismissed-until', sevenDaysFromNow.toString());
+    // Remember dismissal for configured duration
+    const dismissedUntil = Date.now() + INSTALL_PROMPT.DISMISSAL_DURATION;
+    localStorage.setItem('pwa-install-dismissed-until', dismissedUntil.toString());
   };
 
   if (!showPrompt || !deferredPrompt) {
