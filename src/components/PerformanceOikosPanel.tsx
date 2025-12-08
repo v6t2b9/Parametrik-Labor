@@ -2,11 +2,13 @@ import { memo } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import type { QualityPreset } from '../types/index.js';
-import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { colors, spacing, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { Section } from './ui/Section';
+import { Divider } from './ui/Divider';
+import { InfoBox } from './ui/InfoBox';
 
-// OPTIMIZED: React.memo prevents re-renders when performance metrics/params haven't changed
 const PerformanceOikosPanelComponent = () => {
-  // OPTIMIZATION: Shallow selectors - only subscribe to needed data
+  // Shallow selectors - only subscribe to needed data
   const performance = useSimulationStore((state) => state.parameters.performance);
   const agentCount = useSimulationStore((state) => state.parameters.globalTemporal.agentCount);
   const performanceMetrics = useSimulationStore((state) => state.performanceMetrics);
@@ -36,10 +38,10 @@ const PerformanceOikosPanelComponent = () => {
         </p>
       </div>
 
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Performance Status */}
-      <div style={styles.statusSection}>
+      <Section title="Performance Status">
         <div style={styles.statusGrid}>
           <div style={styles.statusBox}>
             <div style={styles.statusLabel}>FPS</div>
@@ -75,18 +77,19 @@ const PerformanceOikosPanelComponent = () => {
             Low performance detected. Try reducing quality or enabling auto-optimizer.
           </div>
         )}
-      </div>
+      </Section>
 
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Auto-Optimizer Toggle */}
-      <div style={styles.toggleSection}>
+      <Section title="Auto-Optimizer">
         <label style={styles.toggleLabel}>
           <input
             type="checkbox"
             checked={performance.autoOptimize}
             onChange={(e) => updatePerformanceParams({ autoOptimize: e.target.checked })}
             style={styles.checkbox}
+            aria-label="Enable auto-optimizer"
           />
           <span style={styles.toggleText}>
             {performance.autoOptimize ? 'Auto-Optimizer Active' : 'Auto-Optimizer Disabled'}
@@ -96,48 +99,53 @@ const PerformanceOikosPanelComponent = () => {
           Automatically reduces effects & agent count when FPS drops below target.
           Restores quality when performance improves.
         </p>
-      </div>
+      </Section>
 
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Quality Preset Selection */}
-      <h4 style={styles.sectionTitle}>Quality Presets</h4>
-      <p style={styles.sectionDescription}>Balanced configurations for different hardware capabilities</p>
-      <div style={styles.presetGrid}>
-        {qualityPresets.map((preset) => (
-          <button
-            key={preset.value}
-            onClick={() => applyQualityPreset(preset.value)}
-            style={{
-              ...styles.presetButton,
-              ...(performance.qualityPreset === preset.value ? styles.presetButtonActive : {}),
-            }}
-          >
-            <span style={styles.presetIcon}>{preset.icon}</span>
-            <span style={styles.presetLabel}>{preset.label}</span>
-            <span style={styles.presetDescription}>{preset.description}</span>
-          </button>
-        ))}
-      </div>
+      <Section
+        title="Quality Presets"
+        description="Balanced configurations for different hardware capabilities"
+      >
+        <div style={styles.presetGrid}>
+          {qualityPresets.map((preset) => (
+            <button
+              key={preset.value}
+              onClick={() => applyQualityPreset(preset.value)}
+              style={{
+                ...styles.presetButton,
+                ...(performance.qualityPreset === preset.value ? styles.presetButtonActive : {}),
+              }}
+              aria-pressed={performance.qualityPreset === preset.value}
+            >
+              <span style={styles.presetIcon}>{preset.icon}</span>
+              <span style={styles.presetLabel}>{preset.label}</span>
+              <span style={styles.presetDescription}>{preset.description}</span>
+            </button>
+          ))}
+        </div>
+      </Section>
 
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Target FPS */}
-      <h4 style={styles.sectionTitle}>Target Frame Rate</h4>
-      <ParameterSlider
-        label="Target FPS"
-        value={performance.targetFPS}
-        min={30}
-        max={120}
-        step={10}
-        onChange={(value) => updatePerformanceParams({ targetFPS: value })}
-        description="Auto-optimizer will try to maintain this frame rate"
-      />
+      <Section title="Target Frame Rate">
+        <ParameterSlider
+          label="Target FPS"
+          value={performance.targetFPS}
+          min={30}
+          max={120}
+          step={10}
+          onChange={(value) => updatePerformanceParams({ targetFPS: value })}
+          description="Auto-optimizer will try to maintain this frame rate"
+        />
+      </Section>
 
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Performance Info */}
-      <div style={styles.infoSection}>
+      <InfoBox>
         <h4 style={styles.infoTitle}>How it works</h4>
         <ul style={styles.infoList}>
           <li>Quality Preset sets base parameters for agents & effects</li>
@@ -153,7 +161,7 @@ const PerformanceOikosPanelComponent = () => {
           <li>Aggressive mode: FPS &lt; 50% of target jumps 3 levels</li>
           <li>System recovers quality slowly when FPS is stable</li>
         </ul>
-      </div>
+      </InfoBox>
     </div>
   );
 };
@@ -189,40 +197,37 @@ const styles = {
     color: '#ffaaaa',
     border: '2px solid #5a3a3a',
     borderRadius: effects.borderRadius.lg,
-    fontSize: typography.h3.fontSize,
+    fontSize: '13px',
     fontWeight: 600,
     cursor: 'pointer',
     transition: effects.transition.normal,
   } as React.CSSProperties,
   resetWarning: {
-    ...typography.caption,
+    fontSize: '11px',
     color: '#ff8888',
     marginTop: spacing.sm,
-    marginBottom: '0',
-    textAlign: 'center',
+    marginBottom: 0,
+    textAlign: 'center' as const,
     lineHeight: '1.4',
-  } as React.CSSProperties,
-  statusSection: {
-    marginBottom: spacing.xl,
   } as React.CSSProperties,
   statusGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '10px',
-    marginBottom: '10px',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
   } as React.CSSProperties,
   statusBox: {
     backgroundColor: colors.bg.subtle,
     border: `1px solid ${colors.border.primary}`,
     borderRadius: effects.borderRadius.md,
     padding: spacing.md,
-    textAlign: 'center',
+    textAlign: 'center' as const,
   } as React.CSSProperties,
   statusLabel: {
     fontSize: '10px',
     color: colors.text.tertiary,
     marginBottom: spacing.xs,
-    textTransform: 'uppercase',
+    textTransform: 'uppercase' as const,
     letterSpacing: '0.5px',
   } as React.CSSProperties,
   statusValue: {
@@ -234,13 +239,11 @@ const styles = {
     backgroundColor: 'rgba(255, 107, 107, 0.1)',
     border: '1px solid rgba(255, 107, 107, 0.3)',
     borderRadius: effects.borderRadius.md,
-    padding: '10px',
+    padding: spacing.sm,
     color: '#ff6b6b',
     fontSize: '12px',
-    textAlign: 'center',
-  } as React.CSSProperties,
-  toggleSection: {
-    marginBottom: spacing.xl,
+    textAlign: 'center' as const,
+    marginTop: spacing.sm,
   } as React.CSSProperties,
   toggleLabel: {
     display: 'flex',
@@ -249,53 +252,41 @@ const styles = {
     marginBottom: spacing.sm,
   } as React.CSSProperties,
   checkbox: {
-    marginRight: '10px',
     width: '18px',
     height: '18px',
     cursor: 'pointer',
+    marginRight: spacing.sm,
+    accentColor: colors.accent.primary,
   } as React.CSSProperties,
   toggleText: {
-    ...typography.h3,
+    fontSize: '13px',
     color: colors.text.primary,
     fontWeight: 600,
   } as React.CSSProperties,
   toggleDescription: {
-    ...typography.caption,
+    fontSize: '11px',
     color: colors.text.tertiary,
-    marginLeft: '28px',
-    marginTop: '0',
+    marginLeft: '26px',
+    marginTop: 0,
     lineHeight: '1.4',
-  } as React.CSSProperties,
-  sectionTitle: {
-    ...typography.h3,
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-    fontWeight: 600,
-  } as React.CSSProperties,
-  sectionDescription: {
-    fontSize: '10px',
-    color: colors.text.secondary,
-    marginBottom: '10px',
-    lineHeight: 1.4,
   } as React.CSSProperties,
   presetGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '10px',
+    gap: spacing.sm,
   } as React.CSSProperties,
   presetButton: {
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column' as const,
     alignItems: 'center',
-    padding: `${spacing.sm} ${spacing.sm}`,
+    padding: spacing.md,
     backgroundColor: colors.bg.subtle,
     border: `1px solid ${colors.border.primary}`,
     borderRadius: effects.borderRadius.md,
     cursor: 'pointer',
     transition: effects.transition.normal,
-    ...typography.caption,
     color: colors.text.primary,
-    minHeight: '60px',
+    minHeight: '80px',
   } as React.CSSProperties,
   presetButtonActive: {
     backgroundColor: '#1a1a2e',
@@ -307,7 +298,7 @@ const styles = {
     marginBottom: spacing.sm,
   } as React.CSSProperties,
   presetLabel: {
-    ...typography.h3,
+    fontSize: '13px',
     fontWeight: 600,
     color: colors.text.primary,
     marginBottom: spacing.xs,
@@ -315,29 +306,18 @@ const styles = {
   presetDescription: {
     fontSize: '10px',
     color: colors.text.tertiary,
-    textAlign: 'center',
+    textAlign: 'center' as const,
     lineHeight: '1.3',
   } as React.CSSProperties,
-  divider: {
-    height: '1px',
-    backgroundColor: colors.border.primary,
-    marginBottom: spacing.xl,
-  } as React.CSSProperties,
-  infoSection: {
-    backgroundColor: colors.bg.subtle,
-    border: `1px solid ${colors.border.primary}`,
-    borderRadius: effects.borderRadius.md,
-    padding: '14px',
-  } as React.CSSProperties,
   infoTitle: {
-    ...typography.h3,
+    fontSize: '13px',
     color: colors.text.secondary,
-    marginBottom: '10px',
+    marginBottom: spacing.sm,
     fontWeight: 600,
-    margin: '0 0 10px 0',
+    margin: `0 0 ${spacing.sm} 0`,
   } as React.CSSProperties,
   infoList: {
-    ...typography.caption,
+    fontSize: '11px',
     color: colors.text.tertiary,
     lineHeight: '1.6',
     margin: 0,
