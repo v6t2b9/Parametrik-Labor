@@ -454,12 +454,23 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     updateSpeciesResonanceParams: (species, params) => {
       const current = get().parameters;
       const speciesParams = current.species[species];
-      const currentResonance = speciesParams.resonance || current.universal.resonance;
-      const updatedResonance = { ...currentResonance, ...params } as ResonanceOikosParams;
+
+      // Resolve current effective resonance by merging universal with species-specific overrides
+      // This ensures we always have a complete ResonanceOikosParams object to work with
+      const resolvedResonance: ResonanceOikosParams = {
+        ...current.universal.resonance,
+        ...(speciesParams.resonance || {}),
+        interactionMatrix: {
+          ...current.universal.resonance.interactionMatrix,
+          ...(speciesParams.resonance?.interactionMatrix || {})
+        }
+      };
+
+      const updatedResonance = { ...resolvedResonance, ...params } as ResonanceOikosParams;
       // Deep merge interactionMatrix if present
       if (params.interactionMatrix) {
         updatedResonance.interactionMatrix = {
-          ...currentResonance.interactionMatrix,
+          ...resolvedResonance.interactionMatrix,
           ...params.interactionMatrix
         } as ResonanceOikosParams['interactionMatrix'];
       }
