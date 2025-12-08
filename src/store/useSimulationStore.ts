@@ -381,10 +381,18 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     updateUniversalResonanceParams: (params) => {
       const current = get().parameters;
+      const currentResonance = current.universal.resonance;
       get().setParameters({
         universal: {
           ...current.universal,
-          resonance: { ...current.universal.resonance, ...params },
+          resonance: {
+            ...currentResonance,
+            ...params,
+            // Deep merge interactionMatrix if present
+            ...(params.interactionMatrix && {
+              interactionMatrix: { ...currentResonance.interactionMatrix, ...params.interactionMatrix }
+            }),
+          },
         },
       });
     },
@@ -445,12 +453,20 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     updateSpeciesResonanceParams: (species, params) => {
       const current = get().parameters;
       const speciesParams = current.species[species];
+      const currentResonance = speciesParams.resonance;
       get().setParameters({
         species: {
           ...current.species,
           [species]: {
             ...speciesParams,
-            resonance: { ...speciesParams.resonance, ...params },
+            resonance: {
+              ...currentResonance,
+              ...params,
+              // Deep merge interactionMatrix if present
+              ...(params.interactionMatrix && {
+                interactionMatrix: { ...currentResonance.interactionMatrix, ...params.interactionMatrix }
+              }),
+            },
           },
         },
       });
@@ -539,8 +555,21 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     updateVisualizationParams: (params) => {
       const current = get().parameters;
+      const currentViz = current.visualization;
       get().setParameters({
-        visualization: { ...current.visualization, ...params },
+        visualization: {
+          ...currentViz,
+          ...params,
+          // Deep merge color objects if present
+          ...(params.colorRed && { colorRed: { ...currentViz.colorRed, ...params.colorRed } }),
+          ...(params.colorGreen && { colorGreen: { ...currentViz.colorGreen, ...params.colorGreen } }),
+          ...(params.colorBlue && { colorBlue: { ...currentViz.colorBlue, ...params.colorBlue } }),
+          ...(params.colorBg && { colorBg: { ...currentViz.colorBg, ...params.colorBg } }),
+          // Deep merge hueCycling if present
+          ...(params.hueCycling && {
+            hueCycling: { ...currentViz.hueCycling, ...params.hueCycling }
+          }),
+        },
       });
     },
 
@@ -563,14 +592,19 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     updateModelParams: (params) => {
       const current = get().parameters;
+      const currentModelParams = current.modelParams;
       const newParams = {
         ...current,
         modelParams: {
-          ...current.modelParams,
+          ...currentModelParams,
           ...params,
-          // Preserve nested m2 and m3 params if not provided
-          m2: { ...current.modelParams.m2, ...(params.m2 || {}) },
-          m3: { ...current.modelParams.m3, ...(params.m3 || {}) },
+          // Deep merge m2 and m3 if present
+          ...(params.m2 && {
+            m2: { ...currentModelParams.m2, ...params.m2 }
+          }),
+          ...(params.m3 && {
+            m3: { ...currentModelParams.m3, ...params.m3 }
+          }),
         },
       };
 
