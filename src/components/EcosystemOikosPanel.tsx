@@ -8,6 +8,11 @@ import { ParameterSlider } from './ParameterSlider';
 import type { EcologyConfig } from '../types/ecosystem';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
+// DeepPartial type helper for nested partial objects
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
 export function EcosystemOikosPanel() {
   const parameters = useSimulationStore((state) => state.parameters);
   const setParameters = useSimulationStore((state) => state.setParameters);
@@ -20,12 +25,19 @@ export function EcosystemOikosPanel() {
     });
   };
 
-  const handleUpdateEcosystem = (updates: Partial<EcologyConfig>) => {
+  const handleUpdateEcosystem = (updates: DeepPartial<EcologyConfig>) => {
     if (!ecosystem) return;
     setParameters({
       ecosystem: {
         ...ecosystem,
         ...updates,
+        // Deep merge nested objects
+        ...(updates.population && {
+          population: { ...ecosystem.population, ...updates.population }
+        }),
+        ...(updates.audioEcology && {
+          audioEcology: { ...ecosystem.audioEcology, ...updates.audioEcology }
+        }),
       } as EcologyConfig,
     });
   };
@@ -132,7 +144,6 @@ export function EcosystemOikosPanel() {
           onChange={(val) =>
             handleUpdateEcosystem({
               population: {
-                ...ecosystem.population,
                 maxPopulation: val,
               },
             })
@@ -169,7 +180,6 @@ export function EcosystemOikosPanel() {
           onChange={(val) =>
             handleUpdateEcosystem({
               audioEcology: {
-                ...ecosystem.audioEcology,
                 boostStrength: val,
               },
             })

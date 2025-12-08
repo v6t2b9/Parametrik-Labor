@@ -28,6 +28,11 @@ import { debug } from '../utils/debug';
 // Re-export for backward compatibility
 export { resolveSpeciesParams };
 
+// DeepPartial type helper for nested partial objects
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
 // Quality preset configurations
 function getQualitySettings(preset: QualityPreset) {
   switch (preset) {
@@ -102,28 +107,28 @@ interface SimulationStore {
   updateUniversalPhysicalParams: (params: Partial<PhysicalOikosParams>) => void;
   updateUniversalSemioticParams: (params: Partial<SemioticOikosParams>) => void;
   updateUniversalTemporalParams: (params: Partial<SpeciesTemporalParams>) => void;
-  updateUniversalResonanceParams: (params: Partial<ResonanceOikosParams>) => void;
+  updateUniversalResonanceParams: (params: DeepPartial<ResonanceOikosParams>) => void;
   updateUniversalAudioParams: (params: Partial<MusicMappingParameters>) => void;
 
   updateSpeciesPhysicalParams: (species: AgentType, params: Partial<PhysicalOikosParams>) => void;
   updateSpeciesSemioticParams: (species: AgentType, params: Partial<SemioticOikosParams>) => void;
   updateSpeciesTemporalParams: (species: AgentType, params: Partial<SpeciesTemporalParams>) => void;
-  updateSpeciesResonanceParams: (species: AgentType, params: Partial<ResonanceOikosParams>) => void;
+  updateSpeciesResonanceParams: (species: AgentType, params: DeepPartial<ResonanceOikosParams>) => void;
   updateSpeciesAudioParams: (species: AgentType, params: Partial<MusicMappingParameters>) => void;
 
   // Context-aware updates (based on current activeSpeciesScope)
   updatePhysicalParams: (params: Partial<PhysicalOikosParams>) => void;
   updateSemioticParams: (params: Partial<SemioticOikosParams>) => void;
   updateTemporalParams: (params: Partial<SpeciesTemporalParams>) => void;
-  updateResonanceParams: (params: Partial<ResonanceOikosParams>) => void;
+  updateResonanceParams: (params: DeepPartial<ResonanceOikosParams>) => void;
   updateAudioParams: (params: Partial<MusicMappingParameters>) => void;
 
   // Global updates
   updateGlobalTemporalParams: (params: Partial<AllParameters['globalTemporal']>) => void;
-  updateVisualizationParams: (params: Partial<AllParameters['visualization']>) => void;
+  updateVisualizationParams: (params: DeepPartial<AllParameters['visualization']>) => void;
   updateEffectsParams: (params: Partial<AllParameters['effects']>) => void;
   updatePerformanceParams: (params: Partial<AllParameters['performance']>) => void;
-  updateModelParams: (params: Partial<ModelParams>) => void;
+  updateModelParams: (params: DeepPartial<ModelParams>) => void;
   updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => void;
   applyQualityPreset: (preset: QualityPreset) => void;
 
@@ -234,7 +239,13 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         if (update?.colorGreen) merged.colorGreen = { ...update.colorGreen };
         if (update?.colorBlue) merged.colorBlue = { ...update.colorBlue };
         if (update?.colorBg) merged.colorBg = { ...update.colorBg };
-        if (update?.hueCycling) merged.hueCycling = { ...update.hueCycling };
+        // Deep merge hueCycling (don't overwrite whole object)
+        if (current.hueCycling || update?.hueCycling) {
+          merged.hueCycling = {
+            ...(current.hueCycling || {}),
+            ...(update?.hueCycling || {}),
+          };
+        }
         return merged;
       };
 
@@ -370,10 +381,19 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     updateUniversalResonanceParams: (params) => {
       const current = get().parameters;
+      const currentResonance = current.universal.resonance;
+      const updatedResonance = { ...currentResonance, ...params } as ResonanceOikosParams;
+      // Deep merge interactionMatrix if present
+      if (params.interactionMatrix) {
+        updatedResonance.interactionMatrix = {
+          ...currentResonance.interactionMatrix,
+          ...params.interactionMatrix
+        } as ResonanceOikosParams['interactionMatrix'];
+      }
       get().setParameters({
         universal: {
           ...current.universal,
-          resonance: { ...current.universal.resonance, ...params },
+          resonance: updatedResonance,
         },
       });
     },
@@ -434,12 +454,21 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     updateSpeciesResonanceParams: (species, params) => {
       const current = get().parameters;
       const speciesParams = current.species[species];
+      const currentResonance = speciesParams.resonance || current.universal.resonance;
+      const updatedResonance = { ...currentResonance, ...params } as ResonanceOikosParams;
+      // Deep merge interactionMatrix if present
+      if (params.interactionMatrix) {
+        updatedResonance.interactionMatrix = {
+          ...currentResonance.interactionMatrix,
+          ...params.interactionMatrix
+        } as ResonanceOikosParams['interactionMatrix'];
+      }
       get().setParameters({
         species: {
           ...current.species,
           [species]: {
             ...speciesParams,
-            resonance: { ...speciesParams.resonance, ...params },
+            resonance: updatedResonance,
           },
         },
       });
@@ -528,8 +557,27 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     updateVisualizationParams: (params) => {
       const current = get().parameters;
+      const currentViz = current.visualization;
+      const updatedViz = { ...currentViz, ...params } as AllParameters['visualization'];
+      // Deep merge color objects if present
+      if (params.colorRed) {
+        updatedViz.colorRed = { ...currentViz.colorRed, ...params.colorRed } as AllParameters['visualization']['colorRed'];
+      }
+      if (params.colorGreen) {
+        updatedViz.colorGreen = { ...currentViz.colorGreen, ...params.colorGreen } as AllParameters['visualization']['colorGreen'];
+      }
+      if (params.colorBlue) {
+        updatedViz.colorBlue = { ...currentViz.colorBlue, ...params.colorBlue } as AllParameters['visualization']['colorBlue'];
+      }
+      if (params.colorBg) {
+        updatedViz.colorBg = { ...currentViz.colorBg, ...params.colorBg } as AllParameters['visualization']['colorBg'];
+      }
+      // Deep merge hueCycling if present
+      if (params.hueCycling) {
+        updatedViz.hueCycling = { ...currentViz.hueCycling, ...params.hueCycling } as AllParameters['visualization']['hueCycling'];
+      }
       get().setParameters({
-        visualization: { ...current.visualization, ...params },
+        visualization: updatedViz,
       });
     },
 
@@ -552,16 +600,19 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
 
     updateModelParams: (params) => {
       const current = get().parameters;
+      const currentModelParams = current.modelParams;
+      const updatedModelParams = { ...currentModelParams, ...params } as ModelParams;
+      // Deep merge m2 and m3 if present
+      if (params.m2) {
+        updatedModelParams.m2 = { ...currentModelParams.m2, ...params.m2 } as ModelParams['m2'];
+      }
+      if (params.m3) {
+        updatedModelParams.m3 = { ...currentModelParams.m3, ...params.m3 } as ModelParams['m3'];
+      }
       const newParams = {
         ...current,
-        modelParams: {
-          ...current.modelParams,
-          ...params,
-          // Preserve nested m2 and m3 params if not provided
-          m2: { ...current.modelParams.m2, ...(params.m2 || {}) },
-          m3: { ...current.modelParams.m3, ...(params.m3 || {}) },
-        },
-      };
+        modelParams: updatedModelParams,
+      } as AllParameters;
 
       // Update engine and reinitialize agents (model change requires reset)
       const { engine: currentEngine } = get();
