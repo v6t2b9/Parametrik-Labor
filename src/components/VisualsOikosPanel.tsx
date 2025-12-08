@@ -499,9 +499,9 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
 
 const styles = {
   panel: {
-    padding: spacing.xl,
+    padding: spacing.lg,
     backgroundColor: colors.bg.secondary,
-    borderRadius: effects.borderRadius.lg,
+    borderRadius: effects.borderRadius.md,
     border: `1px solid ${colors.border.primary}`,
   } as React.CSSProperties,
   title: {
