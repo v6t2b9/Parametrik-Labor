@@ -26,6 +26,13 @@ export function EcosystemOikosPanel() {
       ecosystem: {
         ...ecosystem,
         ...updates,
+        // Deep merge nested objects
+        ...(updates.population && {
+          population: { ...ecosystem.population, ...updates.population }
+        }),
+        ...(updates.audioEcology && {
+          audioEcology: { ...ecosystem.audioEcology, ...updates.audioEcology }
+        }),
       } as EcologyConfig,
     });
   };
@@ -132,7 +139,6 @@ export function EcosystemOikosPanel() {
           onChange={(val) =>
             handleUpdateEcosystem({
               population: {
-                ...ecosystem.population,
                 maxPopulation: val,
               },
             })
@@ -169,7 +175,6 @@ export function EcosystemOikosPanel() {
           onChange={(val) =>
             handleUpdateEcosystem({
               audioEcology: {
-                ...ecosystem.audioEcology,
                 boostStrength: val,
               },
             })

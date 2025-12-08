@@ -47,7 +47,7 @@ export const ResonanceOikosPanel = memo(function ResonanceOikosPanel() {
             max={2.0}
             step={0.1}
             onChange={(value) => updateResonanceParams({
-              interactionMatrix: { ...currentValues.interactionMatrix, [key]: value }
+              interactionMatrix: { [key]: value }
             })}
             description={desc}
             hasOverride={hasOverride('interactionMatrix')}

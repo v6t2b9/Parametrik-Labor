@@ -18,19 +18,14 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
   const updateEffectsParams = useSimulationStore((state) => state.updateEffectsParams);
 
   // Memoized handlers for better performance
+  // Store handles deep merging of hueCycling, so we can just send the updates
   const handleHueCyclingUpdate = useCallback(
     (updates: Partial<VisualizationParams['hueCycling']>) => {
       updateVisualizationParams({
-        hueCycling: {
-          enabled: visualization.hueCycling?.enabled ?? false,
-          startHue: visualization.hueCycling?.startHue ?? 0,
-          endHue: visualization.hueCycling?.endHue ?? 360,
-          speed: visualization.hueCycling?.speed ?? 1.0,
-          ...updates,
-        },
+        hueCycling: updates,
       });
     },
-    [updateVisualizationParams, visualization.hueCycling]
+    [updateVisualizationParams]
   );
 
   // Blend mode options

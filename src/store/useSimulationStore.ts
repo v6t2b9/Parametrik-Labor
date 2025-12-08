@@ -234,7 +234,13 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
         if (update?.colorGreen) merged.colorGreen = { ...update.colorGreen };
         if (update?.colorBlue) merged.colorBlue = { ...update.colorBlue };
         if (update?.colorBg) merged.colorBg = { ...update.colorBg };
-        if (update?.hueCycling) merged.hueCycling = { ...update.hueCycling };
+        // Deep merge hueCycling (don't overwrite whole object)
+        if (current.hueCycling || update?.hueCycling) {
+          merged.hueCycling = {
+            ...(current.hueCycling || {}),
+            ...(update?.hueCycling || {}),
+          };
+        }
         return merged;
       };
 
