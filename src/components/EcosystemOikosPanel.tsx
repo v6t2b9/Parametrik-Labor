@@ -8,6 +8,11 @@ import { ParameterSlider } from './ParameterSlider';
 import type { EcologyConfig } from '../types/ecosystem';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
 
+// DeepPartial type helper for nested partial objects
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
 export function EcosystemOikosPanel() {
   const parameters = useSimulationStore((state) => state.parameters);
   const setParameters = useSimulationStore((state) => state.setParameters);
@@ -20,7 +25,7 @@ export function EcosystemOikosPanel() {
     });
   };
 
-  const handleUpdateEcosystem = (updates: Partial<EcologyConfig>) => {
+  const handleUpdateEcosystem = (updates: DeepPartial<EcologyConfig>) => {
     if (!ecosystem) return;
     setParameters({
       ecosystem: {

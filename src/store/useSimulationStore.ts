@@ -28,6 +28,11 @@ import { debug } from '../utils/debug';
 // Re-export for backward compatibility
 export { resolveSpeciesParams };
 
+// DeepPartial type helper for nested partial objects
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
 // Quality preset configurations
 function getQualitySettings(preset: QualityPreset) {
   switch (preset) {
@@ -102,28 +107,28 @@ interface SimulationStore {
   updateUniversalPhysicalParams: (params: Partial<PhysicalOikosParams>) => void;
   updateUniversalSemioticParams: (params: Partial<SemioticOikosParams>) => void;
   updateUniversalTemporalParams: (params: Partial<SpeciesTemporalParams>) => void;
-  updateUniversalResonanceParams: (params: Partial<ResonanceOikosParams>) => void;
+  updateUniversalResonanceParams: (params: DeepPartial<ResonanceOikosParams>) => void;
   updateUniversalAudioParams: (params: Partial<MusicMappingParameters>) => void;
 
   updateSpeciesPhysicalParams: (species: AgentType, params: Partial<PhysicalOikosParams>) => void;
   updateSpeciesSemioticParams: (species: AgentType, params: Partial<SemioticOikosParams>) => void;
   updateSpeciesTemporalParams: (species: AgentType, params: Partial<SpeciesTemporalParams>) => void;
-  updateSpeciesResonanceParams: (species: AgentType, params: Partial<ResonanceOikosParams>) => void;
+  updateSpeciesResonanceParams: (species: AgentType, params: DeepPartial<ResonanceOikosParams>) => void;
   updateSpeciesAudioParams: (species: AgentType, params: Partial<MusicMappingParameters>) => void;
 
   // Context-aware updates (based on current activeSpeciesScope)
   updatePhysicalParams: (params: Partial<PhysicalOikosParams>) => void;
   updateSemioticParams: (params: Partial<SemioticOikosParams>) => void;
   updateTemporalParams: (params: Partial<SpeciesTemporalParams>) => void;
-  updateResonanceParams: (params: Partial<ResonanceOikosParams>) => void;
+  updateResonanceParams: (params: DeepPartial<ResonanceOikosParams>) => void;
   updateAudioParams: (params: Partial<MusicMappingParameters>) => void;
 
   // Global updates
   updateGlobalTemporalParams: (params: Partial<AllParameters['globalTemporal']>) => void;
-  updateVisualizationParams: (params: Partial<AllParameters['visualization']>) => void;
+  updateVisualizationParams: (params: DeepPartial<AllParameters['visualization']>) => void;
   updateEffectsParams: (params: Partial<AllParameters['effects']>) => void;
   updatePerformanceParams: (params: Partial<AllParameters['performance']>) => void;
-  updateModelParams: (params: Partial<ModelParams>) => void;
+  updateModelParams: (params: DeepPartial<ModelParams>) => void;
   updatePerformanceMetrics: (metrics: Partial<PerformanceMetrics>) => void;
   applyQualityPreset: (preset: QualityPreset) => void;
 
