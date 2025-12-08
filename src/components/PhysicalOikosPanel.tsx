@@ -3,7 +3,9 @@ import { useSimulationStore, resolveSpeciesParams } from '../store/useSimulation
 import { ParameterSlider } from './ParameterSlider';
 import { physicsPresets } from '../presets/tabPresets';
 import type { AgentType } from '../types';
-import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { colors, spacing, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { PresetGrid, type Preset } from './ui/PresetGrid';
+import { Divider } from './ui/Divider';
 
 export const PhysicalOikosPanel = memo(function PhysicalOikosPanel() {
   const parameters = useSimulationStore((state) => state.parameters);
@@ -25,30 +27,23 @@ export const PhysicalOikosPanel = memo(function PhysicalOikosPanel() {
     return speciesOverride !== undefined && param in speciesOverride;
   }, [ui.activeSpeciesScope, parameters.species]);
 
+  // Convert physicsPresets to PresetGrid format
+  const presets: Preset<typeof currentValues>[] = physicsPresets.map((preset) => ({
+    name: preset.name,
+    icon: preset.icon,
+    description: preset.description,
+    params: preset.params,
+  }));
+
   return (
     <div style={styles.panel}>
       <h3 style={styles.title}>Physics</h3>
       <p style={styles.subtitle}>Trail decay and diffusion settings</p>
 
-      {/* Physics Presets Section */}
-      <div style={styles.presetSection}>
-        <h4 style={styles.presetTitle}>Presets</h4>
-        <div style={styles.presetGrid}>
-          {physicsPresets.map((preset) => (
-            <button
-              key={preset.name}
-              onClick={() => updatePhysicalParams(preset.params)}
-              style={styles.presetButton}
-              title={preset.description}
-            >
-              <span style={styles.presetIcon}>{preset.icon}</span>
-              <span style={styles.presetName}>{preset.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Physics Presets */}
+      <PresetGrid presets={presets} onSelect={updatePhysicalParams} title="Presets" />
 
-      <div style={styles.divider} />
+      <Divider />
 
       <ParameterSlider
         label="Decay Rate"
@@ -110,45 +105,6 @@ const styles = {
   } as React.CSSProperties,
   subtitle: {
     ...createSubtitleStyle(),
-    marginBottom: spacing.lg,
-  } as React.CSSProperties,
-  presetSection: {
-    marginBottom: spacing.lg,
-  } as React.CSSProperties,
-  presetTitle: {
-    ...createHeaderStyle('h3'),
-    marginBottom: spacing.md,
-  } as React.CSSProperties,
-  presetGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
-    gap: spacing.sm,
-  } as React.CSSProperties,
-  presetButton: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: `${spacing.sm} ${spacing.sm}`,
-    backgroundColor: colors.bg.subtle,
-    border: `1px solid ${colors.border.primary}`,
-    borderRadius: effects.borderRadius.md,
-    cursor: 'pointer',
-    transition: effects.transition.normal,
-    ...typography.caption,
-    color: colors.text.primary,
-    minHeight: '60px', // Touch-friendly
-  } as React.CSSProperties,
-  presetIcon: {
-    fontSize: '20px',
-    marginBottom: spacing.xs,
-  } as React.CSSProperties,
-  presetName: {
-    ...typography.caption,
-    textAlign: 'center',
-  } as React.CSSProperties,
-  divider: {
-    height: '1px',
-    backgroundColor: colors.border.primary,
     marginBottom: spacing.lg,
   } as React.CSSProperties,
 };

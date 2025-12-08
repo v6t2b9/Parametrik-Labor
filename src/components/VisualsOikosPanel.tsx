@@ -1,15 +1,55 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { useSimulationStore } from '../store/useSimulationStore';
 import { ParameterSlider } from './ParameterSlider';
 import { ColorPicker } from './ColorPicker';
 import { visualPresets, effectsPresets } from '../presets/tabPresets';
 import { colors, spacing, typography, effects, createHeaderStyle, createSubtitleStyle } from '../design-system';
+import { Section, Subsection } from './ui/Section';
+import { ToggleGroup, type ToggleOption } from './ui/ToggleGroup';
+import { PresetGrid } from './ui/PresetGrid';
+import { Divider } from './ui/Divider';
+import { HueCyclingSection } from './visuals/HueCyclingSection';
+import type { VisualizationParams } from '../types';
 
 export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
   const visualization = useSimulationStore((state) => state.parameters.visualization);
   const effectsParams = useSimulationStore((state) => state.parameters.effects);
   const updateVisualizationParams = useSimulationStore((state) => state.updateVisualizationParams);
   const updateEffectsParams = useSimulationStore((state) => state.updateEffectsParams);
+
+  // Memoized handlers for better performance
+  const handleHueCyclingUpdate = useCallback(
+    (updates: Partial<VisualizationParams['hueCycling']>) => {
+      updateVisualizationParams({
+        hueCycling: {
+          enabled: visualization.hueCycling?.enabled ?? false,
+          startHue: visualization.hueCycling?.startHue ?? 0,
+          endHue: visualization.hueCycling?.endHue ?? 360,
+          speed: visualization.hueCycling?.speed ?? 1.0,
+          ...updates,
+        },
+      });
+    },
+    [updateVisualizationParams, visualization.hueCycling]
+  );
+
+  // Blend mode options
+  const blendModeOptions: ToggleOption<VisualizationParams['blendMode']>[] = [
+    { value: 'additive', label: 'Additive', description: 'Bright luminous mix, auto-normalized on overlap' },
+    { value: 'average', label: 'Average', description: 'Soft balanced mix without oversaturation' },
+    { value: 'multiply', label: 'Multiply', description: 'Darker mix with high contrast' },
+    { value: 'screen', label: 'Screen', description: 'Bright soft combination for organic flows' },
+  ];
+
+  // Kaleidoscope presets
+  const kaleidoscopePresets: ToggleOption<number>[] = [
+    { value: 0, label: 'Off', description: 'No kaleidoscope effect' },
+    { value: 4, label: '4 ✚', description: '4-way cross pattern' },
+    { value: 6, label: '6 ❄️', description: '6-way snowflake pattern' },
+    { value: 8, label: '8 🔮', description: '8-way mandala pattern' },
+    { value: 12, label: '12 🕉️', description: '12-way complex mandala' },
+    { value: 3, label: '3 △', description: '3-way triangle pattern' },
+  ];
 
   return (
     <div style={styles.panel}>
@@ -18,50 +58,26 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
         Complete visual control - from colors to post-processing effects
       </p>
 
-      {/* Visual Presets Section */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Presets</h4>
-        <div style={styles.presetGrid}>
-          {visualPresets.map((preset) => (
-            <button
-              key={preset.name}
-              onClick={() => updateVisualizationParams(preset.params)}
-              style={styles.presetButton}
-              title={preset.description}
-            >
-              <span style={styles.presetIcon}>{preset.icon}</span>
-              <span style={styles.presetName}>{preset.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Visual Presets */}
+      <PresetGrid
+        presets={visualPresets}
+        onSelect={updateVisualizationParams}
+        title="Visual Presets"
+      />
 
-      <div style={styles.divider} />
+      <Divider />
 
-      {/* Effect Presets Section */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Presets</h4>
-        <div style={styles.presetGrid}>
-          {effectsPresets.map((preset) => (
-            <button
-              key={preset.name}
-              onClick={() => updateEffectsParams(preset.params)}
-              style={styles.presetButton}
-              title={preset.description}
-            >
-              <span style={styles.presetIcon}>{preset.icon}</span>
-              <span style={styles.presetName}>{preset.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Effect Presets */}
+      <PresetGrid
+        presets={effectsPresets}
+        onSelect={updateEffectsParams}
+        title="Effect Presets"
+      />
 
-      <div style={styles.divider} />
+      <Divider />
 
       {/* Visual Parameters */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Visual Parameters</h4>
-
+      <Section title="Visual Parameters">
         <ParameterSlider
           label="Brightness"
           value={visualization.brightness}
@@ -82,97 +98,54 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
           description="Trail visibility threshold - lower values show more detail, higher values create smoother trails"
         />
 
-        {/* Blend Mode Section */}
-        <div style={styles.blendModeSection}>
-          <label style={styles.paramLabel}>Blend Mode</label>
-          <p style={styles.paramDescription}>
-            How the three species colors are mixed together
-          </p>
-          <div style={styles.blendModeGrid}>
-            {[
-              { mode: 'additive' as const, label: 'Additive', desc: 'Bright luminous mix, auto-normalized on overlap' },
-              { mode: 'average' as const, label: 'Average', desc: 'Soft balanced mix without oversaturation' },
-              { mode: 'multiply' as const, label: 'Multiply', desc: 'Darker mix with high contrast' },
-              { mode: 'screen' as const, label: 'Screen', desc: 'Bright soft combination for organic flows' },
-            ].map((item) => (
-              <button
-                key={item.mode}
-                onClick={() => updateVisualizationParams({ blendMode: item.mode })}
-                style={{
-                  ...styles.blendModeButton,
-                  backgroundColor: visualization.blendMode === item.mode ? '#7d5dbd' : '#1a1a2d',
-                  borderColor: visualization.blendMode === item.mode ? '#9d7dd4' : '#2a2b3a',
-                }}
-                title={item.desc}
-              >
-                <span style={styles.blendModeLabel}>{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Blend Mode */}
+        <ToggleGroup
+          label="Blend Mode"
+          description="How the three species colors are mixed together"
+          options={blendModeOptions}
+          value={visualization.blendMode}
+          onChange={(mode) => updateVisualizationParams({ blendMode: mode })}
+          columns={2}
+        />
 
         {/* Show Agents Checkbox */}
-        <div style={styles.labModeSection}>
-          <div style={styles.toggleContainer}>
-            <label style={styles.toggleLabel}>
-              <input
-                type="checkbox"
-                checked={visualization.showAgents}
-                onChange={(e) => updateVisualizationParams({ showAgents: e.target.checked })}
-                style={styles.checkbox}
-              />
-              <span>Show Agents</span>
-            </label>
-          </div>
+        <div style={styles.toggleContainer}>
+          <label style={styles.toggleLabel}>
+            <input
+              type="checkbox"
+              checked={visualization.showAgents}
+              onChange={(e) => updateVisualizationParams({ showAgents: e.target.checked })}
+              style={styles.checkbox}
+              aria-label="Show agent markers on canvas"
+            />
+            <span>Show Agents</span>
+          </label>
           <p style={styles.paramDescription}>
             Display agent markers on the canvas (dots or triangles showing position and direction)
           </p>
-
-          {/* Agent Display Type (only visible when agents are shown) */}
-          {visualization.showAgents && (
-            <div style={{ marginTop: '12px' }}>
-              <label style={styles.paramLabel}>Agent Display Style</label>
-              <p style={styles.paramDescription}>
-                How agents are visualized on the canvas
-              </p>
-              <div style={styles.toggleGroup}>
-                <button
-                  onClick={() => updateVisualizationParams({ useTriangles: false })}
-                  style={{
-                    ...styles.toggleButton,
-                    backgroundColor: !visualization.useTriangles ? '#7d5dbd' : '#1a1a2d',
-                    borderColor: !visualization.useTriangles ? '#9d7dd4' : '#2a2b3a',
-                  }}
-                  title="Simple circular dots"
-                >
-                  Dots
-                </button>
-                <button
-                  onClick={() => updateVisualizationParams({ useTriangles: true })}
-                  style={{
-                    ...styles.toggleButton,
-                    backgroundColor: visualization.useTriangles ? '#7d5dbd' : '#1a1a2d',
-                    borderColor: visualization.useTriangles ? '#9d7dd4' : '#2a2b3a',
-                  }}
-                  title="Directional triangles showing movement orientation"
-                >
-                  Triangles
-                </button>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
 
-      <div style={styles.divider} />
+        {/* Agent Display Type (only visible when agents are shown) */}
+        {visualization.showAgents && (
+          <ToggleGroup
+            label="Agent Display Style"
+            description="How agents are visualized on the canvas"
+            options={[
+              { value: 'dots', label: 'Dots', description: 'Simple circular dots' },
+              { value: 'triangles', label: 'Triangles', description: 'Directional triangles showing movement orientation' },
+            ]}
+            value={visualization.useTriangles ? 'triangles' : 'dots'}
+            onChange={(value) => updateVisualizationParams({ useTriangles: value === 'triangles' })}
+          />
+        )}
+      </Section>
+
+      <Divider />
 
       {/* Post-Processing Effects */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Post-Processing Effects</h4>
-
+      <Section title="Post-Processing Effects">
         {/* Blur & Glow */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Blur & Glow</h5>
+        <Subsection title="Blur & Glow">
           <ParameterSlider
             label="Blur"
             value={effectsParams.blur}
@@ -182,11 +155,10 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ blur: value })}
             description="Gaussian blur radius (px) - creates softer, dreamier visuals"
           />
-        </div>
+        </Subsection>
 
         {/* Better Bloom (Professional) */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Better Bloom (Professional Multi-Pass)</h5>
+        <Subsection title="Better Bloom (Professional Multi-Pass)">
           <ParameterSlider
             label="Bloom Intensity"
             value={effectsParams.bloomIntensity}
@@ -218,11 +190,10 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
               />
             </>
           )}
-        </div>
+        </Subsection>
 
         {/* Color Grading */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Color Grading</h5>
+        <Subsection title="Color Grading">
           <ParameterSlider
             label="Saturation"
             value={effectsParams.saturation}
@@ -250,11 +221,10 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ hueShift: value })}
             description="Hue rotation in degrees (0-360) - cycles through the color spectrum"
           />
-        </div>
+        </Subsection>
 
         {/* Motion & Trails */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Motion & Trails</h5>
+        <Subsection title="Motion & Trails">
           <ParameterSlider
             label="Motion Blur"
             value={effectsParams.motionBlur}
@@ -264,11 +234,10 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ motionBlur: value })}
             description="Frame persistence / ghosting - higher values create longer trails and fluid motion"
           />
-        </div>
+        </Subsection>
 
         {/* Atmospheric */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Atmospheric</h5>
+        <Subsection title="Atmospheric">
           <ParameterSlider
             label="Vignette"
             value={effectsParams.vignette}
@@ -278,11 +247,10 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ vignette: value })}
             description="Edge darkening - focuses attention on the center of the canvas"
           />
-        </div>
+        </Subsection>
 
         {/* Feedback / Echo (Recursive Rendering) */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Feedback / Echo (Recursive Rendering)</h5>
+        <Subsection title="Feedback / Echo (Recursive Rendering)">
           <ParameterSlider
             label="Feedback Amount"
             value={effectsParams.feedbackAmount}
@@ -332,84 +300,18 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
               />
             </>
           )}
-        </div>
+        </Subsection>
 
         {/* Kaleidoscope (Radial Mirroring) */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Kaleidoscope (Radial Mirroring)</h5>
-
+        <Subsection title="Kaleidoscope (Radial Mirroring)">
           {/* Quick Presets for Mandala Effects */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={styles.paramLabel}>Quick Presets</label>
-            <div style={{...styles.toggleGroup, gridTemplateColumns: 'repeat(3, 1fr)'}}>
-              <button
-                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 0 })}
-                style={{
-                  ...styles.toggleButton,
-                  backgroundColor: effectsParams.kaleidoscopeSegments === 0 ? '#7d5dbd' : '#1a1a2d',
-                  borderColor: effectsParams.kaleidoscopeSegments === 0 ? '#9d7dd4' : '#2a2b3a',
-                }}
-                title="No kaleidoscope effect"
-              >
-                Off
-              </button>
-              <button
-                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 4 })}
-                style={{
-                  ...styles.toggleButton,
-                  backgroundColor: effectsParams.kaleidoscopeSegments === 4 ? '#7d5dbd' : '#1a1a2d',
-                  borderColor: effectsParams.kaleidoscopeSegments === 4 ? '#9d7dd4' : '#2a2b3a',
-                }}
-                title="4-way cross pattern"
-              >
-                4 ✚
-              </button>
-              <button
-                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 6 })}
-                style={{
-                  ...styles.toggleButton,
-                  backgroundColor: effectsParams.kaleidoscopeSegments === 6 ? '#7d5dbd' : '#1a1a2d',
-                  borderColor: effectsParams.kaleidoscopeSegments === 6 ? '#9d7dd4' : '#2a2b3a',
-                }}
-                title="6-way snowflake pattern"
-              >
-                6 ❄️
-              </button>
-              <button
-                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 8 })}
-                style={{
-                  ...styles.toggleButton,
-                  backgroundColor: effectsParams.kaleidoscopeSegments === 8 ? '#7d5dbd' : '#1a1a2d',
-                  borderColor: effectsParams.kaleidoscopeSegments === 8 ? '#9d7dd4' : '#2a2b3a',
-                }}
-                title="8-way mandala pattern"
-              >
-                8 🔮
-              </button>
-              <button
-                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 12 })}
-                style={{
-                  ...styles.toggleButton,
-                  backgroundColor: effectsParams.kaleidoscopeSegments === 12 ? '#7d5dbd' : '#1a1a2d',
-                  borderColor: effectsParams.kaleidoscopeSegments === 12 ? '#9d7dd4' : '#2a2b3a',
-                }}
-                title="12-way complex mandala"
-              >
-                12 🕉️
-              </button>
-              <button
-                onClick={() => updateEffectsParams({ kaleidoscopeSegments: 3 })}
-                style={{
-                  ...styles.toggleButton,
-                  backgroundColor: effectsParams.kaleidoscopeSegments === 3 ? '#7d5dbd' : '#1a1a2d',
-                  borderColor: effectsParams.kaleidoscopeSegments === 3 ? '#9d7dd4' : '#2a2b3a',
-                }}
-                title="3-way triangle pattern"
-              >
-                3 △
-              </button>
-            </div>
-          </div>
+          <ToggleGroup
+            label="Quick Presets"
+            options={kaleidoscopePresets}
+            value={effectsParams.kaleidoscopeSegments}
+            onChange={(segments) => updateEffectsParams({ kaleidoscopeSegments: segments })}
+            columns={3}
+          />
 
           <ParameterSlider
             label="Segments (Fine Control)"
@@ -442,11 +344,10 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
               />
             </>
           )}
-        </div>
+        </Subsection>
 
         {/* Radial Blur (Tunnel/Explosion) */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Radial Blur (Tunnel/Explosion)</h5>
+        <Subsection title="Radial Blur (Tunnel/Explosion)">
           <ParameterSlider
             label="Strength"
             value={effectsParams.radialBlurStrength}
@@ -487,11 +388,10 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
               />
             </>
           )}
-        </div>
+        </Subsection>
 
         {/* Psychedelic / Distortion */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Psychedelic / Distortion</h5>
+        <Subsection title="Psychedelic / Distortion">
           <ParameterSlider
             label="Chromatic Aberration"
             value={effectsParams.chromaticAberration}
@@ -501,11 +401,10 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ chromaticAberration: value })}
             description="RGB channel offset (px) - creates retro glitch or CRT-style effects"
           />
-        </div>
+        </Subsection>
 
         {/* Retro / Lo-Fi */}
-        <div style={styles.subsection}>
-          <h5 style={styles.subsectionTitle}>Retro / Lo-Fi</h5>
+        <Subsection title="Retro / Lo-Fi">
           <ParameterSlider
             label="Scanlines"
             value={effectsParams.scanlines}
@@ -524,141 +423,47 @@ export const VisualsOikosPanel = memo(function VisualsOikosPanel() {
             onChange={(value) => updateEffectsParams({ pixelation: value })}
             description="Pixel/block size - 1 = none, higher values create retro pixelated look"
           />
-        </div>
-      </div>
+        </Subsection>
+      </Section>
 
-      <div style={styles.divider} />
+      <Divider />
 
-      {/* Color Channels - Interactive Pickers */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Color Channels</h4>
-        <p style={styles.sectionDescription}>
-          Customize the colors for each species and background (visual only, doesn't affect simulation)
-        </p>
+      {/* Color Channels */}
+      <Section
+        title="Color Channels"
+        description="Customize the colors for each species and background (visual only, doesn't affect simulation)"
+      >
         <div style={styles.colorGrid}>
           <ColorPicker
             label="Red Species"
             color={visualization.colorRed}
             onChange={(color) => updateVisualizationParams({ colorRed: color })}
           />
-
           <ColorPicker
             label="Green Species"
             color={visualization.colorGreen}
             onChange={(color) => updateVisualizationParams({ colorGreen: color })}
           />
-
           <ColorPicker
             label="Blue Species"
             color={visualization.colorBlue}
             onChange={(color) => updateVisualizationParams({ colorBlue: color })}
           />
-
           <ColorPicker
             label="Background"
             color={visualization.colorBg}
             onChange={(color) => updateVisualizationParams({ colorBg: color })}
           />
         </div>
-      </div>
+      </Section>
 
-      <div style={styles.divider} />
+      <Divider />
 
-      {/* Hue Cycling Section */}
-      <div style={styles.section}>
-        <h4 style={styles.sectionTitle}>Hue Cycling</h4>
-        <p style={styles.sectionDescription}>
-          Automatic color transitions for flowing animations. Enable cycling and configure the hue range and speed.
-        </p>
-
-        {/* Enable Toggle */}
-        <div style={styles.toggleContainer}>
-          <label style={styles.toggleLabel}>
-            <input
-              type="checkbox"
-              checked={visualization.hueCycling?.enabled ?? false}
-              onChange={(e) => updateVisualizationParams({
-                hueCycling: {
-                  enabled: e.target.checked,
-                  startHue: visualization.hueCycling?.startHue ?? 0,
-                  endHue: visualization.hueCycling?.endHue ?? 360,
-                  speed: visualization.hueCycling?.speed ?? 1.0,
-                }
-              })}
-              style={styles.checkbox}
-            />
-            <span>Enable Hue Cycling</span>
-          </label>
-        </div>
-
-        {/* Hue Cycling Controls (only shown when enabled) */}
-        {visualization.hueCycling?.enabled && (
-          <div style={styles.hueCyclingControls}>
-            <ParameterSlider
-              label="Start Hue"
-              value={visualization.hueCycling.startHue ?? 0}
-              min={0}
-              max={360}
-              step={1}
-              onChange={(value) => updateVisualizationParams({
-                hueCycling: {
-                  enabled: visualization.hueCycling?.enabled ?? false,
-                  startHue: value,
-                  endHue: visualization.hueCycling?.endHue ?? 360,
-                  speed: visualization.hueCycling?.speed ?? 1.0,
-                }
-              })}
-              description="Starting hue (0-360° on color wheel)"
-            />
-
-            <ParameterSlider
-              label="End Hue"
-              value={visualization.hueCycling.endHue ?? 360}
-              min={0}
-              max={360}
-              step={1}
-              onChange={(value) => updateVisualizationParams({
-                hueCycling: {
-                  enabled: visualization.hueCycling?.enabled ?? false,
-                  startHue: visualization.hueCycling?.startHue ?? 0,
-                  endHue: value,
-                  speed: visualization.hueCycling?.speed ?? 1.0,
-                }
-              })}
-              description="Ending hue (0-360° on color wheel)"
-            />
-
-            <ParameterSlider
-              label="Cycle Speed"
-              value={visualization.hueCycling.speed ?? 1.0}
-              min={0.1}
-              max={10.0}
-              step={0.1}
-              onChange={(value) => updateVisualizationParams({
-                hueCycling: {
-                  enabled: visualization.hueCycling?.enabled ?? false,
-                  startHue: visualization.hueCycling?.startHue ?? 0,
-                  endHue: visualization.hueCycling?.endHue ?? 360,
-                  speed: value,
-                }
-              })}
-              description="Transition speed (lower = slower, smoother)"
-            />
-
-            <div style={styles.infoBox}>
-              <p style={styles.infoText}>
-                <strong>Hue Wheel Reference:</strong> The hue value oscillates between start and end points.
-                <br/>
-                • <strong>0° = Red</strong>, 60° = Yellow, 120° = Green, 180° = Cyan, 240° = Blue, 300° = Magenta, 360° = Red
-                <br/>
-                • Small ranges (e.g., 0-60°) create subtle shifts
-                <br/>
-                • Large ranges (e.g., 0-360°) cycle through the full rainbow
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Hue Cycling */}
+      <HueCyclingSection
+        hueCycling={visualization.hueCycling}
+        onUpdate={handleHueCyclingUpdate}
+      />
 
       {/* Tips */}
       <div style={styles.infoBox}>
@@ -709,116 +514,6 @@ const styles = {
     fontSize: '12px',
     marginBottom: spacing.xxl,
   } as React.CSSProperties,
-  section: {
-    marginBottom: spacing.xxl,
-  } as React.CSSProperties,
-  sectionTitle: {
-    fontSize: '15px',
-    color: colors.accent.light,
-    marginBottom: spacing.sm,
-    fontWeight: 600,
-  } as React.CSSProperties,
-  sectionDescription: {
-    ...typography.caption,
-    color: colors.text.muted,
-    marginBottom: spacing.md,
-    lineHeight: '1.4',
-  } as React.CSSProperties,
-  subsection: {
-    marginTop: spacing.xl,
-  } as React.CSSProperties,
-  subsectionTitle: {
-    ...typography.h3,
-    color: colors.text.secondary,
-    marginBottom: spacing.md,
-    fontWeight: 600,
-  } as React.CSSProperties,
-  presetGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))',
-    gap: spacing.sm,
-  } as React.CSSProperties,
-  presetButton: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: `${spacing.sm} ${spacing.sm}`,
-    backgroundColor: colors.bg.subtle,
-    border: `1px solid ${colors.border.primary}`,
-    borderRadius: effects.borderRadius.md,
-    cursor: 'pointer',
-    transition: effects.transition.normal,
-    ...typography.caption,
-    color: colors.text.primary,
-    minHeight: '60px',
-  } as React.CSSProperties,
-  presetIcon: {
-    fontSize: '24px',
-    marginBottom: spacing.xs,
-  } as React.CSSProperties,
-  presetName: {
-    fontSize: '9px',
-    textAlign: 'center',
-    lineHeight: '1.2',
-  } as React.CSSProperties,
-  divider: {
-    height: '1px',
-    backgroundColor: colors.border.primary,
-    margin: `${spacing.xxl} 0`,
-  } as React.CSSProperties,
-  paramLabel: {
-    ...typography.h3,
-    color: colors.text.primary,
-    fontWeight: 500,
-    marginBottom: spacing.sm,
-    display: 'block',
-  } as React.CSSProperties,
-  paramDescription: {
-    ...typography.caption,
-    color: colors.text.muted,
-    marginBottom: spacing.md,
-    lineHeight: '1.3',
-  } as React.CSSProperties,
-  blendModeSection: {
-    marginTop: spacing.xl,
-  } as React.CSSProperties,
-  blendModeGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: spacing.sm,
-  } as React.CSSProperties,
-  blendModeButton: {
-    padding: spacing.md,
-    border: '2px solid',
-    borderRadius: effects.borderRadius.lg,
-    cursor: 'pointer',
-    transition: effects.transition.normal,
-    fontWeight: 600,
-    fontSize: '12px',
-  } as React.CSSProperties,
-  blendModeLabel: {
-    display: 'block',
-    textAlign: 'center',
-    color: colors.text.primary,
-  } as React.CSSProperties,
-  labModeSection: {
-    marginTop: spacing.xl,
-  } as React.CSSProperties,
-  toggleGroup: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: spacing.sm,
-  } as React.CSSProperties,
-  toggleButton: {
-    padding: spacing.md,
-    border: '2px solid',
-    borderRadius: effects.borderRadius.lg,
-    cursor: 'pointer',
-    transition: effects.transition.normal,
-    fontWeight: 600,
-    fontSize: '12px',
-    color: colors.text.primary,
-  } as React.CSSProperties,
   colorGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
@@ -832,9 +527,10 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: spacing.sm,
-    ...typography.h3,
+    fontSize: '13px',
     color: colors.text.primary,
     cursor: 'pointer',
+    fontWeight: 500,
   } as React.CSSProperties,
   checkbox: {
     width: '18px',
@@ -842,12 +538,11 @@ const styles = {
     cursor: 'pointer',
     accentColor: colors.accent.primary,
   } as React.CSSProperties,
-  hueCyclingControls: {
-    marginTop: spacing.lg,
-    padding: spacing.lg,
-    backgroundColor: colors.bg.subtle,
-    borderRadius: effects.borderRadius.md,
-    border: '1px solid #3d2d5d',
+  paramDescription: {
+    ...typography.caption,
+    color: colors.text.muted,
+    marginBottom: 0,
+    lineHeight: '1.3',
   } as React.CSSProperties,
   infoBox: {
     padding: spacing.lg,
@@ -862,12 +557,6 @@ const styles = {
     marginBottom: spacing.md,
     fontWeight: 600,
     margin: `0 0 ${spacing.md} 0`,
-  } as React.CSSProperties,
-  infoText: {
-    ...typography.caption,
-    color: colors.text.secondary,
-    lineHeight: '1.6',
-    margin: 0,
   } as React.CSSProperties,
   infoList: {
     ...typography.caption,
