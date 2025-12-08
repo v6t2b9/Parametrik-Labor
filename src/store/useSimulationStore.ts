@@ -382,13 +382,13 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     updateUniversalResonanceParams: (params) => {
       const current = get().parameters;
       const currentResonance = current.universal.resonance;
-      const updatedResonance = { ...currentResonance, ...params };
+      const updatedResonance = { ...currentResonance, ...params } as ResonanceOikosParams;
       // Deep merge interactionMatrix if present
       if (params.interactionMatrix) {
         updatedResonance.interactionMatrix = {
           ...currentResonance.interactionMatrix,
           ...params.interactionMatrix
-        };
+        } as ResonanceOikosParams['interactionMatrix'];
       }
       get().setParameters({
         universal: {
@@ -455,13 +455,13 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
       const current = get().parameters;
       const speciesParams = current.species[species];
       const currentResonance = speciesParams.resonance || current.universal.resonance;
-      const updatedResonance = { ...currentResonance, ...params };
+      const updatedResonance = { ...currentResonance, ...params } as ResonanceOikosParams;
       // Deep merge interactionMatrix if present
       if (params.interactionMatrix) {
         updatedResonance.interactionMatrix = {
           ...currentResonance.interactionMatrix,
           ...params.interactionMatrix
-        };
+        } as ResonanceOikosParams['interactionMatrix'];
       }
       get().setParameters({
         species: {
@@ -558,23 +558,23 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     updateVisualizationParams: (params) => {
       const current = get().parameters;
       const currentViz = current.visualization;
-      const updatedViz = { ...currentViz, ...params };
+      const updatedViz = { ...currentViz, ...params } as AllParameters['visualization'];
       // Deep merge color objects if present
       if (params.colorRed) {
-        updatedViz.colorRed = { ...currentViz.colorRed, ...params.colorRed };
+        updatedViz.colorRed = { ...currentViz.colorRed, ...params.colorRed } as AllParameters['visualization']['colorRed'];
       }
       if (params.colorGreen) {
-        updatedViz.colorGreen = { ...currentViz.colorGreen, ...params.colorGreen };
+        updatedViz.colorGreen = { ...currentViz.colorGreen, ...params.colorGreen } as AllParameters['visualization']['colorGreen'];
       }
       if (params.colorBlue) {
-        updatedViz.colorBlue = { ...currentViz.colorBlue, ...params.colorBlue };
+        updatedViz.colorBlue = { ...currentViz.colorBlue, ...params.colorBlue } as AllParameters['visualization']['colorBlue'];
       }
       if (params.colorBg) {
-        updatedViz.colorBg = { ...currentViz.colorBg, ...params.colorBg };
+        updatedViz.colorBg = { ...currentViz.colorBg, ...params.colorBg } as AllParameters['visualization']['colorBg'];
       }
       // Deep merge hueCycling if present
       if (params.hueCycling) {
-        updatedViz.hueCycling = { ...currentViz.hueCycling, ...params.hueCycling };
+        updatedViz.hueCycling = { ...currentViz.hueCycling, ...params.hueCycling } as AllParameters['visualization']['hueCycling'];
       }
       get().setParameters({
         visualization: updatedViz,
@@ -601,18 +601,18 @@ export const useSimulationStore = create<SimulationStore>((set, get) => {
     updateModelParams: (params) => {
       const current = get().parameters;
       const currentModelParams = current.modelParams;
-      const updatedModelParams = { ...currentModelParams, ...params };
+      const updatedModelParams = { ...currentModelParams, ...params } as ModelParams;
       // Deep merge m2 and m3 if present
       if (params.m2) {
-        updatedModelParams.m2 = { ...currentModelParams.m2, ...params.m2 };
+        updatedModelParams.m2 = { ...currentModelParams.m2, ...params.m2 } as ModelParams['m2'];
       }
       if (params.m3) {
-        updatedModelParams.m3 = { ...currentModelParams.m3, ...params.m3 };
+        updatedModelParams.m3 = { ...currentModelParams.m3, ...params.m3 } as ModelParams['m3'];
       }
       const newParams = {
         ...current,
         modelParams: updatedModelParams,
-      };
+      } as AllParameters;
 
       // Update engine and reinitialize agents (model change requires reset)
       const { engine: currentEngine } = get();
